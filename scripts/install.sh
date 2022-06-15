@@ -144,7 +144,7 @@ rolloutExitCode=0
 (kubectl rollout status deployment webhook-server -n datree --timeout=180s) || rolloutExitCode=$?
 
 if [ "$rolloutExitCode" != "0" ]; then
-  printf "❌  datree webhook rollout failed, please try again. If this keeps happening please contact us: https://github.com/datreeio/webhook-datree/issues"
+  printf "\n❌  datree webhook rollout failed, please try again. If this keeps happening please contact us: https://github.com/datreeio/webhook-datree/issues\n"
 else
   printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
 fi
