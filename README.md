@@ -89,7 +89,7 @@ spec:
 Simply replace `<your-token>` with your actual token, then copy the entire command and run it in your terminal. 
 
 ## Uninstallation
-To uninstall the webhook, copy this command and run it in your terminal:  
+To uninstall the webhook, copy the following command and run it in your terminal:  
 ```
 bash <(curl https://get.datree.io/webhook-uninstall)
 ```
