@@ -1,7 +1,7 @@
 # Datree admission webhook
 
 <p align="center">
-<img src="/internal/images/diagram.png" width="800px" />
+<img src="/internal/images/diagram.png" width="700px" />
 </p>
   
 ## Overview
