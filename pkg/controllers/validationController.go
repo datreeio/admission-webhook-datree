@@ -28,36 +28,32 @@ func NewValidationController() *ValidationController {
 // Validate TODO: think about the name of the controller
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
 	writer := responseWriter.New(w)
-
-	defer func() {
-		if panicErr := recover(); panicErr != nil {
-			validator := networkValidator.NewNetworkValidator()
-			newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
-			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
-			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
-			reporter.ReportPanicError(panicErr)
-			admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
-			if err != nil {
-				writer.BadRequest(err.Error())
-				return
-			}
-			writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, false, utils.ParseErrorToString(panicErr)))
-		}
-	}()
-
-	err := headerValidation(req)
-	if err != nil {
-		writer.BadRequest(err.Error())
-		return
-	}
-
 	switch req.Method {
 	case http.MethodPost:
-		admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
+		err := headerValidation(req)
 		if err != nil {
+			fmt.Println(fmt.Errorf("header validation failed: %s", err))
 			writer.BadRequest(err.Error())
 			return
 		}
+
+		admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
+		if err != nil {
+			fmt.Println(fmt.Errorf("parsing request body failed: %s", err))
+			writer.BadRequest(err.Error())
+			return
+		}
+
+		defer func() {
+			if panicErr := recover(); panicErr != nil {
+				validator := networkValidator.NewNetworkValidator()
+				newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
+				newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
+				reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
+				reporter.ReportPanicError(panicErr)
+				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, false, utils.ParseErrorToString(panicErr)))
+			}
+		}()
 		res := services.Validate(admissionReviewReq)
 		writer.WriteBody(res)
 		return
@@ -78,8 +74,11 @@ func ParseHTTPRequestBodyToAdmissionReview(body io.ReadCloser) (*admission.Admis
 	var admissionReviewReq admission.AdmissionReview
 
 	err := json.NewDecoder(body).Decode(&admissionReviewReq)
-	if err != nil || admissionReviewReq.Request == nil {
-		return &admissionReviewReq, fmt.Errorf("request is nil %s", err)
+	if err != nil {
+		return &admissionReviewReq, fmt.Errorf("%s", err)
+	}
+	if admissionReviewReq.Request == nil {
+		return &admissionReviewReq, fmt.Errorf("request is nil")
 	}
 
 	return &admissionReviewReq, nil
