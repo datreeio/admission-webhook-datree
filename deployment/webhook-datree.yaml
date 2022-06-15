@@ -19,6 +19,8 @@ spec:
     spec:
       containers:
         - name: server
+          # caution: don't change the order of the environment variables
+          # changing the order will harm resource patching
           env:
             - name: DATREE_TOKEN
               value: ${DATREE_TOKEN}
