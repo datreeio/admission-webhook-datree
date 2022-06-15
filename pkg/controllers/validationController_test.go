@@ -17,7 +17,7 @@ var applyRequestNotAllowedJson string
 var applyRequestAllowedJson string
 
 func TestHeaderValidation(t *testing.T) {
-	request := httptest.NewRequest(http.MethodGet, "/validate", nil)
+	request := httptest.NewRequest(http.MethodPost, "/validate", nil)
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "text/html")
@@ -49,7 +49,7 @@ func TestValidateRequestBodyEmpty(t *testing.T) {
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
-	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "request is nil EOF")
+	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "EOF")
 }
 
 func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
