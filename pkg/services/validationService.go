@@ -3,11 +3,12 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/webhook-datree/pkg/config"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/datreeio/webhook-datree/pkg/config"
 
 	"github.com/datreeio/webhook-datree/pkg/enums"
 
@@ -119,7 +120,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 		allowed = false
 
 		sb := strings.Builder{}
-		sb.WriteString("\n")
+		sb.WriteString("\n---\n")
 		sb.WriteString(resultStr)
 		msg = sb.String()
 	}
@@ -256,7 +257,7 @@ func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*ext
 
 	var filesConfigurations []*extractor.FileConfigurations
 	filesConfigurations = append(filesConfigurations, &extractor.FileConfigurations{
-		FileName:       fmt.Sprintf("fileToTest-%s-%s-%s.yaml", admissionReviewReq.Name, admissionReviewReq.Kind.Kind, admissionReviewReq.UID),
+		FileName:       fmt.Sprintf("webhook-%s-%s.tmp.yaml\n\n", admissionReviewReq.Name, admissionReviewReq.Kind.Kind),
 		Configurations: []extractor.Configuration{config},
 	})
 
