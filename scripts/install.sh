@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Sets up the environment for the admission controller webhook in the active cluster.
 # check that user have kubectl installed and openssl
