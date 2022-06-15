@@ -93,4 +93,4 @@ To uninstall the webhook, copy this command and run it in your terminal:
 `bash <(curl https://get.datree.io/webhook-uninstall)`
 
 ## Local development
-To run the webhook locally (in development), view the DEVELOPER_GUIDE.md file.
+To run the webhook locally (in development), view our [developer guide](/guides/developer-guide.md).
