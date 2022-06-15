@@ -257,7 +257,7 @@ func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*ext
 
 	var filesConfigurations []*extractor.FileConfigurations
 	filesConfigurations = append(filesConfigurations, &extractor.FileConfigurations{
-		FileName:       fmt.Sprintf("webhook-%s-%s.tmp.yaml\n\n", admissionReviewReq.Name, admissionReviewReq.Kind.Kind),
+		FileName:       fmt.Sprintf("webhook-%s-%s.tmp.yaml", admissionReviewReq.Name, admissionReviewReq.Kind.Kind),
 		Configurations: []extractor.Configuration{config},
 	})
 
