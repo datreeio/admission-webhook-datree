@@ -13,10 +13,6 @@ The webhook will catch kubectl **create**, **apply** and **edit** operations and
 The webhook officially supports Kubernetes version *1.19* and higher, and has been tested with EKS.
 
 ## Installation
-To install and start using the webhook, choose one of the following options:
-
-### Option 1 - installation script
-
 **Prerequisites**  
 The following applications need to be installed on the machine:
 - kubectl
@@ -34,9 +30,6 @@ To install without a prompt, you can provide your token as part of the installat
 ```
 DATREE_TOKEN=<your-token> bash <(curl https://get.datree.io/webhook)
 ```
-
-### Option 2 - manual installation
-See the [manual installation guide](/guides/manual-installation.md)
 
 ## Usage
 Once the webhook is installed, every hooked operation will trigger a Datree policy check.  
