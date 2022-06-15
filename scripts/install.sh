@@ -148,4 +148,3 @@ if [ "$rolloutExitCode" != "0" ]; then
 else
   printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
 fi
-
