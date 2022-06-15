@@ -1,6 +1,6 @@
 # Datree admission webhook
 
-![image](/internal)
+![image](/internal/images/diagram.png)
 
 ## Overview
 
