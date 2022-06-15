@@ -24,8 +24,12 @@ The following applications need to be installed on the machine:
 - curl
 
 **Installation**  
-Simply copy this command and run it in your terminal:  
-`curl... install.sh`
+Simply copy the following command and run it in your terminal:  
+`bash <(curl https://get.datree.io/webhook)`
+
+**NOTE:** the link above will prompt you to enter your Datree token during installation.  
+To install without a prompt, you can provide your token as part of the installation command, by running this in your terminal:  
+`DATREE_TOKEN=<your-token> bash <(curl https://get.datree.io/webhook)`
 
 ### Option 2 - manual installation
 See the [manual installation guide](/guides/manual-installation.md)
@@ -86,7 +90,7 @@ Simply replace `<your-token>` with your actual token, then copy the entire comma
 
 ## Uninstall
 To uninstall the webhook, copy this command and run it in your terminal:  
-`curl... uninstall.sh`
+`bash <(curl https://get.datree.io/webhook-uninstall)`
 
 ## Local development
 To run the webhook locally (in development), view the DEVELOPER_GUIDE.md file.
