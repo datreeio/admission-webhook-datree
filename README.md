@@ -24,11 +24,11 @@ The following applications need to be installed on the machine:
 - curl
 
 **Installation**  
-Simply copy this command and run it in your terminal:
+Simply copy this command and run it in your terminal:  
 `curl... install.sh`
 
 ### Option 2 - manual installation
-put in guides folder
+See the [manual installation guide](/guides/manual-installation.md)
 
 ## Usage
 Once the webhook is installed, every hooked operation will trigger a Datree policy check. If any violations are found, the following output will be displayed:
@@ -85,7 +85,7 @@ spec:
 Simply replace `<your-token>` with your actual token, then copy the entire command and run it in your terminal. 
 
 ## Uninstall
-To uninstall the webhook, copy this command and run it in your terminal:
+To uninstall the webhook, copy this command and run it in your terminal:  
 `curl... uninstall.sh`
 
 ## Local development
