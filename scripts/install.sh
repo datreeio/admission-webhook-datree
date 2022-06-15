@@ -132,14 +132,20 @@ printf "\n🔗 Creating webhook resources...\n"
 # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
 # template with it. Then, create the Kubernetes resources.
 ca_pem_b64="$(openssl base64 -A <"${keydir}/ca.crt")"
-curl "https://raw.githubusercontent.com/datreeio/webhook-datree/main/deployment/webhook-datree.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
+sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' <"${basedir}/webhook-datree.yaml" \
     | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
     | kubectl create -f -
 
 # Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
 rm -rf "${keydir}"
 
-deploymentRevision=$(kubectl get deployment webhook-server -n datree -o "jsonpath={.metadata.annotations['deployment\.kubernetes\.io/revision']}")
-kubectl rollout status deployment webhook-server -n datree --revision="$deploymentRevision"
+# Wait for deployment rollout
+rolloutExitCode=0
+(kubectl rollout status deployment webhook-server -n datree --timeout=180s) || rolloutExitCode=$?
 
-printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
+if [ "$rolloutExitCode" != "0" ]; then
+  printf "❌  datree webhook rollout failed, please try again. If this keeps happening please contact us: https://github.com/datreeio/webhook-datree/issues"
+else
+  printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
+fi
+
