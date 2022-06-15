@@ -1,0 +1,35 @@
+name: Release
+on:
+  workflow_dispatch:
+  push:
+    branches: [ fix-svu ]
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - id: define_version
+        name: Define release version
+        run: |-
+          OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
+          echo "detected version = $OUTPUT_VERSION"
+          echo ::set-output name=version::$(echo $OUTPUT_VERSION)
+      - uses: rickstaa/action-create-tag@v1
+        with:
+          tag: ${{ steps.define_version.outputs.version }}
+          message: "Latest release"
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Copy files to S3 bucket
+        run: |
+          aws s3 cp ./scripts/install.sh s3://get.datree.io/webhook --acl public-read
+          aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/webhook-uninstall --acl public-read
+          aws s3 cp ./deployment/webhook-datree.yaml.sh s3://get.datree.io/webhook-datree.yaml --acl public-read
+      - name: Invalidate CloudFront
+        run: |
+          echo "Cloudfront: Invalidating /*"
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
