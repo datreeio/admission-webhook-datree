@@ -28,7 +28,7 @@ jobs:
         run: |
           aws s3 cp ./scripts/install.sh s3://get.datree.io/webhook --acl public-read
           aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/webhook-uninstall --acl public-read
-          aws s3 cp ./deployment/webhook-datree.yaml.sh s3://get.datree.io/webhook-datree.yaml --acl public-read
+          aws s3 cp ./deployment/webhook-datree.yaml s3://get.datree.io/webhook-datree.yaml --acl public-read
       - name: Invalidate CloudFront
         run: |
           echo "Cloudfront: Invalidating /*"
