@@ -4,7 +4,7 @@ on:
   push:
     branches: [ release_installation_script_to_s3 ]
 jobs:
-  create-tag:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -26,6 +26,8 @@ jobs:
           aws-region: us-east-1
       - name: Copy files to S3 bucket
         run: |
+          pwd
+          ls
           aws s3 cp ./scripts/install.sh s3://get.datree.io/webhook --acl public-read
           aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/webhook-uninstall --acl public-read
           aws s3 cp ./deployment/webhook-datree.yaml.sh s3://get.datree.io/webhook-datree.yaml --acl public-read
