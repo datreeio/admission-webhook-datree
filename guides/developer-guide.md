@@ -66,3 +66,18 @@ make test-in-minikube
 ```
 ./scripts/build-docker-image.sh
 ```
+
+### Deployment
+**Important things to keep in mind when releasing to production**:
+
+When uploading a new version you should run the github action and wait until a new build is uploaded to dockerhub.
+
+After that when a new build was published successfully you should test it and open a new PR to update webhook-datree.yaml image property.
+
+
+**The release will fail in the following scenarios:**
+* Release is performed and then immediately a new commit is pushed to main - will release a production tag with commit hash (instead of semantic version)
+* Release is performed right after merging to main - will release a staging tag with semantic version (instead of commit hash)
+* Release is performed twice in a row (without pushing a new commit) - will try to release the same docker tag again (and fail)
+
+**When releasing a new version to production notice if cloudfront invalidation failed - if so re-run the failed release workflow**

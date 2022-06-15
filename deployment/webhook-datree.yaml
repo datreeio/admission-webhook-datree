@@ -58,7 +58,7 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi
-          image: datree/webhook:0.1.1
+          image: datree/webhook:0.1.5
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
