@@ -139,4 +139,13 @@ curl "https://raw.githubusercontent.com/datreeio/webhook-datree/main/deployment/
 # Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
 rm -rf "${keydir}"
 
-printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
+# Wait for deployment rollout
+rolloutExitCode=0
+(kubectl rollout status deployment webhook-server -n datree --timeout=180s) || rolloutExitCode=$?
+
+if [ "$rolloutExitCode" != "0" ]; then
+  printf "\n❌  datree webhook rollout failed, please try again. If this keeps happening please contact us: https://github.com/datreeio/webhook-datree/issues\n"
+else
+  printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
+fi
+
