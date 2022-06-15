@@ -139,4 +139,7 @@ curl "https://raw.githubusercontent.com/datreeio/webhook-datree/main/deployment/
 # Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
 rm -rf "${keydir}"
 
+deploymentRevision=$(kubectl get deployment webhook-server -n datree -o "jsonpath={.metadata.annotations['deployment\.kubernetes\.io/revision']}")
+kubectl rollout status deployment webhook-server -n datree --revision="$deploymentRevision"
+
 printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
