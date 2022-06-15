@@ -1,8 +1,6 @@
 name: Release
 on:
   workflow_dispatch:
-  push:
-    branches: [ release_installation_script_to_s3 ]
 jobs:
   release-tag:
     runs-on: ubuntu-latest
