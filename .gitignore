@@ -1,0 +1,9 @@
+../webhook-datree/.idea/*
+
+../webhook-datree/.vscode/*
+!../webhook-datree/.vscode/thunder-tests/thunderCollection.json
+!../webhook-datree/.vscode/thunder-tests/thunderclient.json
+
+webhook-datree
+
+.DS_STORE

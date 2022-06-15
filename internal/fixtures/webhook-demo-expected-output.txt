@@ -1,0 +1,42 @@
+Error from server: error when creating "./internal/fixtures/webhook-demo.yaml": admission webhook "webhook-server.datree.svc" denied the request: 
+>>  File: fileToTest-rss-site-Deployment-73654f30-27b9-4376-bbe0-c16ac2938cdd.yaml
+
+[V] YAML validation
+[V] Kubernetes schema validation
+
+[X] Policy check
+
+❌  Ensure each container image has a pinned (tag) version  [1 occurrence]
+    — metadata.name: rss-site (kind: Deployment)
+💡  Incorrect value for key `image` - specify an image version to avoid unpleasant "version surprises" in the future
+
+❌  Ensure each container has a configured liveness probe  [1 occurrence]
+    — metadata.name: rss-site (kind: Deployment)
+💡  Missing property object `livenessProbe` - add a properly configured livenessProbe to catch possible deadlocks
+
+❌  Ensure each container has a configured memory limit  [1 occurrence]
+    — metadata.name: rss-site (kind: Deployment)
+💡  Missing property object `limits.memory` - value should be within the accepted boundaries recommended by the organization
+
+❌  Prevent workload from using the default namespace  [1 occurrence]
+    — metadata.name: rss-site (kind: Deployment)
+💡  Incorrect value for key `namespace` - use an explicit namespace instead of the default one (`default`)
+
+
+(Summary)
+
+- Passing YAML validation: 1/1
+
+- Passing Kubernetes (v1.23.3) schema validation: 1/1
+
+- Passing policy check: 0/1
+
++-----------------------------------+--------------------------------------------------------------+
+| Enabled rules in policy “Default” | 21                                                           |
+| Configs tested against policy     | 1                                                            |
+| Total rules evaluated             | 21                                                           |
+| [36mTotal rules skipped[0m               | [36m0[0m                                                            |
+| [91mTotal rules failed[0m                | [91m4[0m                                                            |
+| [32mTotal rules passed[0m                | [32m17[0m                                                           |
+| See all rules in policy           | https://app.staging.datree.io/login?t=aaaaaaaaaaaaaaaaaaaaaa |
++-----------------------------------+--------------------------------------------------------------+
