@@ -79,4 +79,5 @@ After that when a new build was published successfully you should test it and op
 * Release is performed and then immediately a new commit is pushed to main - will release a production tag with commit hash (instead of semantic version)
 * Release is performed right after merging to main - will release a staging tag with semantic version (instead of commit hash)
 * Release is performed twice in a row (without pushing a new commit) - will try to release the same docker tag again (and fail)
-* When releasing a new version to production notice if cloudfront invalidation failed - if so re-run the failed release workflow
+
+**When releasing a new version to production notice if cloudfront invalidation failed - if so re-run the failed release workflow**
