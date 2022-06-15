@@ -40,14 +40,14 @@ spec:
               path: /health
               port: 8443
               scheme: HTTPS
-            initialDelaySeconds: 3
+            initialDelaySeconds: 5
             periodSeconds: 30
           readinessProbe:
             httpGet:
-              path: /health
+              path: /ready
               port: 8443
               scheme: HTTPS
-            initialDelaySeconds: 15
+            initialDelaySeconds: 5
             periodSeconds: 30
           resources:
             limits:
