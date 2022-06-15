@@ -4,7 +4,7 @@
 # check that user have kubectl installed and openssl
 # generate TLS keys
 generate_keys () {
-  printf "Generating TLS keys...\n"
+  printf "🔑 Generating TLS keys...\n"
 
   chmod 0700 "${keydir}"
   cd "${keydir}"
@@ -45,13 +45,13 @@ verify_prerequisites () {
 
   if [ -z "${openssl_path}" ] ;
   then
-    printf '%s\n' "openssl doesn't exist, please install openssl\n"
+    printf '%s\n' "openssl doesn't exist, please install openssl"
     exit 1
   fi
 
   if [ -z "${kubectl_path}" ] ;
   then
-    printf '%s\n' "kubectl doesn't exist, please install kubectl\n"
+    printf '%s\n' "kubectl doesn't exist, please install kubectl"
     exit 1
   fi
 }
@@ -62,7 +62,7 @@ verify_datree_namespace_not_existing () {
 
   if [ -n "${namespace_exists}" ] ;
     then
-      printf '%s\n' "datree namespace already exists\n"
+      printf '%s\n' "datree namespace already exists"
       exit 1
     fi
 }
@@ -73,7 +73,7 @@ verify_webhook_resources_not_existing () {
 
   if [ -n "${validating_webhook_exists}" ] ;
     then
-      printf '%s\n' "datree validating webhook already exists\n"
+      printf '%s\n' "datree validating webhook already exists"
       exit 1
     fi
 }
@@ -96,7 +96,7 @@ basedir="$(pwd)/deployment"
 
 # Create the `datree` namespace. This cannot be part of the YAML file as we first need to create the TLS secret,
 # which would fail otherwise.
-printf "Creating datree namespace\n"
+printf "\n🏠 Creating datree namespace...\n"
 kubectl create namespace datree
 
 # Label datree namespace to avoid deadlocks in self hosted webhooks
@@ -110,7 +110,12 @@ kubectl label namespaces kube-system admission.datree/validate=skip
 # Override DATREE_TOKEN env
 if [ -z "$DATREE_TOKEN" ] ;
 then
-    echo Enter datree token. https://hub.datree.io/setup/account-token#1-get-your-account-token-from-the-dashboard:
+    echo
+    echo =====================================
+    echo === Finish setting up the webhook ===
+    echo =====================================
+    echo "👉 Insert token (available at https://app.datree.io/settings/token-management)"
+    echo "ℹ️  The token is used to connect the webhook with your account."
     read datree_token
 else
     datree_token=$DATREE_TOKEN
@@ -122,7 +127,7 @@ kubectl -n datree create secret tls webhook-server-tls \
     --cert "${keydir}/webhook-server-tls.crt" \
     --key "${keydir}/webhook-server-tls.key"
 
-printf "Creating webhook resources\n"
+printf "\n🔗 Creating webhook resources...\n"
 
 # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
 # template with it. Then, create the Kubernetes resources.
@@ -134,4 +139,4 @@ curl "https://raw.githubusercontent.com/datreeio/webhook-datree/main/deployment/
 # Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
 rm -rf "${keydir}"
 
-printf "The webhook server has been deployed and configured!🔥🔥🔥\n"
+printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
