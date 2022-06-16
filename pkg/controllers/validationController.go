@@ -6,10 +6,10 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/datreeio/webhook-datree/pkg/errorReporter"
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 
-	"github.com/datreeio/webhook-datree/pkg/responseWriter"
-	"github.com/datreeio/webhook-datree/pkg/services"
+	"github.com/datreeio/admission-webhook-datree/pkg/responseWriter"
+	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	admission "k8s.io/api/admission/v1"
 
 	"github.com/datreeio/datree/pkg/cliClient"

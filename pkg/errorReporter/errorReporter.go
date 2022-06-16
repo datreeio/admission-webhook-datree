@@ -9,7 +9,7 @@ import (
 	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/utils"
 
-	"github.com/datreeio/webhook-datree/pkg/enums"
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
 	"github.com/datreeio/datree/pkg/cliClient"
 )

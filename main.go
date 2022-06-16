@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 
-	"github.com/datreeio/webhook-datree/pkg/controllers"
-	"github.com/datreeio/webhook-datree/pkg/errorReporter"
-	"github.com/datreeio/webhook-datree/pkg/server"
+	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"

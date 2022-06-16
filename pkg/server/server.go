@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/datreeio/webhook-datree/pkg/deploymentConfig"
+	"github.com/datreeio/admission-webhook-datree/pkg/deploymentConfig"
 )
 
 func ValidateCertificate() (certPath string, keyPath string, err error) {

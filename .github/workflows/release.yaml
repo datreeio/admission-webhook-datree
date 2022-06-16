@@ -30,9 +30,9 @@ jobs:
           aws-region: us-east-1
       - name: Copy files to S3 bucket
         run: |
-          aws s3 cp ./scripts/install.sh s3://get.datree.io/webhook --acl public-read
-          aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/webhook-uninstall --acl public-read
-          aws s3 cp ./deployment/webhook-datree.yaml s3://get.datree.io/webhook-datree.yaml --acl public-read
+          aws s3 cp ./scripts/install.sh s3://get.datree.io/admission-webhook --acl public-read
+          aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/admission-webhook-uninstall --acl public-read
+          aws s3 cp ./deployment/admission-webhook-datree.yaml s3://get.datree.io/admission-webhook-datree.yaml --acl public-read
       - name: Invalidate CloudFront
         run: |
           echo "Cloudfront: Invalidating /*"
