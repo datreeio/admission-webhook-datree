@@ -22,13 +22,13 @@ The following applications need to be installed on the machine:
 **Installation**  
 Simply copy the following command and run it in your terminal:  
 ```
-bash <(curl https://get.datree.io/webhook)
+bash <(curl https://get.datree.io/admission-webhook)
 ```
 
 **[NOTE]** the link above will prompt you to enter your Datree token during installation.  
 To install without a prompt, you can provide your token as part of the installation command, by running this in your terminal:  
 ```
-DATREE_TOKEN=<your-token> bash <(curl https://get.datree.io/webhook)
+DATREE_TOKEN=<your-token> bash <(curl https://get.datree.io/admission-webhook)
 ```
 
 ## Usage
@@ -40,7 +40,7 @@ If any misconfigurations are found, the following output will be displayed:
 If no misconfigurations are found, the resource will be applied/updated normally.
 
 ## Behavior
-The webhook’s behavior is configured within the `datree-webhook` resource.  
+The webhook’s behavior is configured within the `webhook-server` resource.  
 The following settings are supported:  
 | Setting              | Values                 | Description                  |
 | -------------------- | ---------------------- |  --------------------------- |
@@ -91,7 +91,7 @@ Simply replace `<your-token>` with your actual token, then copy the entire comma
 ## Uninstallation
 To uninstall the webhook, copy the following command and run it in your terminal:  
 ```
-bash <(curl https://get.datree.io/webhook-uninstall)
+bash <(curl https://get.datree.io/admission-webhook-uninstall)
 ```
 
 ## Local development
