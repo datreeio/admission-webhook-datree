@@ -4,6 +4,6 @@
 !../admission-webhook-datree/.vscode/thunder-tests/thunderCollection.json
 !../admission-webhook-datree/.vscode/thunder-tests/thunderclient.json
 
-admission-webhook-datree
+webhook-datree
 
 .DS_STORE
