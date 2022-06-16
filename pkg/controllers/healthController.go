@@ -3,7 +3,7 @@ package controllers
 import (
 	"net/http"
 
-	"github.com/datreeio/webhook-datree/pkg/responseWriter"
+	"github.com/datreeio/admission-webhook-datree/pkg/responseWriter"
 )
 
 type HealthController struct{}

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/datreeio/webhook-datree/pkg/config"
+	"github.com/datreeio/admission-webhook-datree/pkg/config"
 
-	"github.com/datreeio/webhook-datree/pkg/enums"
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
 	policyFactory "github.com/datreeio/datree/bl/policy"
 	"github.com/datreeio/datree/pkg/ciContext"
@@ -22,7 +22,7 @@ import (
 	"github.com/datreeio/datree/pkg/printer"
 	"github.com/datreeio/datree/pkg/utils"
 
-	cliClient "github.com/datreeio/webhook-datree/pkg/clients"
+	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 
 	"github.com/ghodss/yaml"
 	"github.com/lithammer/shortuuid"

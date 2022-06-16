@@ -1,4 +1,4 @@
-module github.com/datreeio/webhook-datree
+module github.com/datreeio/admission-webhook-datree
 
 go 1.18
 

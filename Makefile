@@ -1,8 +1,8 @@
 start-watch:
-	gow run -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/webhook-datree/pkg/config.WebhookVersion=0.0.1" main.go
+	gow run -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" main.go
 
 start:
-	go run -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/webhook-datree/pkg/config.WebhookVersion=0.0.1" main.go
+	go run -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" main.go
 start-dev:
 	make datree_build_env=dev start
 start-staging:
@@ -11,7 +11,7 @@ start-production:
 	make datree_build_env=main start
 
 build:
-	go build -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/webhook-datree/pkg/config.WebhookVersion=0.0.1" -o webhook-datree
+	go build -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" -o webhook-datree
 build-dev:
 	make datree_build_env=dev build
 build-staging:

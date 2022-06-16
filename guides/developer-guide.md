@@ -1,6 +1,6 @@
 # Developer Guide
 
-This guide explains how to set up your environment for developing on webhook-datree.  
+This guide explains how to set up your environment for developing on admission-webhook-datree.  
 This guide was written for macOS and Linux machines.
 
 ## For developing on a local server with thunder client (faster build)
@@ -12,7 +12,7 @@ This guide was written for macOS and Linux machines.
 - **optional**: [gow](https://github.com/mitranim/gow#installation) (go file watcher)
 - **optional**: VS Code + Thunder Client
 
-### Running webhook-datree as a local server
+### Running admission-webhook-datree as a local server
 ```
 make start
 ```
@@ -72,7 +72,7 @@ make test-in-minikube
 
 When uploading a new version you should run the github action and wait until a new build is uploaded to dockerhub.
 
-After that when a new build was published successfully you should test it and open a new PR to update webhook-datree.yaml image property.
+After that when a new build was published successfully you should test it and open a new PR to update admission-webhook-datree.yaml image property.
 
 
 **The release will fail in the following scenarios:**
