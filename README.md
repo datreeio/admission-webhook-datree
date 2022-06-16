@@ -28,7 +28,7 @@ bash <(curl https://get.datree.io/admission-webhook)
 **[NOTE]** the link above will prompt you to enter your Datree token during installation.  
 To install without a prompt, you can provide your token as part of the installation command, by running this in your terminal:  
 ```
-DATREE_TOKEN=<your-token> bash <(curl https://get.datree.io/admission-webhook)
+DATREE_TOKEN=[your-token] bash <(curl https://get.datree.io/admission-webhook)
 ```
 
 ## Usage
