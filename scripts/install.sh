@@ -37,20 +37,12 @@ cd -
 }
 
 verify_prerequisites () {
-  local openssl_path
-  local kubectl_path
-
-  openssl_path="$(whereis openssl)"
-  kubectl_path="$(which kubectl)"
-
-  if [ -z "${openssl_path}" ] ;
-  then
+  if ! command -v openssl &> /dev/null;then
     printf '%s\n' "openssl doesn't exist, please install openssl"
     exit 1
   fi
 
-  if [ -z "${kubectl_path}" ] ;
-  then
+  if ! command -v kubectl &> /dev/null;then
     printf '%s\n' "kubectl doesn't exist, please install kubectl"
     exit 1
   fi
