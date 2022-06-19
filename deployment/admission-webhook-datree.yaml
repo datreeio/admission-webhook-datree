@@ -43,14 +43,14 @@ spec:
               port: 8443
               scheme: HTTPS
             initialDelaySeconds: 5
-            periodSeconds: 30
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /ready
               port: 8443
               scheme: HTTPS
             initialDelaySeconds: 5
-            periodSeconds: 30
+            periodSeconds: 10
           resources:
             limits:
               cpu: 1000m
