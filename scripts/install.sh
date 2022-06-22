@@ -122,9 +122,9 @@ kubectl label namespaces kube-system admission.datree/validate=skip
 if [ -z "$DATREE_TOKEN" ] ;
 then
     echo
-    echo =====================================
-    echo === Finish setting up the webhook ===
-    echo =====================================
+    echo ==============================================================================
+    echo ======================= Finish setting up the webhook ========================
+    echo ==============================================================================
 
     token_set=false
     while [ "$token_set" = false ]; do
