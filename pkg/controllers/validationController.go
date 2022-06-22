@@ -51,7 +51,7 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 				newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
 				reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
 				reporter.ReportPanicError(panicErr)
-				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, false, utils.ParseErrorToString(panicErr)))
+				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), []string{utils.ParseErrorToString(panicErr)}))
 			}
 		}()
 		res := services.Validate(admissionReviewReq)

@@ -95,5 +95,8 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":true")
+	body := responseRecorder.Body.String()
+
+	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Contains(t, strings.TrimSpace(body), "warnings\":[\"can't get current webhook version\"")
 }

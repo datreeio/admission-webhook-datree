@@ -44,9 +44,11 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	msg := "We're good!"
 	allowed := true
 	var err error
+	warningMessages := []string{}
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
+
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
@@ -57,7 +59,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	}
 
 	if reqOptions.FieldManager == "" {
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
 	}
 
 	token, err := getToken(cliClient)
@@ -68,7 +70,10 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	clientId := getClientId()
 
 	policyName := os.Getenv(enums.Policy)
-	prerunData, _ := cliClient.RequestEvaluationPrerunData(token)
+	prerunData, err := cliClient.RequestEvaluationPrerunData(token)
+	if err != nil {
+		warningMessages = append(warningMessages, err.Error())
+	}
 	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL)
 	if err != nil {
 		panic(err)
@@ -97,11 +102,22 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
 		policyCheckResults)
 
+	verifyVersionResponse, err := cliClient.VerifyWebhookVersion(evaluationRequestData.WebhookVersion)
+	if err != nil {
+		warningMessages = append(warningMessages, err.Error())
+	} else {
+		if verifyVersionResponse != nil {
+			for i := range verifyVersionResponse.MessageTextArray {
+				warningMessages = append(warningMessages, verifyVersionResponse.MessageTextArray[i])
+			}
+		}
+	}
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
 		_, err = sendEvaluationResult(cliClient, evaluationRequestData)
 		if err != nil {
 			fmt.Println("saving evaluation results failed")
+			warningMessages = append(warningMessages, "saving evaluation results failed")
 		}
 	}
 
@@ -124,7 +140,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 		sb.WriteString(resultStr)
 		msg = sb.String()
 	}
-	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg)
+	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
@@ -154,13 +170,31 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 	return sendEvaluationResultsResponse, err
 }
 
-func ParseEvaluationResponseIntoAdmissionReview(requestUID types.UID, allowed bool, msg string) *admission.AdmissionReview {
+func ParseEvaluationResponseIntoAdmissionReview(requestUID types.UID, allowed bool, msg string, warningMessages []string) *admission.AdmissionReview {
 	statusCode := http.StatusOK
 	message := msg
 
 	if !allowed {
 		statusCode = http.StatusInternalServerError
 		message = msg
+	}
+
+	if len(warningMessages) > 0 {
+		return &admission.AdmissionReview{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "AdmissionReview",
+				APIVersion: "admission.k8s.io/v1",
+			},
+			Response: &admission.AdmissionResponse{
+				UID:      requestUID,
+				Warnings: warningMessages,
+				Allowed:  allowed,
+				Result: &metav1.Status{
+					Code:    int32(statusCode),
+					Message: message,
+				},
+			},
+		}
 	}
 
 	return &admission.AdmissionReview{

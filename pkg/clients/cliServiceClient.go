@@ -2,6 +2,7 @@ package clients
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"net/http"
@@ -151,6 +152,39 @@ func (c *CliClient) SendWebhookEvaluationResult(request *EvaluationResultRequest
 	}
 
 	var res = &cliClient.SendEvaluationResultsResponse{}
+	err = json.Unmarshal(httpRes.Body, &res)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+type SendEvaluationResultsResponse struct {
+	EvaluationId  int    `json:"evaluationId"`
+	PromptMessage string `json:"promptMessage,omitempty"`
+}
+
+type VerifyWebhookVersionResponse struct {
+	CliVersion       string   `json:"cliVersion"`
+	MessageTextArray []string `json:"messageTextArray"`
+	MessageColor     string   `json:"messageColor"`
+}
+
+func (c *CliClient) VerifyWebhookVersion(WebhookVersion string) (*VerifyWebhookVersionResponse, error) {
+	if c.networkValidator.IsLocalMode() {
+		return nil, nil
+	}
+	if WebhookVersion == "" {
+		return nil, errors.New("can't get current webhook version")
+	}
+	httpRes, err := c.httpClient.Request(http.MethodGet, "/cli/messages/versions/"+WebhookVersion+"/webhook", nil, c.flagsHeaders)
+	if err != nil {
+		return nil, err
+	}
+
+	var res = &VerifyWebhookVersionResponse{}
+
 	err = json.Unmarshal(httpRes.Body, &res)
 	if err != nil {
 		return nil, err
