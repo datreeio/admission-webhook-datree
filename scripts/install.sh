@@ -70,6 +70,25 @@ verify_webhook_resources_not_existing () {
     fi
 }
 
+are_you_sure () {
+  read -p "Are you sure you want to run as anonymous user? (y/n) " -n 1 -r
+  echo
+  if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo true
+  else 
+    echo false
+  fi
+}
+
+verify_correct_token_regex () {
+  if ! [[ $datree_token =~ ^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$ 
+        || $datree_token =~ ^[0-9a-zA-Z]{22}$ 
+        || $datree_token =~ ^[0-9a-zA-Z]{20}$ ]] ; then
+      echo "🚫 Invalid token format"
+      exit 1
+  fi
+}
+
 verify_datree_namespace_not_existing
 
 verify_webhook_resources_not_existing
@@ -106,13 +125,26 @@ then
     echo =====================================
     echo === Finish setting up the webhook ===
     echo =====================================
-    echo "👉 Insert token (available at https://app.datree.io/settings/token-management)"
-    echo "ℹ️  The token is used to connect the webhook with your account."
-    read datree_token
+
+    token_set=false
+    while [ "$token_set" = false ]; do
+      echo "👉 Insert token (available at https://app.datree.io/settings/token-management)"
+      echo "ℹ️  The token is used to connect the webhook with your account."
+      read datree_token
+      token_set=true
+
+      if [ -z "$datree_token" ]; then
+        is_sure=$(are_you_sure)
+        if [ $is_sure = false ]; then
+          token_set=false
+        fi
+      fi 
+    done
 else
     datree_token=$DATREE_TOKEN
 fi
 
+verify_correct_token_regex
 
 # Create the TLS secret for the generated keys.
 kubectl -n datree create secret tls webhook-server-tls \
