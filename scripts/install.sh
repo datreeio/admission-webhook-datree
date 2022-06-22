@@ -126,17 +126,17 @@ then
     echo === Finish setting up the webhook ===
     echo =====================================
 
-    tokenSet=false
-    while [ "$tokenSet" = false ]; do
+    token_set=false
+    while [ "$token_set" = false ]; do
       echo "👉 Insert token (available at https://app.datree.io/settings/token-management)"
       echo "ℹ️  The token is used to connect the webhook with your account."
       read datree_token
-      tokenSet=true
+      token_set=true
 
       if [ -z "$datree_token" ]; then
-        isSure=$(are_you_sure)
-        if [ $isSure = false ]; then
-          tokenSet=false
+        is_sure=$(are_you_sure)
+        if [ $is_sure = false ]; then
+          token_set=false
         fi
       fi 
     done
