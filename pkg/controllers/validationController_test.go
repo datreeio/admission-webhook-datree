@@ -2,11 +2,12 @@ package controllers
 
 import (
 	_ "embed"
-	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/config"
 
 	"github.com/stretchr/testify/assert"
 )
