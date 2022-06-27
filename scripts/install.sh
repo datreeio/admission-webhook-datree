@@ -86,12 +86,15 @@ verify_webhook_secret_tls () {
   webhook_secret_exists="$(kubectl get secrets --field-selector type=kubernetes.io/tls -n datree --ignore-not-found)"
 
   if ! [[ -n "${webhook_secret_exists}" ]] ; then
-      printf "\n🔗 Creating webhook secret tls...\n"
+    # Generate keys into a temporary directory.
+    generate_keys
 
-      # Create the TLS secret for the generated keys.
-      kubectl -n datree create secret tls webhook-server-tls \
-        --cert "${keydir}/webhook-server-tls.crt" \
-        --key "${keydir}/webhook-server-tls.key"
+    printf "\n🔗 Creating webhook secret tls...\n"
+
+    # Create the TLS secret for the generated keys.
+    kubectl -n datree create secret tls webhook-server-tls \
+      --cert "${keydir}/webhook-server-tls.crt" \
+      --key "${keydir}/webhook-server-tls.key"
   fi
 }
 
@@ -120,9 +123,6 @@ set -eo pipefail
 
 # Create Temporary directory for TLS keys
 keydir="$(mktemp -d)"
-
-# Generate keys into a temporary directory.
-generate_keys
 
 basedir="$(pwd)/deployment"
 
