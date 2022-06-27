@@ -81,21 +81,18 @@ override_webhook_resources () {
     | kubectl apply -f -
 }
 
-verify_webhook_secret_tls () {
-  local webhook_secret_exists
-  webhook_secret_exists="$(kubectl get secrets --field-selector type=kubernetes.io/tls -n datree --ignore-not-found)"
+override_webhook_secret_tls () {
+  # Generate keys into a temporary directory.
+  generate_keys
 
-  if ! [[ -n "${webhook_secret_exists}" ]] ; then
-    # Generate keys into a temporary directory.
-    generate_keys
+  printf "\n🔗 Creating webhook secret tls...\n"
 
-    printf "\n🔗 Creating webhook secret tls...\n"
+  # Override the TLS secret for the generated keys.
+  kubectl delete secrets webhook-server-tls -n datree --ignore-not-found
 
-    # Create the TLS secret for the generated keys.
-    kubectl -n datree create secret tls webhook-server-tls \
-      --cert "${keydir}/webhook-server-tls.crt" \
-      --key "${keydir}/webhook-server-tls.key"
-  fi
+  kubectl -n datree create secret tls webhook-server-tls \
+    --cert "${keydir}/webhook-server-tls.crt" \
+    --key "${keydir}/webhook-server-tls.key"
 }
 
 are_you_sure () {
@@ -159,7 +156,7 @@ else
     datree_token=$DATREE_TOKEN
 fi
 
-verify_webhook_secret_tls
+override_webhook_secret_tls
 
 override_webhook_resources
 
