@@ -71,20 +71,14 @@ verify_datree_namespace () {
 }
 
 override_webhook_resources () {
-  # local validating_webhook_exists
-  # validating_webhook_exists="$(kubectl get validatingwebhookconfiguration.admissionregistration.k8s.io/webhook-datree --ignore-not-found)"
+  printf "\n🔗 Creating webhook resources...\n"
 
-  # if ! [[ -n "${validating_webhook_exists}" ]] ; then
-      printf "\n🔗 Creating webhook resources...\n"
-
-      # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
-      # template with it. Then, create the Kubernetes resources.
-      ca_pem_b64="$(openssl base64 -A <"${keydir}/ca.crt")"
-      curl "https://raw.githubusercontent.com/datreeio/admission-webhook-datree/main/deployment/admission-webhook-datree.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
-        | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
-        | kubectl apply -f -
-        # | kubectl create -f -
-  # fi
+  # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
+  # template with it. Then, create the Kubernetes resources.
+  ca_pem_b64="$(openssl base64 -A <"${keydir}/ca.crt")"
+  curl "https://raw.githubusercontent.com/datreeio/admission-webhook-datree/main/deployment/admission-webhook-datree.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
+    | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
+    | kubectl apply -f -
 }
 
 verify_webhook_secret_tls () {
