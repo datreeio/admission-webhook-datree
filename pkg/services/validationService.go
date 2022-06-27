@@ -54,11 +54,10 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	msg := "We're good!"
 	allowed := true
 	var err error
-	warningMessages := []string{}
+	var warningMessages []string
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
-
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
@@ -69,13 +68,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 		panic(err)
 	}
 
-<<<<<<< Updated upstream
-	if reqOptions.FieldManager == "" {
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
-=======
 	if !shouldEvaluateResourceByKind(admissionReviewReq.Request.Kind.Kind) || !shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) || rootObject.Metadata.DeletionTimestamp != "" {
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg)
->>>>>>> Stashed changes
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
 	}
 
 	token, err := getToken(cliClient)
