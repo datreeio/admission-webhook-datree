@@ -171,14 +171,14 @@ type VerifyWebhookVersionResponse struct {
 	MessageColor     string   `json:"messageColor"`
 }
 
-func (c *CliClient) VerifyWebhookVersion(WebhookVersion string) (*VerifyWebhookVersionResponse, error) {
+func (c *CliClient) VerifyWebhookVersion(webhookVersion string) (*VerifyWebhookVersionResponse, error) {
 	if c.networkValidator.IsLocalMode() {
 		return nil, nil
 	}
-	if WebhookVersion == "" {
+	if webhookVersion == "" {
 		return nil, errors.New("can't get current webhook version")
 	}
-	httpRes, err := c.httpClient.Request(http.MethodGet, "/cli/messages/versions/"+WebhookVersion+"/webhook", nil, c.flagsHeaders)
+	httpRes, err := c.httpClient.Request(http.MethodGet, "/cli/messages/versions/"+webhookVersion+"/webhook", nil, c.flagsHeaders)
 	if err != nil {
 		return nil, err
 	}
