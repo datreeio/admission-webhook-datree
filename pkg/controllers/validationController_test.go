@@ -7,6 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/config"
+
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,7 +67,21 @@ func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
 }
 
 func TestValidateRequestBody(t *testing.T) {
-	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(`{"request":{"uid":"123", "options": {"apiVersion":"meta.k8s.io/v1","kind":"UpdateOptions", "fieldManager": "1231"}}}`))
+	config.WebhookVersion = "0.0.1"
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(`{
+  "request": {
+    "uid": "123",
+    "object": {
+      "metadata": {
+        "managedFields": [
+          {
+            "manager": "kube-controller"
+          }
+        ]
+      }
+    }
+  }
+}`))
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
@@ -98,5 +114,4 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 	body := responseRecorder.Body.String()
 
 	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
-	assert.Contains(t, strings.TrimSpace(body), "warnings\":[\"can't get current webhook version\"")
 }

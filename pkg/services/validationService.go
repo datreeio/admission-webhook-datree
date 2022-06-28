@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"k8s.io/utils/strings/slices"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -33,10 +35,18 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-type AdmissionReqOptions struct {
-	Kind         string `json:"kind"`
-	ApiVersion   string `json:"apiVersion"`
-	FieldManager string `json:"fieldManager,omitempty"`
+type ManagedFields struct {
+	Manager string `json:"manager"`
+}
+
+type Metadata struct {
+	Name              string          `json:"name"`
+	DeletionTimestamp string          `json:"deletionTimestamp"`
+	ManagedFields     []ManagedFields `json:"managedFields"`
+}
+
+type RootObject struct {
+	Metadata Metadata `json:"metadata"`
 }
 
 func Validate(admissionReviewReq *admission.AdmissionReview) *admission.AdmissionReview {
@@ -44,21 +54,21 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	msg := "We're good!"
 	allowed := true
 	var err error
-	warningMessages := []string{}
+	var warningMessages []string
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
-
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
 
-	var reqOptions AdmissionReqOptions
-	if err := json.Unmarshal(admissionReviewReq.Request.Options.Raw, &reqOptions); err != nil {
+	var rootObject RootObject
+	if err := json.Unmarshal(admissionReviewReq.Request.Object.Raw, &rootObject); err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 
-	if reqOptions.FieldManager == "" {
+	if !shouldEvaluateResourceByKind(admissionReviewReq.Request.Kind.Kind) || !shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) || rootObject.Metadata.DeletionTimestamp != "" {
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
 	}
 
@@ -332,4 +342,21 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 	}
 
 	return evaluationRequestData
+}
+
+func shouldEvaluateResourceByKind(resourceKind string) bool {
+	unsupportedResourceKinds := []string{"Application", "Event"}
+	return !slices.Contains(unsupportedResourceKinds, resourceKind)
+}
+
+func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
+	supportedPrefixes := []string{"kubectl", "argocd"}
+	for _, field := range fields {
+		for _, prefix := range supportedPrefixes {
+			if strings.HasPrefix(field.Manager, prefix) {
+				return true
+			}
+		}
+	}
+	return false
 }
