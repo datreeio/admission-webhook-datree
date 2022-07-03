@@ -51,7 +51,7 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 				newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
 				reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
 				reporter.ReportPanicError(panicErr)
-				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), []string{utils.ParseErrorToString(panicErr)}))
+				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), []string{"Datree failed to validate the applied resource. Check the pod logs for more details."}))
 			}
 		}()
 		res := services.Validate(admissionReviewReq)
