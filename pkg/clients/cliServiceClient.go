@@ -165,13 +165,13 @@ type SendEvaluationResultsResponse struct {
 	PromptMessage string `json:"promptMessage,omitempty"`
 }
 
-type VerifyWebhookVersionResponse struct {
+type VersionRelatedMessagesResponse struct {
 	CliVersion       string   `json:"cliVersion"`
 	MessageTextArray []string `json:"messageTextArray"`
 	MessageColor     string   `json:"messageColor"`
 }
 
-func (c *CliClient) VerifyWebhookVersion(webhookVersion string) (*VerifyWebhookVersionResponse, error) {
+func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRelatedMessagesResponse, error) {
 	if c.networkValidator.IsLocalMode() {
 		return nil, nil
 	}
@@ -183,7 +183,7 @@ func (c *CliClient) VerifyWebhookVersion(webhookVersion string) (*VerifyWebhookV
 		return nil, err
 	}
 
-	var res = &VerifyWebhookVersionResponse{}
+	var res = &VersionRelatedMessagesResponse{}
 
 	err = json.Unmarshal(httpRes.Body, &res)
 	if err != nil {

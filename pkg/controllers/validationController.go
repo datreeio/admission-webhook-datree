@@ -27,6 +27,7 @@ func NewValidationController() *ValidationController {
 
 // Validate TODO: think about the name of the controller
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
+	var warningMessages []string
 	writer := responseWriter.New(w)
 	switch req.Method {
 	case http.MethodPost:
@@ -51,10 +52,12 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 				newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
 				reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
 				reporter.ReportPanicError(panicErr)
-				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), []string{"Datree failed to validate the applied resource. Check the pod logs for more details."}))
+				fmt.Println(utils.ParseErrorToString(panicErr))
+				warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
+				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
 			}
 		}()
-		res := services.Validate(admissionReviewReq)
+		res := services.Validate(admissionReviewReq, &warningMessages)
 		writer.WriteBody(res)
 		return
 	default:

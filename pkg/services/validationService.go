@@ -49,12 +49,11 @@ type RootObject struct {
 	Metadata Metadata `json:"metadata"`
 }
 
-func Validate(admissionReviewReq *admission.AdmissionReview) *admission.AdmissionReview {
+func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string) *admission.AdmissionReview {
 	startTime := time.Now()
 	msg := "We're good!"
 	allowed := true
 	var err error
-	var warningMessages []string
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
@@ -69,7 +68,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	}
 
 	if !shouldEvaluateResourceByKind(admissionReviewReq.Request.Kind.Kind) || !shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) || rootObject.Metadata.DeletionTimestamp != "" {
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
 	}
 
 	token, err := getToken(cliClient)
@@ -82,11 +81,19 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	policyName := os.Getenv(enums.Policy)
 	prerunData, err := cliClient.RequestEvaluationPrerunData(token)
 	if err != nil {
-		warningMessages = append(warningMessages, err.Error())
+		*warningMessages = append(*warningMessages, err.Error())
 	}
 	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL)
 	if err != nil {
-		panic(err)
+		*warningMessages = append(*warningMessages, err.Error())
+		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
+		so we are validating against default policy */
+		policyName = "Default"
+		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL)
+		if err != nil {
+			*warningMessages = append(*warningMessages, err.Error())
+			panic(err.Error())
+		}
 	}
 
 	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
@@ -112,13 +119,13 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
 		policyCheckResults)
 
-	verifyVersionResponse, err := cliClient.VerifyWebhookVersion(evaluationRequestData.WebhookVersion)
+	verifyVersionResponse, err := cliClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
-		warningMessages = append(warningMessages, err.Error())
+		*warningMessages = append(*warningMessages, err.Error())
 	} else {
 		if verifyVersionResponse != nil {
 			for i := range verifyVersionResponse.MessageTextArray {
-				warningMessages = append(warningMessages, verifyVersionResponse.MessageTextArray[i])
+				*warningMessages = append(*warningMessages, verifyVersionResponse.MessageTextArray[i])
 			}
 		}
 	}
@@ -127,7 +134,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 		_, err = sendEvaluationResult(cliClient, evaluationRequestData)
 		if err != nil {
 			fmt.Println("saving evaluation results failed")
-			warningMessages = append(warningMessages, "saving evaluation results failed")
+			*warningMessages = append(*warningMessages, "saving evaluation results failed")
 		}
 	}
 
@@ -150,7 +157,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview) *admission.Admissio
 		sb.WriteString(resultStr)
 		msg = sb.String()
 	}
-	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, warningMessages)
+
+	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
