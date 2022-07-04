@@ -67,7 +67,12 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		panic(err)
 	}
 
-	if !shouldEvaluateResourceByKind(admissionReviewReq.Request.Kind.Kind) || !shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) || rootObject.Metadata.DeletionTimestamp != "" {
+	resourceKind := admissionReviewReq.Request.Kind.Kind
+
+	if !shouldEvaluateResourceByKind(resourceKind) ||
+		!shouldEvaluateApplicationResource(resourceKind, admissionReviewReq.Request.Operation) ||
+		!shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) ||
+		rootObject.Metadata.DeletionTimestamp != "" {
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
 	}
 
@@ -353,8 +358,12 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 }
 
 func shouldEvaluateResourceByKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Application", "Event"}
+	unsupportedResourceKinds := []string{"Event"}
 	return !slices.Contains(unsupportedResourceKinds, resourceKind)
+}
+
+func shouldEvaluateApplicationResource(resourceKind string, operation admission.Operation) bool {
+	return (resourceKind == "Application" && operation == admission.Create) || resourceKind != "Application"
 }
 
 func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
