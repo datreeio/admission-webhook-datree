@@ -70,7 +70,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 
 	if !shouldEvaluateResourceByKind(resourceKind) ||
-		!shouldEvaluateApplicationResource(resourceKind, admissionReviewReq.Request.Operation) ||
+		!shouldEvaluateArgoCRDResources(resourceKind, admissionReviewReq.Request.Operation) ||
 		!shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) ||
 		rootObject.Metadata.DeletionTimestamp != "" {
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
@@ -362,8 +362,10 @@ func shouldEvaluateResourceByKind(resourceKind string) bool {
 	return !slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 
-func shouldEvaluateApplicationResource(resourceKind string, operation admission.Operation) bool {
-	return (resourceKind == "Application" && operation == admission.Create) || resourceKind != "Application"
+func shouldEvaluateArgoCRDResources(resourceKind string, operation admission.Operation) bool {
+	argoCRDList := []string{"Application", "Workflow", "Rollout"}
+	isKindInArgoCRDList := slices.Contains(argoCRDList, resourceKind)
+	return (isKindInArgoCRDList && operation == admission.Create) || !isKindInArgoCRDList
 }
 
 func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
