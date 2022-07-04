@@ -1,7 +1,7 @@
 FROM golang:1.18-alpine AS builder
 
-ARG BUILD_ENVIRONMENT=staging
-ARG WEBHOOK_VERSION="unknown"
+ARG BUILD_ENVIRONMENT
+ARG WEBHOOK_VERSION
 
 WORKDIR /go/src/app
 

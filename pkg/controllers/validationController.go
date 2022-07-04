@@ -64,7 +64,6 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 		writer.NotAllowed("Method not allowed")
 	}
 }
-
 func headerValidation(req *http.Request) error {
 	if req.Header.Get("Content-Type") != "application/json" {
 		return fmt.Errorf("Content-Type header is not application/json")

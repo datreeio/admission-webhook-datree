@@ -10,11 +10,8 @@ TAG=""
 if ([ -z "$LATEST_COMMIT_TAG" ]); then
   # No commit tag found - staging deployment
   SHORTHASH="$(git rev-parse --short HEAD)"
-  TAG=$DOCKER_REPO:$SHORTHASH
+  TAG=$DOCKER_REPO$SHORTHASH
 else
   # Commit tag found - production deployment
-  TAG=$DOCKER_REPO:$LATEST_COMMIT_TAG
+  TAG=$DOCKER_REPO$LATEST_COMMIT_TAG
 fi
-
-docker tag $IMAGE_NAME $TAG
-docker push $TAG
