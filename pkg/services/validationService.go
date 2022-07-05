@@ -369,7 +369,7 @@ func shouldEvaluateArgoCRDResources(resourceKind string, operation admission.Ope
 }
 
 func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
-	supportedPrefixes := []string{"kubectl", "argocd"}
+	supportedPrefixes := []string{"kubectl", "argocd", "argo"}
 	for _, field := range fields {
 		for _, prefix := range supportedPrefixes {
 			if strings.HasPrefix(field.Manager, prefix) {
