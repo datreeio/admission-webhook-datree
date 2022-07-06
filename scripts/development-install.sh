@@ -1,5 +1,5 @@
 #!/bin/sh
-#This script is for development purposes only! - no need to upload it to s3
+# This script is for development purposes only! - no need to upload it to s3
 
 verify_prerequisites () {
   if ! command -v openssl &> /dev/null;then
