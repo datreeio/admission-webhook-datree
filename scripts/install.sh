@@ -134,7 +134,7 @@ then
     token_set=false
     while [ "$token_set" = false ]; do
       echo "👉 Insert token (available at https://app.datree.io/settings/token-management)"
-      echo "ℹ️  The token is used to connect the webhook with your account."
+      echo "ℹ️  The token is used to connect the webhook with your workspace."
       read datree_token
       token_set=true
 
