@@ -67,7 +67,12 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		panic(err)
 	}
 
-	if !shouldEvaluateResourceByKind(admissionReviewReq.Request.Kind.Kind) || !shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) || rootObject.Metadata.DeletionTimestamp != "" {
+	resourceKind := admissionReviewReq.Request.Kind.Kind
+
+	if !shouldEvaluateResourceByKind(resourceKind) ||
+		!shouldEvaluateArgoCRDResources(resourceKind, admissionReviewReq.Request.Operation) ||
+		!shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) ||
+		rootObject.Metadata.DeletionTimestamp != "" {
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
 	}
 
@@ -353,12 +358,18 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 }
 
 func shouldEvaluateResourceByKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Application", "Event"}
+	unsupportedResourceKinds := []string{"Event"}
 	return !slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 
+func shouldEvaluateArgoCRDResources(resourceKind string, operation admission.Operation) bool {
+	argoCRDList := []string{"Application", "Workflow", "Rollout"}
+	isKindInArgoCRDList := slices.Contains(argoCRDList, resourceKind)
+	return (isKindInArgoCRDList && operation == admission.Create) || !isKindInArgoCRDList
+}
+
 func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
-	supportedPrefixes := []string{"kubectl", "argocd"}
+	supportedPrefixes := []string{"kubectl", "argocd", "argo"}
 	for _, field := range fields {
 		for _, prefix := range supportedPrefixes {
 			if strings.HasPrefix(field.Manager, prefix) {
