@@ -40,9 +40,10 @@ type ManagedFields struct {
 }
 
 type Metadata struct {
-	Name              string          `json:"name"`
-	DeletionTimestamp string          `json:"deletionTimestamp"`
-	ManagedFields     []ManagedFields `json:"managedFields"`
+	Name              string            `json:"name"`
+	DeletionTimestamp string            `json:"deletionTimestamp"`
+	ManagedFields     []ManagedFields   `json:"managedFields"`
+	Labels            map[string]string `json:"labels"`
 }
 
 type RootObject struct {
@@ -71,8 +72,10 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	if !shouldEvaluateResourceByKind(resourceKind) ||
 		!shouldEvaluateArgoCRDResources(resourceKind, admissionReviewReq.Request.Operation) ||
+		!shouldEvaluateFluxCDResources(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels) ||
 		!shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) ||
 		rootObject.Metadata.DeletionTimestamp != "" {
+
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
 	}
 
@@ -366,6 +369,15 @@ func shouldEvaluateArgoCRDResources(resourceKind string, operation admission.Ope
 	argoCRDList := []string{"Application", "Workflow", "Rollout"}
 	isKindInArgoCRDList := slices.Contains(argoCRDList, resourceKind)
 	return (isKindInArgoCRDList && operation == admission.Create) || !isKindInArgoCRDList
+}
+
+func shouldEvaluateFluxCDResources(isDryRun bool, admissionLabels map[string]string) bool {
+	isFluxObject := false
+	if _, ok := admissionLabels["kustomize.toolkit.fluxcd.io"]; ok {
+		isFluxObject = true
+	}
+
+	return !isFluxObject || !isDryRun
 }
 
 func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
