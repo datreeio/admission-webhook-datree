@@ -49,7 +49,8 @@
         "name":"pod-with-conflict-1",
         "namespace":"tzlil-tets",
         "labels":{
-          "app":"pod-with-conflict-1"
+          "app":"pod-with-conflict-1",
+          "kustomize.toolkit.fluxcd.io": true
         },
         "managedFields": [
           {
@@ -219,7 +220,8 @@
             }
           }
         ]
-      }
+      },
+      "dryRun": false
     },
     "options":{
       "apiVersion":"meta.k8s.io/v1",
