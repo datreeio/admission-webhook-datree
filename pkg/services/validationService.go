@@ -93,7 +93,13 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
 		so we are validating against default policy */
-		policyName = "Default"
+
+		for _, policy := range prerunData.PoliciesJson.Policies {
+			if policy.IsDefault {
+				policyName = policy.Name
+			}
+		}
+
 		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL)
 		if err != nil {
 			*warningMessages = append(*warningMessages, err.Error())
