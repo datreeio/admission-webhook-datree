@@ -15,3 +15,5 @@ else
   # Commit tag found - production deployment
   TAG=$DOCKER_REPO$LATEST_COMMIT_TAG
 fi
+
+echo $TAG
