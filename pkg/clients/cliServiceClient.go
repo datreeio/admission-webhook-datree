@@ -3,9 +3,10 @@ package clients
 import (
 	"encoding/json"
 	"errors"
+	"net/http"
+
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
-	"net/http"
 
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/httpClient"
@@ -45,7 +46,7 @@ func (c *CliClient) CreateToken() (*cliClient.CreateTokenResponse, error) {
 	res, err := c.httpClient.Request(http.MethodPost, "/cli/tokens/", nil, headers)
 
 	if err != nil {
-		networkErr := c.networkValidator.IdentifyNetworkError(err.Error())
+		networkErr := c.networkValidator.IdentifyNetworkError(err)
 		if networkErr != nil {
 			return nil, networkErr
 		}
@@ -75,7 +76,7 @@ func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.Eval
 	res, err := c.httpClient.Request(http.MethodGet, "/cli/evaluation/policyCheck/tokens/"+tokenId+"/prerun?", nil, c.flagsHeaders)
 
 	if err != nil {
-		networkErr := c.networkValidator.IdentifyNetworkError(err.Error())
+		networkErr := c.networkValidator.IdentifyNetworkError(err)
 		if networkErr != nil {
 			return &cliClient.EvaluationPrerunDataResponse{}, networkErr
 		}
@@ -139,7 +140,7 @@ func (c *CliClient) SendWebhookEvaluationResult(request *EvaluationResultRequest
 	}
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/policyCheck/result", request, c.flagsHeaders)
 	if err != nil {
-		networkErr := c.networkValidator.IdentifyNetworkError(err.Error())
+		networkErr := c.networkValidator.IdentifyNetworkError(err)
 		if networkErr != nil {
 			return &cliClient.SendEvaluationResultsResponse{}, networkErr
 		}

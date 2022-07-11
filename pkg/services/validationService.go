@@ -8,6 +8,8 @@ import (
 	"strings"
 	"time"
 
+	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
+
 	"k8s.io/utils/strings/slices"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
@@ -88,7 +90,19 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 	}
-	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL)
+
+	// convert default rules string into DefaultRulesDefinitions structure
+	defaultRules, err := cliDefaultRules.YAMLToStruct(prerunData.DefaultRulesYaml)
+	if err != nil {
+		// get default rules from cli binary on failure
+		defaultRules, err = cliDefaultRules.GetDefaultRules()
+		// panic if didn't manage to get default rules
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
@@ -100,7 +114,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 			}
 		}
 
-		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL)
+		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
 		if err != nil {
 			*warningMessages = append(*warningMessages, err.Error())
 			panic(err.Error())
