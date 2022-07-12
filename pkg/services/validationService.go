@@ -373,8 +373,12 @@ func shouldEvaluateArgoCRDResources(resourceKind string, operation admission.Ope
 
 func shouldEvaluateFluxCDResources(isDryRun bool, admissionLabels map[string]string) bool {
 	isFluxObject := false
-	if _, ok := admissionLabels["kustomize.toolkit.fluxcd.io"]; ok {
-		isFluxObject = true
+
+	for label := range admissionLabels {
+		if strings.Contains(label, "kustomize.toolkit.fluxcd.io") {
+			isFluxObject = true
+			break
+		}
 	}
 
 	return !isFluxObject || !isDryRun

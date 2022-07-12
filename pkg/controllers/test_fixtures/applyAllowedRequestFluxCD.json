@@ -50,7 +50,7 @@
         "namespace":"tzlil-tets",
         "labels":{
           "app":"pod-with-conflict-1",
-          "kustomize.toolkit.fluxcd.io": true
+          "kustomize.toolkit.fluxcd.io/namespace": "flux-system"
         },
         "managedFields": [
           {
