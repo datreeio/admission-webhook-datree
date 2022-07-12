@@ -67,7 +67,7 @@ jobs:
         with:
           cmd: |-
             OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
-            yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ OUTPUT_VERSION }}"))' 'deployment/admission-webhook-datree.yaml'
+            yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:$OUTPUT_VERSION"))' 'deployment/admission-webhook-datree.yaml'
       - name: Auto commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
