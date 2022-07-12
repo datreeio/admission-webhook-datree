@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
-
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,6 +16,9 @@ var applyRequestNotAllowedJson string
 
 //go:embed test_fixtures/applyAllowedRequest.json
 var applyRequestAllowedJson string
+
+//go:embed test_fixtures/applyAllowedRequestFluxCD.json
+var applyAllowedRequestFluxCDJson string
 
 func TestHeaderValidation(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", nil)
@@ -79,7 +81,8 @@ func TestValidateRequestBody(t *testing.T) {
           }
         ]
       }
-    }
+    },
+		"dryRun": false
   }
 }`))
 	responseRecorder := httptest.NewRecorder()
@@ -105,6 +108,19 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestAllowedJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	validationController := NewValidationController()
+	validationController.Validate(responseRecorder, request)
+
+	body := responseRecorder.Body.String()
+
+	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+}
+
+func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyAllowedRequestFluxCDJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
