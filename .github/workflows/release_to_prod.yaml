@@ -74,6 +74,9 @@ jobs:
 #          echo "Cloudfront: Invalidating /*"
 #          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
       - name: Echo Envs
-        run: |
+        run: |-
+            OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
+            echo "detected version = $OUTPUT_VERSION"
+            echo ::set-output name=version::$(echo $OUTPUT_VERSION)
             echo "DATREE_IMAGE: ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.define_version.outputs.version }}"
 
