@@ -109,4 +109,4 @@ webhooks:
       - operations: ["CREATE", "UPDATE"]
         apiGroups: ["*"]
         apiVersions: ["*"]
-        resources: ["*/*"]
+        resources: ["*"]
