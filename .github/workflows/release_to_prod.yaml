@@ -56,16 +56,18 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-      - name: Echo Envs
-        run: |-
-            OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
-            echo "detected version = $OUTPUT_VERSION"
-            echo ::set-output name=version::$(echo $OUTPUT_VERSION)
-            echo "DATREE_IMAGE: ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:$OUTPUT_VERSION"
+#      - name: Echo Envs
+#        run: |-
+#            OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
+#            echo "detected version = $OUTPUT_VERSION"
+#            echo ::set-output name=version::$(echo $OUTPUT_VERSION)
+#            echo "DATREE_IMAGE: ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ OUTPUT_VERSION }}"
       - name: Update version
         uses: mikefarah/yq@master
         with:
-          cmd: yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ OUTPUT_VERSION }}"))' 'deployment/admission-webhook-datree.yaml'
+          cmd: |-
+            OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
+            yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ OUTPUT_VERSION }}"))' 'deployment/admission-webhook-datree.yaml'
       - name: Auto commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
