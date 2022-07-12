@@ -26,7 +26,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           build-args: |-
-            "BUILD_ENVIRONMENT=prod"
+            "BUILD_ENVIRONMENT=main"
             "WEBHOOK_VERSION=${{ steps.define_version.outputs.version }}"
           context: .
           file: ./Dockerfile
@@ -41,18 +41,20 @@ jobs:
         with:
           tag: ${{ steps.define_version.outputs.version }}
           message: "Latest release"
-  upload-files-to-s3:
-    runs-on: ubuntu-latest
-    needs:
-      - release-docker
-    steps:
-      - uses: actions/checkout@v3
       - name: Set AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
+      - name: Update version
+        uses: mikefarah/yq@master
+        with:
+          cmd: yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.define_version.outputs.version }}"))' 'deployment/admission-webhook-datree.yaml'
+      - name: Auto commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'build: Automated Change - Bump webhook-image version to ${{ steps.define_version.outputs.version }}'
       - name: Copy files to S3 bucket
         run: |
           aws s3 cp ./scripts/install.sh s3://get.datree.io/admission-webhook --acl public-read
@@ -62,11 +64,3 @@ jobs:
         run: |
           echo "Cloudfront: Invalidating /*"
           aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
-      - name: Update version
-        uses: mikefarah/yq@master
-        with:
-          cmd: yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.define_version.outputs.version }}"))' 'deployment/admission-webhook-datree.yaml'
-      - name: Auto commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: 'build: Automated Change - Bump webhook-image version to ${{ steps.define_version.outputs.version }}'
