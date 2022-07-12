@@ -44,7 +44,7 @@ jobs:
   upload-files-to-s3:
     runs-on: ubuntu-latest
     needs:
-      - release-tag
+      - release-docker
     steps:
       - uses: actions/checkout@v3
       - name: Set AWS credentials
