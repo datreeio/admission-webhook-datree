@@ -16,39 +16,6 @@ jobs:
           OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
           echo "detected version = $OUTPUT_VERSION"
           echo ::set-output name=version::$(echo $OUTPUT_VERSION)
-#      - uses: docker/setup-buildx-action@v1
-#      - name: Log in to DockerHub
-#        uses: docker/login-action@v1
-#        with:
-#          username: ${{ secrets.DOCKERHUB_USERNAME }}
-#          password: ${{ secrets.DOCKERHUB_TOKEN }}
-#      - name: Build and push datree image to registries
-#        uses: docker/build-push-action@v2
-#        with:
-#          build-args: |-
-#            "BUILD_ENVIRONMENT=main"
-#            "WEBHOOK_VERSION=${{ steps.define_version.outputs.version }}"
-#          context: .
-#          file: ./Dockerfile
-#          platforms: linux/amd64,linux/arm64
-#          push: true
-#          tags: |
-#            ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.define_version.outputs.version }}
-#            ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:latest
-#          cache-from: type=gha
-#          cache-to: type=gha
-#      - uses: rickstaa/action-create-tag@v1
-#        with:
-#          tag: ${{ steps.define_version.outputs.version }}
-#          message: "Latest release"
-  upload-files-to-s3:
-    env:
-      REPO_NAME: datree
-      IMAGE_NAME: admission-webhook
-    runs-on: ubuntu-latest
-    needs:
-      - release-docker
-    steps:
       - uses: actions/checkout@v3
       - name: Set AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -56,12 +23,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-#      - name: Echo Envs
-#        run: |-
-#            OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
-#            echo "detected version = $OUTPUT_VERSION"
-#            echo ::set-output name=version::$(echo $OUTPUT_VERSION)
-#            echo "DATREE_IMAGE: ${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ OUTPUT_VERSION }}"
       - name: Update version
         uses: mikefarah/yq@master
         with:
@@ -70,12 +31,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: 'build: Automated Change - Bump webhook-image version to ${{ steps.define_version.outputs.version }}'
-#      - name: Copy files to S3 bucket
-#        run: |
-#          aws s3 cp ./scripts/install.sh s3://get.datree.io/admission-webhook --acl public-read
-#          aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/admission-webhook-uninstall --acl public-read
-#          aws s3 cp ./deployment/admission-webhook-datree.yaml s3://get.datree.io/admission-webhook-datree.yaml --acl public-read
-#      - name: Invalidate CloudFront
-#        run: |
-#          echo "Cloudfront: Invalidating /*"
-#          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+
