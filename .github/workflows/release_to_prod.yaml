@@ -51,7 +51,7 @@ jobs:
       - name: Update version
         uses: mikefarah/yq@master
         with:
-          cmd: yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}"/"${{ env.IMAGE_NAME }}":"${{ steps.define_version.outputs.version }}"))' 'deployment/admission-webhook-datree.yaml'
+          cmd: yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.define_version.outputs.version }}"))' 'deployment/admission-webhook-datree.yaml'
       - name: Auto commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
