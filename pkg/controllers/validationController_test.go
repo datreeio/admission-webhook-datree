@@ -20,6 +20,9 @@ var applyRequestAllowedJson string
 //go:embed test_fixtures/applyAllowedRequestFluxCD.json
 var applyAllowedRequestFluxCDJson string
 
+//go:embed test_fixtures/applyAllowedRequestFluxCDNoLabels.json
+var applyAllowedRequestFluxCDJsonNoLabels string
+
 func TestHeaderValidation(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", nil)
 	responseRecorder := httptest.NewRecorder()
@@ -121,6 +124,19 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 
 func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyAllowedRequestFluxCDJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	validationController := NewValidationController()
+	validationController.Validate(responseRecorder, request)
+
+	body := responseRecorder.Body.String()
+
+	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+}
+
+func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyAllowedRequestFluxCDJsonNoLabels))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
