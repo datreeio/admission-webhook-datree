@@ -74,7 +74,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	if !shouldEvaluateResourceByKind(resourceKind) ||
 		!shouldEvaluateArgoCRDResources(resourceKind, admissionReviewReq.Request.Operation) ||
-		!shouldEvaluateFluxCDResources(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels) ||
+		!shouldEvaluateFluxCDResources(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels, admissionReviewReq.Request.Namespace) ||
 		!shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) ||
 		rootObject.Metadata.DeletionTimestamp != "" {
 
@@ -391,21 +391,29 @@ func shouldEvaluateArgoCRDResources(resourceKind string, operation admission.Ope
 	return (isKindInArgoCRDList && operation == admission.Create) || !isKindInArgoCRDList
 }
 
-func shouldEvaluateFluxCDResources(isDryRun bool, admissionLabels map[string]string) bool {
-	isFluxObject := false
+func shouldEvaluateFluxCDResources(isDryRun bool, labels map[string]string, namespace string) bool {
+	isFluxObject := isFluxObject(labels, namespace)
+	badFluxObject := (isFluxObject && len(labels) == 0) || (isFluxObject && isDryRun)
 
-	for label := range admissionLabels {
+	return !isFluxObject || !badFluxObject
+}
+
+func isFluxObject(labels map[string]string, namespace string) bool {
+	if namespace == "flux-system" {
+		return true
+	}
+
+	for label := range labels {
 		if strings.Contains(label, "kustomize.toolkit.fluxcd.io") {
-			isFluxObject = true
-			break
+			return true
 		}
 	}
 
-	return !isFluxObject || !isDryRun
+	return false
 }
 
 func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
-	supportedPrefixes := []string{"kubectl", "argocd", "argo"}
+	supportedPrefixes := []string{"kubectl", "argocd", "argo", "kustomize-controller"}
 	for _, field := range fields {
 		for _, prefix := range supportedPrefixes {
 			if strings.HasPrefix(field.Manager, prefix) {
