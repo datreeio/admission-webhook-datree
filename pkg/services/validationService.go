@@ -13,6 +13,7 @@ import (
 	"k8s.io/utils/strings/slices"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
@@ -193,6 +194,12 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 	var OSInfoFn = utils.NewOSInfo
 	osInfo := OSInfoFn()
 
+	nodesCount, nodesCountError := k8sMetadataUtil.GetNodesCount()
+	var nodesCountErrorString string
+	if nodesCountError != nil {
+		nodesCountErrorString = nodesCountError.Error()
+	}
+
 	sendEvaluationResultsResponse, err := cliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
 		K8sVersion: evaluationRequestData.EvaluationData.K8sVersion,
 		ClientId:   evaluationRequestData.EvaluationData.ClientId,
@@ -203,8 +210,10 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 			PlatformVersion: osInfo.PlatformVersion,
 			KernelVersion:   osInfo.KernelVersion,
 			ClusterContext: &cliClient.ClusterContext{
-				IsInCluster:    true,
-				WebhookVersion: evaluationRequestData.WebhookVersion,
+				IsInCluster:     true,
+				WebhookVersion:  evaluationRequestData.WebhookVersion,
+				NodesCount:      nodesCount,
+				NodesCountError: nodesCountErrorString,
 			},
 			EvaluationDurationSeconds: evaluationRequestData.EvaluationData.EvaluationDurationSeconds,
 		},

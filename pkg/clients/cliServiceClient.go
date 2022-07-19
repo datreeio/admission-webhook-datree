@@ -130,8 +130,10 @@ type Metadata struct {
 }
 
 type ClusterContext struct {
-	WebhookVersion string `json:"webhookVersion"`
-	IsInCluster    bool   `json:"isInCluster"`
+	WebhookVersion  string `json:"webhookVersion"`
+	IsInCluster     bool   `json:"isInCluster"`
+	NodesCount      int    `json:"nodesCount"`
+	NodesCountError string `json:"nodesCountError"`
 }
 
 func (c *CliClient) SendWebhookEvaluationResult(request *EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
