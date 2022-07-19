@@ -5,6 +5,7 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	"github.com/datreeio/datree/pkg/cliClient"
@@ -42,6 +43,8 @@ func start(port string) {
 			os.Exit(DefaultErrExitCode)
 		}
 	}()
+
+	k8sMetadataUtil.InitK8sMetadataUtil()
 
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
