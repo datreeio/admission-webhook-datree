@@ -390,7 +390,7 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 }
 
 func shouldEvaluateResourceByKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Event"}
+	unsupportedResourceKinds := []string{"Event", "GitRepository"}
 	return !slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 
