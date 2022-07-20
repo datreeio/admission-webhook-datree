@@ -73,7 +73,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 
-	if !shouldEvaluateResourceByKind(resourceKind) ||
+	if !isMetadataNameExists(rootObject.Metadata) ||
+		!shouldEvaluateResourceByKind(resourceKind) ||
 		!shouldEvaluateArgoCRDResources(resourceKind, admissionReviewReq.Request.Operation) ||
 		!shouldEvaluateFluxCDResources(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels, admissionReviewReq.Request.Namespace) ||
 		!shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) ||
@@ -431,4 +432,8 @@ func shouldEvaluateResourceByManager(fields []ManagedFields) bool {
 		}
 	}
 	return false
+}
+
+func isMetadataNameExists(metadata Metadata) bool {
+	return metadata.Name != ""
 }
