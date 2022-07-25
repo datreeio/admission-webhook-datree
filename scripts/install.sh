@@ -70,14 +70,19 @@ verify_datree_namespace () {
   kubectl label namespaces kube-system admission.datree/validate=skip
 }
 
-override_webhook_resources () {
-  printf "\n🔗 Creating webhook resources...\n"
+override_core_resources () {
+  printf "\n🔗 Creating core resources...\n"
+  curl "https://get.datree.io/core-resources.yaml"  | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
+    | kubectl apply -f -
+}
+
+override_webhook_resource () {
+  printf "\n🔗 Creating validation webhook resource...\n"
 
   # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
   # template with it. Then, create the Kubernetes resources.
   ca_pem_b64="$(openssl base64 -A <"${keydir}/ca.crt")"
-  curl "https://get.datree.io/admission-webhook-datree.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
-    | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
+  curl "https://get.datree.io/validating-webhook-configuration.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
     | kubectl apply -f -
 }
 
@@ -96,7 +101,7 @@ override_webhook_secret_tls () {
 }
 
 are_you_sure () {
-  read -p "Are you sure you want to run as anonymous user? (y/n) " -n 1 -r
+  read -p "Are you sure you want to run as anonymous user? (y/N) " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo true
   else 
@@ -120,8 +125,6 @@ set -eo pipefail
 
 # Create Temporary directory for TLS keys
 keydir="$(mktemp -d)"
-
-basedir="$(pwd)/deployment"
 
 # Override DATREE_TOKEN env
 if [ -z "$DATREE_TOKEN" ] ;
@@ -158,10 +161,7 @@ fi
 
 override_webhook_secret_tls
 
-override_webhook_resources
-
-# Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
-rm -rf "${keydir}"
+override_core_resources
 
 # Wait for deployment rollout
 rolloutExitCode=0
@@ -170,5 +170,9 @@ rolloutExitCode=0
 if [ "$rolloutExitCode" != "0" ]; then
   printf "\n❌  datree webhook rollout failed, please try again. If this keeps happening please contact us: https://github.com/datreeio/admission-webhook-datree/issues\n"
 else
+  override_webhook_resource
+  # Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
+  rm -rf "${keydir}"
+
   printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
 fi
