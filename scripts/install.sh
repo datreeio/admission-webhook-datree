@@ -72,7 +72,7 @@ verify_datree_namespace () {
 
 override_core_resources () {
   printf "\n🔗 Creating core resources...\n"
-  curl "https://get.datree.io/admission-webhook-datree.yaml"  | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
+  curl "https://get.datree.io/core-resources.yaml"  | sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' \
     | kubectl apply -f -
 }
 
@@ -82,7 +82,7 @@ override_webhook_resource () {
   # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
   # template with it. Then, create the Kubernetes resources.
   ca_pem_b64="$(openssl base64 -A <"${keydir}/ca.crt")"
-  curl "https://raw.githubusercontent.com/datreeio/admission-webhook-datree/main/kube/validating-webhook-configuration.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
+  curl "https://get.datree.io/validating-webhook-configuration.yaml" |  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' \
     | kubectl apply -f -
 }
 
