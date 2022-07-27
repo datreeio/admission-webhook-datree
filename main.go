@@ -3,20 +3,19 @@ package main
 import (
 	"fmt"
 
+	"net/http"
+	"os"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
-
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/printer"
 	"github.com/datreeio/datree/pkg/utils"
-
-	"net/http"
-	"os"
 )
 
 const DefaultErrExitCode = 1

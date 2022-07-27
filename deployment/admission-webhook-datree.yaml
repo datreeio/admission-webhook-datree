@@ -26,6 +26,7 @@ rules:
       - ""
     resources:
       - "nodes"
+      - "namespaces"
     verbs:
       - "get"
       - "list"
@@ -40,7 +41,7 @@ metadata:
     app: webhook-server
     owner: datree
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: webhook-server
