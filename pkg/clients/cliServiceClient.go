@@ -198,6 +198,7 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 
 type ReportK8sMetadataRequest struct {
 	ClusterUuid   types.UID
+	Token         string
 	NodesCount    int
 	NodesCountErr error
 }

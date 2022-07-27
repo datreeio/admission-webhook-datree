@@ -3,9 +3,11 @@ package k8sMetadataUtil
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
@@ -63,9 +65,11 @@ func getClusterUuid(clientset *kubernetes.Clientset) (types.UID, error) {
 func sendK8sMetadata(clientset *kubernetes.Clientset, client *cliClient.CliClient) {
 	nodesCount, nodesCountErr := getNodesCount(clientset)
 	clusterUuid, _ := getClusterUuid(clientset)
+	token := os.Getenv(enums.Token)
 
 	client.ReportK8sMetadata(&cliClient.ReportK8sMetadataRequest{
 		ClusterUuid:   clusterUuid,
+		Token:         token,
 		NodesCount:    nodesCount,
 		NodesCountErr: nodesCountErr,
 	})
