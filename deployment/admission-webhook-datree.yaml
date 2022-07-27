@@ -41,7 +41,7 @@ metadata:
     app: webhook-server
     owner: datree
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: webhook-server
