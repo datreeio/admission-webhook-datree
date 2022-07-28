@@ -1,0 +1,8 @@
+# by deafult
+@datreeio/developers
+
+# specific files
+README.md  @datreeio/product
+
+# specific directories
+internal/images/**  @datreeio/product
