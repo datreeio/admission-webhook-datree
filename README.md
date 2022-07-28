@@ -1,7 +1,7 @@
-# Datree admission webhook
+# Datree Admission Webhook
 
 <p align="center">
-<img src="/internal/images/diagram.png" width="700px" />
+<img src="https://user-images.githubusercontent.com/19731161/181518854-41ab570e-de18-491e-800e-b13020e51003.png" width="80%" />
 </p>
   
 # Overview
