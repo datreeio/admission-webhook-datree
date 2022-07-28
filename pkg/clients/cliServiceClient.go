@@ -3,7 +3,6 @@ package clients
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/datreeio/datree/pkg/ciContext"
@@ -204,6 +203,5 @@ type ReportK8sMetadataRequest struct {
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
-	httpRes, _ := c.httpClient.Request(http.MethodPost, "/cli/workspace/cluster/", request, c.flagsHeaders)
-	fmt.Println(string(httpRes.Body))
+	c.httpClient.Request(http.MethodPost, "/cli/workspace/cluster/", request, c.flagsHeaders)
 }
