@@ -196,12 +196,12 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 }
 
 type ReportK8sMetadataRequest struct {
-	ClusterUuid   types.UID
-	Token         string
-	NodesCount    int
-	NodesCountErr error
+	ClusterUuid   types.UID `json:"clusterUuid"`
+	Token         string    `json:"token"`
+	NodesCount    int       `json:"nodesCount"`
+	NodesCountErr string    `json:"nodesCountErr"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
-	c.httpClient.Request(http.MethodPost, "/cli/workspace/cluster/", request, c.flagsHeaders)
+	c.httpClient.Request(http.MethodPost, "/cli/clusterEvents", request, c.flagsHeaders)
 }

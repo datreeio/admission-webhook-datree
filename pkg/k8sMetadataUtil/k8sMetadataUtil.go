@@ -22,6 +22,7 @@ func InitK8sMetadataUtil() {
 
 	if err != nil {
 		fmt.Println("Error getting k8s client", err)
+
 		return
 	}
 
@@ -67,10 +68,14 @@ func sendK8sMetadata(clientset *kubernetes.Clientset, client *cliClient.CliClien
 	clusterUuid, _ := getClusterUuid(clientset)
 	token := os.Getenv(enums.Token)
 
+	var nodesCountErrString string
+	if nodesCountErr != nil {
+		nodesCountErrString = nodesCountErr.Error()
+	}
 	client.ReportK8sMetadata(&cliClient.ReportK8sMetadataRequest{
 		ClusterUuid:   clusterUuid,
 		Token:         token,
 		NodesCount:    nodesCount,
-		NodesCountErr: nodesCountErr,
+		NodesCountErr: nodesCountErrString,
 	})
 }
