@@ -7,7 +7,7 @@ import (
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
-	"k8s.io/apimachinery/pkg/types"
+	k8sTypes "k8s.io/apimachinery/pkg/types"
 
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/httpClient"
@@ -196,10 +196,10 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 }
 
 type ReportK8sMetadataRequest struct {
-	ClusterUuid   types.UID `json:"clusterUuid"`
-	Token         string    `json:"token"`
-	NodesCount    int       `json:"nodesCount"`
-	NodesCountErr string    `json:"nodesCountErr"`
+	ClusterUuid   k8sTypes.UID `json:"clusterUuid"`
+	Token         string       `json:"token"`
+	NodesCount    int          `json:"nodesCount"`
+	NodesCountErr string       `json:"nodesCountErr"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {

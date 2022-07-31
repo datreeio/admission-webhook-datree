@@ -32,7 +32,7 @@ import (
 	"github.com/lithammer/shortuuid"
 	admission "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 )
@@ -217,7 +217,7 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 	return sendEvaluationResultsResponse, err
 }
 
-func ParseEvaluationResponseIntoAdmissionReview(requestUID types.UID, allowed bool, msg string, warningMessages []string) *admission.AdmissionReview {
+func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed bool, msg string, warningMessages []string) *admission.AdmissionReview {
 	statusCode := http.StatusOK
 	message := msg
 

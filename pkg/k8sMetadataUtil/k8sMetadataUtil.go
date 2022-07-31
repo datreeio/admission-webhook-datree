@@ -11,7 +11,7 @@ import (
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -21,7 +21,7 @@ func InitK8sMetadataUtil() {
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
-	var clusterUuid types.UID
+	var clusterUuid k8sTypes.UID
 	var nodesCount int
 	var nodesCountErr error
 	k8sClient, err := getClientSet()
@@ -60,7 +60,7 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-func getClusterUuid(clientset *kubernetes.Clientset) (types.UID, error) {
+func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
 	clusterMetadata, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 	if err != nil {
 		return "", err
@@ -68,7 +68,7 @@ func getClusterUuid(clientset *kubernetes.Clientset) (types.UID, error) {
 	return clusterMetadata.UID, nil
 }
 
-func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid types.UID, client *cliClient.CliClient) {
+func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
 	token := os.Getenv(enums.Token)
 	var nodesCountErrString string
 	if nodesCountErr != nil {
