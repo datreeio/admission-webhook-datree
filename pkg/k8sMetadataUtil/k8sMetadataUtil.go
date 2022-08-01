@@ -2,37 +2,53 @@ package k8sMetadataUtil
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"os"
 	"time"
 
+	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
+	"github.com/datreeio/datree/pkg/networkValidator"
+	"github.com/robfig/cron/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
 
-var nodesCount int
-var nodesCountErr error
-
 func InitK8sMetadataUtil() {
+
+	validator := networkValidator.NewNetworkValidator()
+	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
+
+	var clusterUuid k8sTypes.UID
+	var nodesCount int
+	var nodesCountErr error
+
 	k8sClient, err := getClientSet()
+
 	if err != nil {
-		errString := fmt.Sprintf("getClientSet error: %s", err.Error())
-		fmt.Println(errString)
-		nodesCount = -1
-		nodesCountErr = errors.New(errString)
+		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 		return
 	}
-	go func() {
-		for {
-			setNodesCount(k8sClient)
-			time.Sleep(time.Hour)
-		}
-	}()
+
+	clusterUuid, _ = getClusterUuid(k8sClient)
+
+	cornJob := cron.New(cron.WithLocation(time.UTC))
+	cornJob.AddFunc("@hourly", func() {
+		nodesCount, nodesCountErr = getNodesCount(k8sClient)
+		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+	})
+	cornJob.Start()
 }
 
-func GetNodesCount() (int, error) {
-	return nodesCount, nodesCountErr
+func getNodesCount(clientset *kubernetes.Clientset) (int, error) {
+	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+	if err != nil {
+		return -1, err
+	}
+
+	return len(nodes.Items), nil
 }
 
 func getClientSet() (*kubernetes.Clientset, error) {
@@ -49,17 +65,26 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-func setNodesCount(clientset *kubernetes.Clientset) {
-
-	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
+func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
+	clusterMetadata, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 	if err != nil {
-		errString := fmt.Sprintf("List error: %s", err.Error())
-		fmt.Println(errString)
-		nodesCount = -1
-		nodesCountErr = errors.New(errString)
-		return
+		return "", err
+	}
+	return clusterMetadata.UID, nil
+}
+
+func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
+	token := os.Getenv(enums.Token)
+
+	var nodesCountErrString string
+	if nodesCountErr != nil {
+		nodesCountErrString = nodesCountErr.Error()
 	}
 
-	nodesCount = len(nodes.Items)
-	nodesCountErr = nil
+	client.ReportK8sMetadata(&cliClient.ReportK8sMetadataRequest{
+		ClusterUuid:   clusterUuid,
+		Token:         token,
+		NodesCount:    nodesCount,
+		NodesCountErr: nodesCountErrString,
+	})
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
+	k8sTypes "k8s.io/apimachinery/pkg/types"
 
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/httpClient"
@@ -130,10 +131,8 @@ type Metadata struct {
 }
 
 type ClusterContext struct {
-	WebhookVersion  string `json:"webhookVersion"`
-	IsInCluster     bool   `json:"isInCluster"`
-	NodesCount      int    `json:"nodesCount"`
-	NodesCountError string `json:"nodesCountError"`
+	WebhookVersion string `json:"webhookVersion"`
+	IsInCluster    bool   `json:"isInCluster"`
 }
 
 func (c *CliClient) SendWebhookEvaluationResult(request *EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
@@ -194,4 +193,15 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 	}
 
 	return res, nil
+}
+
+type ReportK8sMetadataRequest struct {
+	ClusterUuid   k8sTypes.UID `json:"clusterUuid"`
+	Token         string       `json:"token"`
+	NodesCount    int          `json:"nodesCount"`
+	NodesCountErr string       `json:"nodesCountErr"`
+}
+
+func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
+	c.httpClient.Request(http.MethodPost, "/cli/clusterEvents", request, c.flagsHeaders)
 }

@@ -13,7 +13,6 @@ import (
 	"k8s.io/utils/strings/slices"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
-	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
@@ -33,7 +32,7 @@ import (
 	"github.com/lithammer/shortuuid"
 	admission "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/rest"
 )
@@ -195,12 +194,6 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 	var OSInfoFn = utils.NewOSInfo
 	osInfo := OSInfoFn()
 
-	nodesCount, nodesCountError := k8sMetadataUtil.GetNodesCount()
-	var nodesCountErrorString string
-	if nodesCountError != nil {
-		nodesCountErrorString = nodesCountError.Error()
-	}
-
 	sendEvaluationResultsResponse, err := cliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
 		K8sVersion: evaluationRequestData.EvaluationData.K8sVersion,
 		ClientId:   evaluationRequestData.EvaluationData.ClientId,
@@ -211,10 +204,8 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 			PlatformVersion: osInfo.PlatformVersion,
 			KernelVersion:   osInfo.KernelVersion,
 			ClusterContext: &cliClient.ClusterContext{
-				IsInCluster:     true,
-				WebhookVersion:  evaluationRequestData.WebhookVersion,
-				NodesCount:      nodesCount,
-				NodesCountError: nodesCountErrorString,
+				IsInCluster:    true,
+				WebhookVersion: evaluationRequestData.WebhookVersion,
 			},
 			EvaluationDurationSeconds: evaluationRequestData.EvaluationData.EvaluationDurationSeconds,
 		},
@@ -226,7 +217,7 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 	return sendEvaluationResultsResponse, err
 }
 
-func ParseEvaluationResponseIntoAdmissionReview(requestUID types.UID, allowed bool, msg string, warningMessages []string) *admission.AdmissionReview {
+func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed bool, msg string, warningMessages []string) *admission.AdmissionReview {
 	statusCode := http.StatusOK
 	message := msg
 
