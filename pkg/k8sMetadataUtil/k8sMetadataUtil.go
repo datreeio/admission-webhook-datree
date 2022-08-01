@@ -2,7 +2,6 @@ package k8sMetadataUtil
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"time"
 
@@ -37,8 +36,8 @@ func InitK8sMetadataUtil() {
 	nodesCount, nodesCountErr = getNodesCount(k8sClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-	cornJob.AddFunc("@every 10s", func() { sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient) })
-	// cornJob.AddFunc("@hourly", func() { sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient) })
+
+	cornJob.AddFunc("@hourly", func() { sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient) })
 	cornJob.Start()
 }
 
@@ -47,7 +46,6 @@ func getNodesCount(clientset *kubernetes.Clientset) (*int, error) {
 
 	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		fmt.Println("Error getting nodes count", err)
 		return nodesCount, err
 	}
 
