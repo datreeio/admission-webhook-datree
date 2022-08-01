@@ -33,11 +33,12 @@ func InitK8sMetadataUtil() {
 	}
 
 	clusterUuid, _ = getClusterUuid(k8sClient)
-	nodesCount, nodesCountErr = getNodesCount(k8sClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-
-	cornJob.AddFunc("@hourly", func() { sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient) })
+	cornJob.AddFunc("@hourly", func() {
+		nodesCount, nodesCountErr = getNodesCount(k8sClient)
+		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+	})
 	cornJob.Start()
 }
 
