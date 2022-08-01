@@ -99,6 +99,19 @@ spec:
 ```
 Simply replace `<your-token>` with your actual token, then copy the entire command and run it in your terminal. 
 
+### How to ignore a namespace:
+
+Add the label `"admission.datree/validate=skip"` to the configuration of the namespace you would like to ignore:
+```
+kubectl label namespaces default "admission.datree/validate=skip"
+```
+
+To delete the label and resume running the datree webhook on the namespace again:
+
+```
+kubectl label namespaces default "admission.datree/validate-"
+```
+
 ## Uninstallation
 To uninstall the webhook, copy the following command and run it in your terminal:  
 ```
