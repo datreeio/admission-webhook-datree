@@ -4,9 +4,9 @@ function removeTokenAndFileNamePostfixFromResult() {
   # For anonymous invocations, the token changes on every run.
   # Therefore we need to remove the token from the result.
   # Same for the file name, which has a changing postfix
-  echo "${1}" | 
-  sed -e 's/app.staging.datree.io\/login?t=[^ ]\{1,\}/app.staging.datree.io\/login?t=<TOKEN>               /g' |
-  sed -e 's/fileToTest-rss-site-Deployment-[^ ]\{1,\}\.yaml/fileToTest-rss-site-Deployment-<FILE_CHANGING_POSTFIX>.yaml/g'
+  echo "${1}" |
+    sed -e 's/app.staging.datree.io\/login?t=[^ ]\{1,\}/app.staging.datree.io\/login?t=<TOKEN>               /g' |
+    sed -e 's/fileToTest-rss-site-Deployment-[^ ]\{1,\}\.yaml/fileToTest-rss-site-Deployment-<FILE_CHANGING_POSTFIX>.yaml/g'
 }
 
 # declare colors for output
