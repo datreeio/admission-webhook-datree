@@ -198,7 +198,7 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 type ReportK8sMetadataRequest struct {
 	ClusterUuid   k8sTypes.UID `json:"clusterUuid"`
 	Token         string       `json:"token"`
-	NodesCount    *int         `json:"nodesCount"`
+	NodesCount    int          `json:"nodesCount"`
 	NodesCountErr string       `json:"nodesCountErr"`
 }
 
