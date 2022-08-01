@@ -2,6 +2,7 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
@@ -22,28 +23,35 @@ func InitK8sMetadataUtil() {
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
 	var clusterUuid k8sTypes.UID
-	var nodesCount int
+	var nodesCount *int
 	var nodesCountErr error
+
 	k8sClient, err := getClientSet()
 
-	if err == nil {
+	if err != nil {
 		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 		return
 	}
 
 	clusterUuid, _ = getClusterUuid(k8sClient)
 	nodesCount, nodesCountErr = getNodesCount(k8sClient)
+
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() { sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient) })
 	cornJob.Start()
 }
 
-func getNodesCount(clientset *kubernetes.Clientset) (int, error) {
+func getNodesCount(clientset *kubernetes.Clientset) (*int, error) {
+	var nodesCount int
+
 	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return 0, err
+		fmt.Println("Error getting nodes count", err)
+		return &nodesCount, err
 	}
-	return len(nodes.Items), nil
+
+	nodesCount = len(nodes.Items)
+	return &nodesCount, nil
 }
 
 func getClientSet() (*kubernetes.Clientset, error) {
@@ -68,12 +76,14 @@ func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
 	return clusterMetadata.UID, nil
 }
 
-func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
+func sendK8sMetadata(nodesCount *int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
 	token := os.Getenv(enums.Token)
+
 	var nodesCountErrString string
 	if nodesCountErr != nil {
 		nodesCountErrString = nodesCountErr.Error()
 	}
+
 	client.ReportK8sMetadata(&cliClient.ReportK8sMetadataRequest{
 		ClusterUuid:   clusterUuid,
 		Token:         token,
