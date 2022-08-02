@@ -22,21 +22,22 @@ func InitK8sMetadataUtil() {
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
 	var clusterUuid k8sTypes.UID
-	var nodesCount int
-	var nodesCountErr error
 
 	k8sClient, err := getClientSet()
 
 	if err != nil {
-		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+		sendK8sMetadata(-1, err, clusterUuid, cliClient)
 		return
 	}
 
-	clusterUuid, _ = getClusterUuid(k8sClient)
+	clusterUuid, err = getClusterUuid(k8sClient)
+	if err != nil {
+		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+	}
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
-		nodesCount, nodesCountErr = getNodesCount(k8sClient)
+		nodesCount, nodesCountErr := getNodesCount(k8sClient)
 		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
 	cornJob.Start()
