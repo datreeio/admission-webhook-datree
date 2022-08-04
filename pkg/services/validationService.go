@@ -328,12 +328,22 @@ func getClientId() string {
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
 	yamlSchema, _ := yaml.JSONToYAML(admissionReviewReq.Object.Raw)
+	var annotations map[string]interface{}
+	var rawYaml map[string]interface{}
+	err := yaml.Unmarshal(yamlSchema, &rawYaml)
+	if err == nil {
+		metadata := rawYaml["metadata"].(map[string]interface{})
+		if metadata != nil && metadata["annotations"] != nil {
+			annotations = metadata["annotations"].(map[string]interface{})
+		}
+	}
 
 	config := extractor.Configuration{
 		MetadataName: admissionReviewReq.Name,
 		Kind:         admissionReviewReq.Kind.Kind,
 		ApiVersion:   admissionReviewReq.Kind.Version,
 		Payload:      yamlSchema,
+		Annotations:  annotations,
 	}
 
 	var filesConfigurations []*extractor.FileConfigurations
