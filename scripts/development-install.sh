@@ -71,16 +71,31 @@ verify_datree_namespace() {
   kubectl label namespaces kube-system admission.datree/validate=skip
 }
 
-override_webhook_resources() {
-  printf "\n🔗 Creating webhook resources...\n"
+override_core_resources() {
+  printf "\n🔗 Creating core resources...\n"
+  imagePullPolicy="Always"
+  image="datree/webhook-staging:latest"
+  replicasCount=2
+  if [[ "${IS_MINIKUBE}" -eq "true" ]]; then
+    echo "Overriding core resources for minikube..."
+    imagePullPolicy="Never"
+    image="webhook-server"
+    replicasCount=1
+  fi
+  sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' <"${basedir}/kube/core-resources.yaml" |
+    sed -e "s/imagePullPolicy: Always/imagePullPolicy: ${imagePullPolicy}/g" |
+    sed "s/image:.*/image: ${image}/g" |
+    sed "s/replicas:.*/replicas: ${replicasCount}/g" |
+    kubectl apply -f -
+}
+
+override_webhook_resource() {
+  printf "\n🔗 Creating validation webhook resource...\n"
 
   # Read the PEM-encoded CA certificate, base64 encode it, and replace the `${CA_PEM_B64}` placeholder in the YAML
   # template with it. Then, create the Kubernetes resources.
   ca_pem_b64="$(openssl base64 -A <"${keydir}/ca.crt")"
-  sed -e 's/imagePullPolicy: Always/imagePullPolicy: Never/g' <"${basedir}/admission-webhook-datree.yaml" |
-    sed 's/image:.*/image: webhook-server/g' |
-    sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' |
-    sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' |
+  sed -e 's@${CA_PEM_B64}@'"$ca_pem_b64"'@g' <"${basedir}/kube/validating-webhook-configuration.yaml" |
     kubectl apply -f -
 }
 
@@ -99,7 +114,7 @@ override_webhook_secret_tls() {
 }
 
 are_you_sure() {
-  read -p "Are you sure you want to run as anonymous user? (y/n) " -n 1 -r
+  read -p "Are you sure you want to run as anonymous user? (y/N) " -n 1 -r
   if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo true
   else
@@ -124,7 +139,7 @@ set -eo pipefail
 # Create Temporary directory for TLS keys
 keydir="$(mktemp -d)"
 
-basedir="$(pwd)/deployment"
+basedir="$(pwd)"
 
 # Override DATREE_TOKEN env
 if [ -z "$DATREE_TOKEN" ]; then
@@ -136,7 +151,7 @@ if [ -z "$DATREE_TOKEN" ]; then
   token_set=false
   while [ "$token_set" = false ]; do
     echo "👉 Insert token (available at https://app.datree.io/settings/token-management)"
-    echo "ℹ️  The token is used to connect the webhook with your account."
+    echo "ℹ️  The token is used to connect the webhook with your workspace."
     read datree_token
     token_set=true
 
@@ -160,10 +175,7 @@ fi
 
 override_webhook_secret_tls
 
-override_webhook_resources
-
-# Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
-rm -rf "${keydir}"
+override_core_resources
 
 # Wait for deployment rollout
 rolloutExitCode=0
@@ -172,5 +184,9 @@ rolloutExitCode=0
 if [ "$rolloutExitCode" != "0" ]; then
   printf "\n❌  datree webhook rollout failed, please try again. If this keeps happening please contact us: https://github.com/datreeio/admission-webhook-datree/issues\n"
 else
+  override_webhook_resource
+  # Delete the key directory to prevent abuse (DO NOT USE THESE KEYS ANYWHERE ELSE).
+  rm -rf "${keydir}"
+
   printf "\n🎉 DONE! The webhook server is now deployed and configured\n"
 fi
