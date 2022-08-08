@@ -72,7 +72,7 @@ make test-in-minikube
 
 When uploading a new version you should run the github action and wait until a new build is uploaded to dockerhub.
 
-After that when a new build was published successfully you should test it and open a new PR to update admission-webhook-datree.yaml image property.
+After that when a new build was published successfully you should test it and open a new PR to update kube/core-resources.yaml image property.
 
 
 **The release will fail in the following scenarios:**
