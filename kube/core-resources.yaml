@@ -92,8 +92,7 @@ spec:
             requests:
               cpu: 100m
               memory: 256Mi
-          # image: datree/admission-webhook:0.1.21
-          image: datree/webhook-staging:275f2fd
+          image: datree/admission-webhook:0.1.21
           imagePullPolicy: Always
           ports:
             - containerPort: 8443
