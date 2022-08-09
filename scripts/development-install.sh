@@ -74,18 +74,18 @@ verify_datree_namespace() {
 override_core_resources() {
   printf "\n🔗 Creating core resources...\n"
   imagePullPolicy="Always"
-  image="datree/webhook-staging:latest"
+  image='datree\/webhook-staging:latest'
   replicasCount=2
-  if [[ "${IS_MINIKUBE}" -eq "true" ]]; then
+  if [[ "${IS_MINIKUBE}" == "true" ]]; then
     echo "Overriding core resources for minikube..."
     imagePullPolicy="Never"
     image="webhook-server"
     replicasCount=1
   fi
-  sed 's@${DATREE_TOKEN}@'"$datree_token"'@g' <"${basedir}/kube/core-resources.yaml" |
-    sed -e "s/imagePullPolicy: Always/imagePullPolicy: ${imagePullPolicy}/g" |
-    sed "s/image:.*/image: ${image}/g" |
-    sed "s/replicas:.*/replicas: ${replicasCount}/g" |
+  sed 's/${DATREE_TOKEN}/'"$datree_token"'/g' <"${basedir}/kube/core-resources.yaml" |
+    sed -e 's/imagePullPolicy: Always/imagePullPolicy: '"$imagePullPolicy"'/g' |
+    sed 's/image:.*/image: '"${image}"'/g' |
+    sed 's/replicas:.*/replicas: '"$replicasCount"'/g' |
     kubectl apply -f -
 }
 
