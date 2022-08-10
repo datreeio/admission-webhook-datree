@@ -10,6 +10,8 @@ jobs:
     name: Release container image to public registries
     steps:
       - uses: actions/checkout@v3
+        with:
+          token: ${{secrets.DATREE_CI_GH_TOKEN}}
       - name: Define release version
         id: define_version
         run: |-
@@ -54,8 +56,7 @@ jobs:
       - name: Auto commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: 'build: Automated Change - Bump webhook-image version to ${{ steps.define_version.outputs.version }}'
-          commit_user_name: datree-ci
+          commit_message: "build: Automated Change - Bump webhook-image version to ${{ steps.define_version.outputs.version }}"
       - name: Copy files to S3 bucket
         run: |
           aws s3 cp ./scripts/install.sh s3://get.datree.io/admission-webhook --acl public-read
