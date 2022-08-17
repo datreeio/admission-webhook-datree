@@ -8,15 +8,13 @@ metadata:
     owner: datree
     app: "webhook-server"
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels: 
       app: "webhook-server"
   template:
     metadata:
-      labels: labels: {{ include "datree.labels" . | nindent 8 }}
+      labels: {{ include "datree.labels" . | nindent 8 }}
         app: "webhook-server"
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
