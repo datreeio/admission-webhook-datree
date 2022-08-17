@@ -21,6 +21,10 @@ labels:
   app: webhook-server
 
 datreeToken: ""
+datreePolicy: ""
+datreeVerbose: ""
+datreeOutput: ""
+datreeNoRecord: ""
 
 image:
   # The name of the image to use.
