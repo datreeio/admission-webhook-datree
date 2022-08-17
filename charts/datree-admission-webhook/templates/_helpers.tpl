@@ -6,6 +6,9 @@
 {{/* Helm required labels */}}
 {{- define "datree.labels" -}}
 app.kubernetes.io/version: "{{ .Chart.Version }}"
+app.kubernetes.io/managed-by: "Helm"
+meta.helm.sh/release-name: "{{ .Chart.Name }}"
+meta.helm.sh/release-namespace: "{{ .Release.Namespace }}" 
 helm.sh/chart: {{ template "datree.chart" . }}
     {{- if .Values.customLabels }}
         {{ toYaml .Values.customLabels }}
