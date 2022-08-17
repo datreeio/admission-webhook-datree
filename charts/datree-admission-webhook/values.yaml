@@ -1,58 +1,59 @@
 # Default values for datree-admission-webhook.
 
-# The name of the namespace all datree-webhook-resources will be created in.
+# The name of the namespace all resources will be created in.
 namespace: datree
 
-createSelfSignedCert: true
-
+# The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
 
-nameOverride: webhook-server
+# Additional labels to add to all resources.
+customLabels: {}
 
-serviceAccount:
-  # The name of the service account to use.
-  name: webhook-server-datree
-
-clusterRole:
-  # The name of the cluster role to use.
-  name: webhook-server-datree
-
-labels:
-  app: webhook-server
+# Create ClusterRoles, ClusterRoleBindings, and ServiceAccount
+rbac:
+  serviceAccount:
+    # Create the ServiceAccount
+    create: true
+    # The ServiceAccount name
+    name: webhook-server-datree
+  clusterRole:
+    # Create the ClusterRole
+    create: true
+    # The ClusterRole name
+    name: webhook-server-datree
 
 datree:
+  # The token used to link the CLI to your dashboard.
   token: <DATREE_TOKEN>
-  policy: "" # optional - TODO: add description
-  verbose: "" #
+  # The name of the policy to check, e.g: staging. (string, optional)
+  policy: ""
+  # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
+  verbose: ""
+  # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
   output: ""
+  # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord: ""
 
+# The Datree webhook-server image to use.
 image:
-  # The name of the image to use.
-  name: datree/admission-webhook
-  # -- Image tag
+  # Image repository
+  repository: datree/admission-webhook
+  # Image tag
   tag: 0.1.20
+  # Image pull policy
   pullPolicy: Always
 
+# Security context for the containers
 securityContext:
-  #{}
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 25000
 
 resources:
-  #{}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   limits:
     cpu: 1000m
     memory: 512Mi
   requests:
     cpu: 100m
     memory: 256Mi
-
-autoscaling:
-  enabled: true
