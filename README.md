@@ -2,7 +2,8 @@
 
 ```sh
 helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
-helm install datree-webhook --namespace datree datree-admission-webhook --create-namespace
+helm repo update
+helm install datree-webhook --namespace datree datree-webhook/datree-admission-webhook --create-namespace
 ```
 
 **Full documentation at:https://github.com/datreeio/admission-webhook-datree**
