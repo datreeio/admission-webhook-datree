@@ -20,15 +20,17 @@ clusterRole:
 labels:
   app: webhook-server
 
-datreeToken: ""
-datreePolicy: ""
-datreeVerbose: ""
-datreeOutput: ""
-datreeNoRecord: ""
+datree:
+  token: <DATREE_TOKEN>
+  policy: "" # optional - TODO: add description
+  verbose: "" #
+  output: ""
+  noRecord: ""
 
 image:
   # The name of the image to use.
   name: datree/admission-webhook
+  # -- Image tag
   tag: 0.1.20
   pullPolicy: Always
 

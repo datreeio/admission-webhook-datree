@@ -24,15 +24,15 @@ spec:
           # changing the order will harm resource patching
           env:
             - name: DATREE_TOKEN
-              value: {{.Values.datreeToken}}
+              value: {{.Values.datree.token}}
             - name: DATREE_POLICY
-              value: {{.Values.datreePolicy}}
+              value: {{.Values.datree.policy}}
             - name: DATREE_VERBOSE
-              value: {{.Values.datreeVerbose}}
+              value: {{.Values.datree.verbose}}
             - name: DATREE_OUTPUT
-              value: {{.Values.datreeOutput}}
+              value: {{.Values.datree.output}}
             - name: DATREE_NO_RECORD
-              value: {{.Values.datreeNoRecord}}
+              value: {{.Values.datree.noRecord}}
           securityContext: {{- toYaml .Values.securityContext | nindent 12}}
           livenessProbe:
             httpGet:
