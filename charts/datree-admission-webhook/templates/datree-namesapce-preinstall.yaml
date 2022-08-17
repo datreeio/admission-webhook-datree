@@ -5,7 +5,3 @@ metadata:
   name: {{.Values.namespace}}
   labels:
     admission.datree/validate: skip
-  annotations:
-    "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": before-hook-creation
