@@ -61,7 +61,24 @@ The following settings are supported:
 | DATREE_NO_RECORD     | true, false            | Don’t send policy checks metadata to the backend |
 | DATREE_OUTPUT        | json, yaml, xml, JUnit | Output the policy check results in the requested format |
 
-**To change the behavior:**  
+### Token
+
+🤫 Since your token is sensitive and you would not want to keep it in your repository, we recommend to set/change it by running a separate `kubectl patch` command:  
+```yaml
+kubectl patch deployment webhook-server -n datree -p '
+spec:
+  template:
+    spec:
+      containers:
+        - name: server
+          env:
+            - name: DATREE_TOKEN
+              value: "<your-token>"'
+```
+Simply replace `<your-token>` with your actual token, then copy the entire command and run it in your terminal. 
+
+### Other settings
+
 1. Create a YAML file in your repository with this content:  
 ```yaml
 spec:
@@ -85,21 +102,7 @@ spec:
 kubectl patch deployment webhook-server -n datree --patch-file /path/to/patch/file.yaml
 ```
 
-🤫 Since your token is sensitive and you would not want to keep it in your repository, we recommend to set/change it by running a separate `kubectl patch` command:  
-```yaml
-kubectl patch deployment webhook-server -n datree -p '
-spec:
-  template:
-    spec:
-      containers:
-        - name: server
-          env:
-            - name: DATREE_TOKEN
-              value: "<your-token>"'
-```
-Simply replace `<your-token>` with your actual token, then copy the entire command and run it in your terminal. 
-
-### How to ignore a namespace:
+## Ignore a namespace
 
 Add the label `"admission.datree/validate=skip"` to the configuration of the namespace you would like to ignore:
 ```
