@@ -1,0 +1,11 @@
+# create and label datree namespace admission.datree/validate=skip
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{.Values.namespace}}
+  labels:
+    admission.datree/validate: skip
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
