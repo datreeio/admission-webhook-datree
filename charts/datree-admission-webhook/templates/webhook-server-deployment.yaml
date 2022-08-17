@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Values.serviceAccount.name}}
+  namespace: {{.Values.namespace}}
+  labels: 
+    env: testing
+    owner: datree
+    {{- include "datree.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels: {{ include "datree.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{ include "datree.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{.Values.serviceAccount.name}}
+      containers:
+        - name: server
+          # caution: don't change the order of the environment variables
+          # changing the order will harm resource patching
+          env:
+            - name: DATREE_TOKEN
+              value: {{.Values.datreeToken}}
+            - name: DATREE_POLICY
+              value: {{.Values.datreePolicy}}
+            - name: DATREE_VERBOSE
+              value: {{.Values.datreeVerbose}}
+            - name: DATREE_OUTPUT
+              value: {{.Values.datreeOutput}}
+            - name: DATREE_NO_RECORD
+              value: {{.Values.datreeNoRecord}}
+          securityContext: {{- toYaml .Values.securityContext | nindent 12}}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8443
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources: {{- toYaml .Values.resources | nindent 12}}
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          ports:
+            - containerPort: 8443
+              name: webhook-api
+          volumeMounts:
+            - name: webhook-tls-certs
+              mountPath: /run/secrets/tls
+              readOnly: true
+      volumes:
+        - name: webhook-tls-certs
+          secret:
+            secretName: webhook-server-tls
