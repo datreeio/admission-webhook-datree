@@ -1,7 +1,9 @@
+{{- if .Values.rbac.clusterRole.create }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{.Values.clusterRole.name}}
+  name: {{.Values.rbac.clusterRole.name}}
+  labels: {{ include "datree.labels" . | nindent 4 }}
 rules:
   - apiGroups:
       - ""
@@ -11,3 +13,4 @@ rules:
     verbs:
       - "get"
       - "list"
+{{-end}}

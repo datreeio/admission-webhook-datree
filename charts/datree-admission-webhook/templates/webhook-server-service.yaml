@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: webhook-server
   namespace: {{.Values.namespace}}
+  labels: {{include "datree.labels" . | nindent 4}}
 spec:
   selector:
     app: webhook-server
