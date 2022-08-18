@@ -55,8 +55,6 @@ For any misconfigurations that were found the following output will be displayed
 
 ## Behavior
 
-<<<<<<< HEAD
-
 ### Token
 
 🤫 Since your token is sensitive and you would not want to keep it in your repository, we recommend to set/change it by running a separate `kubectl patch` command:
@@ -78,7 +76,6 @@ Simply replace `<your-token>` with your actual token, then copy the entire comma
 ### Other settings
 
 1. Create a YAML file in your repository with this content:
-   > > > > > > > 8e11001 (docs: added Helm deployemnt in webhook README and Chart README files.)
 
 ```yaml
 spec:
