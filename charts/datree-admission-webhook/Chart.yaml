@@ -3,7 +3,7 @@ name: datree-admission-webhook
 description: A Helm chart for Datree admission webhook for Kubernetes clusters
 icon: https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png
 type: application
-keywords: 
+keywords:
   - datree-admission-webhook
   - policy agent
   - validating webhook
@@ -12,10 +12,7 @@ home: datree.io
 sources:
   - https://github.com/datreeio/admission-webhook-datree
 
-kubeVersion: ">=1.18.0-0"
-
-
-
+kubeVersion: ">=1.16.0-0"
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
