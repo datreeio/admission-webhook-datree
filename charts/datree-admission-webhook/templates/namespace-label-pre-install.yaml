@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: datree-update-namespace-skip-label
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+spec:
+  template:
+    metadata:
+      labels:
+        release: {{.Values.namespace}}
+    spec:
+      restartPolicy: OnFailure
+      serviceAccount: datree-update-namespace-skip-label
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: kubectl-datree-skip-label
+          image: bitnami/kubectl:latest
+          imagePullPolicy: Always
+          args:
+            - label
+            - ns
+            - {{.Values.namespace}}
+            - kube-system
+            - datree.io/skip=true
+            - --overwrite
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: datree-update-namespace-skip-label
+  namespace: {{.Values.namespace}}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: datree-update-namespace-skip-label
+  labels:
+    release: {{.Values.namespace}}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - update
+      - patch
+    resourceNames:
+      - {{.Values.namespace}}
+      - kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: datree-update-namespace-skip-label
+  labels:
+    release: {{.Values.namespace}}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: datree-update-namespace-skip-label
+subjects:
+  - kind: ServiceAccount
+    name: datree-update-namespace-skip-label
+    namespace: {{.Values.namespace | quote}}

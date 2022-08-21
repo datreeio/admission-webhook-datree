@@ -1,0 +1,7 @@
+# # create and label datree namespace admission.datree/validate=skip
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: {{.Values.namespace}}
+#   labels: {{ include "datree.labels" . | nindent 4 }}
+#     admission.datree/validate: skip
