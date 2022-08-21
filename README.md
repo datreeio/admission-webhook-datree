@@ -15,6 +15,16 @@ The webhook officially supports **Kubernetes version _1.19_** and higher, and ha
 
 # Installation
 
+## Deploy with Helm
+
+```
+  helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
+  helm repo update
+  helm install datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<DATREE_TOKEN>
+```
+
+For more information see [Datree webhook Helm chart](https://github.com/datreeio/admission-webhook-datree/tree/gh-pages).
+
 ## Deploy with installation script
 
 During the installtion the script will require to enter the Datree token during installation.
@@ -35,16 +45,6 @@ The following applications must be installed on the machine:
 - kubectl
 - openssl - _required for creating a certificate authority (CA)._
 - curl
-
-## Deploy with Helm
-
-```
-  helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
-  helm repo update
-  helm install datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<DATREE_TOKEN>
-```
-
-For more information see [Datree webhook Helm chart](https://github.com/datreeio/admission-webhook-datree/tree/gh-pages).
 
 ## Usage
 
