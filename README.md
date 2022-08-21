@@ -9,6 +9,17 @@ Datree offers cluster integration that allows you to validate your resources aga
 
 The webhook will catch **create**, **apply** and **edit** operations and initiate a policy check against the configs associated with each operation. If any misconfigurations are found, the webhook will reject the operation, and display a detailed output with instructions on how to resolve each misconfiguration.
 
+## Webhook validation triggers
+
+K8s use different abstractions to simplify and automate complex processes. For example, when explicitly applying an object type “Deployment”, under the hood, K8s will “translate” this object into implicit objects of type “Pod.”
+
+When installed on your cluster, other policy enforcement tools will validate both explicit and implicit objects. This approach may create a lot of noise and false positive failures since it will cause the webhook to validate objects that the users don’t manage and, in some cases, are not even accessible.
+
+To avoid such issues, we decided to define the specific operations that the admission webhook should validate:
+
+- Kubectl - validate objects that were created or updated using kubectl `create`, `edit`, and `apply` commands. Objects that were implicitly created (e.g., pods created via deployment) are ignored since the webhook validates the deployment that generated them and is accessible to the user.
+- Gitops CD tools - validate objects that were explicitly created and distinguish them from other objects (custom resources) that were implicitly created during the installation and are required for the ongoing operation of these tools (e.g., ArgoCD, FluxCD, etc.)
+
 ## Prerequisites
 
 The webhook officially supports **Kubernetes version _1.19_** and higher, and has been tested with EKS.
@@ -114,17 +125,6 @@ To delete the label and resume running the datree webhook on the namespace again
 ```
 kubectl label namespaces default "admission.datree/validate-"
 ```
-
-### Webhook validation triggers
-
-K8s use different abstractions to simplify and automate complex processes. For example, when explicitly applying an object type “Deployment”, under the hood, K8s will “translate” this object into implicit objects of type “Pod.”
-
-When installed on your cluster, other policy enforcement tools will validate both explicit and implicit objects. This approach may create a lot of noise and false positive failures since it will cause the webhook to validate objects that the users don’t manage and, in some cases, are not even accessible.
-
-To avoid such issues, we decided to define the specific operations that the admission webhook should validate:
-
-- Kubectl - validate objects that were created or updated using kubectl `create`, `edit`, and `apply` commands. Objects that were implicitly created (e.g., pods created via deployment) are ignored since the webhook validates the deployment that generated them and is accessible to the user.
-- Gitops CD tools - validate objects that were explicitly created and distinguish them from other objects (custom resources) that were implicitly created during the installation and are required for the ongoing operation of these tools (e.g., ArgoCD, FluxCD, etc.)
 
 ## Uninstallation
 
