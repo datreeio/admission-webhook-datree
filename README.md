@@ -7,7 +7,7 @@ A Kubernetes validating webhook for policy enforcement within the cluster, on ev
 ```bash
   helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
   helm repo update
-  helm install datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<DATREE_TOKEN>
+  helm install datree-webhook datree-webhook/datree-admission-webhook --set datree.token=<DATREE_TOKEN>
 ```
 
 ### Prerequisites
