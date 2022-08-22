@@ -19,6 +19,6 @@ entries:
         - https://github.com/datreeio/admission-webhook-datree
       type: application
       urls:
-        - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.1.0.tgz
+        - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.1.1.tgz
       version: 0.1.0
 generated: "2022-08-22T13:11:52.644233+03:00"
