@@ -60,3 +60,22 @@ rules:
       - patch
       - update
       - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: datree-pods-reader
+  labels: {{ include "datree.labels" . | nindent 4 }}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "pods"
+      - "jobs"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"

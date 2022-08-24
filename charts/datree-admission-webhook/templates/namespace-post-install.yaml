@@ -7,7 +7,7 @@ metadata:
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
     {{- if .Values.customAnnotations }}
       {{- toYaml .Values.customAnnotations }}
     {{- end }}
@@ -25,8 +25,8 @@ spec:
         kubernetes.io/os: linux
       containers:
         - name: kubectl-label
-          image: "{{ .Values.hooks.labelNamespace.image.repository }}@{{ .Values.hooks.labelNamespace.image.sha }}"
-          imagePullPolicy: {{.Values.hooks.labelNamespace.image.pullPolicy}}
+          image: "{{ .Values.hooks.image.repository }}@{{ .Values.hooks.image.sha }}"
+          imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
           args:
             - label
             - ns

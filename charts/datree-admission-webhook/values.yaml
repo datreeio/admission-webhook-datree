@@ -60,19 +60,14 @@ resources:
     cpu: 1000m
     memory: 512Mi
 
+# During install Datree run two hooks: pre-install and pre-delete.
+# `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with datree.io/skip=true
+# `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
 hooks:
-  # Helm hook that run after the chart is installed and label namespaces with datree.io/skip=true
-  labelNamespace:
-    image:
-      repository: bitnami/kubectl
-      sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
-      pullPolicy: Always
-  # Helm hook that run after the chart is awaits sleepyTime seconds for the webhook-server to be ready
-  waitForServerRollout:
-    # The waiting time before the webhook-server is ready to receive requests.
-    sleepyTime:
-    # An image for running sleep command
-    image:
-      repository: alpine
-      sha: sha256:1304f174557314a7ed9eddb4eab12fed12cb0cd9809e4c28f29af86979a3c870
-      pullPolicy: Always
+  # The timeout time the hook will wait for the webhook-server is ready.
+  timeoutTime:
+  # The image for running kubectl commands
+  image:
+    repository: bitnami/kubectl
+    sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
+    pullPolicy: Always
