@@ -6,6 +6,9 @@ metadata:
   labels: {{ include "datree.labels" . | nindent 4 }}
     owner: datree
     app: "datree-webhook-server"
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -15,6 +18,9 @@ spec:
     metadata:
       labels: {{ include "datree.labels" . | nindent 8 }}
         app: "datree-webhook-server"
+      {{- if .Values.customAnnotations }}
+      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- end }}
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:

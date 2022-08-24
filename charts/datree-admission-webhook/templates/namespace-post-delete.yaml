@@ -4,13 +4,19 @@ metadata:
   name: datree-cleanup-namespaces-hook-pre-delete
   labels: {{include "datree.labels" . | nindent 4}}
   namespace: {{template "datree.namespace" .}}
-  annotations:
+  annotations: 
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded
+  {{- if .Values.customAnnotations }}
+    {{- toYaml .Values.customAnnotations }}
+  {{- end }}
 spec:
   template:
     metadata:
       labels: {{include "datree.labels" . | nindent 8}}
+      {{- if .Values.customAnnotations }}
+      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- end }}
     spec:
       restartPolicy: OnFailure
       serviceAccount: datree-cleanup-namespaces-hook-pre-delete
