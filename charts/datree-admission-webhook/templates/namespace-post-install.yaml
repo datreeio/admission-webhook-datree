@@ -1,24 +1,20 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: datree-update-namespace-skip-label
-  namespace: {{.Values.namespace}}
-  labels:
-    chart: {{template "datree.chart" .}}
-    release: {{.Release.Name}}
+  name: datree-label-namespace
+  namespace: {{template "datree.namespace" .}}
+  labels: {{include "datree.labels" . | nindent 4}}
   annotations:
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "-5"
-    "helm.sh/hook-delete-policy": hook-succeeded,before-hook-creation
+    "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
-      labels:
-        chart: {{template "datree.chart" .}}
-        release: {{.Release.Name}}
+      labels: {{include "datree.labels" . | nindent 8}}
     spec:
       restartPolicy: OnFailure
-      serviceAccount: datree-update-namespace-skip-label
+      serviceAccount: datree-label-namespace
       nodeSelector:
         kubernetes.io/os: linux
       containers:
@@ -29,26 +25,23 @@ spec:
             - label
             - ns
             - kube-system
+            - {{template "datree.namespace" .}}
             - datree.io/skip=true
             - --overwrite
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: datree-update-namespace-skip-label
-  namespace: {{.Values.namespace}}
-  labels:
-    chart: {{template "datree.chart" .}}
-    release: {{.Release.Name}}
+  name: datree-label-namespace
+  namespace: {{template "datree.namespace" .}}
+  labels: {{include "datree.labels" . | nindent 4}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: datree-update-namespace-skip-label
-  namespace: {{.Values.namespace}}
-  labels:
-    chart: {{template "datree.chart" .}}
-    release: {{.Release.Name}}
+  name: datree-label-namespace-update
+  namespace: {{template "datree.namespace" .}}
+  labels: {{include "datree.labels" . | nindent 4}}
 rules:
   - apiGroups:
       - ""
@@ -60,19 +53,19 @@ rules:
       - patch
     resourceNames:
       - kube-system
+      - {{template "datree.namespace" .}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: datree-update-namespace-skip-label
-  namespace: {{.Values.namespace}}
-  labels:
-    release: {{.Release.Name}}
+  name: datree-label-namespace-update
+  namespace: {{template "datree.namespace" .}}
+  labels: {{include "datree.labels" . | nindent 4}}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: datree-update-namespace-skip-label
+  name: datree-label-namespace-update
 subjects:
   - kind: ServiceAccount
-    name: datree-update-namespace-skip-label
-    namespace: {{.Values.namespace | quote}}
+    name: datree-label-namespace
+    namespace: {{template "datree.namespace" .}}

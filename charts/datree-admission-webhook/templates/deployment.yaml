@@ -1,21 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.rbac.serviceAccount.name}}
-  namespace: {{.Values.namespace}}
+  name: datree-webhook-server
+  namespace: {{ template "datree.namespace" . }}
   labels: {{ include "datree.labels" . | nindent 4 }}
-    env: testing
     owner: datree
-    app: "webhook-server"
+    app: "datree-webhook-server"
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels: 
-      app: "webhook-server"
+      app: "datree-webhook-server"
   template:
     metadata:
       labels: {{ include "datree.labels" . | nindent 8 }}
-        app: "webhook-server"
+        app: "datree-webhook-server"
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
