@@ -1,30 +1,28 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: datree-label-namespaces-hook-post-install
-  namespace: {{template "datree.namespace" .}}
+  name: datree-cleanup-namespaces-hook-pre-delete
   labels: {{include "datree.labels" . | nindent 4}}
+  namespace: {{template "datree.namespace" .}}
   annotations:
-    "helm.sh/hook": post-install
-    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
       labels: {{include "datree.labels" . | nindent 8}}
     spec:
-      serviceAccount: datree-label-namespaces-hook-post-install
       restartPolicy: OnFailure
+      serviceAccount: datree-cleanup-namespaces-hook-pre-delete
       nodeSelector:
         kubernetes.io/os: linux
       containers:
         - name: kubectl-label
           image: "{{ .Values.hooks.labelNamespace.image.repository }}@{{ .Values.hooks.labelNamespace.image.sha }}"
           imagePullPolicy: {{.Values.hooks.labelNamespace.image.pullPolicy}}
-          args:
-            - label
-            - ns
-            - kube-system
-            - {{template "datree.namespace" .}}
-            - datree.io/skip=true
-            - --overwrite
+          command:
+            - sh
+            - "-c"
+            - >-
+              kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n {{template "datree.namespace" .}};
+              kubectl label ns kube-system {{template "datree.namespace" .}} datree.io/skip-;
