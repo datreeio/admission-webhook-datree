@@ -6,7 +6,7 @@ metadata:
   labels: {{include "datree.labels" . | nindent 4}}
 spec:
   selector:
-    app: webhook-server
+    app: "datree-webhook-server"
   ports:
     - port: 443
       targetPort: webhook-api

@@ -2,19 +2,21 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: datree-wait-for-webhook-server-rollout
+  namespace: {{template "datree.namespace" .}}
   labels: {{ include "datree.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
     metadata:
-      name: "{{ .Release.Name }}"
+      name: datree-wait-for-webhook-server-rollout
       labels: {{ include "datree.labels" . | nindent 8 }}
     spec:
       restartPolicy: Never
       containers:
       - name: sleepy
-        image: image: "{{ .Values.hooks.waitForServerRollout.image.repository }}@{{ .Values.hooks.waitForServerRollout.image.sha }}"
+        image: "{{ .Values.hooks.waitForServerRollout.image.repository }}@{{ .Values.hooks.waitForServerRollout.image.sha }}"
         imagePullPolicy: {{.Values.hooks.waitForServerRollout.image.pullPolicy}}
         command: ["/bin/sleep","{{ default "60" .Values.sleepyTime }}"]
