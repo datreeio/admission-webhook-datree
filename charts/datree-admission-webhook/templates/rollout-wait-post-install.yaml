@@ -5,7 +5,6 @@ metadata:
   labels: {{ include "datree.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": post-install
-    "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": hook-succeeded
 spec:
   template:
@@ -15,6 +14,7 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-      - name: post-install-sleepy-job
-        image: "alpine:3.3"
+      - name: sleepy
+        image: image: "{{ .Values.hooks.waitForServerRollout.image.repository }}@{{ .Values.hooks.waitForServerRollout.image.sha }}"
+        imagePullPolicy: {{.Values.hooks.waitForServerRollout.image.pullPolicy}}
         command: ["/bin/sleep","{{ default "60" .Values.sleepyTime }}"]

@@ -57,4 +57,18 @@ resources:
     cpu: 1000m
     memory: 512Mi
 
+# The waiting time before the webhook-server is ready to receive requests.
 sleepyTime:
+
+# Helm hook that run after the chart is installed and label namespaces with datree.io/skip=true
+hooks:
+  labelNamespace:
+    image:
+      repository: bitnami/kubectl
+      sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
+      pullPolicy: Always
+  waitForServerRollout:
+    image:
+      repository: alpine
+      sha: sha256:1304f174557314a7ed9eddb4eab12fed12cb0cd9809e4c28f29af86979a3c870
+      pullPolicy: Always
