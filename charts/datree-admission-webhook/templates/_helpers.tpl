@@ -21,5 +21,5 @@ helm.sh/chart: {{ template "datree.chart" . }}
 
 {{/* The namespace name. */}}
 {{- define "datree.namespace" -}}
-{{- default .Release.Namespace .Values.namespace -}}
+{{- default .Release.Namespace .Values.namespace  -}}
 {{- end -}}
