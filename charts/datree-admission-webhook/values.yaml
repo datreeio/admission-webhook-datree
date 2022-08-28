@@ -70,4 +70,4 @@ hooks:
   image:
     repository: bitnami/kubectl
     sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
-    pullPolicy: Always
+    pullPolicy: IfNotPresent
