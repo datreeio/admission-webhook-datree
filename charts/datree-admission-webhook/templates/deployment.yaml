@@ -1,21 +1,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{.Values.rbac.serviceAccount.name}}
-  namespace: {{.Values.namespace}}
+  name: datree-webhook-server
+  namespace: {{ template "datree.namespace" . }}
   labels: {{ include "datree.labels" . | nindent 4 }}
-    env: testing
     owner: datree
-    app: "webhook-server"
+    app: "datree-webhook-server"
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels: 
-      app: "webhook-server"
+      app: "datree-webhook-server"
   template:
     metadata:
       labels: {{ include "datree.labels" . | nindent 8 }}
-        app: "webhook-server"
+        app: "datree-webhook-server"
+      {{- if .Values.customAnnotations }}
+      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- end }}
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
@@ -33,7 +38,7 @@ spec:
               value: {{.Values.datree.output}}
             - name: DATREE_NO_RECORD
               value: {{.Values.datree.noRecord}}
-          securityContext: {{- toYaml .Values.securityContext | nindent 12}}
+          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
           livenessProbe:
             httpGet:
               path: /health
@@ -48,7 +53,7 @@ spec:
               scheme: HTTPS
             initialDelaySeconds: 5
             periodSeconds: 10
-          resources: {{- toYaml .Values.resources | nindent 12}}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{.Values.image.pullPolicy}}
           ports:

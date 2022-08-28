@@ -1,12 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: webhook-server
-  namespace: {{.Values.namespace}}
+  name: datree-webhook-server
+  namespace: {{template "datree.namespace" .}}
   labels: {{include "datree.labels" . | nindent 4}}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
 spec:
   selector:
-    app: webhook-server
+    app: "datree-webhook-server"
   ports:
     - port: 443
       targetPort: webhook-api
