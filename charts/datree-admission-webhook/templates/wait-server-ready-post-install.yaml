@@ -20,7 +20,7 @@ spec:
       serviceAccountName: datree-wait-server-ready-hook-post-install
       restartPolicy: Never
       containers:
-      - name: sleepy
+      - name: kubectl-client
         image: "{{ .Values.hooks.image.repository }}@{{ .Values.hooks.image.sha }}"
         imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
         command:
