@@ -12,7 +12,7 @@ customLabels: {}
 # Additional annotations to add to all resources.
 customAnnotations: {}
 
-# Create ClusterRoles, ClusterRoleBindings, and ServiceAccount
+# Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
     # Create the ServiceAccount
