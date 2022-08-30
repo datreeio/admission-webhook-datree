@@ -44,7 +44,7 @@ For more information see [Datree webhook Helm chart](https://github.com/datreeio
 
 During the installtion the script will require to enter the Datree token during installation.
 
-```
+```bash
 # Install with prompting Datree token
 bash <(curl https://get.datree.io/admission-webhook)
 
@@ -112,7 +112,7 @@ spec:
 2. Change the values of your settings as you desire.
 3. Run the following command to apply your changes to the webhook resource:
 
-```
+```bash
 kubectl patch deployment webhook-server -n datree --patch-file /path/to/patch/file.yaml
 ```
 
@@ -120,13 +120,13 @@ kubectl patch deployment webhook-server -n datree --patch-file /path/to/patch/fi
 
 Add the label `"admission.datree/validate=skip"` to the configuration of the namespace you would like to ignore:
 
-```
+```bash
 kubectl label namespaces default "admission.datree/validate=skip"
 ```
 
 To delete the label and resume running the datree webhook on the namespace again:
 
-```
+```bash
 kubectl label namespaces default "admission.datree/validate-"
 ```
 
@@ -134,8 +134,15 @@ kubectl label namespaces default "admission.datree/validate-"
 
 To uninstall the webhook, copy the following command and run it in your terminal:
 
-```
+```bash
 bash <(curl https://get.datree.io/admission-webhook-uninstall)
+```
+
+To uninstall the helm release, copy the following command and run it in your terminal:
+
+```bash
+helm uninstall datree-webhook -n datree
+kubectl delete ns datree
 ```
 
 ## Local development
