@@ -1,6 +1,8 @@
 package errorReporter
 
 import (
+	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	"os"
 
 	"runtime/debug"
@@ -40,13 +42,17 @@ func (reporter *ErrorReporter) ReportPanicError(panicErr interface{}) {
 
 func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	errorMessage := utils.ParseErrorToString(error)
-	_, _ = reporter.client.ReportCliError(cliClient.ReportCliErrorRequest{
+	statusCode, err := reporter.client.ReportCliError(cliClient.ReportCliErrorRequest{
 		ClientId:     os.Getenv(enums.ClientId),
 		Token:        os.Getenv(enums.Token),
 		CliVersion:   cmd.CliVersion,
 		ErrorMessage: errorMessage,
 		StackTrace:   string(debug.Stack()),
 	}, uri)
+
+	if err != nil {
+		loggerUtil.Log(fmt.Sprintf("ReportError status code: %d, err: %s", statusCode, err.Error()))
+	}
 }
 
 func (reporter *ErrorReporter) getLocalConfig() (unknownLocalConfig *localConfig.LocalConfig) {
