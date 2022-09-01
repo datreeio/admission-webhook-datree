@@ -13,6 +13,7 @@ import (
 	"k8s.io/utils/strings/slices"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	licensemanagerclient "github.com/datreeio/admission-webhook-datree/pkg/licenseManagerClient"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
@@ -86,6 +87,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	if err != nil {
 		panic(err)
 	}
+
+	licensemanagerclient.PollCheckoutLicense(token)
 
 	clientId := getClientId()
 
