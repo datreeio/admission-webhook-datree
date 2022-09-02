@@ -59,6 +59,7 @@ func start(port string) {
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+		fmt.Println("server is listening on port:", port)
 		http.ListenAndServe(":"+port, nil)
 	}
 }

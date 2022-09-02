@@ -40,9 +40,9 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: datree/awsmp-datree-admission-webhook
+  repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
   # Image tag
-  tag: 1.0
+  tag: 1.2
   # Image pull policy
   pullPolicy: Always
 
@@ -73,10 +73,16 @@ hooks:
     pullPolicy: IfNotPresent
 
 # AWS Marketplace configuration
-awsmp:
-  # The name of the secret that contains the license configuration.
-  licenseConfigSecretName: "aws-marketplace-license-config"
-  # The license identity token in the secret.
-  licenseToken: <LICENSE_TOKEN>
-  # The AWS Identity and Access Management role.
-  iamRole: <IAM_ROLE>
+# awsmp:
+#   # The name of the secret that contains the license configuration.
+#   licenseConfigSecretName: "aws-marketplace-license-config"
+#   # The license identity token in the secret.
+#   licenseToken: <LICENSE_TOKEN>
+#   # The AWS Identity and Access Management role.
+#   iamRole: <IAM_ROLE>
+
+# add aws marketplace license config for on-prem deployments
+aws:
+  mpLicenseSecretName: ""
+  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  enableCheckoutLicense: true
