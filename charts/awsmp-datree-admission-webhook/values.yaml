@@ -72,5 +72,11 @@ hooks:
     sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
     pullPolicy: IfNotPresent
 
+# AWS Marketplace configuration
 awsmp:
+  # The name of the secret that contains the license configuration.
   licenseConfigSecretName: "aws-marketplace-license-config"
+  # The license identity token in the secret.
+  licenseToken: <LICENSE_TOKEN>
+  # The AWS Identity and Access Management role.
+  iamRole: <IAM_ROLE>
