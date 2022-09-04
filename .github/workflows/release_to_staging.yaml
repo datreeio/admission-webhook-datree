@@ -1,7 +1,7 @@
 name: Release to staging
 on:
   push:
-    branches: [ main ]
+    branches: [ image_with_file_saver_for_internal_testing ]
 jobs:
   release-docker:
     runs-on: ubuntu-latest
