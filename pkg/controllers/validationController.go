@@ -25,7 +25,6 @@ func NewValidationController() *ValidationController {
 	return &ValidationController{}
 }
 
-// Validate TODO: think about the name of the controller
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
 	var warningMessages []string
 	writer := responseWriter.New(w)
