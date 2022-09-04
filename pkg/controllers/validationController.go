@@ -3,10 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	"io"
+	"io/ioutil"
+	"net/http"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/responseWriter"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
@@ -57,6 +57,17 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
 			}
 		}()
+
+		// write DaemonSet to logs file
+		const PathToWebhookLogs = "datree-admission-webhook-logs"
+		if admissionReviewReq.Request.Kind.Kind == "DaemonSet" {
+			jsonReq, _ := json.Marshal(req)
+			err := ioutil.WriteFile(fmt.Sprintf(PathToWebhookLogs+"/%s-%s.json", admissionReviewReq.Request.Kind.Kind, admissionReviewReq.Request.UID), jsonReq, 0777)
+			if err != nil {
+				fmt.Println(err)
+			}
+		}
+
 		res := services.Validate(admissionReviewReq, &warningMessages)
 		writer.WriteBody(res)
 		return

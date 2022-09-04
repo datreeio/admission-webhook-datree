@@ -66,11 +66,6 @@ spec:
               value: ""
             - name: DATREE_NO_RECORD
               value: ""
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 25000
           livenessProbe:
             httpGet:
               path: /health

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"net/http"
 	"os"
 
@@ -19,6 +18,8 @@ import (
 )
 
 const DefaultErrExitCode = 1
+
+const PathToWebhookLogs = "datree-admission-webhook-logs"
 
 func main() {
 	port := os.Getenv("LISTEN_PORT")
@@ -52,6 +53,10 @@ func start(port string) {
 
 	validationController := controllers.NewValidationController()
 	healthController := controllers.NewHealthController()
+
+	// create folder to save logs
+	os.Mkdir(PathToWebhookLogs, os.ModePerm)
+
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
 	http.HandleFunc("/health", healthController.Health)
