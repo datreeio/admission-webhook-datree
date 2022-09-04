@@ -61,7 +61,7 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 		// write DaemonSet to logs file
 		const PathToWebhookLogs = "datree-admission-webhook-logs"
 		if admissionReviewReq.Request.Kind.Kind == "DaemonSet" {
-			jsonReq, _ := json.Marshal(req)
+			jsonReq, _ := json.Marshal(admissionReviewReq.Request)
 			err := ioutil.WriteFile(fmt.Sprintf(PathToWebhookLogs+"/%s-%s.json", admissionReviewReq.Request.Kind.Kind, admissionReviewReq.Request.UID), jsonReq, 0777)
 			if err != nil {
 				fmt.Println(err)
