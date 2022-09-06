@@ -1,0 +1,64 @@
+{{- if .Values.rbac.clusterRole.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{.Values.rbac.clusterRole.name}}
+  labels: {{ include "datree.labels" . | nindent 4 }}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - "nodes"
+      - "namespaces"
+    verbs:
+      - "get"
+      - "list"
+{{- end}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: datree-namespaces-update
+  labels: {{include "datree.labels" . | nindent 4}}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - namespaces
+    verbs:
+      - get
+      - update
+      - patch
+    resourceNames:
+      - kube-system
+      - {{template "datree.namespace" .}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: datree-validationwebhook-delete
+  labels: {{include "datree.labels" . | nindent 4}}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - "admissionregistration.k8s.io"
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    resourceNames:
+      - datree-webhook
