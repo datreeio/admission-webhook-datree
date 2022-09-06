@@ -25,7 +25,7 @@ To avoid such issues, we decided to define the specific operations that the admi
 The webhook officially supports **Kubernetes version _1.19_** and higher, and has been tested with EKS.
 
 # Installation
-
+<!-- 
 ## Deploy with Helm
 
 ```bash
@@ -38,7 +38,7 @@ The webhook officially supports **Kubernetes version _1.19_** and higher, and ha
   helm install -n datree datree-webhook datree-webhook/datree-admission-webhook --set datree.token=<DATREE_TOKEN>
 ``` -->
 <!-- 
-For more information see [Datree webhook Helm chart](https://github.com/datreeio/admission-webhook-datree/tree/gh-pages).
+For more information see [Datree webhook Helm chart](https://github.com/datreeio/admission-webhook-datree/tree/gh-pages). -->
 
 ## Deploy with installation script
 
@@ -138,12 +138,12 @@ To uninstall the webhook, copy the following command and run it in your terminal
 bash <(curl https://get.datree.io/admission-webhook-uninstall)
 ```
 
-To uninstall the helm release, copy the following command and run it in your terminal:
+<!-- To uninstall the helm release, copy the following command and run it in your terminal:
 
 ```bash
 helm uninstall datree-webhook -n datree
 kubectl delete ns datree
-```
+``` -->
 
 ## Local development
 
