@@ -2,11 +2,13 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
+	licensemanagerclient "github.com/datreeio/admission-webhook-datree/pkg/licenseManagerClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
@@ -20,11 +22,9 @@ func InitK8sMetadataUtil() {
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
-
-	var clusterUuid k8sTypes.UID
-
 	k8sClient, err := getClientSet()
 
+	var clusterUuid k8sTypes.UID
 	if err != nil {
 		sendK8sMetadata(-1, err, clusterUuid, cliClient)
 		return
@@ -41,6 +41,11 @@ func InitK8sMetadataUtil() {
 		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
 	cornJob.Start()
+
+	if os.Getenv(enums.AWSMarketplaceEnableCheckoutLicense) == "true" {
+		runDailyAWSCheckoutLicenseCronJob(k8sClient)
+	}
+
 }
 
 func getNodesCount(clientset *kubernetes.Clientset) (int, error) {
@@ -88,4 +93,23 @@ func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.U
 		NodesCount:    nodesCount,
 		NodesCountErr: nodesCountErrString,
 	})
+}
+
+// run chckout license cron job daily to check if aws marketplace license is valid with the nodes number
+func runDailyAWSCheckoutLicenseCronJob(k8sClient *kubernetes.Clientset) {
+	licenseManagerClient := licensemanagerclient.NewLicenseManagerClient()
+
+	licenseCheckerCornJob := cron.New(cron.WithLocation(time.UTC))
+	licenseCheckerCornJob.AddFunc("@daily", func() {
+		nodesCount, err := getNodesCount(k8sClient)
+		if err != nil {
+			fmt.Println("failed counting nodes for checkout", err)
+		}
+
+		err = licenseManagerClient.CheckoutLicense(nodesCount)
+		if err != nil {
+			fmt.Println("checkout license failed: ", err)
+		}
+	})
+	licenseCheckerCornJob.Start()
 }
