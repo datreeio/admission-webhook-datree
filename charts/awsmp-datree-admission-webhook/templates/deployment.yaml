@@ -62,7 +62,7 @@ spec:
             - name: AWS_MP_PRODUCT_SKU
               value: {{.Values.aws.productSku}}
             - name: AWS_MP_ENABLE_CHECKOUT_LICENSE
-              value: {{.Values.aws.enableCheckoutLicense}}
+              value: {{.Values.aws.enableCheckoutLicense | quote}}
             {{- if .Values.aws.mpLicenseSecretName }}
             - name: AWS_WEB_IDENTITY_REFRESH_TOKEN_FILE
               value: "/var/run/secrets/awsmp-product-license/license_token"

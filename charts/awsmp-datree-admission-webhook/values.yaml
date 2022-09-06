@@ -42,7 +42,7 @@ image:
   # Image repository
   repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
   # Image tag
-  tag: 1.2
+  tag: 1.4.test
   # Image pull policy
   pullPolicy: Always
 
@@ -84,5 +84,5 @@ hooks:
 # add aws marketplace license config for on-prem deployments
 aws:
   mpLicenseSecretName: ""
-  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
-  enableCheckoutLicense: true
+  productSku: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  enableCheckoutLicense: "true"
