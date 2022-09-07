@@ -25,45 +25,47 @@ func NewValidationController() *ValidationController {
 	return &ValidationController{}
 }
 
-// Validate TODO: think about the name of the controller
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
 	var warningMessages []string
 	writer := responseWriter.New(w)
-	switch req.Method {
-	case http.MethodPost:
-		err := headerValidation(req)
-		if err != nil {
-			fmt.Println(fmt.Errorf("header validation failed: %s", err))
-			writer.BadRequest(err.Error())
-			return
-		}
 
-		admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
-		if err != nil {
-			fmt.Println(fmt.Errorf("parsing request body failed: %s", err))
-			writer.BadRequest(err.Error())
-			return
-		}
-
-		defer func() {
-			if panicErr := recover(); panicErr != nil {
-				validator := networkValidator.NewNetworkValidator()
-				newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
-				newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
-				reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
-				reporter.ReportPanicError(panicErr)
-				fmt.Println(utils.ParseErrorToString(panicErr))
-				warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
-				writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
-			}
-		}()
-		res := services.Validate(admissionReviewReq, &warningMessages)
-		writer.WriteBody(res)
-		return
-	default:
+	if req.Method != http.MethodPost {
 		writer.NotAllowed("Method not allowed")
+		return
 	}
+
+	err := headerValidation(req)
+	if err != nil {
+		fmt.Println(fmt.Errorf("header validation failed: %s", err))
+		writer.BadRequest(err.Error())
+		return
+	}
+
+	admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
+	if err != nil {
+		fmt.Println(fmt.Errorf("parsing request body failed: %s", err))
+		writer.BadRequest(err.Error())
+		return
+	}
+
+	// global panic errors handler
+	defer func() {
+		if panicErr := recover(); panicErr != nil {
+			validator := networkValidator.NewNetworkValidator()
+			newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
+			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
+			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
+			reporter.ReportPanicError(panicErr)
+			fmt.Println(utils.ParseErrorToString(panicErr))
+			warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
+			writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
+		}
+	}()
+
+	res := services.Validate(admissionReviewReq, &warningMessages)
+	writer.WriteBody(res)
 }
+
 func headerValidation(req *http.Request) error {
 	if req.Header.Get("Content-Type") != "application/json" {
 		return fmt.Errorf("Content-Type header is not application/json")

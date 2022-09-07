@@ -41,7 +41,7 @@ make start-watch
 - Run Docker daemon by opening Docker desktop
 
 ### Deploy to your local minikube
-- Run `make run deploy-in-minikube` - this will build a docker image and deploy it to minikube
+- Run `make deploy-in-minikube` - this will build a docker image and deploy it to minikube
 - check the webhook is deployed: `kubectl get pods -n datree`
 - try to apply a demo file to the deployment: `kubectl apply -f ./scripts/webhook-demo.yaml`
 
