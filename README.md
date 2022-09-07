@@ -36,8 +36,8 @@ The webhook officially supports **Kubernetes version _1.19_** and higher, and ha
   # Already existing `datree` namespace
   kubectl create ns datree
   helm install -n datree datree-webhook datree-webhook/datree-admission-webhook --set datree.token=<DATREE_TOKEN>
-``` -->
-<!-- 
+```
+ 
 For more information see [Datree webhook Helm chart](https://github.com/datreeio/admission-webhook-datree/tree/gh-pages).
 
 ## Deploy with installation script
