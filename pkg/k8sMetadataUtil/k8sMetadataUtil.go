@@ -105,8 +105,8 @@ func runDailyAWSCheckoutLicenseCronJob(k8sClient *kubernetes.Clientset, cliClien
 	licenseManagerClient := licensemanagerclient.NewLicenseManagerClient()
 
 	licenseCheckerCornJob := cron.New(cron.WithLocation(time.UTC))
-	// @daily means run once a day, midnight
-	licenseCheckerCornJob.AddFunc("@every 1m", func() {
+	// @daily means run once a day, midnight. On debug mode it's very nice to run it once a minute i.e '@every 1min'
+	licenseCheckerCornJob.AddFunc("@daily", func() {
 		nodesCount, err := getNodesCount(k8sClient)
 		if err != nil {
 			loggerUtil.Debug(fmt.Sprint("failed counting nodes for checkout", err))
