@@ -12,6 +12,9 @@ customLabels: {}
 # Additional annotations to add to all resources.
 customAnnotations: {}
 
+# Run the webhook-server in debug mode, this will log debug information to the console.
+debug: false
+
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
@@ -25,6 +28,7 @@ rbac:
     # The ClusterRole name
     name: datree-webhook-server-read
 
+# Datree webhook configuration, checkout more details at htttps://hub.datree.com
 datree:
   # The token used to link the CLI to your dashboard.
   token: <DATREE_TOKEN>
@@ -73,16 +77,14 @@ hooks:
     pullPolicy: IfNotPresent
 
 # AWS Marketplace configuration
-# awsmp:
-#   # The name of the secret that contains the license configuration.
-#   licenseConfigSecretName: "aws-marketplace-license-config"
-#   # The license identity token in the secret.
-#   licenseToken: <LICENSE_TOKEN>
-#   # The AWS Identity and Access Management role.
-#   iamRole: <IAM_ROLE>
-
-# add aws marketplace license config for on-prem deployments
 aws:
-  mpLicenseSecretName: ""
-  productSku: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
-  enableCheckoutLicense: "true"
+  # The name of the secret that contains the license configuration.
+  licenseConfigSecretName: ""
+  # The AWS Region
+  region: "us-east-1"
+  # Enable AWS Marketplace license checkout, this is relevant for paid products only.
+  enableCheckAccountEntitlement: true
+  # The application’s Product SKU (Product ID)
+  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  # The trusted issuer of the license (AWS Marketplace)
+  issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"

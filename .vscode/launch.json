@@ -20,8 +20,10 @@
       "args": ["upgrade"],
       "buildFlags": "-tags=staging",
       "env": {
-        "AWS_MP_ENABLE_CHECKOUT_LICENSE": "true",
-        "AWS_MP_PRODUCT_SKU": "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+        "AWS_MP_ENABLE_CHECK_ENTITLEMENT": "true",
+        "AWS_MP_PRODUCT_ID": "ad0ee0c8-f50f-464a-9bc4-d6270592dd36",
+        "AWS_MP_KEY_FINGERPRINT": "aws:294406891311:AWS/Marketplace:issuer-fingerprint",
+        "AWS_MP_REGION": "us-east-1"
       }
     }
   ]

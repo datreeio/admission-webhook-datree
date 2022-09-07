@@ -11,8 +11,6 @@ import (
 	"github.com/google/uuid"
 )
 
-const awsMarketplaceIssuer = "aws:294406891311:AWS/Marketplace:issuer-fingerprint"
-
 type LicenseManager struct {
 	client                    *licensemanager.LicenseManager
 	awsMarketplaceProductID   string
@@ -21,24 +19,27 @@ type LicenseManager struct {
 
 func NewLicenseManagerClient() *LicenseManager {
 	clientSession := session.Must(session.NewSession())
-	awsClient := licensemanager.New(clientSession, aws.NewConfig().WithRegion("us-east-1"))
+	awsClient := licensemanager.New(clientSession, aws.NewConfig().WithRegion(os.Getenv(enums.AWSMarketplaceRegion)))
 	return &LicenseManager{
 		client:                    awsClient,
-		awsMarketplaceProductID:   os.Getenv(enums.AWSMarketplaceProductSKU),
-		awsMarketplaceFingerprint: awsMarketplaceIssuer,
+		awsMarketplaceProductID:   os.Getenv(enums.AWSMarketplaceProductID),
+		awsMarketplaceFingerprint: os.Getenv(enums.AWSMarketplaceKeyFingerprint),
 	}
 }
 
-// Checkout the account license according to number of nodes, if everything goes well, the license will be checked out,
-// otherwise an error will returned.
-func (l *LicenseManager) CheckoutLicense(entititlementValue int) error {
+// Checkout the account license according to quantity of units the account consumes.
+// If everything goes well, the license will be checked out, otherwise an error will returned.
+func (l *LicenseManager) CheckoutLicense(consumedUnitsCount int) error {
 	_, err := l.client.CheckoutLicense(&licensemanager.CheckoutLicenseInput{
-		ClientToken:  aws.String(uuid.New().String()),
+		ClientToken: aws.String(uuid.New().String()),
+		// "PROVISIONAL" checkout type enables to temporarily draw a unit and return it back to the license pool when the application is stopped.
 		CheckoutType: aws.String("PROVISIONAL"),
 		Entitlements: []*licensemanager.EntitlementData{
 			{
+				// The entitilement name is the contract API name defined in the product.
+				// The contract API name is defined in the product "load form" in the AWS Marketplace management protal
 				Name:  aws.String("Datree"),
-				Value: aws.String(fmt.Sprint(entititlementValue)),
+				Value: aws.String(fmt.Sprint(consumedUnitsCount)),
 				Unit:  aws.String("Count"),
 			},
 		},
