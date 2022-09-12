@@ -8,6 +8,10 @@ replicaCount: 2
 customLabels: {}
 # Additional annotations to add to all resources.
 customAnnotations: {}
+
+# Run the webhook-server in debug mode, this will log debug information to the console.
+# debug: false
+
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
@@ -20,6 +24,8 @@ rbac:
     create: true
     # The ClusterRole name
     name: datree-webhook-server-read
+
+# Datree webhook configuration, checkout more details at htttps://hub.datree.com
 datree:
   # The token used to link the CLI to your dashboard.
   token: <DATREE_TOKEN>
@@ -36,9 +42,10 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: datree/admission-webhook
+  repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
   # Image tag
   tag: 0.1.35
+  # tag: 0.1.24
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -78,3 +85,16 @@ hooks:
     repository: bitnami/kubectl
     sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
     pullPolicy: IfNotPresent
+
+# AWS Marketplace configuration
+aws:
+  # The name of the secret that contains the license configuration.
+  licenseConfigSecretName: ""
+  # The AWS Region
+  region: "us-east-1"
+  # Enable AWS Marketplace license checkout, this is relevant for paid products only.
+  enableCheckEntitlement: true
+  # The application’s Product SKU (Product ID)
+  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  # The trusted issuer of the license (AWS Marketplace)
+  issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"

@@ -29,19 +29,6 @@ spec:
         - name: server
           # caution: don't change the order of the environment variables
           # changing the order will harm resource patching
-          env:
-            - name: DATREE_TOKEN
-              value: "{{ .Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}"
-            - name: DATREE_POLICY
-              value: {{.Values.datree.policy | default "Starter"}}
-            - name: DATREE_VERBOSE
-              value: "{{.Values.datree.verbose}}"
-            - name: DATREE_OUTPUT
-              value: "{{.Values.datree.output}}"
-            - name: DATREE_NO_RECORD
-              value: "{{.Values.datree.noRecord}}"
-            - name: DATREE_ENFORCE
-              value: "{{.Values.datree.enforce}}"
           securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
           livenessProbe:
             httpGet:
@@ -63,6 +50,43 @@ spec:
           ports:
             - containerPort: 8443
               name: webhook-api
+          # caution: don't change the order of the environment variables
+          # changing the order will harm resource patching
+          env:
+            - name: DEBUG
+              value: "{{ .Values.debug }}"
+            # Datree webhook varaibles
+            - name: DATREE_TOKEN
+              value: "{{ .Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}"
+            - name: DATREE_POLICY
+              value: {{.Values.datree.policy | default "Starter"}}
+            - name: DATREE_VERBOSE
+              value: "{{.Values.datree.verbose}}"
+            - name: DATREE_OUTPUT
+              value: "{{.Values.datree.output}}"
+            - name: DATREE_NO_RECORD
+              value: "{{.Values.datree.noRecord}}"
+            - name: DATREE_ENFORCE
+              value: "{{.Values.datree.enforce}}"
+            # AWS Marketplace varaibles
+            - name: AWS_MP_PRODUCT_ID
+              value: {{ .Values.aws.productId }}
+            - name: AWS_MP_KEY_FINGERPRINT
+              value: {{ .Values.aws.issuerKey }}
+            - name: AWS_MP_ENABLE_CHECK_ENTITLEMENT
+              value: "{{.Values.aws.enableCheckEntitlement}}"
+            - name: AWS_MP_REGION
+              value: {{.Values.aws.region}}
+            {{- if .Values.aws.licenseConfigSecretName }}
+            - name: AWS_WEB_IDENTITY_REFRESH_TOKEN_FILE
+              value: "/var/run/secrets/awsmp-product-license/license_token"
+            - name: AWS_ROLE_ARN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.aws.licenseConfigSecretName }}
+                  key: iam_role
+            {{- end}}
+          # add aws marketplace license config to the licensed container application env
           volumeMounts:
             - name: webhook-tls-certs
               mountPath: /run/secrets/tls
@@ -70,6 +94,10 @@ spec:
             - name: webhook-config
               mountPath: /config
               readOnly: true
+          {{- if .Values.aws.licenseConfigSecretName }}
+            - name: awsmp-product-license
+              mountPath: "/var/run/secrets/awsmp-product-license"
+          {{- end}}
       volumes:
         - name: webhook-tls-certs
           secret:
@@ -78,3 +106,8 @@ spec:
           configMap:
             name: webhook-scanning-filters
             optional: true
+      {{- if .Values.aws.licenseConfigSecretName }}
+        - name: awsmp-product-license
+          secret:
+            secretName: {{ .Values.aws.licenseConfigSecretName }}
+      {{- end}}
