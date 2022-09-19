@@ -44,7 +44,7 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
+  repository: public.ecr.aws/m6p7v6h2/datree-admission-webhook
   # Image tag
   tag: 0.1.24
   # Image pull policy
@@ -85,6 +85,6 @@ aws:
   # Enable AWS Marketplace license checkout, this is relevant for paid products only.
   enableCheckEntitlement: true
   # The application’s Product SKU (Product ID)
-  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  productId: "e3c1bf72-7c57-435e-be33-deddbe7220f2"
   # The trusted issuer of the license (AWS Marketplace)
   issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"
