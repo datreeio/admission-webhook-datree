@@ -27,12 +27,15 @@ func shouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bo
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	loggerUtil.Log(fmt.Sprintf("resource kind: %s", resourceKind))
 	loggerUtil.Log("Starting filtering process")
-	return isMetadataNameExists(rootObject.Metadata) &&
+	
+	shouldResourceBeValidated := isMetadataNameExists(rootObject.Metadata) &&
 		shouldEvaluateResourceByKind(resourceKind) &&
 		shouldEvaluateArgoCRDResources(resourceKind, admissionReviewReq.Request.Operation) &&
 		shouldEvaluateFluxCDResources(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels, admissionReviewReq.Request.Namespace) &&
 		shouldEvaluateResourceByManager(rootObject.Metadata.ManagedFields) &&
 		rootObject.Metadata.DeletionTimestamp == ""
+
+	return shouldResourceBeValidated
 }
 
 func shouldEvaluateResourceByKind(resourceKind string) bool {
