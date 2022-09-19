@@ -49,7 +49,6 @@ type Metadata struct {
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string) *admission.AdmissionReview {
 	startTime := time.Now()
 	msg := "We're good!"
-	allowed := true
 	var err error
 
 	validator := networkValidator.NewNetworkValidator()
@@ -177,6 +176,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		loggerUtil.Log(fmt.Sprintf("GetResultsText err: %s", err.Error()))
 	}
 
+	allowed := true
 	if evaluationSummary.PassedPolicyCheckCount == 0 {
 		allowed = false
 
