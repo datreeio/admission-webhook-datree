@@ -31,7 +31,7 @@ rbac:
 # Datree webhook configuration, checkout more details at htttps://hub.datree.com
 datree:
   # The token used to link the CLI to your dashboard.
-  token: <DATREE_TOKEN>
+  token: ""
   # The name of the policy to check, e.g: staging. (string, optional)
   policy: ""
   # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
@@ -44,9 +44,9 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: datree/admission-webhook
+  repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
   # Image tag
-  tag: 0.1.20
+  tag: 0.1.24
   # Image pull policy
   pullPolicy: Always
 
@@ -85,6 +85,6 @@ aws:
   # Enable AWS Marketplace license checkout, this is relevant for paid products only.
   enableCheckEntitlement: true
   # The application’s Product SKU (Product ID)
-  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  productId: "e3c1bf72-7c57-435e-be33-deddbe7220f2"
   # The trusted issuer of the license (AWS Marketplace)
   issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"
