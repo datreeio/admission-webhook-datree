@@ -49,7 +49,6 @@ type Metadata struct {
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string) *admission.AdmissionReview {
 	startTime := time.Now()
 	msg := "We're good!"
-	allowed := true
 	var err error
 
 	validator := networkValidator.NewNetworkValidator()
@@ -177,6 +176,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		loggerUtil.Log(fmt.Sprintf("GetResultsText err: %s", err.Error()))
 	}
 
+	var allowed bool
 	if evaluationSummary.PassedPolicyCheckCount == 0 {
 		allowed = false
 
@@ -184,6 +184,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		sb.WriteString("\n---\n")
 		sb.WriteString(resultStr)
 		msg = sb.String()
+	} else {
+		allowed = true
 	}
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
