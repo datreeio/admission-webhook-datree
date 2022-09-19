@@ -46,7 +46,7 @@ image:
   # Image repository
   repository: public.ecr.aws/m6p7v6h2/datree-admission-webhook
   # Image tag
-  tag: 0.1.24
+  tag: 0.1.24-test
   # Image pull policy
   pullPolicy: Always
 
