@@ -44,7 +44,7 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
+  repository: public.ecr.aws/m6p7v6h2/datree-admission-webhook
   # Image tag
   tag: 0.1.24
   # Image pull policy
