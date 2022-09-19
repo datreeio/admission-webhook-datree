@@ -176,7 +176,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		loggerUtil.Log(fmt.Sprintf("GetResultsText err: %s", err.Error()))
 	}
 
-	allowed := true
+	var allowed bool
 	if evaluationSummary.PassedPolicyCheckCount == 0 {
 		allowed = false
 
@@ -184,6 +184,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		sb.WriteString("\n---\n")
 		sb.WriteString(resultStr)
 		msg = sb.String()
+	} else {
+		allowed = true
 	}
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
