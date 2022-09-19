@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	admission "k8s.io/api/admission/v1"
-	v1 "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
 	"strings"
 )
@@ -14,7 +13,7 @@ type RootObject struct {
 	Metadata Metadata `json:"metadata"`
 }
 
-func shouldResourceBeValidated(admissionReviewReq *v1.AdmissionReview) bool {
+func shouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bool {
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
 	}
