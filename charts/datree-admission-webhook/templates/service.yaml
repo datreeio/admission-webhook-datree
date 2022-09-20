@@ -1,1 +1,5 @@
 {{- include "datree-lib.service" .}}
+---
+{{- include "datree-lib.serviceaccounts" .}}
+---
+
