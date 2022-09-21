@@ -98,17 +98,10 @@ func isArgoResourceThatShouldBeEvaluated(resourceKind string, operation admissio
 		return false
 	}
 
-	if operation != admission.Create {
-		return false
-	}
-
-	argoCRDList := []string{"Application", "Workflow", "Rollout"}
-	isKindInArgoCRDList := slices.Contains(argoCRDList, resourceKind)
-	if !isKindInArgoCRDList {
-		return false
-	}
-
-	return true
+	isKindInArgoCRDListThatShouldBeValidatedOnlyOnCreate := slices.Contains([]string{"Application", "Workflow", "Rollout"}, resourceKind)
+	isOperationCreate := operation == admission.Create
+	
+	return isKindInArgoCRDListThatShouldBeValidatedOnlyOnCreate && isOperationCreate || !isKindInArgoCRDListThatShouldBeValidatedOnlyOnCreate
 }
 
 func isFluxObject(labels map[string]string, namespace string) bool {
