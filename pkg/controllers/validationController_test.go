@@ -2,6 +2,7 @@ package controllers
 
 import (
 	_ "embed"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -98,7 +99,7 @@ func TestValidateRequestBody(t *testing.T) {
 	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "We're good!")
 }
 
-func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
+func TestValidateRequestBodyWithAllowedK8sResource_kubectlApply(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
@@ -106,7 +107,10 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":false")
+	fmt.Println("--------------------------")
+	fmt.Println(responseRecorder.Body.String())
+	fmt.Println("--------------------------")
+	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":true")
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
