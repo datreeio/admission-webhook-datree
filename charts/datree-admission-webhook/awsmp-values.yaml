@@ -2,15 +2,18 @@
 
 # The name of the namespace all resources will be created in, if not specified in the release.
 namespace: ""
+
 # The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
+
 # Additional labels to add to all resources.
 customLabels: {}
+
 # Additional annotations to add to all resources.
 customAnnotations: {}
 
 # Run the webhook-server in debug mode, this will log debug information to the console.
-# debug: false
+debug: false
 
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
@@ -25,6 +28,7 @@ rbac:
     # The ClusterRole name
     name: datree-webhook-server-read
 
+# Datree webhook configuration, checkout more details at htttps://hub.datree.com
 datree:
   # The token used to link the CLI to your dashboard.
   token: <DATREE_TOKEN>
@@ -36,45 +40,32 @@ datree:
   output: ""
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord: ""
-  # Block resources that fail the policy check. (boolean ,optional)
-  enforce: ""
+
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: datree/admission-webhook
+  repository: public.ecr.aws/m6p7v6h2/awsmp-datree-admission-webhook
   # Image tag
-  tag: 0.1.35
-  # tag: 0.1.24
+  tag: 0.1.24
   # Image pull policy
   pullPolicy: Always
+
 # Security context for the containers
-scan_job:
-  image:
-    # Image repository
-    repository: datree/scan-job
-    # Image tag
-    tag: 0.0.8
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 25000
+
 resources:
   limits:
     memory: 512Mi
   requests:
     cpu: 1000m
     memory: 512Mi
-scanJob:
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 512Mi
-    requests:
-      cpu: 500m
-      memory: 256Mi
+
 # During install Datree run two hooks: pre-install and pre-delete.
-# `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
+# `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with datree.io/skip=true
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
 hooks:
   # The timeout time the hook will wait for the webhook-server is ready.
@@ -84,3 +75,16 @@ hooks:
     repository: bitnami/kubectl
     sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
     pullPolicy: IfNotPresent
+
+# AWS Marketplace configuration
+aws:
+  # The name of the secret that contains the license configuration.
+  licenseConfigSecretName: ""
+  # The AWS Region
+  region: "us-east-1"
+  # Enable AWS Marketplace license checkout, this is relevant for paid products only.
+  enableCheckEntitlement: true
+  # The application’s Product SKU (Product ID)
+  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  # The trusted issuer of the license (AWS Marketplace)
+  issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"
