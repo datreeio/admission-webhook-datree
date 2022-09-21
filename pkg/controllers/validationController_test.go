@@ -105,7 +105,7 @@ func TestValidateRequestBodyWithAllowedK8sResource_kubectlApply(t *testing.T) {
 
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
-	
+
 	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":true")
 }
 
