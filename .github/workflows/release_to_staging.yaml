@@ -17,7 +17,6 @@ jobs:
     name: Release container image to public registries
     steps:
       - uses: actions/checkout@v3
-      - run: echo check staging new paths
       - name: Define release version
         id: define_version
         run: |-
