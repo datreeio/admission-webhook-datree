@@ -29,6 +29,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bo
 
 	loggerUtil.Log("Starting filtering process")
 
+	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject.Metadata)
 	isUnsupportedKind := isUnsupportedKind(resourceKind)
 	isResourceDeleted := isResourceDeleted(rootObject)
