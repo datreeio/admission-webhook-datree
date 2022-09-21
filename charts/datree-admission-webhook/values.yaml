@@ -71,3 +71,16 @@ hooks:
     repository: bitnami/kubectl
     sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039
     pullPolicy: IfNotPresent
+
+# AWS Marketplace configuration
+aws:
+  # The name of the secret that contains the license configuration.
+  licenseConfigSecretName: ""
+  # The AWS Region
+  region: ""
+  # Enable AWS Marketplace license checkout, this is relevant for paid products only.
+  enableCheckEntitlement: false
+  # The application’s Product SKU (Product ID)
+  productId: ""
+  # The trusted issuer of the license (AWS Marketplace)
+  issuerKey: ""
