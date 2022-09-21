@@ -29,14 +29,25 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bo
 
 	loggerUtil.Log("Starting filtering process")
 
-	shouldResourceBeValidated := isMetadataNameExists(rootObject.Metadata) &&
-		!isUnsupportedKind(resourceKind) &&
-		!isResourceDeleted(rootObject) &&
-		(isKubectl(rootObject.Metadata.ManagedFields) ||
-			isFluxResourceThatShouldBeEvaluated(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels, admissionReviewReq.Request.Namespace, rootObject.Metadata.ManagedFields) ||
-			isArgoResourceThatShouldBeEvaluated(resourceKind, admissionReviewReq.Request.Operation, rootObject.Metadata.ManagedFields))
+	isMetadataNameExists := isMetadataNameExists(rootObject.Metadata)
+	isUnsupportedKind := isUnsupportedKind(resourceKind)
+	isResourceDeleted := isResourceDeleted(rootObject)
+	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted
 
-	return shouldResourceBeValidated
+	if !arePrerequisitesMet {
+		return false
+	}
+
+	isKubectl := isKubectl(rootObject.Metadata.ManagedFields)
+	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(*admissionReviewReq.Request.DryRun, rootObject.Metadata.Labels, admissionReviewReq.Request.Namespace, rootObject.Metadata.ManagedFields)
+	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(resourceKind, admissionReviewReq.Request.Operation, rootObject.Metadata.ManagedFields)
+	isResourceWhiteListed := isKubectl || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
+
+	if !isResourceWhiteListed {
+		return false
+	}
+
+	return true
 }
 
 func isMetadataNameExists(metadata Metadata) bool {
