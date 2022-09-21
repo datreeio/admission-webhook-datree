@@ -13,9 +13,12 @@ require (
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
 )
 
+require github.com/jmespath/go-jmespath v0.4.0 // indirect
+
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/aws/aws-sdk-go v1.44.91
 	github.com/bmatcuk/doublestar/v2 v2.0.4 // indirect
 	github.com/briandowns/spinner v1.12.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
