@@ -64,7 +64,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages)
 	}
 
-	loggerUtil.Log("Resource needs to be scan")
+	loggerUtil.Log("Resource needs to be scaned")
 	token, err := getToken(cliClient)
 	if err != nil {
 		panic(err)
