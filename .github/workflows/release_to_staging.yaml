@@ -1,7 +1,7 @@
 name: Release to staging
 on:
   push:
-    branches: [ ci_staging_listen_pathes ]
+    branches: [ main ]
     paths:
       - 'pkg/**'
       - 'Dockerfile'
