@@ -21,6 +21,7 @@ import (
 const DefaultErrExitCode = 1
 
 func main() {
+	fmt.Println("to be removed")
 	port := os.Getenv("LISTEN_PORT")
 	if port == "" {
 		port = "8443"
