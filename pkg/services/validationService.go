@@ -59,7 +59,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	clusterK8sVersion := getK8sVersion()
 	loggerUtil.Log(fmt.Sprintf("k8s version: %s", clusterK8sVersion))
 
-	if !shouldResourceBeValidated(admissionReviewReq) {
+	if !ShouldResourceBeValidated(admissionReviewReq) {
 		loggerUtil.Log("Resource needs to be skipped")
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages)
 	}
