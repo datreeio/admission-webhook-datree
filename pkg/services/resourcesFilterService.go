@@ -58,7 +58,7 @@ func isMetadataNameExists(metadata Metadata) bool {
 func isUnsupportedKind(resourceKind string) bool {
 	loggerUtil.Log("Filtering - isUnsupportedKind")
 	unsupportedResourceKinds := []string{"Event", "GitRepository"}
-	return !slices.Contains(unsupportedResourceKinds, resourceKind)
+	return slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 
 func isResourceDeleted(rootObject RootObject) bool {
