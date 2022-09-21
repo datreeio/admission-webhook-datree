@@ -2,7 +2,6 @@ package controllers
 
 import (
 	_ "embed"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -106,10 +105,7 @@ func TestValidateRequestBodyWithAllowedK8sResource_kubectlApply(t *testing.T) {
 
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
-
-	fmt.Println("--------------------------")
-	fmt.Println(responseRecorder.Body.String())
-	fmt.Println("--------------------------")
+	
 	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":true")
 }
 
