@@ -80,7 +80,7 @@ override_core_resources() {
     echo "Overriding core resources for minikube..."
     imagePullPolicy="Never"
     image="webhook-server"
-    replicasCount=2
+    replicasCount=1
   fi
   sed 's/${DATREE_TOKEN}/'"$datree_token"'/g' <"${basedir}/kube/core-resources.yaml" |
     sed -e 's/imagePullPolicy: Always/imagePullPolicy: '"$imagePullPolicy"'/g' |
