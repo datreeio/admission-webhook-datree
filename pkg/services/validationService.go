@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	"net/http"
 	"os"
@@ -46,7 +47,7 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string) *admission.AdmissionReview {
+func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, logger logger.Logger) *admission.AdmissionReview {
 	startTime := time.Now()
 	msg := "We're good!"
 	var err error
@@ -60,11 +61,11 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	loggerUtil.Log(fmt.Sprintf("k8s version: %s", clusterK8sVersion))
 
 	if !ShouldResourceBeValidated(admissionReviewReq) {
-		loggerUtil.Log("Resource needs to be skipped")
+		logger.Log("Resource skipped")
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages)
 	}
+	logger.Log("Resource should be validated")
 
-	loggerUtil.Log("Resource needs to be scan")
 	token, err := getToken(cliClient)
 	if err != nil {
 		panic(err)

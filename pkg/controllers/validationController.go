@@ -3,10 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"io"
 	"net/http"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	"github.com/google/uuid"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/responseWriter"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
@@ -26,6 +28,8 @@ func NewValidationController() *ValidationController {
 }
 
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
+	logger := logger.New(uuid.NewString())
+
 	var warningMessages []string
 	writer := responseWriter.New(w)
 
@@ -62,7 +66,9 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 		}
 	}()
 
-	res := services.Validate(admissionReviewReq, &warningMessages)
+	logger.Log(admissionReviewReq)
+
+	res := services.Validate(admissionReviewReq, &warningMessages, logger)
 	writer.WriteBody(res)
 }
 

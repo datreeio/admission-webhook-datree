@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-
+	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"net/http"
 	"os"
 
@@ -56,6 +57,8 @@ func start(port string) {
 	http.HandleFunc("/validate", validationController.Validate)
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
+
+	logger.LogUtil(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
