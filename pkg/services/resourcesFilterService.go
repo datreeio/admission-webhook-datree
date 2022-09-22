@@ -81,8 +81,7 @@ func isKubectl(managedFields []ManagedFields) bool {
 		if the user overrides the default value of the flag "field-manager" then the request will not be considered a kubectl request
 		and therefore will likely not be evaluated
 	*/
-	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields, []string{"kubectl-client-side-apply", "kubectl-create", "kubectl-edit", "kubectl-patch"})
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"kubectl"})
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"kubectl-client-side-apply", "kubectl-create", "kubectl-edit", "kubectl-patch"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject, managedFields []ManagedFields) bool {
