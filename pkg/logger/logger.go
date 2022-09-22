@@ -49,3 +49,4 @@ func LogUtil(msg string) {
 // TODO remove all the unnecessary logs
 // TODO add a log level for errors
 // TODO add a log level for info
+// TODO consider using Zap
