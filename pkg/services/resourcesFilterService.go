@@ -143,8 +143,8 @@ func doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(fields []ManagedFields,
 
 func isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields []ManagedFields, expectedFieldManagers []string) bool {
 	for _, field := range fields {
-		for _, prefix := range expectedFieldManagers {
-			if field.Manager == prefix {
+		for _, expectedFieldManager := range expectedFieldManagers {
+			if field.Manager == expectedFieldManager {
 				return true
 			}
 		}
