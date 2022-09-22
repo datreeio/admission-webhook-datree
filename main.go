@@ -30,7 +30,7 @@ func main() {
 }
 
 func start(port string) {
-	internalLogger := logger.New("no request id")
+	internalLogger := logger.New("")
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			validator := networkValidator.NewNetworkValidator()
