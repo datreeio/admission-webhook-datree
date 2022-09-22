@@ -8,4 +8,4 @@ webhook-datree
 
 .DS_STORE
 
-./datree-webhook-logs.txt
+datree-webhook-logs.txt
