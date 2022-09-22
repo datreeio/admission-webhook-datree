@@ -80,7 +80,7 @@ func isKubectl(fields []ManagedFields) bool {
 		if the user overrides the default value of the flag "field-manager" then the request will not be considered a kubectl request
 		and therefore will likely not be evaluated
 	*/
-	return isAtLeastOneFieldManagerEqualToOneOfThePrefixes(fields, []string{"kubectl-client-side-apply", "kubectl-create", "kubectl-edit", "kubectl-patch"})
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields, []string{"kubectl-client-side-apply", "kubectl-create", "kubectl-edit", "kubectl-patch"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(isDryRun bool, labels map[string]string, namespace string, fields []ManagedFields) bool {
@@ -141,9 +141,9 @@ func doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(fields []ManagedFields,
 	return false
 }
 
-func isAtLeastOneFieldManagerEqualToOneOfThePrefixes(fields []ManagedFields, prefixes []string) bool {
+func isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields []ManagedFields, expectedFieldManagers []string) bool {
 	for _, field := range fields {
-		for _, prefix := range prefixes {
+		for _, prefix := range expectedFieldManagers {
 			if field.Manager == prefix {
 				return true
 			}
