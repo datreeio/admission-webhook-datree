@@ -3,15 +3,18 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
+	"go.uber.org/zap"
 )
 
 type Logger struct {
 	requestId string
 }
 
-type LogWithRequestId struct {
-	RequestId string `json:"requestId"`
-	Message   any    `json:"message"`
+type LogWithMetadata struct {
+	RequestId    string `json:"requestId"`
+	RequestStage string `json:"requestDirection"` // incoming, outgoing or mid-request
+	Level        string `json:"level"`            // info, error, debug
+	Message      any    `json:"message"`
 }
 
 func New(requestId string) Logger {
@@ -29,7 +32,7 @@ func (l *Logger) Log(object any) {
 	// logsArrayWithParsedJson.filter(log => log.requestId === "some-request-id")
 	// logsArrayWithParsedJson.filter(log => log.message.someProperty === "some-value")
 
-	logWithRequestId := LogWithRequestId{
+	logWithRequestId := LogWithMetadata{
 		RequestId: l.requestId,
 		Message:   object,
 	}
@@ -50,3 +53,15 @@ func LogUtil(msg string) {
 // TODO add a log level for errors
 // TODO add a log level for info
 // TODO consider using Zap
+
+
+loggerr, _ := zap.NewProduction()
+defer logger.Sync() // flushes buffer, if any
+sugar := logger.Sugar()
+sugar.Infow("failed to fetch URL",
+// Structured context as loosely typed key-value pairs.
+"url", url,
+"attempt", 3,
+"backoff", time.Second,
+)
+sugar.Infof("Failed to fetch URL: %s", url)
