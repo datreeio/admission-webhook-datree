@@ -70,7 +70,18 @@ func isResourceDeleted(rootObject RootObject) bool {
 func isKubectl(managedFields []ManagedFields) bool {
 	loggerUtil.Log("Filtering - isKubectl")
 
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"kubectl"})
+	/*
+		This is a strict check for only those field managers to make sure the request was sent via kubectl.
+		all values were taken from these pages under the default value of the flag "field-manager"
+		https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#apply
+		https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#create
+		https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#edit
+		https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#patch
+
+		if the user overrides the default value of the flag "field-manager" then the request will not be considered a kubectl request
+		and therefore will likely not be evaluated
+	*/
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"kubectl-client-side-apply", "kubectl-create", "kubectl-edit", "kubectl-patch"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject, managedFields []ManagedFields) bool {
@@ -129,6 +140,17 @@ func doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields []Managed
 	for _, field := range managedFields {
 		for _, prefix := range prefixes {
 			if strings.HasPrefix(field.Manager, prefix) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields []ManagedFields, expectedFieldManagers []string) bool {
+	for _, field := range fields {
+		for _, expectedFieldManager := range expectedFieldManagers {
+			if field.Manager == expectedFieldManager {
 				return true
 			}
 		}
