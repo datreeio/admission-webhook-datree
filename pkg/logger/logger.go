@@ -53,13 +53,6 @@ func (l *Logger) LogInfo(objectToLog any) {
 	l.logInfo(objectToLog, "")
 }
 
-func (l *Logger) logInfo(objectToLog any, requestDirection string) {
-	l.zapLogger.Infow(l.objectToJson(objectToLog),
-		// Structured context as loosely typed key-value pairs.
-		"requestId", l.requestId,
-		"requestDirection", requestDirection)
-}
-
 // LogUtil this method creates a new logger instance on every call, and does not have a requestId
 // please use the logger instance from the context instead
 func LogUtil(msg string) {
@@ -67,6 +60,12 @@ func LogUtil(msg string) {
 	logger.LogInfo(msg)
 }
 
+func (l *Logger) logInfo(objectToLog any, requestDirection string) {
+	l.zapLogger.Infow(l.objectToJson(objectToLog),
+		// Structured context as loosely typed key-value pairs.
+		"requestId", l.requestId,
+		"requestDirection", requestDirection)
+}
 func (l *Logger) objectToJson(object any) string {
 	result, err := json.Marshal(object)
 	if err != nil {
