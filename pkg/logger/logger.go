@@ -7,6 +7,12 @@ import (
 	admission "k8s.io/api/admission/v1"
 )
 
+// most of our logs are in the following places:
+// 1. webhook start up
+// 2. incoming request
+// 3. outgoing request
+// 4. errors
+
 // Logger - instructions to get the logs are under /guides/developer-guide.md
 type Logger struct {
 	zapLogger *zap.SugaredLogger
@@ -51,7 +57,7 @@ type outgoingLog struct {
 }
 
 func (l *Logger) LogInfo(objectToLog any) {
-	l.logInfo(objectToLog, "mid-request")
+	l.logInfo(objectToLog, "")
 }
 
 func (l *Logger) logInfo(objectToLog any, requestDirection string) {
