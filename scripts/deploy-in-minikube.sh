@@ -10,5 +10,4 @@ fi
 
 IS_MINIKUBE=true bash ./scripts/development-install.sh
 
-sleep 3 # wait for pods to be ready
 kubectl get pods -n datree
