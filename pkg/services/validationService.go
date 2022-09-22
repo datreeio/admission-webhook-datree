@@ -47,7 +47,7 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, logger logger.Logger) *admission.AdmissionReview {
+func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, logger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
 	var err error
@@ -61,10 +61,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	loggerUtil.Log(fmt.Sprintf("k8s version: %s", clusterK8sVersion))
 
 	if !ShouldResourceBeValidated(admissionReviewReq) {
-		logger.Log("Resource skipped")
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
-	logger.Log("Resource should be validated")
 
 	token, err := getToken(cliClient)
 	if err != nil {
@@ -189,7 +187,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
+	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {

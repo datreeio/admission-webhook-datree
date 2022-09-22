@@ -28,7 +28,7 @@ func NewValidationController() *ValidationController {
 }
 
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
-	logger := logger.New(uuid.NewString())
+	internalLogger := logger.New(uuid.NewString())
 
 	var warningMessages []string
 	writer := responseWriter.New(w)
@@ -66,10 +66,10 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 		}
 	}()
 
-	logger.Log(admissionReviewReq)
-
-	res := services.Validate(admissionReviewReq, &warningMessages, logger)
-	writer.WriteBody(res)
+	internalLogger.LogIncoming(admissionReviewReq)
+	admissionReview, isSkipped := services.Validate(admissionReviewReq, &warningMessages, internalLogger)
+	writer.WriteBody(admissionReview)
+	internalLogger.LogOutgoing(admissionReview, isSkipped)
 }
 
 func headerValidation(req *http.Request) error {
