@@ -7,6 +7,7 @@ import (
 	admission "k8s.io/api/admission/v1"
 )
 
+// Logger - instructions to get the logs are under /guides/developer-guide.md
 type Logger struct {
 	zapLogger *zap.SugaredLogger
 	requestId string
@@ -54,18 +55,17 @@ func (l *Logger) LogInfo(objectToLog any) {
 }
 
 func (l *Logger) logInfo(objectToLog any, requestDirection string) {
-
 	l.zapLogger.Infow(l.objectToJson(objectToLog),
 		// Structured context as loosely typed key-value pairs.
 		"requestId", l.requestId,
 		"requestDirection", requestDirection)
-
-	// to dump all the logs from the last 72 hours, the user should run the following command:
-	// for podId in $(kubectl get pods -n datree --output name); do echo $(kubectl logs -n datree --since=72h $podId); done > datree-webhook-logs.txt
 }
 
+// LogUtil this method creates a new logger instance on every call, and does not have a requestId
+// please use the logger instance from the context instead
 func LogUtil(msg string) {
-	fmt.Println(msg)
+	logger := New("")
+	logger.LogInfo(msg)
 }
 
 func (l *Logger) objectToJson(object any) string {

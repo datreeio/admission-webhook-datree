@@ -3,6 +3,12 @@
 This guide explains how to set up your environment for developing on admission-webhook-datree.  
 This guide was written for macOS and Linux machines.
 
+## get webhook internal logs
+use the following command to get all the webhook internal logs from the past 72 hours
+```shell
+mkdir -p ./datree-webhook-logs && for podId in $(kubectl get pods -n datree --output name); do kubectl logs -n datree --since=72h $podId > ./datree-webhook-logs/pod-"$(echo $podId | cut -c 5-)".txt; done
+```
+
 ## For developing on a local server with thunder client (faster build)
 
 ### Prerequisites
