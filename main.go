@@ -15,7 +15,6 @@ import (
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
-	"github.com/datreeio/datree/pkg/printer"
 	"github.com/datreeio/datree/pkg/utils"
 )
 
@@ -31,15 +30,15 @@ func main() {
 }
 
 func start(port string) {
+	internalLogger := logger.New("no request id")
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
-			globalPrinter := printer.CreateNewPrinter()
 			validator := networkValidator.NewNetworkValidator()
 			newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
 			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
 			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
 			reporter.ReportPanicError(panicErr)
-			globalPrinter.PrintMessage(fmt.Sprintf("Datree Webhook failed to start due to Unexpected error: %s\n", utils.ParseErrorToString(panicErr)), "error")
+			internalLogger.LogError(fmt.Sprintf("Datree Webhook failed to start due to Unexpected error: %s\n", utils.ParseErrorToString(panicErr)))
 			os.Exit(DefaultErrExitCode)
 		}
 	}()
@@ -58,7 +57,7 @@ func start(port string) {
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
 
-	logger.LogUtil(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
+	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {

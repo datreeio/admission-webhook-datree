@@ -40,14 +40,14 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 
 	err := headerValidation(req)
 	if err != nil {
-		fmt.Println(fmt.Errorf("header validation failed: %s", err))
+		internalLogger.LogError(fmt.Sprintf("header validation failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
 
 	admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
 	if err != nil {
-		fmt.Println(fmt.Errorf("parsing request body failed: %s", err))
+		internalLogger.LogError(fmt.Sprintf("parsing request body failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
@@ -60,7 +60,7 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
 			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
 			reporter.ReportPanicError(panicErr)
-			fmt.Println(utils.ParseErrorToString(panicErr))
+			internalLogger.LogError(utils.ParseErrorToString(panicErr))
 			warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
 			writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
 		}

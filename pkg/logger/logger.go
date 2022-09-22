@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"encoding/json"
 	"fmt"
 	"go.uber.org/zap"
 	v1 "k8s.io/api/admission/v1"
@@ -45,6 +46,7 @@ func (l *Logger) LogError(message string) {
 		// Structured context as loosely typed key-value pairs.
 		"requestId", l.requestId,
 	)
+	printLogsSeparator()
 }
 
 func (l *Logger) LogIncoming(admissionReview *v1.AdmissionReview) {
@@ -62,46 +64,51 @@ type outgoingLog struct {
 	IsSkipped       bool
 }
 
-func (l *Logger) LogInfo(object any) {
-	l.logInfo(object, "mid-request")
+func (l *Logger) LogInfo(objectToLog any) {
+	l.logInfo(objectToLog, "mid-request")
 }
 
-func (l *Logger) logInfo(object any, requestDirection string) {
+func (l *Logger) logInfo(objectToLog any, requestDirection string) {
 
-	l.zapLogger.Infow("info log",
+	l.zapLogger.Infow(l.objectToJson(objectToLog),
 		// Structured context as loosely typed key-value pairs.
 		"requestId", l.requestId,
-		"requestDirection", requestDirection,
-		"message", object)
+		"requestDirection", requestDirection)
+	printLogsSeparator()
 
-	// when querying the logs, start by with this:
-	// const logsDump = fs.readFileSync('./path/to/logs/file.txt', 'utf8')
-	// const logsArray = logsDump.split("___DATREE_SEPARATOR___")
-	// const logsArrayWithoutLastEmptyElement = logsArray.slice(0, logsArray.length - 1)
-	// const logsArrayWithParsedJson = logsArrayWithoutLastEmptyElement.map(log => JSON.parse(log, null, 2))
+	// to dump all the logs from the last 72 hours, the user should run the following command:
+	// for podId in $(kubectl get pods -n datree --output name); do echo $(kubectl logs -n datree --since=72h $podId); done > datree-webhook-logs.txt
 	//
-	// and then start querying the logs with plain JS, e.g.:
-	// logsArrayWithParsedJson.filter(log => log.requestId === "some-request-id")
-	// logsArrayWithParsedJson.filter(log => log.message.someProperty === "some-value")
+	// when querying the logs, you can start with something like this javascript code:
+	// type "node" in the terminal to open the node console
+	/*
+		const fs = require('fs');
+		const items = fs.readFileSync('./datree-webhook-logs.txt', 'utf8')
+			.split("\n\r")
+			.slice(0, -1)
+			.map(JSON.parse)
+			.filter((value) => value.requestDirection === 'incoming')
+			.map((value) => value.msg)
+		console.log(items)
+	*/
 
-	//logWithRequestId := LogWithMetadata{
-	//	RequestId: l.requestId,
-	//	Message:   object,
-	//}
-	//
-	//result, err := json.Marshal(logWithRequestId)
-	//if err != nil {
-	//	LogUtil(fmt.Sprintf("failed to convert logWithRequestId to JSON, error: %s", err))
-	//	return
-	//}
-	//LogUtil(string(result))
 }
 
 func LogUtil(msg string) {
-	fmt.Printf("%s___DATREE_SEPARATOR___", msg)
+	fmt.Println(msg)
+	printLogsSeparator()
 }
 
-// TODO remove all the unnecessary logs
-// TODO add a log level for errors
-// TODO add a log level for info
-// TODO consider using Zap
+func (l *Logger) objectToJson(object any) string {
+	result, err := json.Marshal(object)
+	if err != nil {
+		l.LogError(fmt.Sprintf("failed to convert object to JSON, error: %s", err))
+		return ""
+	}
+	return string(result)
+}
+
+func printLogsSeparator() {
+	// this is needed in order to parse the logs correctly
+	fmt.Print("___DATREE_LOGS_SEPARATOR___")
+}
