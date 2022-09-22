@@ -67,7 +67,6 @@ func TestShouldResourceBeValidated(t *testing.T) {
 	}
 
 	for _, testCase := range testCases {
-		// convert json to admissionReviewReq
 		var admissionReviewReq *admission.AdmissionReview
 		if err := json.Unmarshal([]byte(testCase.admissionReviewReq), &admissionReviewReq); err != nil {
 			panic(err)

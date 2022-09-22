@@ -54,7 +54,7 @@ func (l *Logger) LogInfo(objectToLog any) {
 }
 
 // LogUtil this method creates a new logger instance on every call, and does not have a requestId
-// please use the logger instance from the context instead
+// please prefer using the logger instance from the context instead
 func LogUtil(msg string) {
 	logger := New("")
 	logger.LogInfo(msg)
