@@ -19,13 +19,6 @@ type Logger struct {
 	requestId string
 }
 
-type LogWithMetadata struct {
-	RequestId        string `json:"requestId"`
-	RequestDirection string `json:"requestDirection"` // incoming, outgoing or mid-request
-	Level            string `json:"level"`            // info, error, debug
-	Message          any    `json:"message"`
-}
-
 func New(requestId string) Logger {
 	zapLogger, _ := zap.NewProduction()
 	defer zapLogger.Sync() // flushes buffer, if any
