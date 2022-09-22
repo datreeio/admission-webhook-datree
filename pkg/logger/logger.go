@@ -84,7 +84,7 @@ func (l *Logger) logInfo(objectToLog any, requestDirection string) {
 	/*
 		const fs = require('fs');
 		const items = fs.readFileSync('./datree-webhook-logs.txt', 'utf8')
-			.split("\n\r")
+			.split("___DATREE_LOGS_SEPARATOR___")
 			.slice(0, -1)
 			.map(JSON.parse)
 			.filter((value) => value.requestDirection === 'incoming')
