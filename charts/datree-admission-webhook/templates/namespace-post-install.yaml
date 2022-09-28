@@ -34,3 +34,4 @@ spec:
             - {{template "datree.namespace" .}}
             - admission.datree/validate=skip
             - --overwrite
+# {{- include "datree-lib.namespace-post-install" .}}
