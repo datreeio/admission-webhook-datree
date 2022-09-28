@@ -35,3 +35,4 @@ spec:
             - {{template "datree.namespace" .}}
             - datree.io/skip=true
             - --overwrite
+{{- end -}}

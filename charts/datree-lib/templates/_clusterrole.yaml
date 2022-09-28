@@ -63,3 +63,4 @@ rules:
       - watch
     resourceNames:
       - datree-webhook
+{{- end -}}

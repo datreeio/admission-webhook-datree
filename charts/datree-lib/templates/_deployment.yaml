@@ -99,3 +99,4 @@ spec:
           secret:
             secretName: {{ .Values.aws.licenseConfigSecretName }}
       {{- end}}
+{{- end -}}
