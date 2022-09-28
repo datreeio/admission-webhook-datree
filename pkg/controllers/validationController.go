@@ -3,10 +3,12 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"io"
 	"net/http"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	"github.com/google/uuid"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/responseWriter"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
@@ -26,6 +28,8 @@ func NewValidationController() *ValidationController {
 }
 
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
+	internalLogger := logger.New(uuid.NewString())
+
 	var warningMessages []string
 	writer := responseWriter.New(w)
 
@@ -36,14 +40,14 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 
 	err := headerValidation(req)
 	if err != nil {
-		fmt.Println(fmt.Errorf("header validation failed: %s", err))
+		internalLogger.LogError(fmt.Sprintf("header validation failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
 
 	admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
 	if err != nil {
-		fmt.Println(fmt.Errorf("parsing request body failed: %s", err))
+		internalLogger.LogError(fmt.Sprintf("parsing request body failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
@@ -56,14 +60,16 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
 			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
 			reporter.ReportPanicError(panicErr)
-			fmt.Println(utils.ParseErrorToString(panicErr))
+			internalLogger.LogError(utils.ParseErrorToString(panicErr))
 			warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
 			writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
 		}
 	}()
 
-	res := services.Validate(admissionReviewReq, &warningMessages)
-	writer.WriteBody(res)
+	internalLogger.LogIncoming(admissionReviewReq)
+	admissionReview, isSkipped := services.Validate(admissionReviewReq, &warningMessages, internalLogger)
+	writer.WriteBody(admissionReview)
+	internalLogger.LogOutgoing(admissionReview, isSkipped)
 }
 
 func headerValidation(req *http.Request) error {

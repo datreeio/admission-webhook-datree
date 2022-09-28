@@ -2,7 +2,7 @@ package services
 
 import (
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"net/http"
 	"os"
 	"strings"
@@ -46,7 +46,7 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string) *admission.AdmissionReview {
+func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
 	var err error
@@ -55,34 +55,26 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 	ciContext := ciContext.Extract()
 
-	loggerUtil.Log("Getting k8s version")
 	clusterK8sVersion := getK8sVersion()
-	loggerUtil.Log(fmt.Sprintf("k8s version: %s", clusterK8sVersion))
 
 	if !ShouldResourceBeValidated(admissionReviewReq) {
-		loggerUtil.Log("Resource needs to be skipped")
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
-	loggerUtil.Log("Resource needs to be scan")
 	token, err := getToken(cliClient)
 	if err != nil {
 		panic(err)
 	}
 
 	clientId := getClientId()
-
 	policyName := os.Getenv(enums.Policy)
-	loggerUtil.Log(fmt.Sprintf("policyName: %s", policyName))
 
-	loggerUtil.Log("Getting prerun data")
 	prerunData, err := cliClient.RequestEvaluationPrerunData(token)
 	if err != nil {
-		loggerUtil.Log(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
+		internalLogger.LogError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 		*warningMessages = append(*warningMessages, err.Error())
 	}
 
-	loggerUtil.Log("convert default rules string into DefaultRulesDefinitions structure")
 	// convert default rules string into DefaultRulesDefinitions structure
 	defaultRules, err := cliDefaultRules.YAMLToStruct(prerunData.DefaultRulesYaml)
 	if err != nil {
@@ -94,13 +86,12 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		}
 	}
 
-	loggerUtil.Log("Extracting policy out of policies yaml")
 	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
 		so we are validating against default policy */
-		loggerUtil.Log(fmt.Sprintf("Extracting policy out of policies yaml err1: %s", err.Error()))
+		internalLogger.LogError(fmt.Sprintf("Extracting policy out of policies yaml err1: %s", err.Error()))
 
 		for _, policy := range prerunData.PoliciesJson.Policies {
 			if policy.IsDefault {
@@ -110,7 +101,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
 		if err != nil {
-			loggerUtil.Log(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
+			internalLogger.LogError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
 			*warningMessages = append(*warningMessages, err.Error())
 			panic(err.Error())
 		}
@@ -128,7 +119,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	evaluator := evaluation.New(cliClient, ciContext)
 	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 	if err != nil {
-		loggerUtil.Log(fmt.Sprintf("Evaluate err: %s", err.Error()))
+		internalLogger.LogError(fmt.Sprintf("Evaluate err: %s", err.Error()))
 	}
 
 	results := policyCheckResults.FormattedResults
@@ -156,7 +147,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	if noRecords != "true" {
 		_, err = sendEvaluationResult(cliClient, evaluationRequestData)
 		if err != nil {
-			fmt.Println("saving evaluation results failed")
+			internalLogger.LogError("saving evaluation results failed")
 			*warningMessages = append(*warningMessages, "saving evaluation results failed")
 		}
 	}
@@ -173,7 +164,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	})
 
 	if err != nil {
-		loggerUtil.Log(fmt.Sprintf("GetResultsText err: %s", err.Error()))
+		internalLogger.LogError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
 	}
 
 	var allowed bool
@@ -188,7 +179,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages)
+	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
@@ -290,14 +281,13 @@ func getK8sVersion() string {
 
 		err = os.Setenv("CLUSTER_K8S_VERSION", clusterK8sVersion)
 		if err != nil {
-			fmt.Println(fmt.Errorf("couldn't set CLUSTER_K8S_VERSION env variable %s", err))
+			logger.LogUtil(fmt.Sprintf("couldn't set CLUSTER_K8S_VERSION env variable %s", err))
 		}
 	}
 	return clusterK8sVersion
 }
 
 func getToken(cliClient *cliClient.CliClient) (string, error) {
-	loggerUtil.Log("getToken")
 	token := os.Getenv(enums.Token)
 
 	if token == "" {
@@ -308,7 +298,7 @@ func getToken(cliClient *cliClient.CliClient) (string, error) {
 
 		err = os.Setenv(enums.Token, newToken.Token)
 		if err != nil {
-			fmt.Println(fmt.Errorf("couldn't set DATREE_TOKEN env variable %s", err))
+			logger.LogUtil(fmt.Sprintf("couldn't set DATREE_TOKEN env variable %s", err))
 		}
 		token = newToken.Token
 	}
@@ -316,21 +306,19 @@ func getToken(cliClient *cliClient.CliClient) (string, error) {
 }
 
 func getClientId() string {
-	loggerUtil.Log("getClientId")
 	clientId := os.Getenv(enums.ClientId)
 	if clientId == "" {
 		clientId = shortuuid.New()
 
 		err := os.Setenv(enums.ClientId, clientId)
 		if err != nil {
-			fmt.Println(fmt.Errorf("couldn't set DATREE_CLIENT_ID env variable %s", err))
+			logger.LogUtil(fmt.Sprintf("couldn't set DATREE_CLIENT_ID env variable %s", err))
 		}
 	}
 	return clientId
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
-	loggerUtil.Log("getFileConfiguration")
 	yamlSchema, _ := yaml.JSONToYAML(admissionReviewReq.Object.Raw)
 	var annotations map[string]interface{}
 	var rawYaml map[string]interface{}
@@ -360,7 +348,6 @@ func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*ext
 }
 
 func getEvaluationSummary(policyCheckResults evaluation.PolicyCheckResultData, passedPolicyCheckCount int) printer.EvaluationSummary {
-	loggerUtil.Log("getEvaluationSummary")
 	// the webhook receives one configuration at a time, we know it already passed yaml and k8s validation
 	evaluationSummary := printer.EvaluationSummary{
 		FilesCount:                1,
@@ -376,7 +363,6 @@ func getEvaluationSummary(policyCheckResults evaluation.PolicyCheckResultData, p
 
 func getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData) cliClient.WebhookEvaluationRequestData {
-	loggerUtil.Log("getEvaluationRequestData")
 	endEvaluationTime := time.Now()
 
 	evaluationDurationSeconds := endEvaluationTime.Sub(startTime).Seconds()

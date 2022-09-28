@@ -7,10 +7,16 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/lithammer/shortuuid v3.0.0+incompatible
 	github.com/stretchr/testify v1.7.1
+	go.uber.org/zap v1.10.0
 	k8s.io/api v0.24.2
 	k8s.io/apimachinery v0.24.2
 	k8s.io/client-go v0.24.2
 	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
+)
+
+require (
+	go.uber.org/atomic v1.4.0 // indirect
+	go.uber.org/multierr v1.1.0 // indirect
 )
 
 require (
@@ -32,7 +38,7 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/gnostic v0.5.7-v3refs // indirect
 	github.com/google/gofuzz v1.1.0 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.0
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect

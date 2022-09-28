@@ -7,3 +7,5 @@
 webhook-datree
 
 .DS_STORE
+
+datree-webhook-logs/*

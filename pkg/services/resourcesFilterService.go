@@ -2,8 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
 	"strings"
@@ -20,15 +18,11 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bo
 
 	var rootObject RootObject
 	if err := json.Unmarshal(admissionReviewReq.Request.Object.Raw, &rootObject); err != nil {
-		fmt.Println(err)
 		panic(err)
 	}
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
-	loggerUtil.Log(fmt.Sprintf("resource kind: %s", resourceKind))
 	managedFields := rootObject.Metadata.ManagedFields
-
-	loggerUtil.Log("Starting filtering process")
 
 	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject)
@@ -53,12 +47,10 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bo
 }
 
 func isMetadataNameExists(rootObject RootObject) bool {
-	loggerUtil.Log("Filtering - isMetadataNameExists")
 	return rootObject.Metadata.Name != ""
 }
 
 func isUnsupportedKind(resourceKind string) bool {
-	loggerUtil.Log("Filtering - isUnsupportedKind")
 	unsupportedResourceKinds := []string{"Event", "GitRepository"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
 }
@@ -68,8 +60,6 @@ func isResourceDeleted(rootObject RootObject) bool {
 }
 
 func isKubectl(managedFields []ManagedFields) bool {
-	loggerUtil.Log("Filtering - isKubectl")
-
 	/*
 		This is a strict check for only those field managers to make sure the request was sent via kubectl.
 		all values were taken from these pages under the default value of the flag "field-manager"
@@ -89,8 +79,6 @@ func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.Admission
 	labels := rootObject.Metadata.Labels
 	namespace := admissionReviewReq.Request.Namespace
 
-	loggerUtil.Log("Filtering - isFluxResourceThatShouldBeEvaluated")
-
 	if !doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"kustomize-controller"}) {
 		return false
 	}
@@ -109,7 +97,6 @@ func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.Admission
 
 func isArgoResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, resourceKind string, managedFields []ManagedFields) bool {
 	operation := admissionReviewReq.Request.Operation
-	loggerUtil.Log("Filtering - isArgoResourceThatShouldBeEvaluated")
 
 	if !doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"argocd", "argo"}) {
 		return false
@@ -122,7 +109,6 @@ func isArgoResourceThatShouldBeEvaluated(admissionReviewReq *admission.Admission
 }
 
 func isFluxObject(labels map[string]string, namespace string) bool {
-	loggerUtil.Log("Filtering - isFluxObject")
 	if namespace == "flux-system" {
 		return true
 	}
