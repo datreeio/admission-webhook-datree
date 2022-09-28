@@ -12,6 +12,9 @@ customLabels: {}
 # Additional annotations to add to all resources.
 customAnnotations: {}
 
+# Run the webhook-server in debug mode, this will log debug information to the console.
+debug: true
+
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
@@ -77,10 +80,10 @@ aws:
   # The name of the secret that contains the license configuration.
   licenseConfigSecretName: ""
   # The AWS Region
-  region: ""
+  region: "us-east-1"
   # Enable AWS Marketplace license checkout, this is relevant for paid products only.
   enableCheckEntitlement: false
   # The application’s Product SKU (Product ID)
   productId: ""
   # The trusted issuer of the license (AWS Marketplace)
-  issuerKey: ""
+  issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"
