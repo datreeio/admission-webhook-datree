@@ -54,3 +54,4 @@ subjects:
   - kind: ServiceAccount
     name: "datree-cleanup-namespaces-hook-pre-delete"
     namespace: "{{template "datree.namespace" .}}"
+{{- end -}}
