@@ -85,6 +85,6 @@ aws:
   # Enable AWS Marketplace license checkout, this is relevant for paid products only.
   enableCheckEntitlement: true
   # The application’s Product SKU (Product ID)
-  productId: "ad0ee0c8-f50f-464a-9bc4-d6270592dd36"
+  productId: "e3c1bf72-7c57-435e-be33-deddbe7220f2"
   # The trusted issuer of the license (AWS Marketplace)
   issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"

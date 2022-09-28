@@ -1,5 +1,5 @@
 apiVersion: v2
-name: awsmp-datree-admission-webhook
+name: datree-admission-webhook
 description: A Helm chart for Datree admission webhook for Kubernetes clusters
 icon: https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png
 type: application
