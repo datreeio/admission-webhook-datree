@@ -224,7 +224,7 @@
     "options":{
       "apiVersion":"meta.k8s.io/v1",
       "kind":"UpdateOptions",
-      "fieldManager":"1231"
+      "fieldManager":"kubectl-client-side-apply"
     },
     "dryRun": false
   }
