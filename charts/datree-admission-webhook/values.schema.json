@@ -76,7 +76,8 @@
         },
         "output": {
           "type": "string",
-          "description": "The format output of the policy check results: yaml, json, xml, simple, JUnit."
+          "description": "The format output of the policy check results: yaml, json, xml, simple, JUnit.",
+          "pattern": "^(yaml|json|xml|simple|JUnit|^$)$"
         },
         "noRecord": {
           "type": "string",
@@ -196,8 +197,7 @@
         },
         "region": {
           "type": "string",
-          "description": "The AWS Region",
-          "pattern": "(af|ap|ca|eu|me|sa|us)-(central|north|(north(?:east|west))|south|south(?:east|west)|east|west)-\\d+"
+          "description": "The AWS Region"
         },
         "enableCheckEntitlement": {
           "type": "boolean",
@@ -209,8 +209,7 @@
         },
         "issuerKey": {
           "type": "string",
-          "description": "The trusted issuer of the license (AWS Marketplace)",
-          "enum": ["aws:294406891311:AWS/Marketplace:issuer-fingerprint"]
+          "description": "The trusted issuer of the license (AWS Marketplace)"
         }
       },
       "required": [
