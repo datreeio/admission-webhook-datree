@@ -80,10 +80,10 @@ aws:
   # The name of the secret that contains the license configuration.
   licenseConfigSecretName: ""
   # The AWS Region
-  region: "us-east-1"
+  region: ""
   # Enable AWS Marketplace license checkout, this is relevant for paid products only.
   enableCheckEntitlement: false
   # The application’s Product SKU (Product ID)
   productId: ""
   # The trusted issuer of the license (AWS Marketplace)
-  issuerKey: "aws:294406891311:AWS/Marketplace:issuer-fingerprint"
+  issuerKey: ""
