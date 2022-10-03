@@ -57,15 +57,18 @@ cecho "GREEN" "helm package done"
 cecho "CYAN" "switch to temp branch to create PR"
 git stash
 git checkout gh-pages
-gl 
-# git checkout -b "release-chart-$new_version"
-# mv "/tmp/datree-admission-webhook-$new_version.tgz" ../
-# helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ../ --merge ../index.yaml
-# git add ../index.yaml
-# git add ../datree-admission-webhook-$new_version.tgz
-# git commit -m "release chart $new_version"
-# gh pr create --title "release chart $new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
-# gco -
-# git stash pop
-# cecho "GREEN" "done"
+git pull
+git checkout -b "release-chart-$new_version"
+mv "/tmp/datree-admission-webhook-$new_version.tgz" ../
+helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ../ --merge ../index.yaml
+git add ../index.yaml
+git add ../datree-admission-webhook-$new_version.tgz
+git commit -m "release chart $new_version"
+git push --set-upstream origin "release-chart-$new_version"
+cecho "CYAN" "open PR"
+gh pr create --title "release chart $new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
+gco -
+cecho "CYAN" "switch back"
+git stash pop
+cecho "GREEN" "done"
 
