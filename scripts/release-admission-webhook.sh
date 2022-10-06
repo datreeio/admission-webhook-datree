@@ -15,12 +15,12 @@ RED="\033[0;31m"
  NC="\033[0m"
 
 if ! command -v helm &> /dev/null; then
-    cecho "RED" "yq doesn't exist, please install yq"
+    cecho "RED" "helm doesn't exist, please install helm"
     exit 1
 fi
 
 if ! command -v gh &> /dev/null; then
-    cecho "RED" "yq doesn't exist, please install yq"
+    cecho "RED" "gh doesn't exist, please install gh"
     exit 1
 fi
 
