@@ -1,11 +1,4 @@
 #!/bin/sh
-# run helm dependency build on the chart /datree-admission-webhook/
-# helm package /datree-admission-webhook/ - mv to temp folder
-# gh checkout gh-pages branch
-# mv chart to gh-pages
-# update index.yaml
-# open PR use gh pr create
-
 
 cecho(){
     RED="\033[0;31m"
