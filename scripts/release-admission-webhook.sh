@@ -52,7 +52,7 @@ git stash
 git checkout gh-pages
 git pull
 git checkout -b "release-chart-$new_version"
-mv "/tmp/datree-admission-webhook-$new_version.tgz" ../
+mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
 helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
 git add ./index.yaml
 git add ./datree-admission-webhook-$new_version.tgz
