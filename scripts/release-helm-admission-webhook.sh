@@ -43,7 +43,7 @@ cecho "CYAN" "new version: $new_version"
 #helm
 helm dependency build ./charts/datree-admission-webhook/
 git checkout gh-pages index.yaml
-helm package ./charts/datree-admission-webhook/ -d /tmp/
+helm package ./charts/datree-admission-webhook/ --version=$new_version -d /tmp/
 helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
 mv index.yaml /tmp/
 cecho "GREEN" "helm package done"
