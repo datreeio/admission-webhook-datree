@@ -1,8 +1,7 @@
-../admission-webhook-datree/.idea/*
-
-../admission-webhook-datree/.vscode/*
-!../admission-webhook-datree/.vscode/thunder-tests/thunderCollection.json
-!../admission-webhook-datree/.vscode/thunder-tests/thunderclient.json
+.idea/*
+.vscode/*
+!.vscode/thunder-tests/thunderCollection.json
+!.vscode/thunder-tests/thunderclient.json
 
 webhook-datree
 
