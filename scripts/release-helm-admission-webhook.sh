@@ -65,6 +65,5 @@ cecho "CYAN" "open PR"
 gh pr create --title "Release chart datree-admission-webhook-$new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
 git checkout -
 cecho "CYAN" "switch back"
-git stash pop
 cecho "GREEN" "done"
 
