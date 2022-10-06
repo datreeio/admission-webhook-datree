@@ -45,8 +45,10 @@ yq e -i ".version = \"$new_version\"" ./charts/datree-admission-webhook/Chart.ya
 
 #helm
 helm dependency build ./charts/datree-admission-webhook/
+git checkout gh-pages index.yaml
 helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
 helm package ./charts/datree-admission-webhook/ -d /tmp/
+mv index.yaml /tmp/
 cecho "GREEN" "helm package done"
 cecho "CYAN" "switch to temp branch to create PR"
 git stash
@@ -54,6 +56,7 @@ git checkout gh-pages
 git pull
 git checkout -b "release-chart-$new_version"
 mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
+mv "/tmp/index.yaml" ./
 git add ./index.yaml
 git add ./datree-admission-webhook-$new_version.tgz
 git commit -m "feat: Release chart datree-admission-webhook-$new_version.tgz"
