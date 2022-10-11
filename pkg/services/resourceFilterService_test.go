@@ -32,6 +32,9 @@ var kindEvent string
 //go:embed resourceFilterService_testFixtures/kindGitRepository.json
 var kindGitRepository string
 
+//go:embed resourceFilterService_testFixtures/managedByHelm.json
+var managedByHelm string
+
 func TestShouldResourceBeValidated(t *testing.T) {
 	testCases := []shouldResourceBeValidatedTestCases{
 		{
@@ -43,6 +46,11 @@ func TestShouldResourceBeValidated(t *testing.T) {
 			testName:           "resource should be validated because it is managed by kubectl",
 			isSkipped:          false,
 			admissionReviewReq: managedByKubectl,
+		},
+		{
+			testName:           "resource should be validated because it is managed by helm",
+			isSkipped:          false,
+			admissionReviewReq: managedByHelm,
 		},
 		{
 			testName:           "resource should be skipped because metadata name is missing",
