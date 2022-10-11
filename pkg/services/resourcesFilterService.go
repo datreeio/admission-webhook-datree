@@ -35,9 +35,10 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bo
 	}
 
 	isKubectl := isKubectl(managedFields)
+	isHelm := isHelm(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isResourceWhiteListed := isKubectl || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
+	isResourceWhiteListed := isKubectl || isHelm || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
 
 	if !isResourceWhiteListed {
 		return false
@@ -72,6 +73,10 @@ func isKubectl(managedFields []ManagedFields) bool {
 		and therefore will likely not be evaluated
 	*/
 	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"kubectl-client-side-apply", "kubectl-create", "kubectl-edit", "kubectl-patch"})
+}
+
+func isHelm(managedFields []ManagedFields) bool {
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"helm"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject, managedFields []ManagedFields) bool {
