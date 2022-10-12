@@ -19,6 +19,7 @@ import (
 	policyFactory "github.com/datreeio/datree/bl/policy"
 	"github.com/datreeio/datree/pkg/ciContext"
 	baseCliClient "github.com/datreeio/datree/pkg/cliClient"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"github.com/datreeio/datree/pkg/extractor"
 	"github.com/datreeio/datree/pkg/networkValidator"
@@ -53,7 +54,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	var err error
 
 	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient("http://localhost:8000", validator)
+	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
