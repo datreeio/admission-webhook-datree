@@ -3,9 +3,10 @@ package services
 import (
 	_ "embed"
 	"encoding/json"
+	"testing"
+
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
-	"testing"
 )
 
 type shouldResourceBeValidatedTestCases struct {
@@ -80,7 +81,9 @@ func TestShouldResourceBeValidated(t *testing.T) {
 			panic(err)
 		}
 
-		isResourceSkipped := !ShouldResourceBeValidated(admissionReviewReq)
+		rootObject := getResourceRootObject(admissionReviewReq)
+
+		isResourceSkipped := !ShouldResourceBeValidated(admissionReviewReq, rootObject)
 		t.Run(testCase.testName, func(t *testing.T) {
 			assert.Equal(t, testCase.isSkipped, isResourceSkipped)
 		})

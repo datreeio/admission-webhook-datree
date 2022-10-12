@@ -3,7 +3,10 @@ package clients
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
@@ -101,6 +104,24 @@ func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.Eval
 // SendEvaluationResult needed to override cliClient for evaluation
 func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
 	return nil, nil
+}
+
+type ClusterRequestMetadata struct {
+	Token        string   `json:"token"`
+	Skipped      bool     `json:"skipped"`
+	Allowed      bool     `json:"allowed"`
+	ResourceKind string   `json:"resourceKind"`
+	ResourceName string   `json:"resourceName"`
+	Managers     []string `json:"managers"`
+	PolicyName   string   `json:"policyName"`
+	K8sVersion   string   `json:"k8sVersion"`
+}
+
+func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {
+	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadata/create", clusterRequestMetadata, c.flagsHeaders)
+	if err != nil {
+		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
+	}
 }
 
 type WebhookEvaluationRequestData struct {

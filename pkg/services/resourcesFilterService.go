@@ -1,24 +1,19 @@
 package services
 
 import (
-	"encoding/json"
+	"strings"
+
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
-	"strings"
 )
 
 type RootObject struct {
 	Metadata Metadata `json:"metadata"`
 }
 
-func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview) bool {
+func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
-	}
-
-	var rootObject RootObject
-	if err := json.Unmarshal(admissionReviewReq.Request.Object.Raw, &rootObject); err != nil {
-		panic(err)
 	}
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
