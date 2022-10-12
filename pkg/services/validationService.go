@@ -1,12 +1,14 @@
 package services
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
@@ -57,13 +59,19 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	clusterK8sVersion := getK8sVersion()
 
-	if !ShouldResourceBeValidated(admissionReviewReq) {
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
-	}
-
 	token, err := getToken(cliClient)
 	if err != nil {
 		panic(err)
+	}
+
+	rootObject := getResourceRootObject(admissionReviewReq)
+	resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
+
+	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
+		clusterRequestMetadata := getClusterRequestMetadata(token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "")
+		cliClient.SendRequestMetadata(clusterRequestMetadata)
+
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
 	clientId := getClientId()
@@ -178,6 +186,9 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	} else {
 		allowed = true
 	}
+
+	clusterRequestMetadata := getClusterRequestMetadata(token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name)
+	cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
@@ -361,6 +372,29 @@ func getEvaluationSummary(policyCheckResults evaluation.PolicyCheckResultData, p
 	return evaluationSummary
 }
 
+func getResourceRootObject(admissionReviewReq *admission.AdmissionReview) RootObject {
+	var rootObject RootObject
+	if err := json.Unmarshal(admissionReviewReq.Request.Object.Raw, &rootObject); err != nil {
+		panic(err)
+	}
+
+	return rootObject
+}
+
+func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) (string, string, []string) {
+	resourceKind := admissionReviewReq.Request.Kind.Kind
+	managedFields := rootObject.Metadata.ManagedFields
+
+	var managers []string
+	for _, manager := range managedFields {
+		managers = append(managers, manager.Manager)
+	}
+
+	resourceName := admissionReviewReq.Request.Name
+
+	return resourceKind, resourceName, managers
+}
+
 func getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData) cliClient.WebhookEvaluationRequestData {
 	endEvaluationTime := time.Now()
@@ -381,4 +415,21 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 	}
 
 	return evaluationRequestData
+}
+
+func getClusterRequestMetadata(token string, skipped bool, allowed bool, resourceKind string, resourceName string,
+	managers []string, clusterK8sVersion string, policyName string) *cliClient.ClusterRequestMetadata {
+
+	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
+		Token:        token,
+		Skipped:      skipped,
+		Allowed:      allowed,
+		ResourceKind: resourceKind,
+		ResourceName: resourceName,
+		Managers:     managers,
+		PolicyName:   policyName,
+		K8sVersion:   clusterK8sVersion,
+	}
+
+	return clusterRequestMetadata
 }
