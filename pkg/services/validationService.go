@@ -51,6 +51,7 @@ type Metadata struct {
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
+	cliEvaluationId := -1
 	var err error
 
 	validator := networkValidator.NewNetworkValidator()
@@ -58,7 +59,6 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
-
 	token, err := getToken(cliClient)
 	if err != nil {
 		panic(err)
@@ -68,7 +68,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
-		clusterRequestMetadata := getClusterRequestMetadata(token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "")
+		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "")
 		cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
@@ -151,10 +151,14 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 			}
 		}
 	}
+
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
-		_, err = sendEvaluationResult(cliClient, evaluationRequestData)
-		if err != nil {
+		evaluationResultResp, err := sendEvaluationResult(cliClient, evaluationRequestData)
+		if err == nil {
+			cliEvaluationId = evaluationResultResp.EvaluationId
+		} else {
+			cliEvaluationId = -2
 			internalLogger.LogError("saving evaluation results failed")
 			*warningMessages = append(*warningMessages, "saving evaluation results failed")
 		}
@@ -187,7 +191,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name)
+	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name)
 	cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
@@ -417,18 +421,19 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 	return evaluationRequestData
 }
 
-func getClusterRequestMetadata(token string, skipped bool, allowed bool, resourceKind string, resourceName string,
+func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
 	managers []string, clusterK8sVersion string, policyName string) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
-		Token:        token,
-		Skipped:      skipped,
-		Allowed:      allowed,
-		ResourceKind: resourceKind,
-		ResourceName: resourceName,
-		Managers:     managers,
-		PolicyName:   policyName,
-		K8sVersion:   clusterK8sVersion,
+		CliEvaluationId: cliEvaluationId,
+		Token:           token,
+		Skipped:         skipped,
+		Allowed:         allowed,
+		ResourceKind:    resourceKind,
+		ResourceName:    resourceName,
+		Managers:        managers,
+		PolicyName:      policyName,
+		K8sVersion:      clusterK8sVersion,
 	}
 
 	return clusterRequestMetadata
