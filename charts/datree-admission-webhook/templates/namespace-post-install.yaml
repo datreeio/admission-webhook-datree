@@ -32,5 +32,5 @@ spec:
             - ns
             - kube-system
             - {{template "datree.namespace" .}}
-            - datree.io/skip=true
+            - admission.datree/validate=skip
             - --overwrite
