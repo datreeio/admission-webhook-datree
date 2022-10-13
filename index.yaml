@@ -3,9 +3,15 @@ entries:
   datree-admission-webhook:
   - apiVersion: v2
     appVersion: 0.1.25
+<<<<<<< Updated upstream
     created: "2022-10-13T15:50:41.537488+03:00"
     description: A Helm chart for Datree admission webhook for Kubernetes clusters
     digest: c5f154c7c39b41a3155cd61c4e03d98bc234b2895411f6c11d766c364376a8cc
+=======
+    created: "2022-10-13T16:15:05.841666+03:00"
+    description: A Helm chart for Datree admission webhook for Kubernetes clusters
+    digest: a62cbedebb8498831f7c3abf0372e26df297f4c842e722883662833473383f86
+>>>>>>> Stashed changes
     home: datree.io
     icon: https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png
     keywords:
@@ -19,8 +25,33 @@ entries:
     - https://github.com/datreeio/admission-webhook-datree
     type: application
     urls:
+<<<<<<< Updated upstream
     - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.3.2.tgz
     version: 0.3.2
+=======
+    - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.3.3.tgz
+    version: 0.3.3
+  - apiVersion: v2
+    appVersion: 0.1.25
+    created: "2022-10-13T13:59:41.296465+03:00"
+    description: A Helm chart for Datree admission webhook for Kubernetes clusters
+    digest: f43b3c0bd23bf880098c058388f024ed9f2c6bee023fa9644c5a97297ba9b29b
+    home: datree.io
+    icon: https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png
+    keywords:
+    - datree-admission-webhook
+    - policy agent
+    - validating webhook
+    - admissions controller
+    kubeVersion: '>=1.16.0-0'
+    name: datree-admission-webhook
+    sources:
+    - https://github.com/datreeio/admission-webhook-datree
+    type: application
+    urls:
+    - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.3.1.tgz
+    version: 0.3.1
+>>>>>>> Stashed changes
   - apiVersion: v2
     appVersion: 0.1.24
     created: "2022-10-06T14:35:05.123457+03:00"
@@ -81,4 +112,8 @@ entries:
     urls:
     - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.1.0.tgz
     version: 0.1.0
+<<<<<<< Updated upstream
 generated: "2022-10-13T15:50:41.536358+03:00"
+=======
+generated: "2022-10-13T16:15:05.840031+03:00"
+>>>>>>> Stashed changes
