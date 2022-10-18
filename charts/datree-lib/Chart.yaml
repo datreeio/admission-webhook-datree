@@ -2,5 +2,5 @@ apiVersion: v2
 name: datree-lib
 description: A Helm chart library for Datree admission webhook for Kubernetes clusters
 type: library
-version: 0.1.0
+version: 0.1.1
 appVersion: "0.1.21"
