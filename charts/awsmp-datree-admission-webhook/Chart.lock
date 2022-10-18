@@ -1,0 +1,6 @@
+dependencies:
+- name: datree-lib
+  repository: file://../datree-lib
+  version: 0.1.0
+digest: sha256:9e2042b6eb6267c11aef85f75517279b1df65881070d49eeffab329d80ab679d
+generated: "2022-10-16T16:47:45.594093+03:00"
