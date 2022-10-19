@@ -69,7 +69,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "")
-		cliClient.SendRequestMetadata(clusterRequestMetadata)
+		go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
@@ -192,7 +192,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name)
-	cliClient.SendRequestMetadata(clusterRequestMetadata)
+	go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
