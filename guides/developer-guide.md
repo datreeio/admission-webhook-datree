@@ -43,8 +43,8 @@ make start-watch
 - [minikube](https://kubernetes.io/docs/tasks/tools/#minikube)
 
 ### Background processes that need to run:
-- Run `minikube start --extra-config=apiserver.enable-admission-plugins=ValidatingAdmissionWebhook`
 - Run Docker daemon by opening Docker desktop
+- Run `minikube start --extra-config=apiserver.enable-admission-plugins=ValidatingAdmissionWebhook`
 
 ### Deploy to your local minikube
 - Run `make deploy-in-minikube` - this will build a docker image and deploy it to minikube
