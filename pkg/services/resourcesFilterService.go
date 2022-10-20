@@ -83,7 +83,7 @@ func isTerraform(managedFields []ManagedFields) bool {
 	Some users also have a field manager similar to this one: "terraform-provider-helm_v2.6.0_x5"
 	Therefore, we check if a field manager contains the case-insensitive "terraform"
 	*/
-	return doesAtLeastOneFieldManagerContainOneOfTheInputsCaseInsensitive(managedFields, []string{"terraform"})
+	return doesAtLeastOneFieldManagerContainOneOfTheInputsNotCaseSensitive(managedFields, []string{"terraform"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject, managedFields []ManagedFields) bool {
@@ -145,7 +145,7 @@ func doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields []Managed
 	return false
 }
 
-func doesAtLeastOneFieldManagerContainOneOfTheInputsCaseInsensitive(managedFields []ManagedFields, inputs []string) bool {
+func doesAtLeastOneFieldManagerContainOneOfTheInputsNotCaseSensitive(managedFields []ManagedFields, inputs []string) bool {
 	for _, field := range managedFields {
 		for _, input := range inputs {
 			if strings.Contains(strings.ToLower(field.Manager), strings.ToLower(input)) {
