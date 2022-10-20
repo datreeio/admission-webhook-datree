@@ -31,9 +31,10 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 
 	isKubectl := isKubectl(managedFields)
 	isHelm := isHelm(managedFields)
+	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isResourceWhiteListed := isKubectl || isHelm || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
+	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
 
 	if !isResourceWhiteListed {
 		return false
@@ -72,6 +73,17 @@ func isKubectl(managedFields []ManagedFields) bool {
 
 func isHelm(managedFields []ManagedFields) bool {
 	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"helm"})
+}
+
+func isTerraform(managedFields []ManagedFields) bool {
+	/**
+	Also supports Terragrunt: https://github.com/gruntwork-io/terragrunt
+	Default terraform field manager: "Terraform"
+	https://github.com/hashicorp/terraform-provider-kubernetes/blob/aa76ff0f804cf52d98a0f2ac21f9d7e9c225c585/manifest/provider/plan.go#L68
+	Some users also have a field manager similar to this one: "terraform-provider-helm_v2.6.0_x5"
+	Therefore, we check if a field manager contains the case-insensitive "terraform"
+	*/
+	return doesAtLeastOneFieldManagerContainOneOfTheInputsNotCaseSensitive(managedFields, []string{"terraform"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject, managedFields []ManagedFields) bool {
@@ -126,6 +138,17 @@ func doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields []Managed
 	for _, field := range managedFields {
 		for _, prefix := range prefixes {
 			if strings.HasPrefix(field.Manager, prefix) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func doesAtLeastOneFieldManagerContainOneOfTheInputsNotCaseSensitive(managedFields []ManagedFields, inputs []string) bool {
+	for _, field := range managedFields {
+		for _, input := range inputs {
+			if strings.Contains(strings.ToLower(field.Manager), strings.ToLower(input)) {
 				return true
 			}
 		}
