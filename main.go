@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/config"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"net/http"
 	"os"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -44,7 +45,7 @@ func start(port string) {
 	}()
 
 	k8sMetadataUtil.InitK8sMetadataUtil()
-
+	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
 		panic(err)

@@ -101,10 +101,17 @@ spec:
             - name: webhook-tls-certs
               mountPath: /run/secrets/tls
               readOnly: true
+            - name: webhook-config
+              mountPath: /config
+              readOnly: true
       volumes:
         - name: webhook-tls-certs
           secret:
             secretName: webhook-server-tls
+        - name: webhook-config
+          configMap:
+            name: datree-webhook-configmap
+            optional: true
 ---
 apiVersion: v1
 kind: Service

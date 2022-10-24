@@ -1,8 +1,10 @@
 package services
 
 import (
+	"regexp"
 	"strings"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
 )
@@ -12,6 +14,38 @@ type RootObject struct {
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+	isResourcesSkipByConfig := configAllowedListsValidation(admissionReviewReq, rootObject)
+
+	if isResourcesSkipByConfig {
+		return false
+	}
+
+	return defaultResourcesValidation(admissionReviewReq, rootObject)
+}
+
+func configAllowedListsValidation(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+	namespace := admissionReviewReq.Request.Namespace
+	resourceKind := admissionReviewReq.Request.Kind.Kind
+	resourceName := rootObject.Metadata.Name
+
+	for _, skipListItem := range server.ConfigAllowedLists.SkipList {
+		skipRuleItem := strings.Split(skipListItem, ";")
+
+		if len(skipRuleItem) != 3 {
+			continue
+		}
+
+		if isRegexMatchString(skipRuleItem[0], namespace) &&
+			isRegexMatchString(skipRuleItem[1], resourceKind) &&
+			isRegexMatchString(skipRuleItem[2], resourceName) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func defaultResourcesValidation(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
 	}
@@ -36,11 +70,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
 
-	if !isResourceWhiteListed {
-		return false
-	}
-
-	return true
+	return isResourceWhiteListed
 }
 
 func isMetadataNameExists(rootObject RootObject) bool {
@@ -166,4 +196,12 @@ func isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields []Manag
 		}
 	}
 	return false
+}
+
+func isRegexMatchString(regex string, str string) bool {
+	r, err := regexp.Compile(regex)
+	if err != nil {
+		return false
+	}
+	return r.MatchString(str)
 }
