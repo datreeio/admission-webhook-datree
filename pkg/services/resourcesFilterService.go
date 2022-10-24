@@ -35,9 +35,9 @@ func configAllowedListsValidation(admissionReviewReq *admission.AdmissionReview,
 			continue
 		}
 
-		if isRegexMatchString(skipRuleItem[0], namespace) &&
-			isRegexMatchString(skipRuleItem[1], resourceKind) &&
-			isRegexMatchString(skipRuleItem[2], resourceName) {
+		if doesRegexMatchString(skipRuleItem[0], namespace) &&
+			doesRegexMatchString(skipRuleItem[1], resourceKind) &&
+			doesRegexMatchString(skipRuleItem[2], resourceName) {
 			return true
 		}
 	}
@@ -202,7 +202,7 @@ func isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields []Manag
 	return false
 }
 
-func isRegexMatchString(regex string, str string) bool {
+func doesRegexMatchString(regex string, str string) bool {
 	r, err := regexp.Compile(regex)
 	if err != nil {
 		return false
