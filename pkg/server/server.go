@@ -11,18 +11,16 @@ import (
 )
 
 type ConfigAllowedListsType struct {
-	SkipList     []string `yaml:"skipList"`
-	ValidateList []string `yaml:"validateList"`
+	SkipList []string `yaml:"skipList"`
 }
 
 var ConfigAllowedLists ConfigAllowedListsType
 
 func InitServerVars() error {
-	skipList, validateList, err := readDatreeWebhookConfigMap()
+	skipList, err := readDatreeWebhookConfigMap()
 
 	ConfigAllowedLists = ConfigAllowedListsType{
-		SkipList:     skipList,
-		ValidateList: validateList,
+		SkipList: skipList,
 	}
 
 	if err != nil {
@@ -54,26 +52,18 @@ func getConfigmapFromPath(filePath string) ([]string, error) {
 	return configMap, nil
 }
 
-func readDatreeWebhookConfigMap() (skipList []string, validateList []string, err error) {
+func readDatreeWebhookConfigMap() (skipList []string, err error) {
 	configDir := `/config`
 	configSkipListPath := filepath.Join(configDir, `skiplist`)
-	validateListPath := filepath.Join(configDir, `validatelist`)
 
 	if validateFileExistence(configSkipListPath) {
 		skipList, err = getConfigmapFromPath(configSkipListPath)
 		if err != nil {
-			return nil, nil, err
+			return nil, err
 		}
 	}
 
-	if validateFileExistence(validateListPath) {
-		validateList, err = getConfigmapFromPath(validateListPath)
-		if err != nil {
-			return nil, nil, err
-		}
-	}
-
-	return skipList, validateList, nil
+	return skipList, nil
 }
 
 func ValidateCertificate() (certPath string, keyPath string, err error) {
