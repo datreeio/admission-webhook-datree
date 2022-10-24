@@ -82,8 +82,9 @@ func isTerraform(managedFields []ManagedFields) bool {
 	https://github.com/hashicorp/terraform-provider-kubernetes/blob/aa76ff0f804cf52d98a0f2ac21f9d7e9c225c585/manifest/provider/plan.go#L68
 	Some users also have a field manager similar to this one: "terraform-provider-helm_v2.6.0_x5"
 	Therefore, we check if a field manager contains the case-insensitive "terraform"
+	Some users have the field manager "HashiCorp", therefore we add it as well
 	*/
-	return doesAtLeastOneFieldManagerContainOneOfTheInputsNotCaseSensitive(managedFields, []string{"terraform"})
+	return doesAtLeastOneFieldManagerContainOneOfTheInputsNotCaseSensitive(managedFields, []string{"terraform", "hashicorp"})
 }
 
 func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject, managedFields []ManagedFields) bool {
