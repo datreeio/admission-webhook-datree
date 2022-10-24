@@ -95,5 +95,4 @@ func ValidateCertificate() (certPath string, keyPath string, err error) {
 	}
 
 	return certPath, keyPath, nil
-
 }
