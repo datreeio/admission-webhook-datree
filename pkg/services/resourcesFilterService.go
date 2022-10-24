@@ -70,7 +70,11 @@ func defaultResourcesValidation(admissionReviewReq *admission.AdmissionReview, r
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
 
-	return isResourceWhiteListed
+	if !isResourceWhiteListed {
+		return false
+	}
+
+	return true
 }
 
 func isMetadataNameExists(rootObject RootObject) bool {
