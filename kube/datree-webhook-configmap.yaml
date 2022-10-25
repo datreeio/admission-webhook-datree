@@ -18,5 +18,5 @@ metadata:
   namespace: datree
 data:
   skiplist: |
-  # - (.*?);ServiceAccount;(.*?)
-  # - (.*?);Deployment;(.*?)
+    - (.*?);ServiceAccount;(.*?)
+    - (.*?);Deployment;(.*?)

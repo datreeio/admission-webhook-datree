@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
@@ -65,10 +66,9 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	rootObject := getResourceRootObject(admissionReviewReq)
-	resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
-
+	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
-		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "")
+		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigAllowedLists)
 		go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
@@ -191,7 +191,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name)
+	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigAllowedLists)
 	go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
@@ -385,9 +385,10 @@ func getResourceRootObject(admissionReviewReq *admission.AdmissionReview) RootOb
 	return rootObject
 }
 
-func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) (string, string, []string) {
+func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) (string, string, string, []string) {
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	managedFields := rootObject.Metadata.ManagedFields
+	namespace := admissionReviewReq.Request.Namespace
 
 	var managers []string
 	for _, manager := range managedFields {
@@ -396,7 +397,7 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 
 	resourceName := admissionReviewReq.Request.Name
 
-	return resourceKind, resourceName, managers
+	return namespace, resourceKind, resourceName, managers
 }
 
 func getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
@@ -422,18 +423,20 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 }
 
 func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
-	managers []string, clusterK8sVersion string, policyName string) *cliClient.ClusterRequestMetadata {
+	managers []string, clusterK8sVersion string, policyName string, namespace string, configAllowedLists server.ConfigAllowedListsType) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
-		CliEvaluationId: cliEvaluationId,
-		Token:           token,
-		Skipped:         skipped,
-		Allowed:         allowed,
-		ResourceKind:    resourceKind,
-		ResourceName:    resourceName,
-		Managers:        managers,
-		PolicyName:      policyName,
-		K8sVersion:      clusterK8sVersion,
+		CliEvaluationId:    cliEvaluationId,
+		Token:              token,
+		Skipped:            skipped,
+		Allowed:            allowed,
+		ResourceKind:       resourceKind,
+		ResourceName:       resourceName,
+		Managers:           managers,
+		PolicyName:         policyName,
+		K8sVersion:         clusterK8sVersion,
+		Namespace:          namespace,
+		ConfigAllowedLists: configAllowedLists,
 	}
 
 	return clusterRequestMetadata
