@@ -14,7 +14,7 @@ type RootObject struct {
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
-	isResourcesSkipByConfig := configAllowedListsValidation(admissionReviewReq, rootObject)
+	isResourcesSkipByConfig := configmapScanningFiltersValidation(admissionReviewReq, rootObject)
 
 	if isResourcesSkipByConfig {
 		return false
@@ -23,12 +23,12 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	return defaultResourcesValidation(admissionReviewReq, rootObject)
 }
 
-func configAllowedListsValidation(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+func configmapScanningFiltersValidation(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	namespace := admissionReviewReq.Request.Namespace
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	resourceName := rootObject.Metadata.Name
 
-	for _, skipListItem := range server.ConfigAllowedLists.SkipList {
+	for _, skipListItem := range server.ConfigmapScanningFilters.SkipList {
 		skipRuleItem := strings.Split(skipListItem, ";")
 
 		if len(skipRuleItem) != 3 {

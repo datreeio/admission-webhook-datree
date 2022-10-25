@@ -10,16 +10,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ConfigAllowedListsType struct {
+type ConfigmapScanningFiltersType struct {
 	SkipList []string `yaml:"skipList"`
 }
 
-var ConfigAllowedLists ConfigAllowedListsType
+var ConfigmapScanningFilters ConfigmapScanningFiltersType
 
 func InitServerVars() error {
 	skipList, err := readDatreeWebhookConfigMap()
 
-	ConfigAllowedLists = ConfigAllowedListsType{
+	ConfigmapScanningFilters = ConfigmapScanningFiltersType{
 		SkipList: skipList,
 	}
 

@@ -108,17 +108,17 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 }
 
 type ClusterRequestMetadata struct {
-	CliEvaluationId    int                           `json:"cliEvaluationId"`
-	Token              string                        `json:"token"`
-	Skipped            bool                          `json:"skipped"`
-	Allowed            bool                          `json:"allowed"`
-	ResourceKind       string                        `json:"resourceKind"`
-	ResourceName       string                        `json:"resourceName"`
-	Managers           []string                      `json:"managers"`
-	PolicyName         string                        `json:"policyName"`
-	K8sVersion         string                        `json:"k8sVersion"`
-	Namespace          string                        `json:"namespace"`
-	ConfigAllowedLists server.ConfigAllowedListsType `json:"configAllowedLists"`
+	CliEvaluationId          int                                 `json:"cliEvaluationId"`
+	Token                    string                              `json:"token"`
+	Skipped                  bool                                `json:"skipped"`
+	Allowed                  bool                                `json:"allowed"`
+	ResourceKind             string                              `json:"resourceKind"`
+	ResourceName             string                              `json:"resourceName"`
+	Managers                 []string                            `json:"managers"`
+	PolicyName               string                              `json:"policyName"`
+	K8sVersion               string                              `json:"k8sVersion"`
+	Namespace                string                              `json:"namespace"`
+	ConfigmapScanningFilters server.ConfigmapScanningFiltersType `json:"configmapScanningFilters"`
 }
 
 func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {

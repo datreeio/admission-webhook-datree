@@ -99,9 +99,9 @@ func TestShouldResourceBeValidated(t *testing.T) {
 	}
 }
 
-func TestConfigAllowedListsValidation(t *testing.T) {
+func TestConfigmapScanningFiltersValidation(t *testing.T) {
 	skipList := []string{"(.*?);Scale;(.*?)", "namespace;kind;name"}
-	server.ConfigAllowedLists.SkipList = skipList
+	server.ConfigmapScanningFilters.SkipList = skipList
 
 	var admissionReviewReq *admission.AdmissionReview
 	if err := json.Unmarshal([]byte(managedByKubectl), &admissionReviewReq); err != nil {
@@ -110,7 +110,7 @@ func TestConfigAllowedListsValidation(t *testing.T) {
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 
-	isResourcesSkipByConfig := configAllowedListsValidation(admissionReviewReq, rootObject)
+	isResourcesSkipByConfig := configmapScanningFiltersValidation(admissionReviewReq, rootObject)
 	t.Run("resource should be skipped because kind Scale it is in the skip list", func(t *testing.T) {
 		assert.Equal(t, true, isResourcesSkipByConfig)
 	})
