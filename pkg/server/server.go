@@ -10,11 +10,11 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-type ConfigmapScanningFiltersType struct {
+type ConfigMapScanningFiltersType struct {
 	SkipList []string `yaml:"skipList" json:"skipList"`
 }
 
-var ConfigmapScanningFilters = ConfigmapScanningFiltersType{}
+var ConfigMapScanningFilters = ConfigMapScanningFiltersType{}
 
 func InitServerVars() error {
 	skipList, err := readConfigScanningFilters()
@@ -23,7 +23,7 @@ func InitServerVars() error {
 		return err
 	}
 
-	ConfigmapScanningFilters.SkipList = skipList
+	ConfigMapScanningFilters.SkipList = skipList
 	return nil
 }
 

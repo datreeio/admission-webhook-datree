@@ -68,7 +68,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
-		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigmapScanningFilters)
+		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
 		go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
@@ -191,7 +191,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigmapScanningFilters)
+	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
 	go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
@@ -423,7 +423,7 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 }
 
 func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
-	managers []string, clusterK8sVersion string, policyName string, namespace string, configmapScanningFilters server.ConfigmapScanningFiltersType) *cliClient.ClusterRequestMetadata {
+	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
 		CliEvaluationId:          cliEvaluationId,
@@ -436,7 +436,7 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 		PolicyName:               policyName,
 		K8sVersion:               clusterK8sVersion,
 		Namespace:                namespace,
-		ConfigmapScanningFilters: configmapScanningFilters,
+		ConfigMapScanningFilters: configMapScanningFilters,
 	}
 
 	return clusterRequestMetadata

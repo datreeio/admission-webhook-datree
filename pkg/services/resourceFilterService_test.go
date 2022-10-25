@@ -99,9 +99,9 @@ func TestShouldResourceBeValidated(t *testing.T) {
 	}
 }
 
-func TestConfigmapScanningFiltersValidation(t *testing.T) {
+func TestConfigMapScanningFiltersValidation(t *testing.T) {
 	skipList := []string{"(.*?);Scale;(.*?)", "namespace;kind;name"}
-	server.ConfigmapScanningFilters.SkipList = skipList
+	server.ConfigMapScanningFilters.SkipList = skipList
 
 	var admissionReviewReq *admission.AdmissionReview
 	if err := json.Unmarshal([]byte(managedByKubectl), &admissionReviewReq); err != nil {

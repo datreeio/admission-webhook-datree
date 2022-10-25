@@ -6,4 +6,4 @@ kubectl delete clusterrolebinding/rolebinding:webhook-server-datree
 kubectl delete serviceaccount/webhook-server-datree -n datree
 kubectl delete clusterrole/webhook-server-datree
 kubectl label namespace kube-system admission.datree/validate-
-kubectl delete namespace/datree
+# kubectl delete namespace/datree

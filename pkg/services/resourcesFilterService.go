@@ -28,7 +28,7 @@ func shouldResourceBeSkipByScanningFilters(admissionReviewReq *admission.Admissi
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	resourceName := rootObject.Metadata.Name
 
-	for _, skipListItem := range server.ConfigmapScanningFilters.SkipList {
+	for _, skipListItem := range server.ConfigMapScanningFilters.SkipList {
 		skipRuleItem := strings.Split(skipListItem, ";")
 
 		if len(skipRuleItem) != 3 {
