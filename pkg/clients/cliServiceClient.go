@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
@@ -107,15 +108,17 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 }
 
 type ClusterRequestMetadata struct {
-	CliEvaluationId int      `json:"cliEvaluationId"`
-	Token           string   `json:"token"`
-	Skipped         bool     `json:"skipped"`
-	Allowed         bool     `json:"allowed"`
-	ResourceKind    string   `json:"resourceKind"`
-	ResourceName    string   `json:"resourceName"`
-	Managers        []string `json:"managers"`
-	PolicyName      string   `json:"policyName"`
-	K8sVersion      string   `json:"k8sVersion"`
+	CliEvaluationId          int                                 `json:"cliEvaluationId"`
+	Token                    string                              `json:"token"`
+	Skipped                  bool                                `json:"skipped"`
+	Allowed                  bool                                `json:"allowed"`
+	ResourceKind             string                              `json:"resourceKind"`
+	ResourceName             string                              `json:"resourceName"`
+	Managers                 []string                            `json:"managers"`
+	PolicyName               string                              `json:"policyName"`
+	K8sVersion               string                              `json:"k8sVersion"`
+	Namespace                string                              `json:"namespace,omitempty"`
+	ConfigMapScanningFilters server.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
 }
 
 func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {

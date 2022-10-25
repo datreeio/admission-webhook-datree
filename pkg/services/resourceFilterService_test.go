@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
 )
@@ -96,4 +97,22 @@ func TestShouldResourceBeValidated(t *testing.T) {
 			assert.Equal(t, testCase.isSkipped, isResourceSkipped)
 		})
 	}
+}
+
+func TestConfigMapScanningFiltersValidation(t *testing.T) {
+	skipList := []string{"(.*?);Scale;(.*?)", "namespace;kind;name"}
+	server.ConfigMapScanningFilters.SkipList = skipList
+
+	var admissionReviewReq *admission.AdmissionReview
+	if err := json.Unmarshal([]byte(managedByKubectl), &admissionReviewReq); err != nil {
+		panic(err)
+	}
+
+	rootObject := getResourceRootObject(admissionReviewReq)
+
+	shouldResourceBeSkipByScanningFilters := shouldResourceBeSkipByScanningFilters(admissionReviewReq, rootObject)
+	t.Run("resource should be skipped because kind Scale it is in the skip list", func(t *testing.T) {
+		assert.Equal(t, true, shouldResourceBeSkipByScanningFilters)
+	})
+
 }

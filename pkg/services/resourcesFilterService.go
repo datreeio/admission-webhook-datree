@@ -1,8 +1,10 @@
 package services
 
 import (
+	"regexp"
 	"strings"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
 )
@@ -12,6 +14,38 @@ type RootObject struct {
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+	shouldResourceBeSkipByScanningFilters := shouldResourceBeSkipByScanningFilters(admissionReviewReq, rootObject)
+
+	if shouldResourceBeSkipByScanningFilters {
+		return false
+	}
+
+	return shouldValidateResourceByDefaultFilters(admissionReviewReq, rootObject)
+}
+
+func shouldResourceBeSkipByScanningFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+	namespace := admissionReviewReq.Request.Namespace
+	resourceKind := admissionReviewReq.Request.Kind.Kind
+	resourceName := rootObject.Metadata.Name
+
+	for _, skipListItem := range server.ConfigMapScanningFilters.SkipList {
+		skipRuleItem := strings.Split(skipListItem, ";")
+
+		if len(skipRuleItem) != 3 {
+			continue
+		}
+
+		if doesRegexMatchString(skipRuleItem[0], namespace) &&
+			doesRegexMatchString(skipRuleItem[1], resourceKind) &&
+			doesRegexMatchString(skipRuleItem[2], resourceName) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func shouldValidateResourceByDefaultFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
 	}
@@ -166,4 +200,12 @@ func isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(fields []Manag
 		}
 	}
 	return false
+}
+
+func doesRegexMatchString(regex string, str string) bool {
+	r, err := regexp.Compile(regex)
+	if err != nil {
+		return false
+	}
+	return r.MatchString(str)
 }
