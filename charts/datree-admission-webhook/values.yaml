@@ -42,7 +42,7 @@ image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.25
+  tag: 0.1.28
   # Image pull policy
   pullPolicy: Always
 
