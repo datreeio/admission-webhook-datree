@@ -6,8 +6,8 @@
 #  - Don't forget to 'kubectl rollout restart deployment -n datree' after you change the configmap
 # ----------------------------------------
 # skiplist:
-#  - (namespace, resource kind, resource name)
-#  - (default, Deployment, nginx-deployment)
+#  - (namespace;resource kind;resource name)
+#  - (default;Deployment;nginx-deployment)
 #  - (.*?);Deployment;(.*?)
 # ----------------------------------------
 
