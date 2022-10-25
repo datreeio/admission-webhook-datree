@@ -11,22 +11,19 @@ import (
 )
 
 type ConfigmapScanningFiltersType struct {
-	SkipList []string `yaml:"skipList"`
+	SkipList []string `yaml:"skipList" json:"skipList"`
 }
 
-var ConfigmapScanningFilters ConfigmapScanningFiltersType
+var ConfigmapScanningFilters = ConfigmapScanningFiltersType{}
 
 func InitServerVars() error {
-	skipList, err := readDatreeWebhookConfigMap()
-
-	ConfigmapScanningFilters = ConfigmapScanningFiltersType{
-		SkipList: skipList,
-	}
+	skipList, err := readConfigScanningFilters()
 
 	if err != nil {
 		return err
 	}
 
+	ConfigmapScanningFilters.SkipList = skipList
 	return nil
 }
 
@@ -37,27 +34,27 @@ func validateFileExistence(filePath string) bool {
 	return true
 }
 
-func getConfigmapFromPath(filePath string) ([]string, error) {
-	var configMap []string
+func getScanningFilterFromConfigMap(filePath string) ([]string, error) {
+	var configMapScanningFilters []string
 	fileContent, readFileError := os.ReadFile(filePath)
 	if readFileError != nil {
 		return nil, readFileError
 	}
 
-	fileUnmarshalError := yaml.Unmarshal([]byte(fileContent), &configMap)
+	fileUnmarshalError := yaml.Unmarshal([]byte(fileContent), &configMapScanningFilters)
 	if fileUnmarshalError != nil {
 		return nil, fileUnmarshalError
 	}
 
-	return configMap, nil
+	return configMapScanningFilters, nil
 }
 
-func readDatreeWebhookConfigMap() (skipList []string, err error) {
+func readConfigScanningFilters() (skipList []string, err error) {
 	configDir := `/config`
 	configSkipListPath := filepath.Join(configDir, `skiplist`)
 
 	if validateFileExistence(configSkipListPath) {
-		skipList, err = getConfigmapFromPath(configSkipListPath)
+		skipList, err = getScanningFilterFromConfigMap(configSkipListPath)
 		if err != nil {
 			return nil, err
 		}

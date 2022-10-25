@@ -117,8 +117,8 @@ type ClusterRequestMetadata struct {
 	Managers                 []string                            `json:"managers"`
 	PolicyName               string                              `json:"policyName"`
 	K8sVersion               string                              `json:"k8sVersion"`
-	Namespace                string                              `json:"namespace"`
-	ConfigmapScanningFilters server.ConfigmapScanningFiltersType `json:"configmapScanningFilters"`
+	Namespace                string                              `json:"namespace,omitempty"`
+	ConfigmapScanningFilters server.ConfigmapScanningFiltersType `json:"configmapScanningFilters,omitempty"`
 }
 
 func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {

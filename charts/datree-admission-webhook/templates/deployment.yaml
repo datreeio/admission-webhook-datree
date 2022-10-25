@@ -72,5 +72,5 @@ spec:
             secretName: webhook-server-tls
         - name: webhook-config
           configMap:
-            name: datree-webhook-configmap
+            name: webhook-scanning-filters
             optional: true

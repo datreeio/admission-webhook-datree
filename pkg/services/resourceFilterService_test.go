@@ -110,9 +110,9 @@ func TestConfigmapScanningFiltersValidation(t *testing.T) {
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 
-	isResourcesSkipByConfig := configmapScanningFiltersValidation(admissionReviewReq, rootObject)
+	shouldResourceBeSkipByScanningFilters := shouldResourceBeSkipByScanningFilters(admissionReviewReq, rootObject)
 	t.Run("resource should be skipped because kind Scale it is in the skip list", func(t *testing.T) {
-		assert.Equal(t, true, isResourcesSkipByConfig)
+		assert.Equal(t, true, shouldResourceBeSkipByScanningFilters)
 	})
 
 }

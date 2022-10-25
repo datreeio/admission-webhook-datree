@@ -14,16 +14,16 @@ type RootObject struct {
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
-	isResourcesSkipByConfig := configmapScanningFiltersValidation(admissionReviewReq, rootObject)
+	shouldResourceBeSkipByScanningFilters := shouldResourceBeSkipByScanningFilters(admissionReviewReq, rootObject)
 
-	if isResourcesSkipByConfig {
+	if shouldResourceBeSkipByScanningFilters {
 		return false
 	}
 
-	return defaultResourcesValidation(admissionReviewReq, rootObject)
+	return shouldValidateResourceByDefaultFilters(admissionReviewReq, rootObject)
 }
 
-func configmapScanningFiltersValidation(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+func shouldResourceBeSkipByScanningFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	namespace := admissionReviewReq.Request.Namespace
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	resourceName := rootObject.Metadata.Name
@@ -45,7 +45,7 @@ func configmapScanningFiltersValidation(admissionReviewReq *admission.AdmissionR
 	return false
 }
 
-func defaultResourcesValidation(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+func shouldValidateResourceByDefaultFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
 	}
