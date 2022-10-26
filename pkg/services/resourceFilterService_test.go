@@ -16,12 +16,6 @@ type shouldResourceBeValidatedTestCases struct {
 	admissionReviewReq string
 }
 
-//go:embed resourceFilterService_testFixtures/notManagedByKubectl.json
-var notManagedByKubectl string
-
-//go:embed resourceFilterService_testFixtures/managedByKubectl.json
-var managedByKubectl string
-
 //go:embed resourceFilterService_testFixtures/metadataNameMissing.json
 var metadataNameMissing string
 
@@ -34,34 +28,11 @@ var kindEvent string
 //go:embed resourceFilterService_testFixtures/kindGitRepository.json
 var kindGitRepository string
 
-//go:embed resourceFilterService_testFixtures/managedByHelm.json
-var managedByHelm string
-
-//go:embed resourceFilterService_testFixtures/managedByTerraform.json
-var managedByTerraform string
+//go:embed resourceFilterService_testFixtures/deploymentWithVariableFieldManager.json
+var deploymentWithVariableFieldManager string
 
 func TestShouldResourceBeValidated(t *testing.T) {
 	testCases := []shouldResourceBeValidatedTestCases{
-		{
-			testName:           "resource should be skipped because it is not managed by kubectl",
-			isSkipped:          true,
-			admissionReviewReq: notManagedByKubectl,
-		},
-		{
-			testName:           "resource should be validated because it is managed by kubectl",
-			isSkipped:          false,
-			admissionReviewReq: managedByKubectl,
-		},
-		{
-			testName:           "resource should be validated because it is managed by helm",
-			isSkipped:          false,
-			admissionReviewReq: managedByHelm,
-		},
-		{
-			testName:           "resource should be validated because it is managed by terraform",
-			isSkipped:          false,
-			admissionReviewReq: managedByTerraform,
-		},
 		{
 			testName:           "resource should be skipped because metadata name is missing",
 			isSkipped:          true,
@@ -84,13 +55,9 @@ func TestShouldResourceBeValidated(t *testing.T) {
 		},
 	}
 
+	server.ConfigMapScanningFilters.SkipList = []string{}
 	for _, testCase := range testCases {
-		var admissionReviewReq *admission.AdmissionReview
-		if err := json.Unmarshal([]byte(testCase.admissionReviewReq), &admissionReviewReq); err != nil {
-			panic(err)
-		}
-
-		rootObject := getResourceRootObject(admissionReviewReq)
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(testCase.admissionReviewReq)
 
 		isResourceSkipped := !ShouldResourceBeValidated(admissionReviewReq, rootObject)
 		t.Run(testCase.testName, func(t *testing.T) {
@@ -100,19 +67,88 @@ func TestShouldResourceBeValidated(t *testing.T) {
 }
 
 func TestConfigMapScanningFiltersValidation(t *testing.T) {
-	skipList := []string{"(.*?);Scale;(.*?)", "namespace;kind;name"}
+	skipList := []string{"(.*?);Deployment;(.*?)", "namespace;kind;name"}
 	server.ConfigMapScanningFilters.SkipList = skipList
 
-	var admissionReviewReq *admission.AdmissionReview
-	if err := json.Unmarshal([]byte(managedByKubectl), &admissionReviewReq); err != nil {
-		panic(err)
-	}
-
-	rootObject := getResourceRootObject(admissionReviewReq)
+	admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
 
 	shouldResourceBeSkipByScanningFilters := shouldResourceBeSkipByScanningFilters(admissionReviewReq, rootObject)
-	t.Run("resource should be skipped because kind Scale it is in the skip list", func(t *testing.T) {
+	t.Run("resource should be skipped because kind Scale is in the skip list", func(t *testing.T) {
 		assert.Equal(t, true, shouldResourceBeSkipByScanningFilters)
 	})
+}
 
+func extractAdmissionReviewReqAndRootObject(resource string) (*admission.AdmissionReview, RootObject) {
+	var admissionReviewReq *admission.AdmissionReview
+	if err := json.Unmarshal([]byte(resource), &admissionReviewReq); err != nil {
+		panic(err)
+	}
+	rootObject := getResourceRootObject(admissionReviewReq)
+	return admissionReviewReq, rootObject
+}
+
+func TestFieldManagersFilters(t *testing.T) {
+	server.ConfigMapScanningFilters.SkipList = []string{}
+
+	t.Run("resource should be validated because it is managed by kubectl", func(t *testing.T) {
+		t.Run("kubectl-client-side-apply", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("kubectl-create", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-create"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("kubectl-edit", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-edit"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("kubectl-patch", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-patch"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+	})
+
+	t.Run("resource should be validated because it is managed by helm", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+		rootObject.Metadata.ManagedFields[0].Manager = "helm"
+		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+
+	t.Run("resource should be validated because it is managed by terraform", func(t *testing.T) {
+		t.Run("Terraform", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "Terraform"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("HashiCorp", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "HashiCorp"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("some-prefix-terraform-provider-kubernetes", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "some-prefix-terraform-provider-kubernetes"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+	})
+
+	t.Run("special cases", func(t *testing.T) {
+		t.Run("resource should be validated because 1 fields manager is matching", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "non-matching-manager"
+			rootObject.Metadata.ManagedFields = append(rootObject.Metadata.ManagedFields, ManagedFields{Manager: "kubectl-client-side-apply"})
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+
+		t.Run("resource should be skipped because it is managed by non-allowed manager", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+			rootObject.Metadata.ManagedFields[0].Manager = "non-matching-manager"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+	})
 }

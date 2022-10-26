@@ -41,7 +41,7 @@ func getScanningFilterFromConfigMap(filePath string) ([]string, error) {
 		return nil, readFileError
 	}
 
-	fileUnmarshalError := yaml.Unmarshal([]byte(fileContent), &configMapScanningFilters)
+	fileUnmarshalError := yaml.Unmarshal(fileContent, &configMapScanningFilters)
 	if fileUnmarshalError != nil {
 		return nil, fileUnmarshalError
 	}

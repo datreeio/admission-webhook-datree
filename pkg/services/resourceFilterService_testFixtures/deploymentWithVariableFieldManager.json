@@ -6,7 +6,7 @@
     "kind":{
       "group":"autoscaling",
       "version":"v1",
-      "kind":"Scale"
+      "kind":"Deployment"
     },
     "resource":{
       "group":"apps",
@@ -53,7 +53,7 @@
         },
         "managedFields": [
           {
-            "manager": "kubectl-client-side-apply",
+            "manager": "REPLACE THIS WITH A FIELD MANAGER NAME",
             "operation": "Update",
             "apiVersion": "v1",
             "time": "2022-06-21T14:11:26Z",
