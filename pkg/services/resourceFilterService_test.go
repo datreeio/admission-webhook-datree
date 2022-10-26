@@ -13,6 +13,8 @@ import (
 //go:embed resourceFilterService_testFixtures/deploymentWithVariableFieldManager.json
 var deploymentWithVariableFieldManager string
 
+// TODO add test cases for Argo and Flux
+
 func TestPrerequisitesFilters(t *testing.T) {
 	server.ConfigMapScanningFilters.SkipList = []string{}
 
