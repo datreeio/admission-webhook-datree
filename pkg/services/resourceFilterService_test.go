@@ -10,6 +10,8 @@ import (
 	admission "k8s.io/api/admission/v1"
 )
 
+// Template taken from here: https://github.com/datreeio/webhook-requests-invetigation/blob/main/kubectl-apply-requests/Deployment-b8a93de7-e0ef-4aaf-8a42-20df3811000e.json
+//
 //go:embed resourceFilterService_testFixtures/templateResource.json
 var templateResource string
 
