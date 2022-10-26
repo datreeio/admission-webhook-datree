@@ -67,14 +67,25 @@ func TestShouldResourceBeValidated(t *testing.T) {
 }
 
 func TestConfigMapScanningFiltersValidation(t *testing.T) {
-	skipList := []string{"(.*?);Deployment;(.*?)", "namespace;kind;name"}
-	server.ConfigMapScanningFilters.SkipList = skipList
+	server.ConfigMapScanningFilters.SkipList = []string{"(.*?);Deployment+;(.*?)", "namespace;kind;name"}
 
-	admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
-
-	shouldResourceBeSkipByScanningFilters := shouldResourceBeSkipByScanningFilters(admissionReviewReq, rootObject)
-	t.Run("resource should be skipped because kind Scale is in the skip list", func(t *testing.T) {
-		assert.Equal(t, true, shouldResourceBeSkipByScanningFilters)
+	t.Run("resource should be skipped because kind Deployment is in the skip list", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
+		admissionReviewReq.Request.Kind.Kind = "Deployment"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+	t.Run("resource should be skipped because kind Deploymenttt matches the regex in the skip list", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
+		admissionReviewReq.Request.Kind.Kind = "Deploymenttt"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+	t.Run("resource should be validated because kind non-skipped-kind is not in the skip list", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
+		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
+		admissionReviewReq.Request.Kind.Kind = "non-skipped-kind"
+		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 }
 

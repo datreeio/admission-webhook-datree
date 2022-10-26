@@ -4,7 +4,6 @@
   "request":{
     "uid":"705ab4f5-6393-11e8-b7cc-42010a800002",
     "kind":{
-      "group":"autoscaling",
       "version":"v1",
       "kind":"Deployment"
     },
@@ -15,9 +14,8 @@
     },
     "subResource":"scale",
     "requestKind":{
-      "group":"autoscaling",
       "version":"v1",
-      "kind":"Scale"
+      "kind":"Deployment"
     },
     "requestResource":{
       "group":"apps",
@@ -44,7 +42,7 @@
     },
     "object":{
       "apiVersion":"v1",
-      "kind":"Pod",
+      "kind":"Deployment",
       "metadata":{
         "name":"pod-with-conflict-1",
         "namespace":"tzlil-tets",

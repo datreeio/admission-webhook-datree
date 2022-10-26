@@ -11,6 +11,7 @@ import (
 
 type RootObject struct {
 	Metadata Metadata `json:"metadata"`
+	Kind     string   `json:"kind"`
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
