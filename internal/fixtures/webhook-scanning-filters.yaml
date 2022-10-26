@@ -1,7 +1,7 @@
 # ----------------------------------------
 # notes:
 #  - The skiplist is a list of regexes that will be matched against the namespace, resource kind, and resource name.
-#  - If any of the regexes match, the resource will be skipped.
+#  - If any of the regexes in the skiplist match (all 3 of namespace, kind and name), the resource will be skipped.
 #  - If no regexes match, the resource will be scanned.
 #  - Don't forget to 'kubectl rollout restart deployment -n datree' after you change the configmap
 # ----------------------------------------

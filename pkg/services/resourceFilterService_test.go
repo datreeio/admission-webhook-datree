@@ -43,24 +43,33 @@ func TestPrerequisitesFilters(t *testing.T) {
 }
 
 func TestConfigMapScanningFiltersValidation(t *testing.T) {
-	server.ConfigMapScanningFilters.SkipList = []string{"(.*?);Deployment+;(.*?)", "namespace;kind;name"}
+	server.ConfigMapScanningFilters.SkipList = []string{"test-namespace+;CronJob+;test-name+", "namespace;kind;name"}
 
-	t.Run("resource should be skipped because kind Deployment is in the skip list", func(t *testing.T) {
+	t.Run("resource should be skipped because kind CronJob is in the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
 		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
-		admissionReviewReq.Request.Kind.Kind = "Deployment"
+
+		admissionReviewReq.Request.Kind.Kind = "CronJob"
+		admissionReviewReq.Request.Namespace = "test-namespace"
+		rootObject.Metadata.Name = "test-name"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
-	t.Run("resource should be skipped because kind Deploymenttt matches the regex in the skip list", func(t *testing.T) {
+	t.Run("resource should be skipped because properties match the regexes in the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
 		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
-		admissionReviewReq.Request.Kind.Kind = "Deploymenttt"
+
+		admissionReviewReq.Request.Kind.Kind = "CronJobbb"
+		admissionReviewReq.Request.Namespace = "test-namespaceee"
+		rootObject.Metadata.Name = "test-nameee"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
-	t.Run("resource should be validated because kind non-skipped-kind is not in the skip list", func(t *testing.T) {
+	t.Run("resource should be validated because kind non-skipped is not in the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(deploymentWithVariableFieldManager)
 		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
-		admissionReviewReq.Request.Kind.Kind = "non-skipped-kind"
+
+		admissionReviewReq.Request.Kind.Kind = "non-skipped"
+		admissionReviewReq.Request.Namespace = "test-namespace"
+		rootObject.Metadata.Name = "test-name"
 		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 }
