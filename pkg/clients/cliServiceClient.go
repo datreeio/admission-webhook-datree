@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"net/http"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
@@ -130,7 +129,7 @@ func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMe
 	}
 }
 
-func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator services.ClusterRequestMetadataAggregator) {
+func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator []*ClusterRequestMetadata) {
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch/create", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
 		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))

@@ -224,8 +224,13 @@ func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadat
 	}
 }
 
-func SendMetadataInBatch(cliClient *cliClient.CliClient) {
-	cliClient.SendRequestMetadataBatch(clusterRequestMetadataAggregator)
+func SendMetadataInBatch(client *cliClient.CliClient) {
+	// map to array
+	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
+	for _, value := range clusterRequestMetadataAggregator {
+		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
+	}
+	go client.SendRequestMetadataBatch(clusterRequestMetadataArray)
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 
