@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"net/http"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
@@ -119,10 +120,18 @@ type ClusterRequestMetadata struct {
 	K8sVersion               string                              `json:"k8sVersion"`
 	Namespace                string                              `json:"namespace,omitempty"`
 	ConfigMapScanningFilters server.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
+	Count                    int                                 `json:"count"`
 }
 
 func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadata/create", clusterRequestMetadata, c.flagsHeaders)
+	if err != nil {
+		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
+	}
+}
+
+func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator services.ClusterRequestMetadataAggregator) {
+	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch/create", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
 		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
 	}

@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mitchellh/hashstructure/v2"
 	"net/http"
 	"os"
 	"strings"
@@ -192,9 +193,41 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
+	saveMetadataInBatch(clusterRequestMetadata, cliClient)
 	go cliClient.SendRequestMetadata(clusterRequestMetadata)
 
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
+}
+
+type ClusterRequestMetadataAggregator = map[uint64]*cliClient.ClusterRequestMetadata
+
+var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
+
+func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadata, client *cliClient.CliClient) {
+	// hash function is not perfect, there might be hash collisions, but it's ok for our use case
+	// we don't care if 0.1% of the logs are inaccurate
+	hash, err := hashstructure.Hash(clusterRequestMetadata, hashstructure.FormatV2, nil)
+	if err != nil {
+		panic(err)
+	}
+	currentValue := clusterRequestMetadataAggregator[hash]
+	if currentValue == nil {
+		clusterRequestMetadataAggregator[hash] = clusterRequestMetadata
+	} else {
+		currentValue.Count++
+	}
+
+	// retrieve hash table size
+	if len(clusterRequestMetadataAggregator) >= 500 {
+		// send all the logs
+		sendMetadataInBatch(client)
+	}
+}
+
+func sendMetadataInBatch(cliClient *cliClient.CliClient) {
+	cliClient.SendRequestMetadataBatch(clusterRequestMetadataAggregator)
+	// clear the hash table
+	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
@@ -437,6 +470,7 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 		K8sVersion:               clusterK8sVersion,
 		Namespace:                namespace,
 		ConfigMapScanningFilters: configMapScanningFilters,
+		Count:                    1,
 	}
 
 	return clusterRequestMetadata
