@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
@@ -17,6 +19,7 @@ import (
 	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/utils"
+	"github.com/go-co-op/gocron"
 )
 
 const DefaultErrExitCode = 1
@@ -63,5 +66,6 @@ func start(port string) {
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
 		http.ListenAndServe(":"+port, nil)
+		gocron.NewScheduler(time.UTC).Every(1).Hour().Do(services.SendMetadataInBatch)
 	}
 }

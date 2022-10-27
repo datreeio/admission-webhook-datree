@@ -220,14 +220,13 @@ func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadat
 	// retrieve hash table size
 	if len(clusterRequestMetadataAggregator) >= 500 {
 		// send all the logs
-		sendMetadataInBatch(client)
+		SendMetadataInBatch(client)
 	}
 }
 
-func sendMetadataInBatch(cliClient *cliClient.CliClient) {
+func SendMetadataInBatch(cliClient *cliClient.CliClient) {
 	cliClient.SendRequestMetadataBatch(clusterRequestMetadataAggregator)
-	// clear the hash table
-	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
+	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
