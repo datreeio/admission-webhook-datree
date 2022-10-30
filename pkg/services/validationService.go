@@ -56,7 +56,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	var err error
 
 	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient("https://localhost:8000", validator)
+	cliClient := cliClient.NewCliServiceClient("https://77d9-84-110-69-94.ngrok.io", validator)
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
@@ -213,9 +213,10 @@ func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadat
 	if currentValue == nil {
 		clusterRequestMetadataAggregator[hash] = clusterRequestMetadata
 	} else {
-		currentValue.Count++
+		currentValue.Occurrences++
 	}
 
+	fmt.Println(clusterRequestMetadataAggregator)
 	// retrieve hash table size
 	if len(clusterRequestMetadataAggregator) >= 500 {
 		// send all the logs
@@ -473,7 +474,7 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 		K8sVersion:               clusterK8sVersion,
 		Namespace:                namespace,
 		ConfigMapScanningFilters: configMapScanningFilters,
-		Count:                    1,
+		Occurrences:              1,
 	}
 
 	return clusterRequestMetadata
