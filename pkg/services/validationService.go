@@ -21,7 +21,6 @@ import (
 	policyFactory "github.com/datreeio/datree/bl/policy"
 	"github.com/datreeio/datree/pkg/ciContext"
 	baseCliClient "github.com/datreeio/datree/pkg/cliClient"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"github.com/datreeio/datree/pkg/extractor"
 	"github.com/datreeio/datree/pkg/networkValidator"
@@ -57,7 +56,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	var err error
 
 	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
+	cliClient := cliClient.NewCliServiceClient("https://localhost:8000", validator)
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
@@ -230,7 +229,7 @@ func SendMetadataInBatch(client *cliClient.CliClient) {
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
-	go client.SendRequestMetadataBatch(clusterRequestMetadataArray)
+	go client.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{Requests: clusterRequestMetadataArray})
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 

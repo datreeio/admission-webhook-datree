@@ -129,7 +129,11 @@ func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMe
 	}
 }
 
-func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator []*ClusterRequestMetadata) {
+type ClusterRequestMetadataBatchReqBody struct {
+	Requests []*ClusterRequestMetadata `json:"requests"`
+}
+
+func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator ClusterRequestMetadataBatchReqBody) {
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
 		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
