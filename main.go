@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
@@ -12,7 +13,6 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
-	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
@@ -46,7 +46,6 @@ func start(port string) {
 		}
 	}()
 
-	k8sMetadataUtil.InitK8sMetadataUtil()
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
@@ -64,6 +63,7 @@ func start(port string) {
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+		k8sMetadataUtil.InitK8sMetadataUtil()
 		initMetadataLogsCronjob()
 		http.ListenAndServe(":"+port, nil)
 	}
