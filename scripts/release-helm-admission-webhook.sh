@@ -49,14 +49,6 @@ function verify_updated_gh_pages_branch(){
     fi
 }
 
-function clean_up(){
-    cecho "CYAN" "Cleaning up all release-helm-chart branches" 
-    if git branch | grep "release-helm-chart-"; then
-        git branch -D $(git branch | grep "release-helm-chart-")
-    fi
-}
-
-clean_up
 verify_command_exists
 verify_updated_gh_pages_branch
 verify_updated_main_branch
@@ -66,7 +58,8 @@ verify_updated_main_branch
 cecho "CYAN" "⏳ Bumping patch version..."
 current_version=$(yq e '.version' ./charts/datree-admission-webhook/Chart.yaml)
 cecho "CYAN" "👴🏽 Current version: $current_version"
-new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')date_stamp
+date_stamp=$(date -d @$(date +%s) '+%b %d %Y %H:%M:%S')
 cecho "CYAN" "🤱🏽 New version: $new_version"
 
 #helm
