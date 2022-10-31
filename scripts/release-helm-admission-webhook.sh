@@ -49,6 +49,10 @@ function verify_updated_gh_pages_branch(){
     fi
 }
 
+function cleanup(){
+
+}
+
 verify_command_exists
 verify_updated_gh_pages_branch
 verify_updated_main_branch
@@ -57,17 +61,21 @@ verify_updated_main_branch
 # bump patch version Chart.yaml
 cecho "CYAN" "⏳ Bumping patch version..."
 current_version=$(yq e '.version' ./charts/datree-admission-webhook/Chart.yaml)
-cecho "CYAN" "👴🏽 Current version: $current_version"
+cecho "CYAN" "👴 Current version: $current_version"
 new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
 date_stamp=$(date +%Y-%m-%d)
-cecho "CYAN" "🤱🏽 New version: $new_version"
+cecho "CYAN" "🤱 New version: $new_version"
 
 #helm
 yq e -i ".version = \"$new_version\"" ./charts/datree-admission-webhook/Chart.yaml
-cecho "CYAN" "👷🏾 Export helm package to /tmp"
+cecho "CYAN" "👷 Export helm package to /tmp"
 helm dependency build ./charts/datree-admission-webhook/
 helm package ./charts/datree-admission-webhook/ --version=$new_version -d /tmp/
-cecho "CYAN" "👷🏾 PR to main release-helm-chart-$new_version"
+cecho "CYAN" "👷 PR to main release-helm-chart-$new_version"
+if git show-ref --verify --quiet "refs/heads/release-helm-chart-$new_version"; then
+    cecho "CYAN" "👷 Branch release-helm-chart-$new_version exists, deleting..."
+    git branch -D release-helm-chart-$new_version
+fi
 git checkout -b "release-helm-chart-$new_version"
 git add ./charts/datree-admission-webhook/Chart.yaml
 git commit -m "Bump helm chart $new_version"
@@ -76,7 +84,7 @@ cecho "CYAN" "🏌🏿 Creating PR Chart.yaml bump - main"
 gh pr create --title "Bump Chart.yaml version to $new_version" --body "bump version to $new_version" --base main --head "release-helm-chart-$new_version"
 
 cecho "GREEN" "✅ Done creating Chart.yaml Bump PR! "
-cecho "GREEN" "👷🏾 Prepare to release helm chart to gh-pages..."
+cecho "GREEN" "👷 Prepare to release helm chart to gh-pages..."
 
 git checkout gh-pages
 mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
@@ -88,7 +96,7 @@ git add ./datree-admission-webhook-$new_version.tgz
 
 git commit -m "feat: Release chart datree-admission-webhook-$new_version.tgz"
 git push --set-upstream origin "release-chart-$new_version"
-cecho "CYAN" "🏌🏿 Creating PR datree-admission-webhook-$new_version.tgz and index - gh-pages"
+cecho "CYAN" "🏌️ Creating PR datree-admission-webhook-$new_version.tgz and index - gh-pages"
 gh pr create --title "Release chart datree-admission-webhook-$new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
 
 cecho "GREEN" "🕊 Done creating helm chart release to gh-pages PR!"
