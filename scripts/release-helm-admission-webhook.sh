@@ -49,10 +49,6 @@ function verify_updated_gh_pages_branch(){
     fi
 }
 
-function cleanup(){
-
-}
-
 verify_command_exists
 verify_updated_gh_pages_branch
 verify_updated_main_branch
