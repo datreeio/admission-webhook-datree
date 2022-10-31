@@ -119,12 +119,17 @@ type ClusterRequestMetadata struct {
 	K8sVersion               string                              `json:"k8sVersion"`
 	Namespace                string                              `json:"namespace,omitempty"`
 	ConfigMapScanningFilters server.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
+	Occurrences              int                                 `json:"occurrences"`
 }
 
-func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {
-	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadata/create", clusterRequestMetadata, c.flagsHeaders)
+type ClusterRequestMetadataBatchReqBody struct {
+	MetadataLogs []*ClusterRequestMetadata `json:"metadataLogs"`
+}
+
+func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator ClusterRequestMetadataBatchReqBody) {
+	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
-		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
+		logger.LogUtil(fmt.Sprintf("SendRequestMetadataBatch status code: %d, err: %s", httpRes.StatusCode, err.Error()))
 	}
 }
 

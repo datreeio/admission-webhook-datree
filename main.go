@@ -2,11 +2,13 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"os"
-
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
+	"github.com/datreeio/admission-webhook-datree/pkg/services"
+	"github.com/robfig/cron/v3"
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -45,6 +47,7 @@ func start(port string) {
 	}()
 
 	k8sMetadataUtil.InitK8sMetadataUtil()
+	initMetadataLogsCronjob()
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
@@ -64,4 +67,10 @@ func start(port string) {
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
 		http.ListenAndServe(":"+port, nil)
 	}
+}
+
+func initMetadataLogsCronjob() {
+	cornJob := cron.New(cron.WithLocation(time.UTC))
+	cornJob.AddFunc("@every 1h", services.SendMetadataInBatch)
+	cornJob.Start()
 }

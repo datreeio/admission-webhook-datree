@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"net/http"
 	"os"
 	"strings"
@@ -20,7 +21,6 @@ import (
 	policyFactory "github.com/datreeio/datree/bl/policy"
 	"github.com/datreeio/datree/pkg/ciContext"
 	baseCliClient "github.com/datreeio/datree/pkg/cliClient"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"github.com/datreeio/datree/pkg/extractor"
 	"github.com/datreeio/datree/pkg/networkValidator"
@@ -49,18 +49,18 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
+var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
+
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
 	cliEvaluationId := -1
 	var err error
 
-	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
-	token, err := getToken(cliClient)
+	token, err := getToken(cliServiceClient)
 	if err != nil {
 		panic(err)
 	}
@@ -69,15 +69,14 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
-		go cliClient.SendRequestMetadata(clusterRequestMetadata)
-
+		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
 	clientId := getClientId()
 	policyName := os.Getenv(enums.Policy)
 
-	prerunData, err := cliClient.RequestEvaluationPrerunData(token)
+	prerunData, err := cliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 		*warningMessages = append(*warningMessages, err.Error())
@@ -124,7 +123,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		Policy:              policy,
 	}
 
-	evaluator := evaluation.New(cliClient, ciContext)
+	evaluator := evaluation.New(cliServiceClient, ciContext)
 	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Evaluate err: %s", err.Error()))
@@ -141,7 +140,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
 		policyCheckResults)
 
-	verifyVersionResponse, err := cliClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
+	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 	} else {
@@ -154,7 +153,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
-		evaluationResultResp, err := sendEvaluationResult(cliClient, evaluationRequestData)
+		evaluationResultResp, err := sendEvaluationResult(cliServiceClient, evaluationRequestData)
 		if err == nil {
 			cliEvaluationId = evaluationResultResp.EvaluationId
 		} else {
@@ -192,9 +191,40 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
-	go cliClient.SendRequestMetadata(clusterRequestMetadata)
-
+	saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
+}
+
+type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMetadata
+
+var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
+
+func saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
+	if err != nil {
+		logger.LogUtil(err.Error())
+		return
+	}
+	logJson := string(logJsonInBytes)
+	currentValue := clusterRequestMetadataAggregator[logJson]
+	if currentValue == nil {
+		clusterRequestMetadataAggregator[logJson] = clusterRequestMetadata
+	} else {
+		currentValue.Occurrences++
+	}
+
+	if len(clusterRequestMetadataAggregator) >= 500 {
+		SendMetadataInBatch()
+	}
+}
+
+func SendMetadataInBatch() {
+	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
+	for _, value := range clusterRequestMetadataAggregator {
+		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
+	}
+	go cliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
+	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 
 func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
@@ -437,6 +467,7 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 		K8sVersion:               clusterK8sVersion,
 		Namespace:                namespace,
 		ConfigMapScanningFilters: configMapScanningFilters,
+		Occurrences:              1,
 	}
 
 	return clusterRequestMetadata

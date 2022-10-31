@@ -18,7 +18,7 @@ var templateResource string
 func TestConfigMapScanningFiltersValidation(t *testing.T) {
 	server.ConfigMapScanningFilters.SkipList = []string{"test-namespace+;CronJob+;test-name+", "namespace;kind;name"}
 
-	t.Run("resource should be skipped because kind CronJob is in the skip list", func(t *testing.T) {
+	t.Run("resource should be skipped because properties match the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
 
