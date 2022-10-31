@@ -92,7 +92,7 @@ git add ./index.yaml
 git add ./datree-admission-webhook-$new_version.tgz
 
 git commit -m "feat: Release chart datree-admission-webhook-$new_version.tgz"
-git push --set-upstream origin "release-chart-$new_version"
+git push --set-upstream origin "release-chart-datree-admission-webhook-$new_version"
 cecho "CYAN" "🏌️ Creating PR datree-admission-webhook-$new_version.tgz and index - gh-pages"
 gh pr create --title "Release chart datree-admission-webhook-$new_version.tgz and index" --body "Release chart datree-admission-webhook-$new_version.tgz and index" --base gh-pages --head "release-chart-datree-admission-webhook-$new_version"
 
