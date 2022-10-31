@@ -52,6 +52,14 @@ function verify_updated_gh_pages_branch(){
     fi
 }
 
+function clean_up(){
+    cecho "CYAN" "Cleaning up"
+    if git show-ref --verify --quiet "refs/heads/release-helm-chart"; then
+        git branch -D $(git branch | grep "release-helm-chart-")
+    fi
+}
+
+clean_up
 verify_command_exists
 verify_updated_gh_pages_branch
 verify_updated_main_branch
