@@ -58,8 +58,8 @@ verify_updated_main_branch
 cecho "CYAN" "⏳ Bumping patch version..."
 current_version=$(yq e '.version' ./charts/datree-admission-webhook/Chart.yaml)
 cecho "CYAN" "👴🏽 Current version: $current_version"
-new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')date_stamp
-date_stamp=$(date -d @$(date +%s) '+%b %d %Y %H:%M:%S')
+new_version=$(echo $current_version | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+date_stamp=$(date +%Y-%m-%d)
 cecho "CYAN" "🤱🏽 New version: $new_version"
 
 #helm
