@@ -222,7 +222,7 @@ func SendMetadataInBatch() {
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
-	go cliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{Requests: clusterRequestMetadataArray})
+	go cliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 

@@ -123,7 +123,7 @@ type ClusterRequestMetadata struct {
 }
 
 type ClusterRequestMetadataBatchReqBody struct {
-	Requests []*ClusterRequestMetadata `json:"requests"`
+	MetadataLogs []*ClusterRequestMetadata `json:"metadataLogs"`
 }
 
 func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator ClusterRequestMetadataBatchReqBody) {
