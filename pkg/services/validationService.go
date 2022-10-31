@@ -49,7 +49,7 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-var CliClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
+var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
@@ -60,7 +60,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
-	token, err := getToken(CliClient)
+	token, err := getToken(cliServiceClient)
 	if err != nil {
 		panic(err)
 	}
@@ -76,7 +76,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	clientId := getClientId()
 	policyName := os.Getenv(enums.Policy)
 
-	prerunData, err := CliClient.RequestEvaluationPrerunData(token)
+	prerunData, err := cliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 		*warningMessages = append(*warningMessages, err.Error())
@@ -123,7 +123,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		Policy:              policy,
 	}
 
-	evaluator := evaluation.New(CliClient, ciContext)
+	evaluator := evaluation.New(cliServiceClient, ciContext)
 	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Evaluate err: %s", err.Error()))
@@ -140,7 +140,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
 		policyCheckResults)
 
-	verifyVersionResponse, err := CliClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
+	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 	} else {
@@ -153,7 +153,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
-		evaluationResultResp, err := sendEvaluationResult(CliClient, evaluationRequestData)
+		evaluationResultResp, err := sendEvaluationResult(cliServiceClient, evaluationRequestData)
 		if err == nil {
 			cliEvaluationId = evaluationResultResp.EvaluationId
 		} else {
@@ -227,7 +227,7 @@ func SendMetadataInBatch() {
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
-	go CliClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{Requests: clusterRequestMetadataArray})
+	go cliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{Requests: clusterRequestMetadataArray})
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 
