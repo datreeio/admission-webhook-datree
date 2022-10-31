@@ -69,7 +69,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
-		saveMetadataInBatch(clusterRequestMetadata)
+		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
@@ -191,7 +191,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
-	saveMetadataInBatch(clusterRequestMetadata)
+	saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
@@ -199,8 +199,7 @@ type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMeta
 
 var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 
-func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
-	// clusterRequestMetadata to json
+func saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	hashInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
 		panic(err)
@@ -213,16 +212,12 @@ func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadat
 		currentValue.Occurrences++
 	}
 
-	fmt.Println(clusterRequestMetadataAggregator)
-	// retrieve hash table size
 	if len(clusterRequestMetadataAggregator) >= 500 {
-		// send all the logs
 		SendMetadataInBatch()
 	}
 }
 
 func SendMetadataInBatch() {
-	// map to array
 	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
