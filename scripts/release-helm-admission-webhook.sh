@@ -86,7 +86,7 @@ cecho "GREEN" "👷 Prepare to release helm chart to gh-pages..."
 git checkout gh-pages
 mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
 helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
-git checkout -b "release-chart-$new_version"
+git checkout -b "release-chart-datree-admission-webhook-$new_version"
 
 git add ./index.yaml
 git add ./datree-admission-webhook-$new_version.tgz
@@ -94,7 +94,7 @@ git add ./datree-admission-webhook-$new_version.tgz
 git commit -m "feat: Release chart datree-admission-webhook-$new_version.tgz"
 git push --set-upstream origin "release-chart-$new_version"
 cecho "CYAN" "🏌️ Creating PR datree-admission-webhook-$new_version.tgz and index - gh-pages"
-gh pr create --title "Release chart datree-admission-webhook-$new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
+gh pr create --title "Release chart datree-admission-webhook-$new_version.tgz and index" --body "Release chart datree-admission-webhook-$new_version.tgz and index" --base gh-pages --head "release-chart-datree-admission-webhook-$new_version"
 
 cecho "GREEN" "🕊 Done creating helm chart release to gh-pages PR!"
 git checkout main
