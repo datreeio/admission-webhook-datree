@@ -70,7 +70,8 @@ helm package ./charts/datree-admission-webhook/ --version=$new_version -d /tmp/
 cecho "CYAN" "👷 PR to main release-helm-chart-$new_version"
 if git show-ref --verify --quiet "refs/heads/release-helm-chart-$new_version"; then
     cecho "CYAN" "👷 Branch release-helm-chart-$new_version exists, deleting..."
-    git branch -D release-helm-chart-$new_version
+    git branch -d release-helm-chart-$new_version
+    git push origin --delete release-helm-chart-$new_version
 fi
 git checkout -b "release-helm-chart-$new_version"
 git add ./charts/datree-admission-webhook/Chart.yaml
