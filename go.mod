@@ -7,7 +7,6 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/go-co-op/gocron v1.17.1
 	github.com/lithammer/shortuuid v3.0.0+incompatible
-	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/zap v1.10.0
 	k8s.io/api v0.24.2
