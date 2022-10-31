@@ -42,8 +42,18 @@ function verify_updated_main_branch(){
         exit 1
     fi
 }
+function verify_updated_gh_pages_branch(){
+    git checkout gh-pages
+    git pull origin gh-pages
+
+    if [ -n "$(git status --porcelain)" ]; then
+        cecho "RED" "Please commit your changes before running this script"
+        exit 1
+    fi
+}
 
 verify_command_exists
+verify_updated_gh_pages_branch
 verify_updated_main_branch
 
 
@@ -67,22 +77,22 @@ git push origin "release-helm-chart-$new_version"
 cecho "GREEN" "Creating PR"
 gh pr create --title "bump version to $new_version" --body "bump version to $new_version" --base main --head "release-helm-chart-$new_version"
 
+cecho "GREEN" "Done!"
+cecho "YELLOW" "Prepare to release helm chart to gh-pages..."
 
-# helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
-# mv index.yaml /tmp/
-# cecho "GREEN" "helm package done"
-# cecho "CYAN" "switch to temp branch to create PR"
-# git checkout gh-pages
-# git pull
-# git checkout -b "release-chart-$new_version"
-# mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
-# mv "/tmp/index.yaml" ./
-# git add ./index.yaml
-# git add ./datree-admission-webhook-$new_version.tgz
-# git commit -m "feat: Release chart datree-admission-webhook-$new_version.tgz"
-# git push --set-upstream origin "release-chart-$new_version"
-# cecho "CYAN" "open PR"
-# gh pr create --title "Release chart datree-admission-webhook-$new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
+git checkout gh-pages
+mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
+helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
+git checkout -b "release-chart-$new_version"
+
+git add ./index.yaml
+git add ./datree-admission-webhook-$new_version.tgz
+
+git commit -m "feat: Release chart datree-admission-webhook-$new_version.tgz"
+git push --set-upstream origin "release-chart-$new_version"
+cecho "CYAN" "open PR"
+gh pr create --title "Release chart datree-admission-webhook-$new_version" --body "release chart $new_version" --base gh-pages --head release-chart-$new_version
+
 # git checkout main
 # git pull
 # git checkout -b "update-chart-$new_version"
