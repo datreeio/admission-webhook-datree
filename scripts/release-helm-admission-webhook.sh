@@ -86,7 +86,7 @@ cecho "GREEN" "👷 Prepare to release helm chart to gh-pages..."
 git checkout gh-pages
 mv "/tmp/datree-admission-webhook-$new_version.tgz" ./
 helm repo index --url https://datreeio.github.io/admission-webhook-datree/ ./ --merge ./index.yaml
-if git show-ref --verify --quiet "refs/heads/release-helm-chart-$new_version"; then
+if git show-ref --verify --quiet "refs/heads/elease-chart-datree-admission-webhook-$new_version"; then
     cecho "CYAN" "👷 Branch release-helm-chart-$new_version exists, deleting..."
     git branch -D release-chart-datree-admission-webhook-$new_version
     git push origin --delete release-chart-datree-admission-webhook-$new_version
