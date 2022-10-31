@@ -3,7 +3,6 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"net/http"
 	"os"
 	"strings"
@@ -49,7 +48,7 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
+var cliServiceClient = cliClient.NewCliServiceClient("http://localhost:8000", networkValidator.NewNetworkValidator())
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
@@ -200,14 +199,15 @@ type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMeta
 var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 
 func saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
-	hashInBytes, err := json.Marshal(clusterRequestMetadata)
+	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
-		panic(err)
+		logger.LogUtil(err.Error())
+		return
 	}
-	hash := string(hashInBytes)
-	currentValue := clusterRequestMetadataAggregator[hash]
+	logJson := string(logJsonInBytes)
+	currentValue := clusterRequestMetadataAggregator[logJson]
 	if currentValue == nil {
-		clusterRequestMetadataAggregator[hash] = clusterRequestMetadata
+		clusterRequestMetadataAggregator[logJson] = clusterRequestMetadata
 	} else {
 		currentValue.Occurrences++
 	}

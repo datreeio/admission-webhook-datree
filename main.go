@@ -5,7 +5,7 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
-	"github.com/go-co-op/gocron"
+	"github.com/robfig/cron/v3"
 	"net/http"
 	"os"
 	"time"
@@ -70,7 +70,7 @@ func start(port string) {
 }
 
 func initMetadataLogsCronjob() {
-	cronJobScheduler := gocron.NewScheduler(time.UTC)
-	cronJobScheduler.Every(1).Hour().Do(services.SendMetadataInBatch)
-	cronJobScheduler.StartAsync()
+	cornJob := cron.New(cron.WithLocation(time.UTC))
+	cornJob.AddFunc("@every 1h", services.SendMetadataInBatch)
+	cornJob.Start()
 }
