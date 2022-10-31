@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"net/http"
 	"os"
 	"strings"
@@ -48,7 +49,7 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
-var cliServiceClient = cliClient.NewCliServiceClient("http://localhost:8000", networkValidator.NewNetworkValidator())
+var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
