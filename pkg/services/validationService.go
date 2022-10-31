@@ -3,7 +3,6 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/mitchellh/hashstructure/v2"
 	"net/http"
 	"os"
 	"strings"
@@ -49,18 +48,18 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
+var CliClient = cliClient.NewCliServiceClient("localhost:8000", networkValidator.NewNetworkValidator())
+
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
 	cliEvaluationId := -1
 	var err error
 
-	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient("https://77d9-84-110-69-94.ngrok.io", validator)
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
-	token, err := getToken(cliClient)
+	token, err := getToken(CliClient)
 	if err != nil {
 		panic(err)
 	}
@@ -69,15 +68,14 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
-		go cliClient.SendRequestMetadata(clusterRequestMetadata)
-
+		saveMetadataInBatch(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
 	clientId := getClientId()
 	policyName := os.Getenv(enums.Policy)
 
-	prerunData, err := cliClient.RequestEvaluationPrerunData(token)
+	prerunData, err := CliClient.RequestEvaluationPrerunData(token)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 		*warningMessages = append(*warningMessages, err.Error())
@@ -124,7 +122,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		Policy:              policy,
 	}
 
-	evaluator := evaluation.New(cliClient, ciContext)
+	evaluator := evaluation.New(CliClient, ciContext)
 	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Evaluate err: %s", err.Error()))
@@ -141,7 +139,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
 		policyCheckResults)
 
-	verifyVersionResponse, err := cliClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
+	verifyVersionResponse, err := CliClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 	} else {
@@ -154,7 +152,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
-		evaluationResultResp, err := sendEvaluationResult(cliClient, evaluationRequestData)
+		evaluationResultResp, err := sendEvaluationResult(CliClient, evaluationRequestData)
 		if err == nil {
 			cliEvaluationId = evaluationResultResp.EvaluationId
 		} else {
@@ -192,23 +190,21 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
-	saveMetadataInBatch(clusterRequestMetadata, cliClient)
-	go cliClient.SendRequestMetadata(clusterRequestMetadata)
-
+	saveMetadataInBatch(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
-type ClusterRequestMetadataAggregator = map[uint64]*cliClient.ClusterRequestMetadata
+type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMetadata
 
 var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 
-func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadata, client *cliClient.CliClient) {
-	// hash function is not perfect, there might be hash collisions, but it's ok for our use case
-	// we don't care if 0.1% of the logs are inaccurate
-	hash, err := hashstructure.Hash(clusterRequestMetadata, hashstructure.FormatV2, nil)
+func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	// clusterRequestMetadata to json
+	hashInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
 		panic(err)
 	}
+	hash := string(hashInBytes)
 	currentValue := clusterRequestMetadataAggregator[hash]
 	if currentValue == nil {
 		clusterRequestMetadataAggregator[hash] = clusterRequestMetadata
@@ -220,17 +216,17 @@ func saveMetadataInBatch(clusterRequestMetadata *cliClient.ClusterRequestMetadat
 	// retrieve hash table size
 	if len(clusterRequestMetadataAggregator) >= 500 {
 		// send all the logs
-		SendMetadataInBatch(client)
+		SendMetadataInBatch()
 	}
 }
 
-func SendMetadataInBatch(client *cliClient.CliClient) {
+func SendMetadataInBatch() {
 	// map to array
 	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
-	go client.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{Requests: clusterRequestMetadataArray})
+	go CliClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{Requests: clusterRequestMetadataArray})
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 

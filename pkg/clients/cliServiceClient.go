@@ -122,13 +122,6 @@ type ClusterRequestMetadata struct {
 	Occurrences              int                                 `json:"occurrences"`
 }
 
-func (c *CliClient) SendRequestMetadata(clusterRequestMetadata *ClusterRequestMetadata) {
-	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadata/create", clusterRequestMetadata, c.flagsHeaders)
-	if err != nil {
-		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
-	}
-}
-
 type ClusterRequestMetadataBatchReqBody struct {
 	Requests []*ClusterRequestMetadata `json:"requests"`
 }
@@ -136,7 +129,7 @@ type ClusterRequestMetadataBatchReqBody struct {
 func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator ClusterRequestMetadataBatchReqBody) {
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
-		logger.LogUtil(fmt.Sprintf("SendRequestMetadata status code: %d, err: %s", httpRes.StatusCode, err.Error()))
+		logger.LogUtil(fmt.Sprintf("SendRequestMetadataBatch status code: %d, err: %s", httpRes.StatusCode, err.Error()))
 	}
 }
 
