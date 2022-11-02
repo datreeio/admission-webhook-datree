@@ -37,7 +37,7 @@ jobs:
       - name: Auto commit changes
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: "build: Automated Change - Bump helm chart version"
+          commit_message: 'build: Automated Change - Bump helm chart version to "${{ env.NEW_CHART_VERSION }}"'
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
         env:
