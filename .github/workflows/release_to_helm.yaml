@@ -21,16 +21,23 @@ jobs:
         run: |
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
-
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
           version: v3.10.0
+      - name: Set Chart Version env
+        run: |
+          NEW_CHART_VERSION=$(yq e '.version' ./charts/datree-admission-webhook/Chart.yaml | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "NEW_CHART_VERSION=$NEW_CHART_VERSION" >> $GITHUB_ENV
       - name: Custom bump versions
         uses: mikefarah/yq@master
         with:
           cmd: |
-            yq e '.version' ./charts/datree-admission-webhook/Chart.yaml | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g'
+            yq e -i '.version= "${{ env.NEW_CHART_VERSION }}"' ./charts/datree-admission-webhook/Chart.yaml
+      - name: Auto commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "build: Automated Change - Bump helm chart version"
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
         env:
