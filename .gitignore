@@ -7,5 +7,6 @@
 webhook-datree
 
 .idea/*
+.vscode/*
 
 .DS_STORE
