@@ -66,11 +66,14 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
+var ClusterUuid k8sTypes.UID = ""
+
 func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
 	clusterMetadata, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
+	ClusterUuid = clusterMetadata.UID
 	return clusterMetadata.UID, nil
 }
 

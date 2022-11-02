@@ -136,6 +136,8 @@ func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator Cl
 type WebhookEvaluationRequestData struct {
 	EvaluationData evaluation.EvaluationRequestData
 	WebhookVersion string
+	ClusterUuid    k8sTypes.UID
+	Namespace      string
 }
 
 type EvaluationResultRequest struct {
@@ -149,6 +151,8 @@ type EvaluationResultRequest struct {
 	AllExecutedRules   []cliClient.RuleData                        `json:"allExecutedRules"`
 	AllEvaluatedFiles  []cliClient.FileData                        `json:"allEvaluatedFiles"`
 	PolicyCheckResults map[string]map[string]*cliClient.FailedRule `json:"policyCheckResults"`
+	ClusterUuid        k8sTypes.UID                                `json:"clusterUuid"`
+	Namespace          string                                      `json:"namespace"`
 }
 
 type Metadata struct {
