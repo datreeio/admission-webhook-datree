@@ -251,6 +251,8 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 		AllExecutedRules:   evaluationRequestData.EvaluationData.RulesData,
 		AllEvaluatedFiles:  evaluationRequestData.EvaluationData.FilesData,
 		PolicyCheckResults: evaluationRequestData.EvaluationData.PolicyCheckResults,
+		ClusterUuid:        evaluationRequestData.ClusterUuid,
+		Namespace:          evaluationRequestData.Namespace,
 	})
 
 	return sendEvaluationResultsResponse, err
