@@ -26,7 +26,11 @@ jobs:
         uses: azure/setup-helm@v3
         with:
           version: v3.10.0
-
+      - name: Custom bump versions
+        uses: mikefarah/yq@master
+        with:
+          cmd: |
+            yq e '.version' ./charts/datree-admission-webhook/Chart.yaml | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g'
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
         env:
