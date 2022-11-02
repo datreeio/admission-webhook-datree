@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"net/http"
 	"os"
@@ -60,6 +61,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
+	evaluationNamespace := admissionReviewReq.Request.Namespace
 	token, err := getToken(cliServiceClient)
 	if err != nil {
 		panic(err)
@@ -138,7 +140,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
-		policyCheckResults)
+		policyCheckResults, evaluationNamespace)
 
 	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
@@ -431,10 +433,8 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 }
 
 func getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
-	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData) cliClient.WebhookEvaluationRequestData {
-	endEvaluationTime := time.Now()
-
-	evaluationDurationSeconds := endEvaluationTime.Sub(startTime).Seconds()
+	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string) cliClient.WebhookEvaluationRequestData {
+	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
 			Token:                     token,
@@ -447,6 +447,8 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 			EvaluationDurationSeconds: evaluationDurationSeconds,
 		},
 		WebhookVersion: config.WebhookVersion,
+		ClusterUuid:    k8sMetadataUtil.ClusterUuid,
+		Namespace:      evaluationNamespace,
 	}
 
 	return evaluationRequestData

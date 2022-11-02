@@ -136,6 +136,8 @@ func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator Cl
 type WebhookEvaluationRequestData struct {
 	EvaluationData evaluation.EvaluationRequestData
 	WebhookVersion string
+	ClusterUuid    k8sTypes.UID
+	Namespace      string
 }
 
 type EvaluationResultRequest struct {
