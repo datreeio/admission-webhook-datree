@@ -1,24 +1,27 @@
 name: Release Charts
 
 on:
-  workflow_dispatch:
-  # workflow_run:
-  #   workflows: ["Release to Prod"]
-  #   types:
-  #     - completed
+  workflow_run:
+    workflows: ["Release to Prod"]
+    types:
+      - completed
 
 jobs:
   release:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    # if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           token: ${{secrets.DATREE_CI_GH_TOKEN}}
+          fetch-depth: 0
+      - name: Configure Git
+        run: |
+          git config user.name "datree-ci"
+          git config user.email "ci@datree.io"
       - name: Install Helm
         uses: azure/setup-helm@v3
         with:
@@ -39,4 +42,4 @@ jobs:
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
         env:
-          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          CR_TOKEN: "${{ secrets.DATREE_CI_GH_TOKEN }}"
