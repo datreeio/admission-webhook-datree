@@ -37,7 +37,5 @@ jobs:
           commit_message: 'build: Automated Change - Bump helm chart version to "${{ env.NEW_CHART_VERSION }}"'
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.1
-        with:  
-          token: ${{secrets.DATREE_CI_GH_TOKEN}}
         env:
           CR_TOKEN: "${{ secrets.DATREE_CI_GH_TOKEN }}"
