@@ -2,16 +2,12 @@
 
 # The name of the namespace all resources will be created in, if not specified in the release.
 namespace: ""
-
 # The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
-
 # Additional labels to add to all resources.
 customLabels: {}
-
 # Additional annotations to add to all resources.
 customAnnotations: {}
-
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
@@ -24,7 +20,6 @@ rbac:
     create: true
     # The ClusterRole name
     name: datree-webhook-server-read
-
 datree:
   # The token used to link the CLI to your dashboard.
   token: <DATREE_TOKEN>
@@ -36,30 +31,26 @@ datree:
   output: ""
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord: ""
-
 # The Datree webhook-server image to use.
 image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.29
+  tag: 0.1.30
   # Image pull policy
   pullPolicy: Always
-
 # Security context for the containers
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 25000
-
 resources:
   limits:
     memory: 512Mi
   requests:
     cpu: 1000m
     memory: 512Mi
-
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
