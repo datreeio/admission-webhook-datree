@@ -138,6 +138,7 @@ type WebhookEvaluationRequestData struct {
 	WebhookVersion string
 	ClusterUuid    k8sTypes.UID
 	Namespace      string
+	IsEnforceMode  bool
 }
 
 type EvaluationResultRequest struct {
@@ -167,6 +168,7 @@ type Metadata struct {
 type ClusterContext struct {
 	WebhookVersion string `json:"webhookVersion"`
 	IsInCluster    bool   `json:"isInCluster"`
+	IsEnforceMode  bool   `json:"isEnforceMode"`
 }
 
 func (c *CliClient) SendWebhookEvaluationResult(request *EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
