@@ -106,7 +106,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":false")
+	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":true")
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
