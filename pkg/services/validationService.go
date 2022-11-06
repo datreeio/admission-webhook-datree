@@ -483,7 +483,7 @@ func getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck bool, cliEvaluati
 	}
 
 	if isFailedPolicyCheck {
-		return fmt.Sprintf("🚩 Some of the applied objects have failed the policy check scan. Check out %s/cli/invocations/%d', for more details", baseUrl, cliEvaluationId)
+		return fmt.Sprintf("🚩 Some of the applied objects have failed the policy check scan. Check out %s/cli/invocations/%d'", baseUrl, cliEvaluationId)
 	}
 
 	return fmt.Sprintf("🏆 You’ve just increased your cluster score! Check out your full cluster report at %s", baseUrl)
