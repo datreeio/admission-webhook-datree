@@ -203,8 +203,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	warningCTMessage := getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck, cliEvaluationId)
-	*warningMessages = append(*warningMessages, warningCTMessage)
+	*warningMessages = append(*warningMessages, getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck, cliEvaluationId))
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
 	saveRequestMetadataLogInAggregator(clusterRequestMetadata)
