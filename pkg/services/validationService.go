@@ -476,8 +476,8 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 
 func getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck bool, cliEvaluationId int) string {
 	if isFailedPolicyCheck {
-		return `🚩 Some objects failed the policy check, get the full report and remediation guides at: https://app.datree.io/cli/invocations/` + strconv.Itoa(cliEvaluationId)
+		return `🚩 Some of the applied objects have failed the policy check scan. Check out https://app.datree.io/cli/invocations/` + strconv.Itoa(cliEvaluationId)
 	}
 
-	return `🏆 Your cluster score was updated, get your full cluster overview at: https://app.datree.io`
+	return `🏆 You’ve just increased your cluster score! Check out your full cluster report at https://app.datree.io`
 }
