@@ -187,8 +187,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	var allowed bool
-	var isPassedPolicyCheck = evaluationSummary.PassedPolicyCheckCount == 0
-	if isPassedPolicyCheck {
+	var isFailedPolicyCheck = evaluationSummary.PassedPolicyCheckCount == 0
+	if isFailedPolicyCheck {
 		allowed = false
 
 		sb := strings.Builder{}
@@ -199,11 +199,11 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		allowed = true
 	}
 
-	if isEnforceMode() {
+	if !isEnforceMode() {
 		allowed = true
 	}
 
-	warningCTMessage := getWarningCTABaseOnPassedPolicyCheck(isPassedPolicyCheck, cliEvaluationId)
+	warningCTMessage := getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck, cliEvaluationId)
 	*warningMessages = append(*warningMessages, warningCTMessage)
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
@@ -474,8 +474,8 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 	return clusterRequestMetadata
 }
 
-func getWarningCTABaseOnPassedPolicyCheck(passedPolicyCheck bool, cliEvaluationId int) string {
-	if passedPolicyCheck {
+func getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck bool, cliEvaluationId int) string {
+	if isFailedPolicyCheck {
 		return `Some objects failed the policy check, get the full report and remediation guides at: https://app.datree.io/cli/invocations/` + strconv.Itoa(cliEvaluationId)
 	}
 	return `Your cluster score was updated, get your full cluster overview at: https://app.datree.io`
