@@ -3,12 +3,14 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
@@ -51,6 +53,10 @@ type Metadata struct {
 }
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
+
+func isEnforceMode() bool {
+	return true
+}
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
@@ -181,7 +187,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	var allowed bool
-	if evaluationSummary.PassedPolicyCheckCount == 0 {
+	var isPassedPolicyCheck = evaluationSummary.PassedPolicyCheckCount == 0
+	if isPassedPolicyCheck {
 		allowed = false
 
 		sb := strings.Builder{}
@@ -191,6 +198,13 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	} else {
 		allowed = true
 	}
+
+	if isEnforceMode() {
+		allowed = true
+	}
+
+	warningCTMessage := getWarningCTABaseOnPassedPolicyCheck(isPassedPolicyCheck, cliEvaluationId)
+	*warningMessages = append(*warningMessages, warningCTMessage)
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
 	saveRequestMetadataLogInAggregator(clusterRequestMetadata)
@@ -267,32 +281,15 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 		message = msg
 	}
 
-	if len(warningMessages) > 0 {
-		return &admission.AdmissionReview{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "AdmissionReview",
-				APIVersion: "admission.k8s.io/v1",
-			},
-			Response: &admission.AdmissionResponse{
-				UID:      requestUID,
-				Warnings: warningMessages,
-				Allowed:  allowed,
-				Result: &metav1.Status{
-					Code:    int32(statusCode),
-					Message: message,
-				},
-			},
-		}
-	}
-
 	return &admission.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AdmissionReview",
 			APIVersion: "admission.k8s.io/v1",
 		},
 		Response: &admission.AdmissionResponse{
-			UID:     requestUID,
-			Allowed: allowed,
+			UID:      requestUID,
+			Allowed:  allowed,
+			Warnings: warningMessages,
 			Result: &metav1.Status{
 				Code:    int32(statusCode),
 				Message: message,
@@ -475,4 +472,11 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 	}
 
 	return clusterRequestMetadata
+}
+
+func getWarningCTABaseOnPassedPolicyCheck(passedPolicyCheck bool, cliEvaluationId int) string {
+	if passedPolicyCheck {
+		return `Some objects failed the policy check, get the full report and remediation guides at: https://app.datree.io/cli/invocations/` + strconv.Itoa(cliEvaluationId)
+	}
+	return `Your cluster score was updated, get your full cluster overview at: https://app.datree.io`
 }
