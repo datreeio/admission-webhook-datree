@@ -29,7 +29,7 @@ spec:
           # changing the order will harm resource patching
           env:
             - name: DATREE_TOKEN
-              value: {{.Values.datree.token}}
+              value: {{ .Values.datree.token | regexFind "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" | required "\n\t❌ A valid DATREE_TOKEN is required!\n\tFor more information: https://github.com/datreeio/datree/tree/main/cluster-integration" }}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy}}
             - name: DATREE_VERBOSE
