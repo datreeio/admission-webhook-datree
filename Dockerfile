@@ -2,6 +2,7 @@ FROM golang:1.18-alpine AS builder
 
 ARG BUILD_ENVIRONMENT
 ARG WEBHOOK_VERSION
+ARG BINARY_PATH
 
 WORKDIR /go/src/app
 
@@ -11,7 +12,7 @@ RUN go mod download
 
 COPY . .
 # cache the build
-RUN --mount=type=cache,target=/root/.cache/go-build go build -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
+RUN --mount=type=cache,target=/root/.cache/go-build go build ./cmd/cert-generator -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
 
 FROM alpine:3.14
 COPY --from=builder /go/src/app/webhook-datree /
