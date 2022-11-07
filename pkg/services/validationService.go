@@ -53,7 +53,6 @@ type Metadata struct {
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
-// TBD: is enforce mode is false, we on warning mode.
 func isEnforceMode() bool {
 	return true
 }
