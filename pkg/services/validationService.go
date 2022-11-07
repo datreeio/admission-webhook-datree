@@ -55,7 +55,7 @@ var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, netwo
 
 // TBD: is enforce mode is false, we on warning mode.
 func isEnforceMode() bool {
-	return false
+	return true
 }
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
