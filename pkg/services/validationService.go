@@ -55,7 +55,7 @@ var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, netwo
 
 // TBD: is enforce mode is false, we on warning mode.
 func isEnforceMode() bool {
-	return false
+	return true
 }
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
@@ -191,14 +191,6 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	if isFailedPolicyCheck {
 		allowed = false
 
-		baseUrl := "https://app.datree.io"
-		if strings.Contains(prerunData.RegistrationURL, "staging") {
-			baseUrl = "https:///app.staging.datree.io"
-		}
-
-		warningUTMMessage := fmt.Sprintf("🚩 Some objects failed the policy check, get the full report at: %s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
-		*warningMessages = append([]string{warningUTMMessage}, *warningMessages...)
-
 		sb := strings.Builder{}
 		sb.WriteString("\n---\n")
 		sb.WriteString(resultStr)
@@ -209,6 +201,11 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 
 	if !isEnforceMode() {
 		allowed = true
+		if isFailedPolicyCheck {
+			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
+			warningUTMMessage := fmt.Sprintf("🚩 Some objects failed the policy check, get the full report at: %s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
+			*warningMessages = append([]string{warningUTMMessage}, *warningMessages...)
+		}
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
