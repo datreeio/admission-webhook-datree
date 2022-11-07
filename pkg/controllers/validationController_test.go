@@ -99,8 +99,6 @@ func TestValidateRequestBody(t *testing.T) {
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
-	// fakeUUID := "b218c483-b5cc-4839-8c3c-1bf3e8e6e839"
-	// t.Setenv(enums.Token, fakeUUID)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
