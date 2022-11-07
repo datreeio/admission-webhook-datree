@@ -53,8 +53,9 @@ type Metadata struct {
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
+// TBD: is enforce mode is false, we on warning mode.
 func isEnforceMode() bool {
-	return true
+	return false
 }
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
@@ -337,8 +338,18 @@ func getK8sVersion() string {
 
 func getToken(cliClient *cliClient.CliClient) (string, error) {
 	token := os.Getenv(enums.Token)
+
 	if token == "" {
-		logger.LogUtil(fmt.Sprintf("couldn't get token env variable %s", token))
+		newToken, err := cliClient.CreateToken()
+		if err != nil {
+			return "", err
+		}
+
+		err = os.Setenv(enums.Token, newToken.Token)
+		if err != nil {
+			logger.LogUtil(fmt.Sprintf("couldn't set DATREE_TOKEN env variable %s", err))
+		}
+		token = newToken.Token
 	}
 	return token, nil
 }
