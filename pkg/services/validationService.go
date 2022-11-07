@@ -191,6 +191,14 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	if isFailedPolicyCheck {
 		allowed = false
 
+		baseUrl := "https://app.datree.io"
+		if strings.Contains(prerunData.RegistrationURL, "staging") {
+			baseUrl = "https:///app.staging.datree.io"
+		}
+
+		warningUTMMessage := fmt.Sprintf("🚩 Some objects failed the policy check, get the full report at: %s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
+		*warningMessages = append([]string{warningUTMMessage}, *warningMessages...)
+
 		sb := strings.Builder{}
 		sb.WriteString("\n---\n")
 		sb.WriteString(resultStr)
@@ -202,8 +210,6 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	if !isEnforceMode() {
 		allowed = true
 	}
-
-	*warningMessages = append(*warningMessages, getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck, cliEvaluationId, prerunData.RegistrationURL))
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
 	saveRequestMetadataLogInAggregator(clusterRequestMetadata)
@@ -335,18 +341,8 @@ func getK8sVersion() string {
 
 func getToken(cliClient *cliClient.CliClient) (string, error) {
 	token := os.Getenv(enums.Token)
-
 	if token == "" {
-		newToken, err := cliClient.CreateToken()
-		if err != nil {
-			return "", err
-		}
-
-		err = os.Setenv(enums.Token, newToken.Token)
-		if err != nil {
-			logger.LogUtil(fmt.Sprintf("couldn't set DATREE_TOKEN env variable %s", err))
-		}
-		token = newToken.Token
+		logger.LogUtil(fmt.Sprintf("couldn't get token env variable %s", token))
 	}
 	return token, nil
 }
@@ -473,18 +469,4 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 	}
 
 	return clusterRequestMetadata
-}
-
-func getWarningCTABasedOnPassedPolicyCheck(isFailedPolicyCheck bool, cliEvaluationId int, registrationURL string) string {
-	baseUrl := "https://app.datree.io"
-
-	if strings.Contains(registrationURL, "staging") {
-		baseUrl = "https:///app.staging.datree.io"
-	}
-
-	if isFailedPolicyCheck {
-		return fmt.Sprintf("🚩 Some of the applied objects have failed the policy check scan. Check out %s/cli/invocations/%d", baseUrl, cliEvaluationId)
-	}
-
-	return fmt.Sprintf("🏆 You’ve just increased your cluster score! Check out your full cluster report at %s", baseUrl)
 }

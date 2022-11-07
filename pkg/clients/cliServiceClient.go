@@ -42,37 +42,6 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 	}
 }
 
-func (c *CliClient) CreateToken() (*cliClient.CreateTokenResponse, error) {
-	if c.networkValidator.IsLocalMode() {
-		return &cliClient.CreateTokenResponse{}, nil
-	}
-
-	headers := map[string]string{}
-	res, err := c.httpClient.Request(http.MethodPost, "/cli/tokens/", nil, headers)
-
-	if err != nil {
-		networkErr := c.networkValidator.IdentifyNetworkError(err)
-		if networkErr != nil {
-			return nil, networkErr
-		}
-
-		if c.networkValidator.IsLocalMode() {
-			return &cliClient.CreateTokenResponse{}, nil
-		}
-
-		return nil, err
-	}
-
-	createTokenResponse := &cliClient.CreateTokenResponse{}
-	err = json.Unmarshal(res.Body, &createTokenResponse)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return createTokenResponse, nil
-}
-
 func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.EvaluationPrerunDataResponse, error) {
 	if c.networkValidator.IsLocalMode() {
 		return &cliClient.EvaluationPrerunDataResponse{IsPolicyAsCodeMode: true}, nil
