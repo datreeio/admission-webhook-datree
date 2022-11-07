@@ -61,7 +61,6 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
-	evaluationNamespace := admissionReviewReq.Request.Namespace
 	token, err := getToken(cliServiceClient)
 	if err != nil {
 		panic(err)
@@ -140,7 +139,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
-		policyCheckResults, evaluationNamespace)
+		policyCheckResults, namespace)
 
 	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
