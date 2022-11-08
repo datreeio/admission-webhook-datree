@@ -1,4 +1,4 @@
-kubectl delete validatingwebhookconfiguration.admissionregistration.k8s.io/webhook-datree
+kubectl delete validatingwebhookconfiguration.admissionregistration.k8s.io/datree-webhook
 kubectl delete service/webhook-server -n datree
 kubectl delete deployment/webhook-server -n datree
 kubectl delete secret/webhook-server-tls -n datree

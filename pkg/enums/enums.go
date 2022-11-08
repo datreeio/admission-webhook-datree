@@ -7,4 +7,5 @@ const (
 	Verbose  = "DATREE_VERBOSE"
 	NoRecord = "DATREE_NO_RECORD"
 	Output   = "DATREE_OUTPUT"
+	Enforce  = "DATREE_ENFORCE"
 )

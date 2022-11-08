@@ -28,3 +28,11 @@ run-in-minikube:
 	bash ./scripts/run-in-minikube.sh
 test-in-minikube:
 	bash ./scripts/test-in-minikube.sh
+
+install-in-minikube-using-helm:
+	eval $(minikube docker-env) && \
+	./scripts/build-docker-image.sh && \
+	helm install -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}"
+
+uninstall-in-minikube-using-helm:
+	helm uninstall -n datree datree-webhook
