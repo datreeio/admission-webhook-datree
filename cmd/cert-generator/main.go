@@ -22,15 +22,22 @@ import (
 )
 
 func main() {
+	loggerUtil.Log("starting cert-generator")
 	caCert, _ := generateSelfSignedCAAndSignWebhookServerCertificate()
-	createValidationWebhookConfig(caCert)
+	loggerUtil.Log(fmt.Sprintf("created ca certificate, caCert: %v", caCert))
+	err := createValidationWebhookConfig(caCert)
+	if err != nil {
+		loggerUtil.Log(fmt.Sprintf("failed to create validation webhook config, err: %v", err))
+	} else {
+		loggerUtil.Log("created validating webhook configuration")
+	}
 }
 
-func createValidationWebhookConfig(caCert *bytes.Buffer) {
+func createValidationWebhookConfig(caCert *bytes.Buffer) error {
 	config := ctrl.GetConfigOrDie()
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic("failed to set go -client")
+		return err // panic("failed to set go -client")
 	}
 
 	webhookNamespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
@@ -49,7 +56,7 @@ func createValidationWebhookConfig(caCert *bytes.Buffer) {
 			ClientConfig: admissionregistrationv1.WebhookClientConfig{
 				CABundle: caCert.Bytes(), // CA bundle created earlier
 				Service: &admissionregistrationv1.ServiceReference{
-					Name:      webhookService,
+					Name:      webhookService, // datree-webhook-server
 					Namespace: webhookNamespace,
 					Path:      &path,
 				},
@@ -79,8 +86,10 @@ func createValidationWebhookConfig(caCert *bytes.Buffer) {
 	}
 
 	if _, err = kubeClient.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), validationWebhookConfig, metav1.CreateOptions{}); err != nil {
-		panic(err)
+		return err
 	}
+
+	return nil
 }
 
 func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error) {
@@ -100,11 +109,9 @@ func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error
 		Bytes: caBytes,
 	})
 
-	dnsNames := []string{"datree-webhook-server",
-		"datree-webhook-server.default",
-		"datree-webhook-server.default.svc",
-		"datree-webhook-server.datree",
-		"datree-webhook-server.datree.svc",
+	webhookNamespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
+	dnsNames := []string{
+		fmt.Sprintf("datree-webhook-server.%s.svc", webhookNamespace),
 	}
 
 	commonName := "/CN=datree-webhook-server.datree.svc"
