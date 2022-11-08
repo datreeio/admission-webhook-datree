@@ -3,12 +3,13 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
@@ -51,6 +52,10 @@ type Metadata struct {
 }
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
+
+func isEnforceMode() bool {
+	return true
+}
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
@@ -180,7 +185,8 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 	}
 
 	var allowed bool
-	if evaluationSummary.PassedPolicyCheckCount == 0 {
+	var isFailedPolicyCheck = evaluationSummary.PassedPolicyCheckCount == 0
+	if isFailedPolicyCheck {
 		allowed = false
 
 		sb := strings.Builder{}
@@ -189,6 +195,15 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		msg = sb.String()
 	} else {
 		allowed = true
+	}
+
+	if !isEnforceMode() {
+		allowed = true
+		if isFailedPolicyCheck {
+			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
+			warningUTMMessage := fmt.Sprintf("🚩 Some objects failed the policy check, get the full report at: %s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
+			*warningMessages = append([]string{warningUTMMessage}, *warningMessages...)
+		}
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
@@ -244,6 +259,7 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 			ClusterContext: &cliClient.ClusterContext{
 				IsInCluster:    true,
 				WebhookVersion: evaluationRequestData.WebhookVersion,
+				IsEnforceMode:  evaluationRequestData.IsEnforceMode,
 			},
 			EvaluationDurationSeconds: evaluationRequestData.EvaluationData.EvaluationDurationSeconds,
 		},
@@ -266,32 +282,15 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 		message = msg
 	}
 
-	if len(warningMessages) > 0 {
-		return &admission.AdmissionReview{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "AdmissionReview",
-				APIVersion: "admission.k8s.io/v1",
-			},
-			Response: &admission.AdmissionResponse{
-				UID:      requestUID,
-				Warnings: warningMessages,
-				Allowed:  allowed,
-				Result: &metav1.Status{
-					Code:    int32(statusCode),
-					Message: message,
-				},
-			},
-		}
-	}
-
 	return &admission.AdmissionReview{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "AdmissionReview",
 			APIVersion: "admission.k8s.io/v1",
 		},
 		Response: &admission.AdmissionResponse{
-			UID:     requestUID,
-			Allowed: allowed,
+			UID:      requestUID,
+			Allowed:  allowed,
+			Warnings: warningMessages,
 			Result: &metav1.Status{
 				Code:    int32(statusCode),
 				Message: message,
@@ -449,6 +448,7 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 		},
 		WebhookVersion: config.WebhookVersion,
 		ClusterUuid:    k8sMetadataUtil.ClusterUuid,
+		IsEnforceMode:  isEnforceMode(),
 		Namespace:      evaluationNamespace,
 	}
 
