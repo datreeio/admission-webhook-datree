@@ -44,11 +44,15 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-admission-webhook-awsmp
+  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
   # Image tag
-  tag: 0.1.24-rc.1
+  tag: 0.1.25-rc.3
   # Image pull policy
   pullPolicy: Always
+
+initContainer:
+  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
+  sha: sha256:694cc1a664315582bb9414f3ef255f3cbd730d361b6dfa2bea2be45dd1801d37
 
 # Security context for the containers
 securityContext:

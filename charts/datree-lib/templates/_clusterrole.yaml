@@ -11,12 +11,19 @@ metadata:
 rules:
   - apiGroups:
       - ""
+      - "admissionregistration.k8s.io"
     resources:
       - "nodes"
       - "namespaces"
+      - "validatingwebhookconfigurations"
     verbs:
       - "get"
       - "list"
+      - "create"
+      - "delete"
+      - "patch"
+      - "update"
+      - "watch"
 {{- end}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1

@@ -9,6 +9,7 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
+	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
@@ -43,6 +44,7 @@ func start(port string) {
 		}
 	}()
 
+	loggerUtil.Log("initializing k8s metadata")
 	k8sMetadataUtil.InitK8sMetadataUtil()
 
 	certPath, keyPath, err := server.ValidateCertificate()
@@ -58,6 +60,7 @@ func start(port string) {
 	http.HandleFunc("/ready", healthController.Ready)
 
 	// start server
+	loggerUtil.Log("strting server")
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
 		http.ListenAndServe(":"+port, nil)
 	}
