@@ -31,6 +31,7 @@ datree:
   verbose: ""               # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
   output: ""                # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
   noRecord: ""              # Don’t send policy checks metadata to the backend. (boolean ,optional)
+  enforce: ""               # Don't allow resources that fail the policy check. (boolean ,optional)
 ```
 
 For further information about Datree flags see [CLI arguments](https://hub.datree.io/setup/cli-arguments).
@@ -38,7 +39,7 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 ### Parameters
 
 | Parameter                             | Description                                                                               | Default                                                                                                                                   |     |     |
-| ------------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --- | --- |
+|---------------------------------------| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --- | --- |
 | namespace                             | The name of the namespace all resources will be created in.                               | datree                                                                                                                                    |     |     |
 | replicaCount                          | The number of Datree webhook-server replicas to deploy for the webhook.                   | 2                                                                                                                                         |     |     |
 | customLabels                          | Additional labels for Datree webhook-server pods.                                         | {}                                                                                                                                        |     |     |
@@ -57,6 +58,7 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 | datree.verbose                        | Display 'How to Fix' link for failed rules in output. (optional)                          | false                                                                                                                                     |     |     |
 | datree.output                         | The format output of the policy check results: yaml, json, xml, simple, JUnit. (optional) | "" (i.e beautiful😊)                                                                                                                      |     |     |
 | datree.noRecord                       | Don’t send policy checks metadata to the backend. (optional)                              | false                                                                                                                                     |     |     |
+| datree.enforce                        | Don't allow resources that fail the policy check. (optional)                              | false                                                                                                                                     |     |     |
 | hooks.waitForServerRollout.sleepyTime | The waiting time before the webhook-server is ready to receive requests.                  | nil                                                                                                                                       |     |     |
 | hooks.waitForServerRollout.image      | An image for running sleep command                                                        | {"repository": "alpine", "sha":"sha256:1304f174557314a7ed9eddb4eab12fed12cb0cd9809e4c28f29af86979a3c870", "pullPolicy":"Always"}          |     |     |
 | hooks.labelNamespace.image.           | An image for running kubectl label command                                                | {"repository": "public.ecr.aws/m6p7v6h2", "sha":"sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039", "pullPolicy":"Always"} |     |     |

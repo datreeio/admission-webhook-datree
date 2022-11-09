@@ -108,6 +108,8 @@ spec:
               value: ""
             - name: DATREE_NO_RECORD
               value: ""
+            - name: DATREE_ENFORCE
+              value: ""
 ```
 
 2. Change the values of your settings as you desire.

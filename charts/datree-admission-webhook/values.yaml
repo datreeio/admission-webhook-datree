@@ -31,7 +31,7 @@ datree:
   output: ""
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord: ""
-  # Whether to enforce the policy check results or not. (boolean ,optional)
+  # Don't allow resources that fail the policy check. (boolean ,optional)
   enforce: ""
 # The Datree webhook-server image to use.
 image:
