@@ -97,7 +97,7 @@ func TestValidateRequestBody(t *testing.T) {
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusOK)
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "We're good!")
+	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Result.Message, "We're good!")
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
@@ -108,7 +108,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":false")
+	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
@@ -137,7 +137,7 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
 }
 
 func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
@@ -150,7 +150,7 @@ func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
 }
 
 func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
@@ -163,7 +163,7 @@ func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
 }
 
 func responseToAdmissionResponse(response string) *admission.AdmissionResponse {
