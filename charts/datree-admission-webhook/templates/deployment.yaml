@@ -39,7 +39,7 @@ spec:
             - name: DATREE_NO_RECORD
               value: {{.Values.datree.noRecord}}
             - name: DATREE_ENFORCE
-              value: "{{.Values.datree.enforce}}"
+              value: {{.Values.datree.enforce}}
           securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
           livenessProbe:
             httpGet:
