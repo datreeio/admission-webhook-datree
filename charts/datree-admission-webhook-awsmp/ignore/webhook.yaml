@@ -1,0 +1,36 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: datree-webhook
+webhooks:
+  - admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURSekNDQWkrZ0F3SUJBZ0lDQitZd0RRWUpLb1pJaHZjTkFRRUxCUUF3TlRFek1ERUdBMVVFQ2hNcUwwTk8KUFVSaGRISmxaU0JCWkcxcGMzTnBiMjRnUTI5dWRISnZiR3hsY2lCWFpXSm9iMjlySUVOQk1CNFhEVEl5TVRFdwpPVEl3TkRVME1sb1hEVEkzTVRFd09USXdORFUwTWxvd05URXpNREVHQTFVRUNoTXFMME5PUFVSaGRISmxaU0JCClpHMXBjM05wYjI0Z1EyOXVkSEp2Ykd4bGNpQlhaV0pvYjI5cklFTkJNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUYKQUFPQ0FROEFNSUlCQ2dLQ0FRRUFvaEYxUmx3MDU0N2F4aFArQWMrYnN4Q2RLMVRORlppOG01WlN0OWltVHNBMwpnRkFISlNJZ3drY1BkWFBXVTF2TytFRVh4UFg1UVIwYlNmSWNzdFJmWGZjelVBUkRNNkcxYU94MDg1Zm56a3VuCm1LTjRMYVBGSkp5dVFIbUI2UWJRVGUxczFUZEtGa3J3dGZFYlEvVVZQM0VHTG8vVmlIYWpORGc3SzQ4ZE9ya0wKbnNPWDEyZjZrVkNaSFJHazRqY3BRb3ZjeXIwYVF0L1IvYVVxVFhrbUVHYmc1a0ZkSjdTeFVzNjVLOTV4UHNiSgprM2RpQTRiMnowNHZwNkJrOC80MEIyR3Y4QzMzTTF6VnVmVzcvZ1BEaWJ1aEJaQzgzNHYxSkdTTHlMRmtrTVExCjFHR1R4VmJuUGszTzRqRVpxREZYdDZ4K3o0MWVZa1JGQnhXSzdvUlc0UUlEQVFBQm8yRXdYekFPQmdOVkhROEIKQWY4RUJBTUNBb1F3SFFZRFZSMGxCQll3RkFZSUt3WUJCUVVIQXdJR0NDc0dBUVVGQndNQk1BOEdBMVVkRXdFQgovd1FGTUFNQkFmOHdIUVlEVlIwT0JCWUVGT3BjMmpDY0Z6K3NYemVXcldGWkhVZzVzT2ZrTUEwR0NTcUdTSWIzCkRRRUJDd1VBQTRJQkFRQngraDBubUN4SjIraEk2UGpjbUFXSzlxMHg0ZXlzNEFicGVmeEFFVWp1UFJGcXZseGYKRm5jNHFVczhDVXRieTBGU3oxYzA3a3pXYmt6WFM1MFhOLzZYMXVtRUk5Q29JZzNPMTZ6VDFaOTNrd2czSXJRKwoyTk9Pbm5aYmVMcm5icXUvNEZtRVVTRGFLODZDaDVIajZEOUU0bFJnOTcySGh4dG9mZURmc0RwWGN1MmZnQmJICkhzUHEzQThocjZ5TWJaZjJHRlgrcUR5ZllobFJ6L3RPeFQwdXEyQTNmNWk3WFdkQXFTRzBsY3YwREV2KzBncXoKSVFoaDFVL1htVXIxNXFLWUkwUWtNSkZQT0dveFRSVmtBQ1FVS0lKcFZtZ2lPTDJRZmZhSXVHbkxaQVorR2Z3LwoxOVhDS1VrYmpGTGwxUUNlT3JsTkJJQk9nUGRrdnpRMXdXYS8KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+      service:
+        name: datree-webhook-server
+        namespace: datree
+        path: /validate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: webhook-server.datree.svc
+    namespaceSelector:
+      matchExpressions:
+        - key: admission.datree/validate
+          operator: DoesNotExist
+    objectSelector: {}
+    rules:
+      - apiGroups:
+          - "*"
+        apiVersions:
+          - "*"
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - "*"
+        scope: "*"
+    sideEffects: None
+    timeoutSeconds: 30

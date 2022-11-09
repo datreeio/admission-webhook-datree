@@ -101,8 +101,8 @@ spec:
             secretName: {{ .Values.aws.licenseConfigSecretName }}
         {{- end}}
       initContainers:
-        - name: webhook-init
-          image: "{{ .Values.initContainer.repository }}@{{ .Values.initContainer.sha }}"
+        - name: init
+          image: "{{ .Values.initContainer.repository }}:{{ .Values.initContainer.tag }}"
           imagePullPolicy: IfNotPresent
           volumeMounts:
             - mountPath: /etc/webhook/certs

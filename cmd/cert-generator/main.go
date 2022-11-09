@@ -7,6 +7,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/base64"
 	"encoding/pem"
 	"fmt"
 	"math/big"
@@ -24,13 +25,14 @@ import (
 func main() {
 	loggerUtil.Log("starting cert-generator")
 	caCert, _ := generateSelfSignedCAAndSignWebhookServerCertificate()
+
 	loggerUtil.Log(fmt.Sprintf("created ca certificate, caCert: %v", caCert))
-	err := createValidationWebhookConfig(caCert)
-	if err != nil {
-		loggerUtil.Log(fmt.Sprintf("failed to create validation webhook config, err: %v", err))
-	} else {
-		loggerUtil.Log("created validating webhook configuration")
-	}
+	// err := createValidationWebhookConfig(caCert)
+	// if err != nil {
+	// 	loggerUtil.Log(fmt.Sprintf("Error. failed to create validation webhook config, err: %v", err))
+	// } else {
+	// 	loggerUtil.Log("Succes! created validating webhook configuration")
+	// }
 }
 
 func createValidationWebhookConfig(caCert *bytes.Buffer) error {
@@ -93,9 +95,25 @@ func createValidationWebhookConfig(caCert *bytes.Buffer) error {
 }
 
 func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error) {
-	ca, caPrivKey, err := createCA("/CN=Admission Controller Webhook Demo CA", time.Now().AddDate(5, 0, 0))
+	ca := &x509.Certificate{
+		SerialNumber: big.NewInt(2022),
+		Subject: pkix.Name{
+			Organization: []string{"/CN=Datree Admission Controller Webhook CA"},
+		},
+		NotBefore:   time.Now(),
+		NotAfter:    time.Now().AddDate(5, 0, 0), // 5 years validity
+		IsCA:        true,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		// keyCertSign bit is for verifying signatures on public key certificates. (e.g. CA certificate)
+		// KeyUsageDigitalSignature bit is for verifying signatures on digital signatures. Read more: https://ldapwiki.com/wiki/KeyCertSign
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		BasicConstraintsValid: true,
+	}
+
+	// create RSA CA private key with 2048 bitKeySize
+	caPrivKey, err := rsa.GenerateKey(cryptorand.Reader, 2048)
 	if err != nil {
-		loggerUtil.Log(err.Error())
+		return nil, err
 	}
 
 	// PEM encode CA cert, this is a bundle of the CA certificates used to verify that the server is really the correct site you're talking to
@@ -103,11 +121,15 @@ func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error
 	if err != nil {
 		fmt.Println(err)
 	}
+
 	caPEM := new(bytes.Buffer)
 	_ = pem.Encode(caPEM, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: caBytes,
 	})
+
+	caBundle := base64.StdEncoding.EncodeToString(caPEM.Bytes())
+	fmt.Println(caBundle)
 
 	webhookNamespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
 	dnsNames := []string{
@@ -143,7 +165,7 @@ func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error
 		fmt.Println(err)
 	}
 
-	// PEM encode the  server cert and key
+	// PEM encode the server cert and key
 	serverCertPEM := new(bytes.Buffer)
 	_ = pem.Encode(serverCertPEM, &pem.Block{
 		Type:  "CERTIFICATE",
@@ -160,6 +182,13 @@ func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error
 	if err != nil {
 		loggerUtil.Log(err.Error())
 	}
+
+	caBundleBuff := bytes.NewBuffer([]byte(caBundle))
+	err = WriteFile("/etc/webhook/certs/ca-bundle.pem", caBundleBuff)
+	if err != nil {
+		loggerUtil.Log(err.Error())
+	}
+
 	err = WriteFile("/etc/webhook/certs/tls.crt", serverCertPEM)
 	if err != nil {
 		loggerUtil.Log(err.Error())
@@ -170,7 +199,8 @@ func generateSelfSignedCAAndSignWebhookServerCertificate() (*bytes.Buffer, error
 		loggerUtil.Log(err.Error())
 	}
 
-	return serverCertPEM, nil
+	loggerUtil.Log("Successfully generated self signed CA and signed webhook server certificate")
+	return caPEM, nil
 
 }
 
