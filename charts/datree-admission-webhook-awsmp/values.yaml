@@ -44,15 +44,15 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
+  repository: localhost:5000/datree-admission-webhook
   # Image tag
-  tag: 0.1.25-rc.3
+  tag: 0.1-rc.7
   # Image pull policy
   pullPolicy: Always
 
 initContainer:
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
-  sha: sha256:694cc1a664315582bb9414f3ef255f3cbd730d361b6dfa2bea2be45dd1801d37
+  repository: localhost:5000/init # 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
+  tag: v0.1-rc.4 # sha256:ff8716992fa7c81ecd2301d600f20877170cdb3d196a758206386c8108a5917d
 
 # Security context for the containers
 securityContext:
@@ -76,8 +76,8 @@ hooks:
   timeoutTime:
   # The image for running kubectl commands
   image:
-    repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/bitnami-kubectl
-    sha: sha256:2c963c1aae87f544a53242348d64dce4bc39739211989394833322d29364b73c
+    repository: bitnami/kubectl # 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/bitnami-kubectl
+    sha: sha256:1841cb16fddd9660c34f9b5bcec51f8c77bedba76c56381537753976b24649df # sha256:2c963c1aae87f544a53242348d64dce4bc39739211989394833322d29364b73c
     pullPolicy: IfNotPresent
 
 # AWS Marketplace configuration
