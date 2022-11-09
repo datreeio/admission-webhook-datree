@@ -34,5 +34,10 @@ install-in-minikube-using-helm:
 	./scripts/build-docker-image.sh && \
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}"
 
+upgrade-in-minikube-using-helm:
+	eval $(minikube docker-env) && \
+	./scripts/build-docker-image.sh && \
+	helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook --reuse-values --set datree.output="json"
+
 uninstall-in-minikube-using-helm:
 	helm uninstall -n datree datree-webhook
