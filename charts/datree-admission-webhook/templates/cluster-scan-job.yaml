@@ -42,7 +42,6 @@ spec:
   template:
     spec:
       serviceAccountName: cluster-scan-job-service-account
-      automountServiceAccountToken: false
       restartPolicy: Never
       containers:
         - name: scan-job
@@ -61,6 +60,6 @@ spec:
               cpu: 1000m
               memory: 512Mi
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 1000m
+              memory: 512Mi
   backoffLimit: 4
