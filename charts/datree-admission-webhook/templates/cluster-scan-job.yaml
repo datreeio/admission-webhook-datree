@@ -56,7 +56,7 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 25000
-          image: "tzlilswimmerdatree/scan-job-test:0.0.2" # TODO to the real production image
+          image: "tzlilswimmerdatree/scan-job-test:0.0.2" # TODO change to the real production image
           imagePullPolicy: Always
           resources:
             limits:
