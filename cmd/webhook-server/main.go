@@ -1,9 +1,7 @@
 package main
 
 import (
-	"context"
 	"fmt"
-	"path/filepath"
 
 	"net/http"
 	"os"
@@ -19,11 +17,6 @@ import (
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/printer"
 	"github.com/datreeio/datree/pkg/utils"
-	"k8s.io/client-go/kubernetes"
-
-	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 const DefaultErrExitCode = 1
@@ -33,19 +26,6 @@ func main() {
 	if port == "" {
 		port = "8443"
 	}
-
-	tlsDir := `/etc/webhook/certs`
-	tlsCertFile := `ca-bundle.pem`
-
-	certPath := filepath.Join(tlsDir, tlsCertFile)
-	cert, _ := os.ReadFile(certPath)
-	loggerUtil.Log(string(cert))
-	// err := createValidationWebhookConfig(cert)
-	// if err != nil {
-	// 	loggerUtil.Log(fmt.Sprintf("failed to create validation webhook config, err: %v", err))
-	// } else {
-	// 	loggerUtil.Log("created validating webhook configuration")
-	// }
 	start(port)
 }
 
@@ -82,63 +62,7 @@ func start(port string) {
 	// start server
 	err = http.ListenAndServeTLS(":"+port, certPath, keyPath, nil)
 	if err != nil {
+		loggerUtil.Log(err.Error())
 		http.ListenAndServe(":"+port, nil)
 	}
-}
-
-func createValidationWebhookConfig(caCert []byte) error {
-	config := ctrl.GetConfigOrDie()
-	kubeClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return err // panic("failed to set go -client")
-	}
-	// webhookNamespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
-	validationCfgName := "datree-webhook"
-
-	path := "/validate"
-	sideEffects := admissionregistrationv1.SideEffectClassNone
-
-	validationWebhookConfig := &admissionregistrationv1.ValidatingWebhookConfiguration{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: validationCfgName,
-		},
-		Webhooks: []admissionregistrationv1.ValidatingWebhook{{
-			Name: "webhook-server.datree.svc",
-			ClientConfig: admissionregistrationv1.WebhookClientConfig{
-				CABundle: caCert, // CA bundle created earlier
-				Service: &admissionregistrationv1.ServiceReference{
-					Name:      "datree-webhook-server", // datree-webhook-server
-					Namespace: "datree",
-					Path:      &path,
-				},
-			},
-			Rules: []admissionregistrationv1.RuleWithOperations{{Operations: []admissionregistrationv1.OperationType{
-				admissionregistrationv1.Create,
-				admissionregistrationv1.Update,
-			},
-				Rule: admissionregistrationv1.Rule{
-					APIGroups:   []string{"*"},
-					APIVersions: []string{"*"},
-					Resources:   []string{"*"},
-				},
-			}},
-			SideEffects:             &sideEffects,
-			AdmissionReviewVersions: []string{"v1", "v1beta1"},
-			TimeoutSeconds:          &[]int32{30}[0],
-			NamespaceSelector: &metav1.LabelSelector{
-				MatchExpressions: []metav1.LabelSelectorRequirement{
-					{ // only validate pods in namespaces with the label "admission.datree/validate"
-						Key:      "admission.datree/validate",
-						Operator: metav1.LabelSelectorOpDoesNotExist,
-					},
-				},
-			},
-		}},
-	}
-
-	if _, err = kubeClient.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), validationWebhookConfig, metav1.CreateOptions{}); err != nil {
-		return err
-	}
-
-	return nil
 }
