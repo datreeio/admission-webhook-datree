@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"path/filepath"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
+	"k8s.io/client-go/kubernetes"
 
 	"net/http"
 	"os"
@@ -24,11 +24,6 @@ import (
 	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/utils"
-	"k8s.io/client-go/kubernetes"
-
-	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ctrl "sigs.k8s.io/controller-runtime"
 )
 
 const DefaultErrExitCode = 1
@@ -38,19 +33,6 @@ func main() {
 	if port == "" {
 		port = "8443"
 	}
-
-	tlsDir := `/etc/webhook/certs`
-	tlsCertFile := `ca-bundle.pem`
-
-	certPath := filepath.Join(tlsDir, tlsCertFile)
-	cert, _ := os.ReadFile(certPath)
-	loggerUtil.Log(string(cert))
-	// err := createValidationWebhookConfig(cert)
-	// if err != nil {
-	// 	loggerUtil.Log(fmt.Sprintf("failed to create validation webhook config, err: %v", err))
-	// } else {
-	// 	loggerUtil.Log("created validating webhook configuration")
-	// }
 	start(port)
 }
 
@@ -89,6 +71,7 @@ func start(port string) {
 	// start server
 	err = http.ListenAndServeTLS(":"+port, certPath, keyPath, nil)
 	if err != nil {
+		loggerUtil.Log(err.Error())
 		http.ListenAndServe(":"+port, nil)
 	}
 }

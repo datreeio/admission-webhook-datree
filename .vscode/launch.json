@@ -17,6 +17,13 @@
       "request": "launch",
       "mode": "debug",
       "program": "${workspaceFolder}/cmd/cert-generator/main.go"
+    },
+    {
+      "name": "Launch webhook-init",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "program": "${workspaceFolder}/cmd/webhook-init/main.go"
     }
   ]
 }
