@@ -1,4 +1,3 @@
-# kube-schema
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -54,7 +53,7 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 25000
-          image: "tzlilswimmerdatree\/scan-job-test:0.0.1"
+          image: "tzlilswimmerdatree\/scan-job-test:0.0.2"
           imagePullPolicy: Always
           resources:
             limits:
