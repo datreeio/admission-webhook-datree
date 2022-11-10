@@ -20,7 +20,7 @@ build-production:
 	make datree_build_env=main build
 
 test:
-	go test ./...
+	DATREE_ENFORCE="true" go test ./...
 
 deploy-in-minikube:
 	bash ./scripts/deploy-in-minikube.sh

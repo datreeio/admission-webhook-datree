@@ -66,6 +66,8 @@ spec:
               value: ""
             - name: DATREE_NO_RECORD
               value: ""
+            - name: DATREE_ENFORCE
+              value: ""
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -54,7 +54,7 @@ type Metadata struct {
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
 func isEnforceMode() bool {
-	return true
+	return os.Getenv(enums.Enforce) == "true"
 }
 
 func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {

@@ -2,6 +2,7 @@ package controllers
 
 import (
 	_ "embed"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/stretchr/testify/assert"
+	admission "k8s.io/api/admission/v1"
 )
 
 //go:embed test_fixtures/applyNotAllowedRequest.json
@@ -95,7 +97,7 @@ func TestValidateRequestBody(t *testing.T) {
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusOK)
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "We're good!")
+	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Result.Message, "We're good!")
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
@@ -106,7 +108,23 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
-	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "\"allowed\":false")
+	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
+}
+
+func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
+	t.Setenv("DATREE_ENFORCE", "false")
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	validationController := NewValidationController()
+	validationController.Validate(responseRecorder, request)
+
+	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
+
+	assert.Equal(t, admissionResponse.Allowed, true)
+	assert.Contains(t, admissionResponse.Warnings[0], "🚩 Some objects failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations/")
+	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
@@ -119,7 +137,7 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
 }
 
 func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
@@ -132,7 +150,7 @@ func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
 }
 
 func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
@@ -145,5 +163,15 @@ func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Contains(t, strings.TrimSpace(body), "\"allowed\":true")
+	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
+}
+
+func responseToAdmissionResponse(response string) *admission.AdmissionResponse {
+	var admissionReview admission.AdmissionReview
+	err := json.Unmarshal([]byte(response), &admissionReview)
+	if err != nil {
+		panic(err)
+	}
+
+	return admissionReview.Response
 }
