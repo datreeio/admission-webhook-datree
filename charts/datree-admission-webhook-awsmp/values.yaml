@@ -46,7 +46,7 @@ image:
   # Image repository
   repository: localhost:5000/datree-admission-webhook
   # Image tag
-  tag: 1.0-rc.1
+  tag: 1.0-rc.2
   # Image pull policy
   pullPolicy: Always
 

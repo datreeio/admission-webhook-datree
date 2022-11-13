@@ -19,7 +19,7 @@ func main() {
 	certPath := filepath.Join(`/etc/webhook/certs`, `ca-bundle.pem`)
 	caPEM, _ := os.ReadFile(certPath)
 
-	time.Sleep(60 * time.Second)
+	time.Sleep(180 * time.Second)
 	loggerUtil.Log("Sleep Over.....")
 
 	err := createValidationWebhookConfig(caPEM)
