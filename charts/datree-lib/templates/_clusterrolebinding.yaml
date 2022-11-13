@@ -54,4 +54,21 @@ subjects:
   - kind: ServiceAccount
     name: "datree-cleanup-namespaces-hook-pre-delete"
     namespace: "{{template "datree.namespace" .}}"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: datree-deployments-delete
+  labels: {{include "datree.labels" . | nindent 4}}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: datree-deployments-delete
+subjects:
+  - kind: ServiceAccount
+    name: "datree-cleanup-namespaces-hook-pre-delete"
+    namespace: "{{template "datree.namespace" .}}"
 {{- end -}}
