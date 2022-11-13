@@ -1,1 +1,126 @@
-{{- include "datree-lib.deployment" .}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datree-webhook-server
+  namespace: {{ template "datree.namespace" . }}
+  labels: {{ include "datree.labels" . | nindent 4 }}
+    owner: datree
+    app: "datree-webhook-server"
+  annotations: 
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "5"
+  {{- if .Values.customAnnotations }}
+    {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels: 
+      app: "datree-webhook-server"
+  template:
+    metadata:
+      labels: {{ include "datree.labels" . | nindent 8 }}
+        app: "datree-webhook-server"
+      {{- if .Values.customAnnotations }}
+      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- end }}
+    spec:
+      serviceAccountName: {{.Values.rbac.serviceAccount.name}}
+      containers:
+      - name: webhook-init
+        image: "{{ .Values.imageWebhook.repository }}:{{ .Values.imageWebhook.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{.Values.image.pullPolicy}}
+        volumeMounts:
+            - mountPath: /etc/webhook/certs
+              name: webhook-certs
+        env:
+          - name: WEBHOOK_NAMESPACE
+            value: {{ template "datree.namespace" . }}
+          - name: WEBHOOK_SERVICE
+            value: "datree-webhook-server"
+      - name: server
+        securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
+        livenessProbe:
+            httpGet:
+                path: /health
+                port: 8443
+                scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        readinessProbe:
+            httpGet:
+                path: /ready
+                port: 8443
+                scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+        resources: {{- toYaml .Values.resources | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{.Values.image.pullPolicy}}
+        ports:
+        - containerPort: 8443
+          name: webhook-api
+        # caution: don't change the order of the environment variables
+        # changing the order will harm resource patching
+        env:
+        - name: DEBUG
+          value: "{{ .Values.debug }}"
+        # Datree webhook varaibles
+        - name: DATREE_TOKEN
+          value: {{.Values.datree.token}}
+        - name: DATREE_POLICY
+          value: {{.Values.datree.policy}}
+        - name: DATREE_VERBOSE
+          value: {{.Values.datree.verbose}}
+        - name: DATREE_OUTPUT
+          value: {{.Values.datree.output}}
+        - name: DATREE_NO_RECORD
+          value: {{.Values.datree.noRecord}}
+         # AWS Marketplace varaibles
+        - name: AWS_MP_PRODUCT_ID
+          value: {{ .Values.aws.productId }}
+        - name: AWS_MP_KEY_FINGERPRINT
+          value: {{ .Values.aws.issuerKey }}
+        - name: AWS_MP_ENABLE_CHECK_ENTITLEMENT
+          value: "{{.Values.aws.enableCheckEntitlement}}"
+        - name: AWS_MP_REGION
+          value: {{.Values.aws.region}}
+        {{- if .Values.aws.licenseConfigSecretName }}
+        - name: AWS_WEB_IDENTITY_REFRESH_TOKEN_FILE
+          value: "/var/run/secrets/awsmp-product-license/license_token"
+        - name: AWS_ROLE_ARN
+          valueFrom:
+            secretKeyRef:
+                name: {{ .Values.aws.licenseConfigSecretName }}
+                key: iam_role
+        {{- end}}
+        # add aws marketplace license config to the licensed container application env
+        volumeMounts:
+        - mountPath: /etc/webhook/certs
+          name: webhook-certs
+          readOnly: true
+        {{- if .Values.aws.licenseConfigSecretName }}
+        - name: awsmp-product-license
+          mountPath: "/var/run/secrets/awsmp-product-license"
+        {{- end}}
+      volumes:
+        - name: webhook-certs
+          emptyDir: {}
+        {{- if .Values.aws.licenseConfigSecretName }}
+        - name: awsmp-product-license
+          secret:
+            secretName: {{ .Values.aws.licenseConfigSecretName }}
+        {{- end}}
+      initContainers:
+        - name: generate-cert
+          image: "{{ .Values.initContainer.repository }}:{{ .Values.initContainer.tag }}"
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etc/webhook/certs
+              name: webhook-certs
+          env:
+          - name: WEBHOOK_NAMESPACE
+            value: {{ template "datree.namespace" . }}
+          - name: WEBHOOK_SERVICE
+            value: "datree-webhook-server"
+          
