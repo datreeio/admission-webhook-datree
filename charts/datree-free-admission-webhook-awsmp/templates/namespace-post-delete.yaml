@@ -1,1 +1,0 @@
-{{- include "datree-lib.namespace-post-delete" .}}
