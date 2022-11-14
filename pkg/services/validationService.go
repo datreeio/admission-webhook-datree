@@ -338,16 +338,7 @@ func getToken(cliClient *cliClient.CliClient) (string, error) {
 	token := os.Getenv(enums.Token)
 
 	if token == "" {
-		newToken, err := cliClient.CreateToken()
-		if err != nil {
-			return "", err
-		}
-
-		err = os.Setenv(enums.Token, newToken.Token)
-		if err != nil {
-			logger.LogUtil(fmt.Sprintf("couldn't set DATREE_TOKEN env variable %s", err))
-		}
-		token = newToken.Token
+		logger.LogUtil("No DATREE_TOKEN was found in env")
 	}
 	return token, nil
 }
