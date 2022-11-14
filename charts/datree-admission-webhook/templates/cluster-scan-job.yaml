@@ -53,7 +53,7 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 25000
-          image: "tzlilswimmerdatree/scan-job-test:0.0.2" # TODO change to the real production image
+          image: "datree/scan-job:0.0.6"
           imagePullPolicy: Always
           resources:
             limits:
