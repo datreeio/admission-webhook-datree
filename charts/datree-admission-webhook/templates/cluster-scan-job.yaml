@@ -3,6 +3,7 @@ kind: ServiceAccount
 metadata:
   name: cluster-scan-job-service-account
   namespace: datree
+automountServiceAccountToken: false
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -52,7 +53,7 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 25000
-          image: "datree/scan-job:0.0.6"
+          image: "datree/scan-job:0.0.6" # TODO add sha
           imagePullPolicy: Always
           resources:
             limits:
