@@ -53,6 +53,8 @@ spec:
             readOnlyRootFilesystem: true
             runAsNonRoot: true
             runAsUser: 25000
+            seccompProfile:
+              type: RuntimeDefault
           image: "datree/scan-job@sha256:971510a72dd1cc9aa23ced4b6c4cd0edb6f2a6147330bbd5fe5a22c034b20523" # semantic version: datree/scan-job:0.0.6
           imagePullPolicy: Always
           resources:
