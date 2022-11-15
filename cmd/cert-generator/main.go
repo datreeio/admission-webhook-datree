@@ -10,59 +10,74 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 )
 
-type certificate struct {
-	cert    *x509.Certificate
-	privKey *rsa.PrivateKey
-	certPEM *bytes.Buffer
-}
-
 func main() {
-	loggerUtil.Log("Start certing!")
-
-	namespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
-
-	// set up CA certificate
-	caCert, _ := startupCACertificate()
-
-	// set up our server certificate
-	serverCert, _ := startupServerCertificate(caCert, namespace)
-
-	err := os.MkdirAll("/etc/webhook/certs/", 0666)
+	// set up self signed CA certificate
+	datreeCAPrivKey, err := generatePrivKey(2048)
 	if err != nil {
 		loggerUtil.Log(err.Error())
 	}
 
-	// save ca-bundle file
-	err = writeFile("/etc/webhook/certs/ca-bundle.pem", caCert.certPEM)
+	// create the CA
+	datreeCA := getDatreeAdmissionWebhookCAConfig()
+	datreeCACertBytes, err := x509.CreateCertificate(cryptorand.Reader, datreeCA, datreeCA, &datreeCAPrivKey.PublicKey, datreeCAPrivKey)
 	if err != nil {
 		loggerUtil.Log(err.Error())
 	}
 
-	err = writeFile("/etc/webhook/certs/tls.crt", serverCert.certPEM)
+	// set up server certificate
+	serverPrivKey, err := generatePrivKey(4096)
 	if err != nil {
 		loggerUtil.Log(err.Error())
 	}
 
-	serverPrivKeyPEM := new(bytes.Buffer)
-	_ = pem.Encode(serverPrivKeyPEM, &pem.Block{
-		Type:  "RSA PRIVATE KEY",
-		Bytes: x509.MarshalPKCS1PrivateKey(serverCert.privKey),
-	})
-	err = writeFile("/etc/webhook/certs/tls.key", serverPrivKeyPEM)
+	// sign the server cert with Datree CA
+	serverCert := getServerCertificateConfig()
+	serverCertBytes, err := x509.CreateCertificate(cryptorand.Reader, serverCert, datreeCA, &serverPrivKey.PublicKey, datreeCAPrivKey)
 	if err != nil {
 		loggerUtil.Log(err.Error())
 	}
 
-	loggerUtil.Log("Successfully generated self signed CA and signed webhook server certificate")
+	tlsDir, isFound := os.LookupEnv("WEBHOOK_CERTS_DIR")
+	if !isFound {
+		loggerUtil.Log("Required directory path for webhook certificates is missing, verify env varaible WEBHOOK_CERTS_DIR in deployment.")
+	}
 
+	err = os.MkdirAll(tlsDir, 0666)
+	if err != nil {
+		loggerUtil.Log(err.Error())
+	}
+
+	err = saveCACertificateCABundle(tlsDir, datreeCACertBytes)
+	if err != nil {
+		loggerUtil.Log(err.Error())
+	}
+
+	err = saveServerTLSCertificate(tlsDir, serverCertBytes, serverPrivKey)
+	if err != nil {
+		loggerUtil.Log(err.Error())
+	}
+
+	loggerUtil.Log("Successfully generated self-signed CA and signed webhook server certificate using this CA!")
+	os.Exit(0)
 }
 
-func newCertificate() *x509.Certificate {
+// generate private and public key for CA with given bitKeySize
+func generatePrivKey(bitsSize int) (*rsa.PrivateKey, error) {
+	privKey, err := rsa.GenerateKey(cryptorand.Reader, bitsSize)
+	if err != nil {
+		return nil, err
+	}
+
+	return privKey, nil
+}
+
+func getDatreeAdmissionWebhookCAConfig() *x509.Certificate {
 	return &x509.Certificate{
 		SerialNumber: big.NewInt(2022),
 		Subject: pkix.Name{
@@ -79,49 +94,19 @@ func newCertificate() *x509.Certificate {
 	}
 }
 
-func startupCACertificate() (*certificate, error) {
-	// set up CA certificate
-	caX509Certificate := newCertificate()
+func getServerCertificateConfig() *x509.Certificate {
+	// webhookServerNamespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
+	// webhookServerDNS := fmt.Sprintf("datree-webhook-server.%s.svc", webhookServerNamespace)
+	webhookDNS, _ := os.LookupEnv("WEBHOOK_SERVER_DNS")
 
-	// create private and public key for CA with 2048 bitKeySize
-	caPrivKey, err := rsa.GenerateKey(cryptorand.Reader, 2048)
-	if err != nil {
-		return nil, err
-	}
-
-	// create the CA
-	caBytes, err := x509.CreateCertificate(cryptorand.Reader, caX509Certificate, caX509Certificate, &caPrivKey.PublicKey, caPrivKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// pem encode
-	// this is a bundle of the CA certificates used to verify that the server is really the correct site you're talking to
-	caPEM := new(bytes.Buffer)
-	err = pem.Encode(caPEM, &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: caBytes,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &certificate{
-		cert:    caX509Certificate,
-		privKey: caPrivKey,
-		certPEM: caPEM,
-	}, nil
-}
-
-func startupServerCertificate(caCert *certificate, namespace string) (*certificate, error) {
 	// server cert config
-	cert := &x509.Certificate{
+	return &x509.Certificate{
 		DNSNames: []string{
-			fmt.Sprintf("datree-webhook-server.%s.svc", namespace),
+			webhookDNS,
 		},
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
-			CommonName: "/CN=datree-webhook-server.datree.svc",
+			CommonName: fmt.Sprintf("/CN=%v", webhookDNS),
 		},
 		NotBefore:    time.Now(),
 		NotAfter:     time.Now().AddDate(5, 0, 0),
@@ -129,31 +114,56 @@ func startupServerCertificate(caCert *certificate, namespace string) (*certifica
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature,
 	}
+}
 
-	// server private key
-	serverPrivKey, err := rsa.GenerateKey(cryptorand.Reader, 4096)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	// sign the server cert
-	serverCertBytes, err := x509.CreateCertificate(cryptorand.Reader, cert, caCert.cert, &serverPrivKey.PublicKey, caCert.privKey)
-	if err != nil {
-		fmt.Println(err)
-	}
-
+func saveServerTLSCertificate(tlsDir string, serverCertificate []byte, serverPrivKey *rsa.PrivateKey) error {
 	// PEM encode the server cert and key
 	serverCertPEM := new(bytes.Buffer)
-	_ = pem.Encode(serverCertPEM, &pem.Block{
+	err := pem.Encode(serverCertPEM, &pem.Block{
 		Type:  "CERTIFICATE",
-		Bytes: serverCertBytes,
+		Bytes: serverCertificate,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = writeFile(filepath.Join(tlsDir, `tls.crt`), serverCertPEM)
+	if err != nil {
+		return err
+	}
+
+	serverPrivKeyPEM := new(bytes.Buffer)
+	_ = pem.Encode(serverPrivKeyPEM, &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(serverPrivKey),
 	})
 
-	return &certificate{
-		cert:    cert,
-		privKey: serverPrivKey,
-		certPEM: serverCertPEM,
-	}, nil
+	err = writeFile(filepath.Join(tlsDir, `tls.key`), serverPrivKeyPEM)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func saveCACertificateCABundle(tlsDir string, caCertificate []byte) error {
+	// pem encode a bundle of the CA certificates
+	// this is used to verify that the server is really the correct site you're talking to
+	datreeCACertPEM := new(bytes.Buffer)
+	err := pem.Encode(datreeCACertPEM, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caCertificate,
+	})
+	if err != nil {
+		return err
+	}
+
+	err = writeFile(filepath.Join(tlsDir, "ca-bundle.pem"), datreeCACertPEM)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // WriteFile writes data in the file at the given path

@@ -28,16 +28,19 @@ spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
       - name: webhook-init
+        restartPolicy: Never
         image: "{{ .Values.imageWebhook.repository }}:{{ .Values.imageWebhook.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{.Values.image.pullPolicy}}
+        imagePullPolicy: IfNotPresent
         volumeMounts:
             - mountPath: /etc/webhook/certs
               name: webhook-certs
         env:
-          - name: WEBHOOK_NAMESPACE
-            value: {{ template "datree.namespace" . }}
-          - name: WEBHOOK_SERVICE
-            value: "datree-webhook-server"
+        - name: WEBHOOK_NAMESPACE
+          value: {{ template "datree.namespace" . }}
+        - name: WEBHOOK_SERVICE
+          value: "datree-webhook-server"
+        - name: WEBHOOK_SELECTOR
+          value: "admission.datree/validate"
       - name: server
         securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
         livenessProbe:
@@ -119,8 +122,8 @@ spec:
             - mountPath: /etc/webhook/certs
               name: webhook-certs
           env:
-          - name: WEBHOOK_NAMESPACE
-            value: {{ template "datree.namespace" . }}
-          - name: WEBHOOK_SERVICE
-            value: "datree-webhook-server"
+          - name: WEBHOOK_CERTS_DIR
+            value: /etc/webhook/certs
+          - name: WEBHOOK_SERVER_DNS
+            value: {{ printf "datree-webhook-server.%s.svc" (include "datree.namespace" .)}}
           
