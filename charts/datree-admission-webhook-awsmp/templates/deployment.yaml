@@ -28,7 +28,6 @@ spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
       - name: webhook-init
-        restartPolicy: Never
         image: "{{ .Values.imageWebhook.repository }}:{{ .Values.imageWebhook.tag | default .Chart.AppVersion }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
@@ -41,6 +40,8 @@ spec:
           value: "datree-webhook-server"
         - name: WEBHOOK_SELECTOR
           value: "admission.datree/validate"
+        - name: WEBHOOK_SERVER_REPLICAS
+          value: "{{ .Values.replicaCount }}"
       - name: server
         securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
         livenessProbe:

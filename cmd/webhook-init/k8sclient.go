@@ -48,16 +48,17 @@ func (k *k8sClient) createPodWatcher(ctx context.Context, selector string) (watc
 	return k.clientset.CoreV1().Pods(k.config.namespace).Watch(ctx, opts)
 }
 
-func (k *k8sClient) waitPodRunning(ctx context.Context, selector string) error {
-	loggerUtil.Debugf("Creating watcher for POD with label:%s ...", selector)
+func (k *k8sClient) waitPodsRunning(ctx context.Context, selector string, replicas int) error {
+	loggerUtil.Debugf("creating watcher for POD with label:%s ...", selector)
 	watcher, err := k.createPodWatcher(ctx, selector)
 	if err != nil {
 		return err
 	}
 
-	loggerUtil.Debug("Watch out! Succuessfuly created watcher for PODs.")
+	loggerUtil.Debug("watch out! Succuessfuly created watcher for PODs.")
 	defer watcher.Stop()
 
+	count := 0
 	for {
 		select {
 		case event := <-watcher.ResultChan():
@@ -65,18 +66,22 @@ func (k *k8sClient) waitPodRunning(ctx context.Context, selector string) error {
 
 			if pod.Status.Phase == v1.PodRunning {
 				if isPodReady(pod) {
-					loggerUtil.Debugf("The POD \"%s\" is running", selector)
-					return nil
+					count++
+					loggerUtil.Debugf("the POD \"%s\" is running", selector)
+					if count == replicas {
+						loggerUtil.Debugf("all PODs are running", selector)
+						return nil
+					}
 				}
 
 			}
 
 		case <-time.After(180 * time.Second):
-			loggerUtil.Debug("Exit from waitPodRunning for POD \"%s\" because the time is over")
+			loggerUtil.Debug("exit from waitPodRunning for POD \"%s\" because the time is over")
 			return nil
 
 		case <-ctx.Done():
-			loggerUtil.Debugf("Exit from waitPodRunning for POD \"%s\" because the context is done", selector)
+			loggerUtil.Debugf("exit from waitPodRunning for POD \"%s\" because the context is done", selector)
 			return nil
 		}
 	}

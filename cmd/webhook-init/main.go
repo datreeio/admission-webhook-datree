@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	"k8s.io/client-go/kubernetes"
@@ -28,7 +29,13 @@ func main() {
 	k8sClient := newK8sClient(kubeClient, "datree")
 
 	// wait for webhook-server pods to be ready
-	err = k8sClient.waitPodRunning(context.Background(), "app=datree-webhook-server")
+	replicas, err := getWebhookServerReplicas()
+	if err != nil {
+		loggerUtil.Logf("required webhook server replicas number is missing, err: %v", err)
+		return
+	}
+
+	err = k8sClient.waitPodsRunning(context.Background(), "app=datree-webhook-server", replicas)
 	if err != nil {
 		loggerUtil.Logf("failed to wait for pods, err: %v", err)
 		return
@@ -48,7 +55,8 @@ func main() {
 	}
 
 	loggerUtil.Log("Horray! Succesfully initiaded datree validation admission webhook.")
-	os.Exit(0)
+
+	select {}
 }
 
 func castDatreeValidationWebhookConfig() (*validationWebhookConfig, error) {
@@ -90,4 +98,17 @@ func readCABundle() ([]byte, error) {
 	}
 
 	return caPEM, nil
+}
+
+func getWebhookServerReplicas() (int, error) {
+	replicasStr, isFound := os.LookupEnv("WEBHOOK_SERVER_REPLICAS")
+	if !isFound {
+		return -1, nil
+	}
+	replicas, err := strconv.Atoi(replicasStr)
+	if err != nil {
+		return -1, err
+	}
+
+	return replicas, nil
 }
