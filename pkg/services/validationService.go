@@ -51,13 +51,29 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
+type ValidationService struct {
+	CliServiceClient *cliClient.CliClient
+}
+
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
 func isEnforceMode() bool {
 	return os.Getenv(enums.Enforce) == "true"
 }
 
-func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
+func NewValidationService() *ValidationService {
+	return &ValidationService{
+		CliServiceClient: cliServiceClient,
+	}
+}
+
+func NewValidationServiceWithCustomCliServiceClient(cliServiceClient *cliClient.CliClient) *ValidationService {
+	return &ValidationService{
+		CliServiceClient: cliServiceClient,
+	}
+}
+
+func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
 	cliEvaluationId := -1
@@ -129,7 +145,7 @@ func Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]
 		Policy:              policy,
 	}
 
-	evaluator := evaluation.New(cliServiceClient, ciContext)
+	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
 	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Evaluate err: %s", err.Error()))

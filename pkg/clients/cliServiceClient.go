@@ -42,6 +42,17 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 	}
 }
 
+func NewCliServiceClientWithCustomHttpClient(httpClient HTTPClient) *CliClient {
+	return &CliClient{
+		baseUrl:          "",
+		httpClient:       httpClient,
+		timeoutClient:    nil,
+		httpErrors:       []string{},
+		networkValidator: nil,
+		flagsHeaders:     make(map[string]string),
+	}
+}
+
 func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.EvaluationPrerunDataResponse, error) {
 	if c.networkValidator.IsLocalMode() {
 		return &cliClient.EvaluationPrerunDataResponse{IsPolicyAsCodeMode: true}, nil
