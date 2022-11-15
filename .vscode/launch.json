@@ -5,11 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch webhook-server",
+      "name": "Launch webhook-init",
       "type": "go",
       "request": "launch",
       "mode": "debug",
-      "program": "${workspaceFolder}/cmd/webhook-server/main.go"
+      "program": "${workspaceFolder}/cmd/webhook-init"
     },
     {
       "name": "Launch cert-generator",
