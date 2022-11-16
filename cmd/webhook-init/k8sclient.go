@@ -15,19 +15,19 @@ import (
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 )
 
-type KubernetesClient interface {
+type kubernetesClient interface {
 	CoreV1() corev1.CoreV1Interface
 	AdmissionregistrationV1() _admissionregistrationv1.AdmissionregistrationV1Interface
 }
 
 type k8sClient struct {
-	clientset KubernetesClient
+	clientset kubernetesClient
 	config    struct {
 		namespace string
 	}
 }
 
-func newK8sClient(c KubernetesClient, ns string) *k8sClient {
+func newK8sClient(c kubernetesClient, ns string) *k8sClient {
 	return &k8sClient{
 		clientset: c,
 		config: struct{ namespace string }{
@@ -113,7 +113,7 @@ func (k *k8sClient) createValidationWebhookConfig(cfg *validationWebhookConfig) 
 
 	validationWebhookConfig := &admissionregistrationv1.ValidatingWebhookConfiguration{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "datree-webhook",
+			Name: cfg.name,
 		},
 		Webhooks: []admissionregistrationv1.ValidatingWebhook{{
 			Name: "webhook-server.datree.svc",
@@ -121,7 +121,7 @@ func (k *k8sClient) createValidationWebhookConfig(cfg *validationWebhookConfig) 
 				CABundle: cfg.caBundle, // CA bundle created earlier
 				Service: &admissionregistrationv1.ServiceReference{
 					Name:      cfg.serviceName, // datree-webhook-server
-					Namespace: "datree",
+					Namespace: cfg.namesapce,
 					Path:      &path,
 				},
 			},
