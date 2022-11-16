@@ -15,8 +15,6 @@ COPY . .
 # cache the build
 RUN --mount=type=cache,target=/root/.cache/go-build go build -o cert-generator -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" ./cmd/cert-generator
 
-# RUN --mount=type=cache,target=/root/.cache/go-build go build -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
-
 FROM alpine:3.14
 COPY --from=builder /go/src/app/cert-generator /
 EXPOSE 8443
