@@ -41,6 +41,7 @@ spec:
   schedule: "0 0 * * *"
   jobTemplate:
     spec:
+      backoffLimit: 4
       template:
         spec:
           serviceAccountName: cluster-scan-job-service-account
@@ -66,7 +67,6 @@ spec:
                 requests:
                   cpu: 1000m
                   memory: 256Mi
-      backoffLimit: 4
   
   
   
