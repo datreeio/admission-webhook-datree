@@ -1,1 +1,0 @@
-{{- include "datree-lib.wait-server-ready-post-install" .}}

@@ -11,12 +11,20 @@ metadata:
 rules:
   - apiGroups:
       - ""
+      - "admissionregistration.k8s.io"
     resources:
       - "nodes"
       - "namespaces"
+      - "validatingwebhookconfigurations"
+      - "pods"
     verbs:
       - "get"
       - "list"
+      - "create"
+      - "delete"
+      - "patch"
+      - "update"
+      - "watch"
 {{- end}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -63,4 +71,28 @@ rules:
       - watch
     resourceNames:
       - datree-webhook
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: datree-deployments-delete
+  labels: {{include "datree.labels" . | nindent 4}}
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - "apps"
+    resources:
+      - "deployments"
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    resourceNames:
+      - datree-webhook-server
 {{- end -}}
