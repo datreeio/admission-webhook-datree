@@ -13,8 +13,7 @@ RUN go mod download
 
 COPY . .
 # cache the build
-# RUN --mount=type=cache,target=/root/.cache/go-build go build cmd/webhook-server -o webhook-server
-RUN go build ./cmd/cert-generator
+RUN --mount=type=cache,target=/root/.cache/go-build go build -o cert-generator -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" ./cmd/cert-generator
 
 # RUN --mount=type=cache,target=/root/.cache/go-build go build -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
 

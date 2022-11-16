@@ -10,10 +10,8 @@ COPY go.* .
 RUN go mod download
 
 COPY . .
-# cache the build, 
-## map the /root/.cache/go-build to your host go build cache folder
-# RUN --mount=type=cache,target=/root/.cache/go-build go build ./cmd/webhook-datree -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
-RUN go build -o webhook-server -tags $BUILD_ENVIRONMENT ./cmd/webhook-server
+# map /root/.cache/go-build to host go build cache folder
+RUN --mount=type=cache,target=/root/.cache/go-build go build -o webhook-server -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" ./cmd/webhook-server 
 
 FROM alpine:3.14
 COPY --from=builder /go/src/app/webhook-server /
