@@ -33,7 +33,7 @@ subjects:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: scan-job
+  name: scan-cronjob
   namespace: datree
   annotations:
     "helm.sh/hook": post-install
