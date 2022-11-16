@@ -31,36 +31,65 @@ subjects:
     namespace: datree
 ---
 apiVersion: batch/v1
-kind: Job
+kind: CronJob
 metadata:
   name: scan-job
   namespace: datree
   annotations:
     "helm.sh/hook": post-install
 spec:
-  template:
+  schedule: "0 0 * * *"
+  jobTemplate:
     spec:
-      serviceAccountName: cluster-scan-job-service-account
-      restartPolicy: Never
-      containers:
-        - name: scan-job
-          env:
-            - name: DATREE_TOKEN
-              value: {{.Values.datree.token}}
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 25000
-            seccompProfile:
-              type: RuntimeDefault
-          image: "datree/scan-job:0.0.8"
-          imagePullPolicy: Always
-          resources:
-            limits:
-              cpu: 1000m
-              memory: 512Mi
-            requests:
-              cpu: 1000m
-              memory: 256Mi
-  backoffLimit: 4
+      template:
+        spec:
+          serviceAccountName: cluster-scan-job-service-account
+          restartPolicy: Never
+          containers:
+            - name: scan-job
+              env:
+                - name: DATREE_TOKEN
+                  value: {{.Values.datree.token}}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                runAsNonRoot: true
+                runAsUser: 25000
+                seccompProfile:
+                  type: RuntimeDefault
+              image: "datree/scan-job:0.0.8"
+              imagePullPolicy: Always
+              resources:
+                limits:
+                  cpu: 1000m
+                  memory: 512Mi
+                requests:
+                  cpu: 1000m
+                  memory: 256Mi
+      backoffLimit: 4
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
