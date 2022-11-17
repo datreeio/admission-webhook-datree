@@ -30,7 +30,7 @@ subjects:
     name: cluster-scan-job-service-account
     namespace: datree
 ---
-apiVersion: batch/v1
+apiVersion: {- .Chart.datree.CronJob.apiVersion -}
 kind: CronJob
 metadata:
   name: scan-cronjob
@@ -67,29 +67,55 @@ spec:
                 requests:
                   cpu: 1000m
                   memory: 256Mi
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datree-scanner
+  namespace: {{ template "datree.namespace" . }}
+  labels: {{ include "datree.labels" . | nindent 4 }}
+    owner: datree
+    app: "datree-scanner"
+  {{- if .Values.customAnnotations }}
+  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: "datree-scanner"
+  template:
+    metadata:
+      labels: {{ include "datree.labels" . | nindent 8 }}
+        app: "datree-scanner"
+      {{- if .Values.customAnnotations }}
+      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- end }}
+    spec:
+      serviceAccountName: cluster-scan-job-service-account
+      containers:
+        - name: datree-scanner
+          env:
+            - name: DATREE_TOKEN
+              value: {{.Values.datree.token}}
+          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8444
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8444
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources: {{- toYaml .Values.resources | nindent 12 }}
+          image: "datree/scan-job:0.0.8"
+          imagePullPolicy: {{.Values.image.pullPolicy}}
+          ports:
+            - containerPort: 8444
+              name: datree-scanner
