@@ -1,5 +1,6 @@
 {{/*
 Get KubeVersion removing pre-release information.
+source: https://github.com/prometheus-community/helm-charts/blob/a3b1ba697a0656e2403700e29b9e7d193d5caad3/charts/prometheus/templates/_helpers.tpl#L159
 */}}
 {{- define "datree.kubeVersion" -}}
   {{- default .Capabilities.KubeVersion.Version (regexFind "v[0-9]+\\.[0-9]+\\.[0-9]+" .Capabilities.KubeVersion.Version) -}}
