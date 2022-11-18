@@ -30,92 +30,22 @@ subjects:
     name: cluster-scan-job-service-account
     namespace: datree
 ---
-apiVersion: {- .Chart.datree.CronJob.apiVersion -}
+apiVersion: {{ include "datree.CronJob.apiVersion" . }}
 kind: CronJob
 metadata:
   name: scan-cronjob
   namespace: datree
+spec:
+  # get the current time, subtract 5 minutes, extract the minutes and inject it into the cron expression
+  # if helm installation was done at 13:35, the cron expression will be 30 * * * *, which means the job will run at 14:30, 15:30, 16:30, etc.
+  schedule: "{{ now | dateModify "-5m" | date "04" }} * * * *" # every hour, starting 55 minutes after helm installation
+  jobTemplate: {{ include "datree.scanJob" . | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scan-job
+  namespace: datree
   annotations:
     "helm.sh/hook": post-install
-spec:
-  schedule: "0 0 * * *"
-  jobTemplate:
-    spec:
-      backoffLimit: 4
-      template:
-        spec:
-          serviceAccountName: cluster-scan-job-service-account
-          restartPolicy: Never
-          containers:
-            - name: scan-job
-              env:
-                - name: DATREE_TOKEN
-                  value: {{.Values.datree.token}}
-              securityContext:
-                allowPrivilegeEscalation: false
-                readOnlyRootFilesystem: true
-                runAsNonRoot: true
-                runAsUser: 25000
-                seccompProfile:
-                  type: RuntimeDefault
-              image: "datree/scan-job:0.0.8"
-              imagePullPolicy: Always
-              resources:
-                limits:
-                  cpu: 1000m
-                  memory: 512Mi
-                requests:
-                  cpu: 1000m
-                  memory: 256Mi
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: datree-scanner
-  namespace: {{ template "datree.namespace" . }}
-  labels: {{ include "datree.labels" . | nindent 4 }}
-    owner: datree
-    app: "datree-scanner"
-  {{- if .Values.customAnnotations }}
-  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
-  {{- end }}
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: "datree-scanner"
-  template:
-    metadata:
-      labels: {{ include "datree.labels" . | nindent 8 }}
-        app: "datree-scanner"
-      {{- if .Values.customAnnotations }}
-      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
-      {{- end }}
-    spec:
-      serviceAccountName: cluster-scan-job-service-account
-      containers:
-        - name: datree-scanner
-          env:
-            - name: DATREE_TOKEN
-              value: {{.Values.datree.token}}
-          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: 8444
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: 8444
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
-          resources: {{- toYaml .Values.resources | nindent 12 }}
-          image: "datree/scan-job:0.0.8"
-          imagePullPolicy: {{.Values.image.pullPolicy}}
-          ports:
-            - containerPort: 8444
-              name: datree-scanner
+{{ include "datree.scanJob" . }}
