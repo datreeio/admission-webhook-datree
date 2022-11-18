@@ -1,6 +1,6 @@
 {{/*
 Get KubeVersion removing pre-release information.
-source: https://github.com/prometheus-community/helm-charts/blob/a3b1ba697a0656e2403700e29b9e7d193d5caad3/charts/prometheus/templates/_helpers.tpl#L159
+inspired by: https://github.com/prometheus-community/helm-charts/blob/a3b1ba697a0656e2403700e29b9e7d193d5caad3/charts/prometheus/templates/_helpers.tpl#L159
 */}}
 {{- define "datree.kubeVersion" -}}
   {{- default .Capabilities.KubeVersion.Version (regexFind "v[0-9]+\\.[0-9]+\\.[0-9]+" .Capabilities.KubeVersion.Version) -}}
@@ -9,6 +9,7 @@ source: https://github.com/prometheus-community/helm-charts/blob/a3b1ba697a0656e
 
 {{/*
 Return the appropriate apiVersion for CronJob.
+inspired by: https://github.com/prometheus-community/helm-charts/blob/a3b1ba697a0656e2403700e29b9e7d193d5caad3/charts/prometheus/templates/_helpers.tpl#L202
 for kubernetes version > 1.21.x use batch/v1
 for 1.19.0 <= kubernetes version < 1.21.0 use batch/v1beta1 
 */}}
