@@ -33,6 +33,8 @@ spec:
           env:
             - name: DATREE_TOKEN
               value: {{.Values.datree.token}}
+            - name: DATREE_POLICY
+              value: {{.Values.datree.policy | default "Starter"}}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -40,7 +42,7 @@ spec:
             runAsUser: 25000
             seccompProfile:
               type: RuntimeDefault
-          image: "datree/scan-job:0.0.8"
+          image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
           imagePullPolicy: Always
           resources:
             limits:
