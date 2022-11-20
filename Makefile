@@ -41,5 +41,5 @@ helm-uninstall:
 	helm uninstall -n datree datree-webhook
 
 helm-install-staging:
-	helm template -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}" --set scan_job.image.repository="datree/scan-job-staging" \
+	helm install -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}" --set scan_job.image.repository="datree/scan-job-staging" \
 	--set scan_job.image.tag="latest" --set image.repository="datree/webhook-staging" --set image.tag="latest"
