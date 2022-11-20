@@ -35,11 +35,8 @@ spec:
               value: {{.Values.datree.token}}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 25000
+          securityContext: 
+            {{- toYaml .Values.securityContext | nindent 12 }}
             seccompProfile:
               type: RuntimeDefault
           image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
