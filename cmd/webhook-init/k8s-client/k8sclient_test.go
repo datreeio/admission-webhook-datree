@@ -1,6 +1,7 @@
 package k8sclient
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -8,84 +9,79 @@ import (
 	testclient "k8s.io/client-go/kubernetes/fake"
 )
 
-type condition[T any] struct {
-	compareFn func(actual T) bool
-	msg       string
+type Condition[T any] func(actual T) bool
+
+type ExpectedCondition[T any] struct {
+	condition Condition[T]
+	message   string
 }
 
-type output struct {
-	err     *condition[error]
-	webhook *condition[*admissionregistrationV1.ValidatingWebhookConfiguration]
-}
-
-type input struct {
-	namespace string
-	cfg       *ValidatingWebhookOpts
-}
-
-type test struct {
-	name     string
-	args     input
-	expected output
+type Expected[T any] struct {
+	value   T
+	message string
 }
 
 func TestCreateValidatingWebhookConfiguration(t *testing.T) {
-	tests := []test{
-		{
-			name: "should create validating webhook configuration",
-			args: input{
-				namespace: "datree",
-				cfg: &ValidatingWebhookOpts{
-					MetaName:    "datree-webhook",
-					ServiceName: "webhook-server",
-					CaBundle:    []byte("caBundle"),
-					Selector:    "app=webhook-server",
-					WebhookName: "webhook-server.datree.svc",
-				}},
-			expected: output{
-				err: &condition[error]{compareFn: func(actual error) bool { return actual == nil }, msg: "should not return error"},
-				webhook: &condition[*admissionregistrationV1.ValidatingWebhookConfiguration]{compareFn: func(actual *admissionregistrationV1.ValidatingWebhookConfiguration) bool {
-					return actual != nil && actual.Name == "datree-webhook" && actual.Webhooks[0].Name == "webhook-server.datree.svc" && actual.Webhooks[0].ClientConfig.Service.Name == "webhook-server" && actual.Webhooks[0].ClientConfig.Service.Namespace == "datree" && actual.Webhooks[0].ClientConfig.Service.Path != nil && *actual.Webhooks[0].ClientConfig.Service.Path == "/validate" && actual.Webhooks[0].ClientConfig.CABundle != nil && string(actual.Webhooks[0].ClientConfig.CABundle) == "caBundle"
-				}, msg: "should return webhook configuration"},
+	type testArgs struct {
+		namespace string
+		cfg       *ValidatingWebhookOpts
+	}
+
+	type testCase struct {
+		args            *testArgs
+		expectedErr     Expected[error]
+		expectedWebhook ExpectedCondition[*admissionregistrationV1.ValidatingWebhookConfiguration]
+	}
+
+	tests := map[string]*testCase{
+		"should create a validating webhook configuration": {
+			args: &testArgs{namespace: "test-namespace", cfg: &ValidatingWebhookOpts{
+				MetaName:    "datree-webhook",
+				ServiceName: "webhook-server",
+				CaBundle:    []byte("caBundle"),
+				Selector:    "app=webhook-server",
+				WebhookName: "webhook-server.datree.svc",
+			}},
+			expectedWebhook: ExpectedCondition[*admissionregistrationV1.ValidatingWebhookConfiguration]{
+				condition: func(actual *admissionregistrationV1.ValidatingWebhookConfiguration) bool {
+					isNameValid := actual.Name == "datree-webhook"
+					isNamespaceValid := actual.Webhooks[0].ClientConfig.Service.Namespace == "test-namespace"
+					isWebhookNameValid := actual.Webhooks[0].Name == "webhook-server.datree.svc"
+					isWebhookServiceNameValid := actual.Webhooks[0].ClientConfig.Service.Name == "webhook-server"
+					isWebhookCABundleValid := string(actual.Webhooks[0].ClientConfig.CABundle) == string([]byte("caBundle"))
+					isWebhookSelectorValid := actual.Webhooks[0].NamespaceSelector.MatchExpressions[0].Key == "app=webhook-server"
+					return isNameValid && isNamespaceValid && isWebhookNameValid && isWebhookServiceNameValid && isWebhookCABundleValid && isWebhookSelectorValid
+				},
+				message: "webhook should use the correct values from the args",
+			},
+			expectedErr: Expected[error]{
+				value:   nil,
+				message: "should not return an error",
 			},
 		},
-		{
-			name: "should not return error when namespace is empty",
-			args: input{
-				namespace: "",
-				cfg: &ValidatingWebhookOpts{
-					MetaName:    "datree-webhook",
-					ServiceName: "webhook-server",
-					CaBundle:    []byte("caBundle"),
-					Selector:    "app=webhook-server",
-					WebhookName: "webhook-server.datree.svc",
+		"should not create validating webhook since opts is nil": {
+			args: &testArgs{namespace: "test-namespace", cfg: nil},
+			expectedWebhook: ExpectedCondition[*admissionregistrationV1.ValidatingWebhookConfiguration]{
+				message: "webhook should be nil",
+				condition: func(actual *admissionregistrationV1.ValidatingWebhookConfiguration) bool {
+					return actual == nil
 				},
 			},
-			expected: output{err: &condition[error]{compareFn: func(actual error) bool { return actual == nil }, msg: "should return error"}},
-		},
-		{
-			name: "should return error when cfg is nil",
-			args: input{
-				namespace: "datree",
-				cfg:       nil,
+			expectedErr: Expected[error]{
+				value:   fmt.Errorf("invalid validating webhook configuration"),
+				message: "should return an error",
 			},
-			expected: output{err: &condition[error]{compareFn: func(actual error) bool { return actual != nil }, msg: "should return error"}},
 		},
 	}
 
-	for _, ts := range tests {
-		t.Run(ts.name, func(t *testing.T) {
-			client := testclient.NewSimpleClientset()
+	client := testclient.NewSimpleClientset()
+	k8sClient := New(client)
 
-			k8sClient := New(client)
-
-			actualVW, actualErr := k8sClient.CreateValidatingWebhookConfiguration(ts.args.namespace, ts.args.cfg)
-			if ts.expected.err != nil {
-				assert.Condition(t, func() bool { return ts.expected.err.compareFn(actualErr) }, ts.expected.err.msg)
-			}
-			if ts.expected.webhook != nil {
-				assert.Condition(t, func() bool { return ts.expected.webhook.compareFn(actualVW) }, ts.expected.webhook.msg)
-			}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			actualVW, actualErr := k8sClient.CreateValidatingWebhookConfiguration(tc.args.namespace, tc.args.cfg)
+			assert.Equal(t, tc.expectedErr.value, actualErr, tc.expectedErr.message)
+			assert.True(t, tc.expectedWebhook.condition(actualVW), tc.expectedWebhook.message)
 		})
 	}
 }

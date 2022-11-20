@@ -49,7 +49,7 @@ type ValidatingWebhookOpts struct {
 
 func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *ValidatingWebhookOpts) (*admissionregistrationV1.ValidatingWebhookConfiguration, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("invalid ValidatingWebhookOpts")
+		return nil, fmt.Errorf("invalid validating webhook configuration")
 	}
 
 	path := "/validate"
