@@ -98,7 +98,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	clientId := getClientId()
 	policyName := os.Getenv(enums.Policy)
 
-	prerunData, err := cliServiceClient.RequestEvaluationPrerunData(token)
+	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
 		internalLogger.LogError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 		*warningMessages = append(*warningMessages, err.Error())

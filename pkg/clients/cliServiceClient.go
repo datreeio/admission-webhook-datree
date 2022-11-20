@@ -42,14 +42,14 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 	}
 }
 
-func NewCliServiceClientWithCustomHttpClient(httpClient HTTPClient) *CliClient {
+func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutClient HTTPClient, httpErrors []string, networkValidator cliClient.NetworkValidator, flagsHeaders map[string]string) *CliClient {
 	return &CliClient{
-		baseUrl:          "",
+		baseUrl:          baseUrl,
 		httpClient:       httpClient,
-		timeoutClient:    nil,
-		httpErrors:       []string{},
-		networkValidator: nil,
-		flagsHeaders:     make(map[string]string),
+		timeoutClient:    timeoutClient,
+		httpErrors:       httpErrors,
+		networkValidator: networkValidator,
+		flagsHeaders:     flagsHeaders,
 	}
 }
 

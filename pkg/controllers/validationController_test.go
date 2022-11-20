@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"testing"
 
@@ -13,17 +12,16 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/datreeio/datree/pkg/httpClient"
+	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
 )
 
-func init() {
-	os.Setenv("DATREE_TOKEN", "81ac2326-d407-4ffa-a997-5745ed71ad5f")
-}
-
 //go:embed test_fixtures/applyNotAllowedRequest.json
 var applyRequestNotAllowedJson string
-var applyRequestNotAllowedMockedResponseBody = []byte("{\"kind\":\"AdmissionReview\",\"apiVersion\":\"admission.k8s.io/v1\",\"response\":{\"uid\":\"705ab4f5-6393-11e8-b7cc-42010a800002\",\"allowed\":true,\"status\":{\"metadata\":{},\"message\":\"\\n---\\nwebhook-my-deployment-Scale.tmp.yaml\\n\\n[V] YAML validation\\n[V] Kubernetes schema validation\\n\\n[X] Policy check\\n\\n❌  Ensure each container has a configured CPU limit  [1 occurrence]\\n    - metadata.name: my-deployment (kind: Scale)\\n💡  Missing property object `limits.cpu` - value should be within the accepted boundaries recomme")
+
+//go:embed test_fixtures/mockServerResponse.json
+var applyRequestNotAllowedMockedResponseBody []byte
 
 //go:embed test_fixtures/applyAllowedRequest.json
 var applyRequestAllowedJson string
@@ -124,6 +122,7 @@ func TestValidateRequestBody(t *testing.T) {
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
+	t.Setenv("DATREE_ENFORCE", "true")
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
@@ -134,7 +133,6 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	})
 
 	validationController.Validate(responseRecorder, request)
-
 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
 }
 
@@ -226,7 +224,7 @@ func (mhc *MockHttpClient) Request(method string, resourceURI string, body inter
 
 func mockValidationController(mockedResponse httpClient.Response) *ValidationController {
 	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
-	mockedCliServiceClient := clients.NewCliServiceClientWithCustomHttpClient(mockedHttpClient)
+	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
 	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient)
 
 	return &ValidationController{
