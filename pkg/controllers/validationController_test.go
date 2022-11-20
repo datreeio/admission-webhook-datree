@@ -151,7 +151,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
 
 	assert.Equal(t, admissionResponse.Allowed, true)
-	assert.Contains(t, admissionResponse.Warnings[0], "🚩 Some objects failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations/")
+	assert.Contains(t, admissionResponse.Warnings[0], "🚩 Object with name my-deployment and kind Scale failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations/")
 	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
 }
 
