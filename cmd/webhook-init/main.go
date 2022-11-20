@@ -2,113 +2,68 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"path/filepath"
-	"strconv"
 
+	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/webhook-init/k8s-client"
+	"github.com/datreeio/admission-webhook-datree/cmd/webhook-init/utils"
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
-	"k8s.io/client-go/kubernetes"
-	ctrl "sigs.k8s.io/controller-runtime"
+	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/watch"
 )
 
 func main() {
-	// create validation webhook config
-	datreeValidationWebhookConfig, err := castDatreeValidationWebhookConfig()
-	if err != nil {
-		loggerUtil.Logf("failed cast webhook configuration, err: %v", err)
-		return
+	k8sClient := k8sclient.New(nil)
+	if k8sClient == nil {
+		loggerUtil.Logf("failed to set k8s go -client, err")
 	}
 
-	// create k8s client
-	kubeClient, err := kubernetes.NewForConfig(ctrl.GetConfigOrDie())
+	err := InitWebhook(k8sClient)
 	if err != nil {
-		loggerUtil.Logf("failed to set k8s go -client, err: %v", err)
-		return
+		loggerUtil.Logf("failed to init webhook, err: %v", err)
 	}
-	k8sClient := newK8sClient(kubeClient, "datree")
+	loggerUtil.Log("horray! succesfully created datree validating admission webhook")
 
-	// wait for webhook-server pods to be ready
-	replicas, err := getWebhookServerReplicas()
-	if err != nil {
-		loggerUtil.Logf("required webhook server replicas number is missing, err: %v", err)
-		return
-	}
+	// wait forever to prevent the container from restrating
+	waitForever()
+}
 
-	err = k8sClient.waitPodsRunning(context.Background(), "app=datree-webhook-server", replicas)
-	if err != nil {
-		loggerUtil.Logf("failed to wait for pods, err: %v", err)
-		return
-	}
+type k8sClientInterface interface {
+	CreateValidatingWebhookConfiguration(namespace string, cfg *k8sclient.ValidatingWebhookOpts) (*admissionregistrationV1.ValidatingWebhookConfiguration, error)
+	DeleteExistingValidatingWebhook(name string) error
+	WaitUntilPodsAreRunning(ctx context.Context, namespace string, selector string, replicas int) error
+	GetValidatingWebhookConfiguration(name string) *admissionregistrationV1.ValidatingWebhookConfiguration
+	CreatePodWatcher(ctx context.Context, namespace string, selector string) (watch.Interface, error)
+	IsPodReady(pod *v1.Pod) bool
+}
 
-	// create validation webhook, if one already exists delete before creating
-	loggerUtil.Log("creating ValidatingWebhook...")
-	err = k8sClient.deleteExistingValidationAdmissionWebhook("datree-webhook")
+func InitWebhook(k8sClient k8sClientInterface) error {
+	err := k8sClient.DeleteExistingValidatingWebhook("datree-webhook")
 	if err != nil {
 		loggerUtil.Logf("failed to delete existed validation webhook config, err: %v", err)
-		return
+		return err
 	}
 
-	err = k8sClient.createValidationWebhookConfig(datreeValidationWebhookConfig)
+	err = k8sClient.WaitUntilPodsAreRunning(context.Background(), utils.GetWebhookNamespace(), utils.GetWebhookSelector(), utils.GetWebhookServerReplicas())
 	if err != nil {
-		loggerUtil.Logf("failed to create validation webhook config, err: %v", err)
+		loggerUtil.Logf("failed to wait for pods, err: %v", err)
+		return err
 	}
 
-	loggerUtil.Log("Horray! Succesfully initiaded datree validation admission webhook.")
+	caBundle, _ := utils.GetWebhookCABundle()
+	_, err = k8sClient.CreateValidatingWebhookConfiguration(utils.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
+		MetaName:    "datree-webhook",
+		ServiceName: utils.GetWebhookServiceName(),
+		CaBundle:    caBundle,
+		Selector:    utils.GetWebhookSelector(),
+		WebhookName: "webhook-server.datree.svc",
+	})
+	if err != nil {
+		return err
+	}
 
+	return nil
+}
+
+func waitForever() {
 	select {}
-}
-
-func castDatreeValidationWebhookConfig() (*validationWebhookConfig, error) {
-	webhookServiceName, isFound := os.LookupEnv("WEBHOOK_SERVICE")
-	if !isFound {
-		return nil, fmt.Errorf("required environment variable WEBHOOK_SERVICE is missing")
-	}
-
-	webhookNamespace, isFound := os.LookupEnv("WEBHOOK_NAMESPACE")
-	if !isFound {
-		return nil, fmt.Errorf("required environment variable WEBHOOK_NAMESPACE is missing")
-	}
-
-	webhookSelector, isFound := os.LookupEnv("WEBHOOK_SELECTOR")
-	if !isFound {
-		return nil, fmt.Errorf("required environment variable WEBHOOK_SELECTOR is missing")
-	}
-
-	// read CA bundle
-	caBundle, err := readCABundle()
-	if err != nil {
-		return nil, fmt.Errorf("failed to read caBundle, err: %v", err)
-	}
-
-	return &validationWebhookConfig{
-		name:        "datree-webhook",
-		serviceName: webhookServiceName,
-		namesapce:   webhookNamespace,
-		caBundle:    caBundle,
-		selector:    webhookSelector,
-	}, nil
-}
-
-func readCABundle() ([]byte, error) {
-	certPath := filepath.Join(`/etc/webhook/certs`, `ca-bundle.pem`)
-	caPEM, err := os.ReadFile(certPath)
-	if err != nil {
-		return nil, err
-	}
-
-	return caPEM, nil
-}
-
-func getWebhookServerReplicas() (int, error) {
-	replicasStr, isFound := os.LookupEnv("WEBHOOK_SERVER_REPLICAS")
-	if !isFound {
-		return -1, nil
-	}
-	replicas, err := strconv.Atoi(replicasStr)
-	if err != nil {
-		return -1, err
-	}
-
-	return replicas, nil
 }
