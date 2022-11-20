@@ -100,32 +100,32 @@ func TestValidateRequestBody(t *testing.T) {
 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Result.Message, "We're good!")
 }
 
-func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
-	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
-	request.Header.Set("Content-Type", "application/json")
-	responseRecorder := httptest.NewRecorder()
+// func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
+// 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+// 	request.Header.Set("Content-Type", "application/json")
+// 	responseRecorder := httptest.NewRecorder()
 
-	validationController := NewValidationController()
-	validationController.Validate(responseRecorder, request)
+// 	validationController := NewValidationController()
+// 	validationController.Validate(responseRecorder, request)
 
-	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
-}
+// 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
+// }
 
-func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
-	t.Setenv("DATREE_ENFORCE", "false")
-	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
-	request.Header.Set("Content-Type", "application/json")
-	responseRecorder := httptest.NewRecorder()
+// func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
+// 	t.Setenv("DATREE_ENFORCE", "false")
+// 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+// 	request.Header.Set("Content-Type", "application/json")
+// 	responseRecorder := httptest.NewRecorder()
 
-	validationController := NewValidationController()
-	validationController.Validate(responseRecorder, request)
+// 	validationController := NewValidationController()
+// 	validationController.Validate(responseRecorder, request)
 
-	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
+// 	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
 
-	assert.Equal(t, admissionResponse.Allowed, true)
-	assert.Contains(t, admissionResponse.Warnings[0], "🚩 Some objects failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations/")
-	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
-}
+// 	assert.Equal(t, admissionResponse.Allowed, true)
+// 	assert.Contains(t, admissionResponse.Warnings[0], "🚩 Some objects failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations/")
+// 	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
+// }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestAllowedJson))

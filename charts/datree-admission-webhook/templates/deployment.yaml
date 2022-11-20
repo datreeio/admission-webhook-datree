@@ -31,17 +31,17 @@ spec:
           # changing the order will harm resource patching
           env:
             - name: DATREE_TOKEN
-              value: {{ .Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}
+              value: "{{ .Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}"
             - name: DATREE_POLICY
-              value: {{.Values.datree.policy}}
+              value: {{.Values.datree.policy | default "Starter"}}
             - name: DATREE_VERBOSE
-              value: {{.Values.datree.verbose}}
+              value: "{{.Values.datree.verbose}}"
             - name: DATREE_OUTPUT
-              value: {{.Values.datree.output}}
+              value: "{{.Values.datree.output}}"
             - name: DATREE_NO_RECORD
-              value: {{.Values.datree.noRecord}}
+              value: "{{.Values.datree.noRecord}}"
             - name: DATREE_ENFORCE
-              value: {{.Values.datree.enforce}}
+              value: "{{.Values.datree.enforce}}"
           securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
           livenessProbe:
             httpGet:
