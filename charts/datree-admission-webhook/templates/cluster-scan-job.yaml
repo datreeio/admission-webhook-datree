@@ -47,6 +47,8 @@ spec:
           env:
             - name: DATREE_TOKEN
               value: {{.Values.datree.token}}
+            - name: DATREE_POLICY
+              value: {{.Values.datree.policy | default "Starter"}}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true

@@ -33,7 +33,7 @@ spec:
             - name: DATREE_TOKEN
               value: "{{ .Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}"
             - name: DATREE_POLICY
-              value: "{{.Values.datree.policy}}"
+              value: {{.Values.datree.policy | default "Starter"}}
             - name: DATREE_VERBOSE
               value: "{{.Values.datree.verbose}}"
             - name: DATREE_OUTPUT
