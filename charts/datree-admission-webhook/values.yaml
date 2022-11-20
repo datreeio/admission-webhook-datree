@@ -48,8 +48,6 @@ scan_job:
     repository: datree/scan-job
     # Image tag
     tag: 0.0.8
-    # Image pull policy
-    pullPolicy: Always
 
 securityContext:
   allowPrivilegeEscalation: false
