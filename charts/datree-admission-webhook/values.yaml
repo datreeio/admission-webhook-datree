@@ -60,6 +60,14 @@ resources:
   requests:
     cpu: 1000m
     memory: 512Mi
+scanJob:
+  resources:
+    limits:
+      cpu: 1000m
+      memory: 512Mi
+    requests:
+      cpu: 500m
+      memory: 256Mi
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready

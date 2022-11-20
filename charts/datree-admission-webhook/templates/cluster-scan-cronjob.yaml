@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cluster-scan-job-service-account
+  namespace: datree
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-scan-job-role
+rules:
+  - apiGroups:
+      - "*"
+    resources:
+      - "*"
+    verbs:
+      - "get"
+      - "list"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-scan-job-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-scan-job-role
+subjects:
+  - kind: ServiceAccount
+    name: cluster-scan-job-service-account
+    namespace: datree
+---
+apiVersion: {{ include "datree.CronJob.apiVersion" . }}
+kind: CronJob
+metadata:
+  name: scan-cronjob
+  namespace: datree
+spec:
+  # get the current time, subtract 5 minutes, extract the minutes and inject it into the cron expression
+  # if helm installation was done at 13:35, the cron expression will be 30 * * * *, which means the job will run at 14:30, 15:30, 16:30, etc.
+  schedule: "{{ now | dateModify "-5m" | date "04" }} * * * *" # every hour, starting 55 minutes after helm installation
+  jobTemplate: {{ include "datree.scanJob" . | nindent 4 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: scan-job
+  namespace: datree
+  annotations:
+    "helm.sh/hook": post-install
+{{ include "datree.scanJob" . }}
