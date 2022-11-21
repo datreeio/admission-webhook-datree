@@ -22,7 +22,7 @@ import (
 var applyRequestNotAllowedJson string
 
 //go:embed test_fixtures/mockServerResponse.json
-var applyRequestNotAllowedMockedResponseBody []byte
+var getPrerunDataResponse []byte
 
 //go:embed test_fixtures/applyAllowedRequest.json
 var applyRequestAllowedJson string
@@ -33,48 +33,36 @@ var applyAllowedRequestFluxCDJson string
 //go:embed test_fixtures/applyAllowedRequestFluxCDNoLabels.json
 var applyAllowedRequestFluxCDJsonNoLabels string
 
-// can be deleted
 func TestHeaderValidation(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", nil)
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "text/html")
-	validationController := mockValidationController(httpClient.Response{
-		StatusCode: http.StatusBadRequest,
-		Body:       []byte("Content-Type header is not application/json"),
-	})
+	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
 	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "Content-Type header is not application/json")
 }
 
-// can be deleted
 func TestValidateHttpMethod(t *testing.T) {
 	request := httptest.NewRequest(http.MethodGet, "/validate", nil)
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	validationController := mockValidationController(httpClient.Response{
-		StatusCode: http.StatusMethodNotAllowed,
-		Body:       []byte("Method not allowed"),
-	})
+	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusMethodNotAllowed)
 	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "Method not allowed")
 }
 
-// can be deleted
 func TestValidateRequestBodyEmpty(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(""))
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	validationController := mockValidationController(httpClient.Response{
-		StatusCode: http.StatusBadRequest,
-		Body:       []byte("EOF"),
-	})
+	validationController := NewValidationController()
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -130,7 +118,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 
 	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
-		Body:       applyRequestNotAllowedMockedResponseBody,
+		Body:       getPrerunDataResponse,
 	})
 
 	validationController.Validate(responseRecorder, request)
@@ -149,7 +137,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 
 	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
-		Body:       applyRequestNotAllowedMockedResponseBody,
+		Body:       getPrerunDataResponse,
 	})
 	validationController.Validate(responseRecorder, request)
 
@@ -167,7 +155,7 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 
 	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
-		Body:       []byte("{\"kind\":\"AdmissionReview\",\"apiVersion\":\"admission.k8s.io/v1\",\"response\":{\"uid\":\"705ab4f5-6393-11e8-b7cc-42010a800002\",\"allowed\":true,\"status\":{\"metadata\":{},\"message\":\"We're good!\",\"code\":200},\"warnings\":[\"can't get current webhook version\"]}}\n"),
+		Body:       getPrerunDataResponse,
 	})
 
 	validationController.Validate(responseRecorder, request)
@@ -184,7 +172,7 @@ func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 
 	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
-		Body:       []byte("{\"kind\":\"AdmissionReview\",\"apiVersion\":\"admission.k8s.io/v1\",\"response\":{\"uid\":\"705ab4f5-6393-11e8-b7cc-42010a800002\",\"allowed\":true,\"status\":{\"metadata\":{},\"message\":\"We're good!\",\"code\":200},\"warnings\":[\"can't get current webhook version\"]}}\n"),
+		Body:       getPrerunDataResponse,
 	})
 	validationController.Validate(responseRecorder, request)
 
@@ -200,7 +188,7 @@ func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
 
 	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
-		Body:       []byte("{\"kind\":\"AdmissionReview\",\"apiVersion\":\"admission.k8s.io/v1\",\"response\":{\"uid\":\"705ab4f5-6393-11e8-b7cc-42010a800002\",\"allowed\":true,\"status\":{\"metadata\":{},\"message\":\"We're good!\",\"code\":200},\"warnings\":[\"can't get current webhook version\"]}}\n"),
+		Body:       getPrerunDataResponse,
 	})
 	validationController.Validate(responseRecorder, request)
 
