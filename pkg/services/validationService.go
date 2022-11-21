@@ -11,10 +11,10 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 
-	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
-
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
+
+	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 
