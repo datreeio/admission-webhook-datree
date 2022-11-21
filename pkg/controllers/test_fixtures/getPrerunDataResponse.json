@@ -1,0 +1,790 @@
+{
+  "defaultK8sVersion": "1.20.0",
+  "policiesJson": {
+    "apiVersion": "v1",
+    "customRules": null,
+    "policies": [
+      {
+        "name": "Default",
+        "isDefault": true,
+        "rules": [
+          {
+            "identifier": "CONTAINERS_MISSING_IMAGE_VALUE_VERSION",
+            "messageOnFailure": "Incorrect value for key `image` - specify an image version to avoid unpleasant \"version surprises\" in the future"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_MEMORY_REQUEST_KEY",
+            "messageOnFailure": "Missing property object `requests.memory` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_CPU_REQUEST_KEY",
+            "messageOnFailure": "Missing property object `requests.cpu` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_MEMORY_LIMIT_KEY",
+            "messageOnFailure": "Missing property object `limits.memory` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_CPU_LIMIT_KEY",
+            "messageOnFailure": "Missing property object `limits.cpu` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "INGRESS_INCORRECT_HOST_VALUE_PERMISSIVE",
+            "messageOnFailure": "Incorrect value for key `host` - specify host instead of using a wildcard character (\"*\")"
+          },
+          {
+            "identifier": "SERVICE_INCORRECT_TYPE_VALUE_NODEPORT",
+            "messageOnFailure": "Incorrect value for key `type` - `NodePort` will open a port on all nodes where it can be reached by the network external to the cluster"
+          },
+          {
+            "identifier": "CRONJOB_INVALID_SCHEDULE_VALUE",
+            "messageOnFailure": "Incorrect value for key `schedule` - the (cron) schedule expressions is not valid and, therefore, will not work as expected"
+          },
+          {
+            "identifier": "WORKLOAD_INVALID_LABELS_VALUE",
+            "messageOnFailure": "Incorrect value for key(s) under `labels` - the vales syntax is not valid so the Kubernetes engine will not accept it"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_RESTARTPOLICY_VALUE_ALWAYS",
+            "messageOnFailure": "Incorrect value for key `restartPolicy` - any other value than `Always` is not supported by this resource"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_LIVENESSPROBE_KEY",
+            "messageOnFailure": "Missing property object `livenessProbe` - add a properly configured livenessProbe to catch possible deadlocks"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_READINESSPROBE_KEY",
+            "messageOnFailure": "Missing property object `readinessProbe` - add a properly configured readinessProbe to notify kubelet your Pods are ready for traffic"
+          },
+          {
+            "identifier": "HPA_MISSING_MINREPLICAS_KEY",
+            "messageOnFailure": "Missing property object `minReplicas` - the value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_NAMESPACE_VALUE_DEFAULT",
+            "messageOnFailure": "Incorrect value for key `namespace` - use an explicit namespace instead of the default one (`default`)"
+          },
+          {
+            "identifier": "DEPLOYMENT_INCORRECT_REPLICAS_VALUE",
+            "messageOnFailure": "Incorrect value for key `replicas` - running 2 or more replicas will increase the availability of the service"
+          },
+          {
+            "identifier": "CRONJOB_MISSING_STARTINGDEADLINESECOND_KEY",
+            "messageOnFailure": "Missing property object `startingDeadlineSeconds` - set a time limit to the cron execution to allow killing it if exceeded"
+          },
+          {
+            "identifier": "K8S_DEPRECATED_APIVERSION_1.16",
+            "messageOnFailure": "Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.16)"
+          },
+          {
+            "identifier": "K8S_DEPRECATED_APIVERSION_1.17",
+            "messageOnFailure": "Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.17)"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_PRIVILEGED_VALUE_TRUE",
+            "messageOnFailure": "Incorrect value for key `privileged` - this mode will allow the container the same access as processes running on the host"
+          },
+          {
+            "identifier": "CRONJOB_MISSING_CONCURRENCYPOLICY_KEY",
+            "messageOnFailure": "Missing property object `concurrencyPolicy` - the behavior will be more deterministic if jobs won't run concurrently"
+          },
+          {
+            "identifier": "RESOURCE_MISSING_NAME",
+            "messageOnFailure": "Missing key `name` or `generateName` - one of them must be set to apply resource to a cluster"
+          }
+        ]
+      },
+      {
+        "name": "Argo",
+        "rules": [
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_FAILFAST_VALUE_FALSE",
+            "messageOnFailure": "Incorrect value for key `failFast` - value should be `true` to prevent DAG from running on all branches, regardless of the failed outcomes of the DAG branches"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_SERVICE_ACCOUNT_NAME_VALUE_DEFAULT",
+            "messageOnFailure": "Incorrect value for key `serviceAccountName` - when set to `default` container is exposed to possible attacks"
+          },
+          {
+            "identifier": "ARGO_CONFIGMAP_MISSING_PART_OF_LABEL_VALUE_ARGOCD",
+            "messageOnFailure": "Incorrect value for annotation `app.kubernetes.io/part-of` - value should be `argocd`, or ArgoCD won't recognize this resource"
+          },
+          {
+            "identifier": "ARGO_ROLLOUT_MISSING_PAUSE_DURATION",
+            "messageOnFailure": "Missing the key `duration` - prevent the rollout from waiting indefinitely for the pause condition"
+          },
+          {
+            "identifier": "ARGO_APP_PROJECT_INCORRECT_NAMESPACE_VALUE",
+            "messageOnFailure": "Incorrect value for property `namespace` - Application and AppProject have to be installed on the argocd namespace"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_RETRY_STRATEGY_VALUE_EMPTY",
+            "messageOnFailure": "Incorrect value for key `retryStrategy` - empty value (`{}`) can cause failed/errored steps to keep retrying, which can result in OOM issues"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_REVISION_HISTORY_LIMIT_VALUE_0",
+            "messageOnFailure": "Incorrect value for key `revisionHistoryLimit` - value above 0 is required to enable rolling back from a failed deployment"
+          },
+          {
+            "identifier": "ARGO_ROLLOUT_INCORRECT_SCALE_DOWN_DELAY_VALUE_BELOW_30",
+            "messageOnFailure": "Incorrect value for key `scaleDownDelaySeconds` - value should be at least 30 to prevent packets from being sent to a node that killed the pod"
+          },
+          {
+            "identifier": "ARGO_ROLLOUT_INCORRECT_PROGRESS_DEADLINE_ABORT_VALUE_FALSE",
+            "messageOnFailure": "Incorrect value for key `progressDeadlineAbort` - value should be `true` to prevent the rollout pod from retrying indefinitely"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_ENSURE_RETRY_ON_BOTH_ERROR_AND_TRANSIENT_ERROR",
+            "messageOnFailure": "Incorrect value for key `retryPolicy` - the expression should include retry on steps that failed either on transient or Argo controller errors"
+          }
+        ]
+      },
+      {
+        "name": "NSA",
+        "rules": [
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASUSER_VALUE_LOWUID",
+            "messageOnFailure": "Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_READONLYROOTFILESYSTEM_VALUE",
+            "messageOnFailure": "Incorrect value for key `readOnlyRootFilesystem` - set to 'true' to protect filesystem from potential attacks"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPATH",
+            "messageOnFailure": "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_KEY_ALLOWPRIVILEGEESCALATION",
+            "messageOnFailure": "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RESOURCES_VERBS_VALUE",
+            "messageOnFailure": "Incorrect value for key `resources` and/or `verbs` - allowing containers to run the exec command can be exploited by attackers"
+          },
+          {
+            "identifier": "CONTAINERS_INVALID_CAPABILITIES_VALUE",
+            "messageOnFailure": "Incorrect value for key `add` - refrain from using insecure capabilities to prevent access to sensitive components"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPORT",
+            "messageOnFailure": "Incorrect key `hostPort` - refrain from using this key to prevent insecurely exposing your workload"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASGROUP_VALUE_LOWGID",
+            "messageOnFailure": "Invalid value for key `runAsGroup` - must be greater than 999 to ensure container is running with non-root group membership"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASNONROOT_VALUE",
+            "messageOnFailure": "Invalid value for key `runAsNonRoot` - must be set to `true` to prevent unnecessary privileges"
+          },
+          {
+            "identifier": "SRVACC_INCORRECT_AUTOMOUNTSERVICEACCOUNTTOKEN_VALUE",
+            "messageOnFailure": "Invalid value for key `automountServiceAccountToken` - must be set to `false` to prevent granting unnecessary access to the service account"
+          }
+        ]
+      },
+      {
+        "name": "cdk8s",
+        "rules": [
+          {
+            "identifier": "CONTAINERS_MISSING_IMAGE_VALUE_VERSION",
+            "messageOnFailure": "Incorrect value for key `image` - specify an image version to avoid unpleasant \"version surprises\" in the future"
+          },
+          {
+            "identifier": "INGRESS_INCORRECT_HOST_VALUE_PERMISSIVE",
+            "messageOnFailure": "Incorrect value for key `host` - specify host instead of using a wildcard character (\"*\")"
+          },
+          {
+            "identifier": "CRONJOB_INVALID_SCHEDULE_VALUE",
+            "messageOnFailure": "Incorrect value for key `schedule` - the (cron) schedule expressions is not valid and, therefore, will not work as expected"
+          },
+          {
+            "identifier": "WORKLOAD_INVALID_LABELS_VALUE",
+            "messageOnFailure": "Incorrect value for key(s) under `labels` - the vales syntax is not valid so the Kubernetes engine will not accept it"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_RESTARTPOLICY_VALUE_ALWAYS",
+            "messageOnFailure": "Incorrect value for key `restartPolicy` - any other value than `Always` is not supported by this resource"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_NAMESPACE_VALUE_DEFAULT",
+            "messageOnFailure": "Incorrect value for key `namespace` - use an explicit namespace instead of the default one (`default`)"
+          },
+          {
+            "identifier": "DEPLOYMENT_INCORRECT_REPLICAS_VALUE",
+            "messageOnFailure": "Incorrect value for key `replicas` - running 2 or more replicas will increase the availability of the service"
+          },
+          {
+            "identifier": "K8S_INCORRECT_KIND_VALUE_POD",
+            "messageOnFailure": "Incorrect value for key `kind` - raw pod won't be rescheduled in the event of a node failure"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_READONLYROOTFILESYSTEM_VALUE",
+            "messageOnFailure": "Incorrect value for key `readOnlyRootFilesystem` - set to 'true' to protect filesystem from potential attacks"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPATH",
+            "messageOnFailure": "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_KEY_ALLOWPRIVILEGEESCALATION",
+            "messageOnFailure": "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPORT",
+            "messageOnFailure": "Incorrect key `hostPort` - refrain from using this key to prevent insecurely exposing your workload"
+          },
+          {
+            "identifier": "RESOURCE_MISSING_NAME",
+            "messageOnFailure": "Missing key `name` or `generateName` - one of them must be set to apply resource to a cluster"
+          }
+        ]
+      },
+      {
+        "name": "Secrets",
+        "rules": [
+          {
+            "identifier": "ALL_EXPOSED_SECRET_BITBUCKET",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_DATADOG",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GCP",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_AWS",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GITHUB",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GITLAB",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_TERRAFORM",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_HEROKU",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_JWT",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_LAUNCHDARKLY",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_NEWRELIC",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_NPM",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_OKTA",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_STRIPE",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_SUMOLOGIC",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_TWILIO",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_VAULT",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_PRIVATEKEY",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          }
+        ]
+      },
+      {
+        "name": "Strict",
+        "rules": [
+          {
+            "identifier": "CONTAINERS_MISSING_IMAGE_VALUE_VERSION",
+            "messageOnFailure": "Incorrect value for key `image` - specify an image version to avoid unpleasant \"version surprises\" in the future"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_MEMORY_REQUEST_KEY",
+            "messageOnFailure": "Missing property object `requests.memory` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_CPU_REQUEST_KEY",
+            "messageOnFailure": "Missing property object `requests.cpu` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_MEMORY_LIMIT_KEY",
+            "messageOnFailure": "Missing property object `limits.memory` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_CPU_LIMIT_KEY",
+            "messageOnFailure": "Missing property object `limits.cpu` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "INGRESS_INCORRECT_HOST_VALUE_PERMISSIVE",
+            "messageOnFailure": "Incorrect value for key `host` - specify host instead of using a wildcard character (\"*\")"
+          },
+          {
+            "identifier": "SERVICE_INCORRECT_TYPE_VALUE_NODEPORT",
+            "messageOnFailure": "Incorrect value for key `type` - `NodePort` will open a port on all nodes where it can be reached by the network external to the cluster"
+          },
+          {
+            "identifier": "CRONJOB_INVALID_SCHEDULE_VALUE",
+            "messageOnFailure": "Incorrect value for key `schedule` - the (cron) schedule expressions is not valid and, therefore, will not work as expected"
+          },
+          {
+            "identifier": "WORKLOAD_INVALID_LABELS_VALUE",
+            "messageOnFailure": "Incorrect value for key(s) under `labels` - the vales syntax is not valid so the Kubernetes engine will not accept it"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_RESTARTPOLICY_VALUE_ALWAYS",
+            "messageOnFailure": "Incorrect value for key `restartPolicy` - any other value than `Always` is not supported by this resource"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_LIVENESSPROBE_KEY",
+            "messageOnFailure": "Missing property object `livenessProbe` - add a properly configured livenessProbe to catch possible deadlocks"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_READINESSPROBE_KEY",
+            "messageOnFailure": "Missing property object `readinessProbe` - add a properly configured readinessProbe to notify kubelet your Pods are ready for traffic"
+          },
+          {
+            "identifier": "HPA_MISSING_MINREPLICAS_KEY",
+            "messageOnFailure": "Missing property object `minReplicas` - the value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "HPA_MISSING_MAXREPLICAS_KEY",
+            "messageOnFailure": "Missing property object `maxReplicas` - the value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_NAMESPACE_VALUE_DEFAULT",
+            "messageOnFailure": "Incorrect value for key `namespace` - use an explicit namespace instead of the default one (`default`)"
+          },
+          {
+            "identifier": "DEPLOYMENT_INCORRECT_REPLICAS_VALUE",
+            "messageOnFailure": "Incorrect value for key `replicas` - running 2 or more replicas will increase the availability of the service"
+          },
+          {
+            "identifier": "CRONJOB_MISSING_STARTINGDEADLINESECOND_KEY",
+            "messageOnFailure": "Missing property object `startingDeadlineSeconds` - set a time limit to the cron execution to allow killing it if exceeded"
+          },
+          {
+            "identifier": "K8S_DEPRECATED_APIVERSION_1.16",
+            "messageOnFailure": "Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.16)"
+          },
+          {
+            "identifier": "K8S_DEPRECATED_APIVERSION_1.17",
+            "messageOnFailure": "Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.17)"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_PRIVILEGED_VALUE_TRUE",
+            "messageOnFailure": "Incorrect value for key `privileged` - this mode will allow the container the same access as processes running on the host"
+          },
+          {
+            "identifier": "WORKLOAD_MISSING_LABEL_OWNER_VALUE",
+            "messageOnFailure": "Missing label object `owner` - add a proper owner label to know which person/team to ping when needed"
+          },
+          {
+            "identifier": "DEPLOYMENT_MISSING_LABEL_ENV_VALUE",
+            "messageOnFailure": "Missing label object `env` - add a proper environment description (e.g. \"prod\", \"testing\", etc.) to the Deployment config"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_IMAGE_VALUE_DIGEST",
+            "messageOnFailure": "Incorrect value for key `image` - add a digest tag (starts with `@sha256:`) to represent an immutable version of the image"
+          },
+          {
+            "identifier": "CRONJOB_MISSING_CONCURRENCYPOLICY_KEY",
+            "messageOnFailure": "Missing property object `concurrencyPolicy` - the behavior will be more deterministic if jobs won't run concurrently"
+          },
+          {
+            "identifier": "K8S_INCORRECT_KIND_VALUE_POD",
+            "messageOnFailure": "Incorrect value for key `kind` - raw pod won't be rescheduled in the event of a node failure"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_HOSTPID_VALUE_TRUE",
+            "messageOnFailure": "Incorrect value for key `hostPID` - running on the host's PID namespace enables access to sensitive information from processes running outside the container"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_HOSTIPC_VALUE_TRUE",
+            "messageOnFailure": "Incorrect value for key `hostIPC` - running on the host`s IPC namespace can be (maliciously) used to interact with other processes running outside the container"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_HOSTNETWORK_VALUE_TRUE",
+            "messageOnFailure": "Incorrect value for key `hostNetwork` - running on the host's network namespace can allow a compromised container to sniff network traffic"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASUSER_VALUE_LOWUID",
+            "messageOnFailure": "Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_PATH_VALUE_DOCKERSOCKET",
+            "messageOnFailure": "Incorrect value for key `path` - avoid mounting the docker.socket becasue it can allow container breakout"
+          },
+          {
+            "identifier": "CONFIGMAP_CVE2021_25742_INCORRECT_SNIPPET_ANNOTATIONS_VALUE",
+            "messageOnFailure": "Missing property object `allow-snippet-annotations` - set it to \"false\" to override default behaviour"
+          },
+          {
+            "identifier": "INGRESS_CVE2021_25742_INCORRECT_SERVER_SNIPPET_KEY",
+            "messageOnFailure": "Forbidden property object `server-snippet` - ingress-nginx custom snippets are not allowed"
+          },
+          {
+            "identifier": "CONTAINER_CVE2021_25741_INCORRECT_SUBPATH_KEY",
+            "messageOnFailure": "Forbidden property object `subPath` - malicious users can gain access to files & directories outside of the volume"
+          },
+          {
+            "identifier": "ENDPOINTSLICE_CVE2021_25373_INCORRECT_ADDRESSES_VALUE",
+            "messageOnFailure": "Incorrect value for key `addresses` - IP address is within vulnerable ranges (127.0.0.0/8 and 169.254.0.0/16)"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_FAILFAST_VALUE_FALSE",
+            "messageOnFailure": "Incorrect value for key `failFast` - value should be `true` to prevent DAG from running on all branches, regardless of the failed outcomes of the DAG branches"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_SERVICE_ACCOUNT_NAME_VALUE_DEFAULT",
+            "messageOnFailure": "Incorrect value for key `serviceAccountName` - when set to `default` container is exposed to possible attacks"
+          },
+          {
+            "identifier": "ARGO_CONFIGMAP_MISSING_PART_OF_LABEL_VALUE_ARGOCD",
+            "messageOnFailure": "Incorrect value for annotation `app.kubernetes.io/part-of` - value should be `argocd`, or ArgoCD won't recognize this resource"
+          },
+          {
+            "identifier": "ARGO_ROLLOUT_MISSING_PAUSE_DURATION",
+            "messageOnFailure": "Missing the key `duration` - prevent the rollout from waiting indefinitely for the pause condition"
+          },
+          {
+            "identifier": "ARGO_APP_PROJECT_INCORRECT_NAMESPACE_VALUE",
+            "messageOnFailure": "Incorrect value for property `namespace` - Application and AppProject have to be installed on the argocd namespace"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_RETRY_STRATEGY_VALUE_EMPTY",
+            "messageOnFailure": "Incorrect value for key `retryStrategy` - empty value (`{}`) can cause failed/errored steps to keep retrying, which can result in OOM issues"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_INCORRECT_REVISION_HISTORY_LIMIT_VALUE_0",
+            "messageOnFailure": "Incorrect value for key `revisionHistoryLimit` - value above 0 is required to enable rolling back from a failed deployment"
+          },
+          {
+            "identifier": "ARGO_ROLLOUT_INCORRECT_SCALE_DOWN_DELAY_VALUE_BELOW_30",
+            "messageOnFailure": "Incorrect value for key `scaleDownDelaySeconds` - value should be at least 30 to prevent packets from being sent to a node that killed the pod"
+          },
+          {
+            "identifier": "ARGO_ROLLOUT_INCORRECT_PROGRESS_DEADLINE_ABORT_VALUE_FALSE",
+            "messageOnFailure": "Incorrect value for key `progressDeadlineAbort` - value should be `true` to prevent the rollout pod from retrying indefinitely"
+          },
+          {
+            "identifier": "ARGO_WORKFLOW_ENSURE_RETRY_ON_BOTH_ERROR_AND_TRANSIENT_ERROR",
+            "messageOnFailure": "Incorrect value for key `retryPolicy` - the expression should include retry on steps that failed either on transient or Argo controller errors"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_READONLYROOTFILESYSTEM_VALUE",
+            "messageOnFailure": "Incorrect value for key `readOnlyRootFilesystem` - set to 'true' to protect filesystem from potential attacks"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPATH",
+            "messageOnFailure": "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_KEY_ALLOWPRIVILEGEESCALATION",
+            "messageOnFailure": "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RESOURCES_VERBS_VALUE",
+            "messageOnFailure": "Incorrect value for key `resources` and/or `verbs` - allowing containers to run the exec command can be exploited by attackers"
+          },
+          {
+            "identifier": "CONTAINERS_INVALID_CAPABILITIES_VALUE",
+            "messageOnFailure": "Incorrect value for key `add` - refrain from using insecure capabilities to prevent access to sensitive components"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPORT",
+            "messageOnFailure": "Incorrect key `hostPort` - refrain from using this key to prevent insecurely exposing your workload"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASGROUP_VALUE_LOWGID",
+            "messageOnFailure": "Invalid value for key `runAsGroup` - must be greater than 999 to ensure container is running with non-root group membership"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASNONROOT_VALUE",
+            "messageOnFailure": "Invalid value for key `runAsNonRoot` - must be set to `true` to prevent unnecessary privileges"
+          },
+          {
+            "identifier": "SRVACC_INCORRECT_AUTOMOUNTSERVICEACCOUNTTOKEN_VALUE",
+            "messageOnFailure": "Invalid value for key `automountServiceAccountToken` - must be set to `false` to prevent granting unnecessary access to the service account"
+          },
+          {
+            "identifier": "RESOURCE_MISSING_NAME",
+            "messageOnFailure": "Missing key `name` or `generateName` - one of them must be set to apply resource to a cluster"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_INITIALDELAYSECONDS_VALUE",
+            "messageOnFailure": "Incorrect value for key `initialDelaySeconds` - set explicitly to control the start time before a probe is initiated (min 0)"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_PERIODSECONDS_VALUE",
+            "messageOnFailure": "Incorrect value for key `periodSeconds` - set explicitly to control how often a probe is performed (min 1)"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_TIMEOUTSECONDS_VALUE",
+            "messageOnFailure": "Incorrect value for key `timeoutSeconds` - set explicitly to control when a probe times out (min 1)"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_SUCCESSTHRESHOLD_VALUE",
+            "messageOnFailure": "Incorrect value for key `successThreshold` - set explicitly to control when a probe is considered successful after having failed"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_FAILURETHRESHOLD_VALUE",
+            "messageOnFailure": "Incorrect value for key `failureThreshold` - set explicitly to control the number of retries after a probe fails (min 1)"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_PRESTOP_KEY",
+            "messageOnFailure": "Missing property object `preStop` - set to ensure graceful shutdown of the container"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_SECCOMP_PROFILE",
+            "messageOnFailure": "Incorrect value for key seccompProfile - set an explicit value to prevent malicious use of system calls within the container"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_BITBUCKET",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_DATADOG",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GCP",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_AWS",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GITHUB",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GITLAB",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_TERRAFORM",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_HEROKU",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_JWT",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_LAUNCHDARKLY",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_NEWRELIC",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_NPM",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_OKTA",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_STRIPE",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_SUMOLOGIC",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_TWILIO",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_VAULT",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_PRIVATEKEY",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          }
+        ]
+      },
+      {
+        "name": "Starter",
+        "rules": [
+          {
+            "identifier": "CONTAINERS_MISSING_IMAGE_VALUE_VERSION",
+            "messageOnFailure": "Incorrect value for key `image` - specify an image version to avoid unpleasant \"version surprises\" in the future"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_MEMORY_REQUEST_KEY",
+            "messageOnFailure": "Missing property object `requests.memory` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_MEMORY_LIMIT_KEY",
+            "messageOnFailure": "Missing property object `limits.memory` - value should be within the accepted boundaries recommended by the organization"
+          },
+          {
+            "identifier": "INGRESS_INCORRECT_HOST_VALUE_PERMISSIVE",
+            "messageOnFailure": "Incorrect value for key `host` - specify host instead of using a wildcard character (\"*\")"
+          },
+          {
+            "identifier": "CRONJOB_INVALID_SCHEDULE_VALUE",
+            "messageOnFailure": "Incorrect value for key `schedule` - the (cron) schedule expressions is not valid and, therefore, will not work as expected"
+          },
+          {
+            "identifier": "WORKLOAD_INVALID_LABELS_VALUE",
+            "messageOnFailure": "Incorrect value for key(s) under `labels` - the value's syntax is not valid so the Kubernetes engine will not accept it"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_RESTARTPOLICY_VALUE_ALWAYS",
+            "messageOnFailure": "Incorrect value for key `restartPolicy` - any other value than `Always` is not supported by this resource"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_LIVENESSPROBE_KEY",
+            "messageOnFailure": "Missing property object `livenessProbe` - add a properly configured livenessProbe to catch possible deadlocks"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_READINESSPROBE_KEY",
+            "messageOnFailure": "Missing property object `readinessProbe` - add a properly configured readinessProbe to notify kubelet your Pods are ready for traffic"
+          },
+          {
+            "identifier": "WORKLOAD_INCORRECT_NAMESPACE_VALUE_DEFAULT",
+            "messageOnFailure": "Incorrect value for key `namespace` - use an explicit namespace instead of the default one (`default`)"
+          },
+          {
+            "identifier": "DEPLOYMENT_INCORRECT_REPLICAS_VALUE",
+            "messageOnFailure": "Incorrect value for key `replicas` - running 2 or more replicas will increase the availability of the service"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_RUNASUSER_VALUE_LOWUID",
+            "messageOnFailure": "Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_READONLYROOTFILESYSTEM_VALUE",
+            "messageOnFailure": "Incorrect value for key `readOnlyRootFilesystem` - set to 'true' to protect filesystem from potential attacks"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPATH",
+            "messageOnFailure": "Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host"
+          },
+          {
+            "identifier": "CONTAINERS_MISSING_KEY_ALLOWPRIVILEGEESCALATION",
+            "messageOnFailure": "Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges"
+          },
+          {
+            "identifier": "CONTAINERS_INCORRECT_KEY_HOSTPORT",
+            "messageOnFailure": "Incorrect key `hostPort` - refrain from using this key to prevent insecurely exposing your workload"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_BITBUCKET",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_DATADOG",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GCP",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_AWS",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GITHUB",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_GITLAB",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_TERRAFORM",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_HEROKU",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_JWT",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_LAUNCHDARKLY",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_NEWRELIC",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_NPM",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_OKTA",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_STRIPE",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_SUMOLOGIC",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_TWILIO",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_VAULT",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          },
+          {
+            "identifier": "ALL_EXPOSED_SECRET_PRIVATEKEY",
+            "messageOnFailure": "Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen"
+          }
+        ]
+      }
+    ]
+  },
+  "registrationUrl": "https://app.staging.datree.io",
+  "promptRegistrationURL": "https://app.staging.datree.io",
+  "isPolicyAsCodeMode": false,
+  "defaultRulesYaml": "# for autocompletion in VS Code\n# yaml-language-server: $schema=./defaultRulesSchema.json\napiVersion: v1\naliases:\n  - &standardKinds\n    properties:\n      kind:\n        enum:\n          - Deployment\n          - Pod\n          - DaemonSet\n          - StatefulSet\n          - ReplicaSet\n          - CronJob\n          - Job\n  - &notKindSecret\n    properties:\n      kind:\n        not:\n          enum:\n            - Secret\n  # The following alias is used to prohibit a string from matching a given regex anywhere in the manifest\n  # make sure to use the $ref \"#/definitions/regexes\" in the schema definition to populate the regexes variable\n  - &recursiveDontAllowValue\n    type: object\n    additionalProperties:\n      if:\n        type: object\n      then:\n        \"$ref\": \"#\"\n      else:\n        if:\n          type: array\n        then:\n          items:\n            if:\n              type: object\n            then:\n              \"$ref\": \"#\"\n            else:\n              if:\n                type: string\n              then:\n                not: \n                  \"$ref\": \"#/definitions/regexes\"\n        else:\n          if:\n            type: string\n          then:\n            not:\n              \"$ref\": \"#/definitions/regexes\"\nrules:\n  - id: 1\n    name: Ensure each container image has a pinned (tag) version\n    uniqueName: CONTAINERS_MISSING_IMAGE_VALUE_VERSION\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-image-pinned-version\"\n    messageOnFailure: Incorrect value for key `image` - specify an image version to avoid unpleasant \"version surprises\" in the future\n    category: Containers\n    schema:\n      definitions:\n        imageValuePattern:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        image:\n                          # catch all strings with image tag version\n                          pattern: \"\\\\@sha.*|:(\\\\w|\\\\.|\\\\-)+$\"\n                          not:\n                            # ignore `latest` as image tag version\n                            pattern: \".*:(latest|LATEST)$\"\n      allOf:\n        - $ref: \"#/definitions/imageValuePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 2\n    name: Ensure each container has a configured memory request\n    uniqueName: CONTAINERS_MISSING_MEMORY_REQUEST_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-memory-request\"\n    messageOnFailure: \"Missing property object `requests.memory` - value should be within the accepted boundaries recommended by the organization\"\n    category: Containers\n    schema:\n      definitions:\n        memoryRequestPattern:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        resources:\n                          properties:\n                            requests:\n                              type: object\n                              properties:\n                                memory:\n                                  type:\n                                    - string\n                                    - number\n                              required:\n                                - memory\n                          required:\n                            - requests\n                      required:\n                        - resources\n      allOf:\n        - $ref: \"#/definitions/memoryRequestPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 3\n    name: Ensure each container has a configured CPU request\n    uniqueName: CONTAINERS_MISSING_CPU_REQUEST_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-cpu-request\"\n    messageOnFailure: \"Missing property object `requests.cpu` - value should be within the accepted boundaries recommended by the organization\"\n    category: Containers\n    schema:\n      definitions:\n        cpuRequestPattern:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        resources:\n                          properties:\n                            requests:\n                              type: object\n                              properties:\n                                cpu:\n                                  type:\n                                    - string\n                                    - number\n                              required:\n                                - cpu\n                          required:\n                            - requests\n                      required:\n                        - resources\n      allOf:\n        - $ref: \"#/definitions/cpuRequestPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 4\n    name: Ensure each container has a configured memory limit\n    uniqueName: CONTAINERS_MISSING_MEMORY_LIMIT_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-memory-limit\"\n    messageOnFailure: \"Missing property object `limits.memory` - value should be within the accepted boundaries recommended by the organization\"\n    category: Containers\n    schema:\n      definitions:\n        memoryLimitPattern:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        resources:\n                          properties:\n                            limits:\n                              type: object\n                              properties:\n                                memory:\n                                  type:\n                                    - string\n                                    - number\n                              required:\n                                - memory\n                          required:\n                            - limits\n                      required:\n                        - resources\n      allOf:\n        - $ref: \"#/definitions/memoryLimitPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 5\n    name: Ensure each container has a configured CPU limit\n    uniqueName: CONTAINERS_MISSING_CPU_LIMIT_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-cpu-limit\"\n    messageOnFailure: \"Missing property object `limits.cpu` - value should be within the accepted boundaries recommended by the organization\"\n    category: Containers\n    schema:\n      definitions:\n        cpuLimitPattern:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        resources:\n                          properties:\n                            limits:\n                              type: object\n                              properties:\n                                cpu:\n                                  type:\n                                    - string\n                                    - number\n                              required:\n                                - cpu\n                          required:\n                            - limits\n                      required:\n                        - resources\n      allOf:\n        - $ref: \"#/definitions/cpuLimitPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 6\n    name: \"Prevent Ingress from forwarding all traffic to a single container\"\n    uniqueName: \"INGRESS_INCORRECT_HOST_VALUE_PERMISSIVE\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-ingress-forwarding-traffic-to-single-container\"\n    messageOnFailure: 'Incorrect value for key `host` - specify host instead of using a wildcard character (\"*\")'\n    category: Networking\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Ingress\n      then:\n        properties:\n          spec:\n            properties:\n              rules:\n                type: array\n                items:\n                  properties:\n                    host:\n                      type: string\n                      not:\n                        enum:\n                          - \"*\"\n  - id: 7\n    name: Prevent Service from exposing node port\n    uniqueName: SERVICE_INCORRECT_TYPE_VALUE_NODEPORT\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-node-port\"\n    messageOnFailure: \"Incorrect value for key `type` - `NodePort` will open a port on all nodes where it can be reached by the network external to the cluster\"\n    category: Networking\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Service\n      then:\n        properties:\n          spec:\n            properties:\n              type:\n                type: string\n                not:\n                  enum:\n                    - \"NodePort\"\n  - id: 8\n    name: Ensure CronJob scheduler is valid\n    uniqueName: CRONJOB_INVALID_SCHEDULE_VALUE\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-cronjob-scheduler-valid\"\n    messageOnFailure: \"Incorrect value for key `schedule` - the (cron) schedule expressions is not valid and, therefore, will not work as expected\"\n    category: CronJob\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - \"CronJob\"\n      then:\n        properties:\n          spec:\n            properties:\n              schedule:\n                # use cases to test the regex - https://regex101.com/r/K4d7Ju/1\n                pattern: (^((\\*\\/)?([0-5]?[0-9])((\\,|\\-|\\/)([0-5]?[0-9]))*|\\*)\\s+((\\*\\/)?((2[0-3]|1[0-9]|[0-9]|00))((\\,|\\-|\\/)(2[0-3]|1[0-9]|[0-9]|00))*|\\*)\\s+((\\*\\/)?([1-9]|[12][0-9]|3[01])((\\,|\\-|\\/)([1-9]|[12][0-9]|3[01]))*|\\*)\\s+((\\*\\/)?([1-9]|1[0-2])((\\,|\\-|\\/)([1-9]|1[0-2]))*|\\*|(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|des))\\s+((\\*\\/)?[0-6]((\\,|\\-|\\/)[0-6])*|\\*|00|(sun|mon|tue|wed|thu|fri|sat))\\s*$)|@(annually|yearly|monthly|weekly|daily|hourly|reboot)\n  - id: 9\n    name: Ensure workload has valid label values\n    uniqueName: WORKLOAD_INVALID_LABELS_VALUE\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-labels-value-valid\"\n    messageOnFailure: \"Incorrect value for key(s) under `labels` - the value's syntax is not valid so the Kubernetes engine will not accept it\"\n    category: Workload\n    schema:\n      if: *standardKinds\n      then:\n        properties:\n          metadata:\n            properties:\n              labels:\n                patternProperties:\n                  ^.*$:\n                    format: hostname\n                additionalProperties: false\n  - id: 10\n    name: \"Ensure deployment-like resource is using a valid restart policy\"\n    uniqueName: \"WORKLOAD_INCORRECT_RESTARTPOLICY_VALUE_ALWAYS\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-valid-restart-policy\"\n    messageOnFailure: \"Incorrect value for key `restartPolicy` - any other value than `Always` is not supported by this resource\"\n    category: Workload\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Deployment\n              - ReplicaSet\n              - DaemonSet\n              - ReplicationController\n      then:\n        properties:\n          spec:\n            properties:\n              template:\n                properties:\n                  spec:\n                    properties:\n                      restartPolicy:\n                        enum:\n                          - \"Always\"\n  - id: 11\n    name: Ensure each container has a configured liveness probe\n    uniqueName: CONTAINERS_MISSING_LIVENESSPROBE_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-liveness-probe\"\n    messageOnFailure: \"Missing property object `livenessProbe` - add a properly configured livenessProbe to catch possible deadlocks\"\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      required:\n                        - livenessProbe\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 12\n    name: Ensure each container has a configured readiness probe\n    uniqueName: CONTAINERS_MISSING_READINESSPROBE_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-readiness-probe\"\n    messageOnFailure: \"Missing property object `readinessProbe` - add a properly configured readinessProbe to notify kubelet your Pods are ready for traffic\"\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      required:\n                        - readinessProbe\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 13\n    name: Ensure HPA has minimum replicas configured\n    uniqueName: HPA_MISSING_MINREPLICAS_KEY\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-hpa-minimum-replicas\"\n    messageOnFailure: \"Missing property object `minReplicas` - the value should be within the accepted boundaries recommended by the organization\"\n    category: Other\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - HorizontalPodAutoscaler\n      then:\n        properties:\n          spec:\n            required:\n              - minReplicas\n  - id: 14\n    name: Ensure HPA has maximum replicas configured\n    uniqueName: HPA_MISSING_MAXREPLICAS_KEY\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/ensure-hpa-maximum-replicas\"\n    messageOnFailure: \"Missing property object `maxReplicas` - the value should be within the accepted boundaries recommended by the organization\"\n    category: Other\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - HorizontalPodAutoscaler\n      then:\n        properties:\n          spec:\n            required:\n              - maxReplicas\n  - id: 15\n    name: Prevent workload from using the default namespace\n    uniqueName: WORKLOAD_INCORRECT_NAMESPACE_VALUE_DEFAULT\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-deafult-namespce\"\n    messageOnFailure: Incorrect value for key `namespace` - use an explicit namespace instead of the default one (`default`)\n    category: Workload\n    schema:\n      if: *standardKinds\n      then:\n        properties:\n          metadata:\n            properties:\n              namespace:\n                not:\n                  enum:\n                    - \"default\"\n  - id: 16\n    name: \"Ensure Deployment has more than one replica configured\"\n    uniqueName: \"DEPLOYMENT_INCORRECT_REPLICAS_VALUE\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-minimum-two-replicas\"\n    messageOnFailure: \"Incorrect value for key `replicas` - running 2 or more replicas will increase the availability of the service\"\n    category: Workload\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Deployment\n      then:\n        properties:\n          spec:\n            properties:\n              replicas:\n                minimum: 2\n  - id: 17\n    name: \"Ensure CronJob has a configured deadline\"\n    uniqueName: \"CRONJOB_MISSING_STARTINGDEADLINESECOND_KEY\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/ensure-cronjob-deadline\"\n    messageOnFailure: \"Missing property object `startingDeadlineSeconds` - set a time limit to the cron execution to allow killing it if exceeded\"\n    category: CronJob\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - CronJob\n      then:\n        properties:\n          spec:\n            properties:\n              startingDeadlineSeconds:\n                type: number\n            required:\n              - startingDeadlineSeconds\n  - id: 18\n    name: \"Prevent deprecated APIs in Kubernetes v1.16\"\n    uniqueName: \"K8S_DEPRECATED_APIVERSION_1.16\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-deprecated-k8s-api-116\"\n    messageOnFailure: \"Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.16)\"\n    category: Deprecation\n    schema:\n      properties:\n        apiVersion:\n          type: string\n          not:\n            enum:\n              - \"extensions/v1beta1\"\n              - \"apps/v1beta1\"\n              - \"apps/v1beta2\"\n  - id: 19\n    name: \"Prevent deprecated APIs in Kubernetes v1.17\"\n    uniqueName: \"K8S_DEPRECATED_APIVERSION_1.17\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-deprecated-k8s-api-117\"\n    messageOnFailure: \"Incorrect value for key `apiVersion` - the version you are trying to use is not supported by the Kubernetes cluster version (>=1.17)\"\n    category: Deprecation\n    schema:\n      properties:\n        apiVersion:\n          type: string\n          not:\n            enum:\n              - \"kubeadm.k8s.io/v1beta1\"\n              - \"rbac.authorization.k8s.io/v1alpha1\"\n              - \"rbac.authorization.k8s.io/v1beta1\"\n  - id: 20\n    name: \"Prevent containers from having root access capabilities\"\n    uniqueName: \"CONTAINERS_INCORRECT_PRIVILEGED_VALUE_TRUE\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-privileged-containers\"\n    messageOnFailure: \"Incorrect value for key `privileged` - this mode will allow the container the same access as processes running on the host\"\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        securityContext:\n                          properties:\n                            privileged:\n                              not:\n                                enum:\n                                  - true\n                                  - \"true\"\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 21\n    name: Ensure workload has a configured `owner` label\n    uniqueName: WORKLOAD_MISSING_LABEL_OWNER_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/ensure-owner-label\"\n    messageOnFailure: \"Missing label object `owner` - add a proper owner label to know which person/team to ping when needed\"\n    category: Workload\n    schema:\n      if: *standardKinds\n      then:\n        properties:\n          metadata:\n            properties:\n              labels:\n                required:\n                  - owner\n  - id: 22\n    name: Ensure Deployment has a configured `env` label\n    uniqueName: DEPLOYMENT_MISSING_LABEL_ENV_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/ensure-env-label\"\n    messageOnFailure: 'Missing label object `env` - add a proper environment description (e.g. \"prod\", \"testing\", etc.) to the Deployment config'\n    category: Workload\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Deployment\n      then:\n        properties:\n          metadata:\n            properties:\n              labels:\n                required:\n                  - env\n            required:\n              - labels\n        required:\n          - metadata\n  - id: 23\n    name: Ensure each container image has a digest tag\n    uniqueName: CONTAINERS_MISSING_IMAGE_VALUE_DIGEST\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/ensure-digest-tag\"\n    messageOnFailure: \"Incorrect value for key `image` - add a digest tag (starts with `@sha256:`) to represent an immutable version of the image\"\n    category: Containers\n    schema:\n      definitions:\n        imageValuePattern:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        image:\n                          pattern: .*\\@sha256\\:\\S{64}$\n      allOf:\n        - $ref: \"#/definitions/imageValuePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 24\n    name: \"Prevent CronJob from executing jobs concurrently\"\n    uniqueName: \"CRONJOB_MISSING_CONCURRENCYPOLICY_KEY\"\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/prevent-cronjob-concurrency\"\n    messageOnFailure: Missing property object `concurrencyPolicy` - the behavior will be more deterministic if jobs won't run concurrently\n    category: CronJob\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - CronJob\n      then:\n        properties:\n          spec:\n            properties:\n              concurrencyPolicy:\n                enum:\n                  - \"Forbid\"\n                  - \"Replace\"\n            required:\n              - concurrencyPolicy\n  - id: 25\n    name: \"Prevent deploying naked pods\"\n    uniqueName: \"K8S_INCORRECT_KIND_VALUE_POD\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/prevent-naked-pods\"\n    messageOnFailure: Incorrect value for key `kind` - raw pod won't be rescheduled in the event of a node failure\n    category: Other\n    schema:\n      properties:\n        kind:\n          type: string\n          not:\n            enum:\n              - \"Pod\"\n  - id: 26\n    name: Prevent containers from sharing the host's PID namespace\n    uniqueName: \"CONTAINERS_INCORRECT_HOSTPID_VALUE_TRUE\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/prevent-using-host-pid\"\n    messageOnFailure: Incorrect value for key `hostPID` - running on the host's PID namespace enables access to sensitive information from processes running outside the container\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  hostPID:\n                    not:\n                      enum:\n                        - true\n                        - \"true\"\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 27\n    name: \"Prevent containers from sharing the host`s IPC namespace\"\n    uniqueName: \"CONTAINERS_INCORRECT_HOSTIPC_VALUE_TRUE\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/prevent-using-host-ipc\"\n    messageOnFailure: \"Incorrect value for key `hostIPC` - running on the host`s IPC namespace can be (maliciously) used to interact with other processes running outside the container\"\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  hostIPC:\n                    not:\n                      enum:\n                        - true\n                        - \"true\"\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 28\n    name: Prevent containers from sharing the host's network namespace\n    uniqueName: \"CONTAINERS_INCORRECT_HOSTNETWORK_VALUE_TRUE\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/prevent-using-host-network\"\n    messageOnFailure: Incorrect value for key `hostNetwork` - running on the host's network namespace can allow a compromised container to sniff network traffic\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  hostNetwork:\n                    not:\n                      enum:\n                        - true\n                        - \"true\"\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 29\n    name: \"Prevent containers from accessing host files by using high UIDs\"\n    uniqueName: \"CONTAINERS_INCORRECT_RUNASUSER_VALUE_LOWUID\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/prevent-uid-conflicts\"\n    messageOnFailure: \"Incorrect value for key `runAsUser` - value should be above 9999 to reduce the likelihood that the UID is already taken\"\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        securityContext:\n                          properties:\n                            runAsUser:\n                              minimum: 10000\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 30\n    name: \"Prevent containers from mounting Docker socket\"\n    uniqueName: \"CONTAINERS_INCORRECT_PATH_VALUE_DOCKERSOCKET\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/prevent-mounting-docker-socket\"\n    messageOnFailure: \"Incorrect value for key `path` - avoid mounting the docker.socket becasue it can allow container breakout\"\n    category: Containers\n    schema:\n      definitions:\n        specContainers:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      properties:\n                        volumeMounts:\n                          type: array\n                          items:\n                            properties:\n                              mountPath:\n                                not:\n                                  enum:\n                                    - \"/var/run/docker.sock\"\n        specVolumes:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  volumes:\n                    type: array\n                    items:\n                      properties:\n                        hostPath:\n                          properties:\n                            path:\n                              not:\n                                enum:\n                                  - \"/var/run/docker.sock\"\n      allOf:\n        - $ref: \"#/definitions/specContainers\"\n        - $ref: \"#/definitions/specVolumes\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 31\n    name: \"Prevent ConfigMap security vulnerability (CVE-2021-25742)\"\n    uniqueName: \"CONFIGMAP_CVE2021_25742_INCORRECT_SNIPPET_ANNOTATIONS_VALUE\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-configmap-security-vulnerability-cve-2021-25742\"\n    messageOnFailure: Missing property object `allow-snippet-annotations` - set it to \"false\" to override default behaviour\n    category: Security\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - ConfigMap\n          metadata:\n            anyOf:\n              - properties:\n                  name:\n                    enum:\n                      - nginx-config\n                      - nginx-conf\n                      - ingress-nginx-controller\n                required:\n                  - name\n              - properties:\n                  namespace:\n                    enum:\n                      - ingress-nginx\n                      - nginx-ingress\n                required:\n                  - namespace\n      then:\n        properties:\n          data:\n            properties:\n              allow-snippet-annotations:\n                enum:\n                  - \"false\"\n            required:\n              - allow-snippet-annotations\n        required:\n          - data\n  - id: 32\n    name: \"Prevent Ingress security vulnerability (CVE-2021-25742)\"\n    uniqueName: \"INGRESS_CVE2021_25742_INCORRECT_SERVER_SNIPPET_KEY\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-ingress-security-vulnerability-cve-2021-25742\"\n    messageOnFailure: Forbidden property object `server-snippet` - ingress-nginx custom snippets are not allowed\n    category: Security\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Ingress\n      then:\n        properties:\n          metadata:\n            properties:\n              annotations:\n                not:\n                  propertyNames:\n                    pattern: ^.*server-snippet$\n  - id: 33\n    name: \"Prevent container security vulnerability (CVE-2021-25741)\"\n    uniqueName: \"CONTAINER_CVE2021_25741_INCORRECT_SUBPATH_KEY\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-container-security-vulnerability-cve-2021-25741\"\n    messageOnFailure: Forbidden property object `subPath` - malicious users can gain access to files & directories outside of the volume\n    category: Security\n    schema:\n      definitions:\n        subPathPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      volumeMounts:\n                        type: array\n                        items:\n                          propertyNames:\n                            not:\n                              pattern: ^subPath$\n      allOf:\n        - $ref: \"#/definitions/subPathPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 34\n    name: \"Prevent EndpointSlice security vulnerability (CVE-2021-25737)\"\n    uniqueName: \"ENDPOINTSLICE_CVE2021_25373_INCORRECT_ADDRESSES_VALUE\"\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-endpointslice-validation-from-enabling-host-network-hijack-cve-2021-25737\"\n    messageOnFailure: Incorrect value for key `addresses` - IP address is within vulnerable ranges (127.0.0.0/8 and 169.254.0.0/16)\n    category: Security\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - EndpointSlice\n      then:\n        properties:\n          endpoints:\n            type: array\n            items:\n              properties:\n                addresses:\n                  type: array\n                  items:\n                    not:\n                      anyOf:\n                        - pattern: ^(169\\.254\\.)\n                        - pattern: ^(127\\.)\n  - id: 35\n    name: \"Ensure Workflow DAG fail-fast on node failure\"\n    uniqueName: \"ARGO_WORKFLOW_INCORRECT_FAILFAST_VALUE_FALSE\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-workflow-dag-fail-fast-on-node-failure\n    messageOnFailure: Incorrect value for key `failFast` - value should be `true` to prevent DAG from running on all branches, regardless of the failed outcomes of the DAG branches\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Workflow\n          spec:\n            properties:\n              templates:\n                type: array\n                items:\n                  properties:\n                    dag:\n                      properties:\n                        failFast:\n                          required:\n                            - failFast\n      then:\n        properties:\n          spec:\n            properties:\n              templates:\n                type: array\n                items:\n                  properties:\n                    dag:\n                      properties:\n                        failFast:\n                          const: true\n  - id: 36\n    name: \"Prevent Workflow pods from using the default service account\"\n    uniqueName: \"ARGO_WORKFLOW_INCORRECT_SERVICE_ACCOUNT_NAME_VALUE_DEFAULT\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/prevent-workflow-pods-from-using-the-default-service-account\n    messageOnFailure: Incorrect value for key `serviceAccountName` - when set to `default` container is exposed to possible attacks\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - WorkflowTemplate\n              - Workflow\n      then:\n        properties:\n          spec:\n            properties:\n              serviceAccountName:\n                type: string\n                not:\n                  const: default\n            required:\n              - serviceAccountName\n  - id: 37\n    name: \"Ensure ConfigMap is recognized by ArgoCD\"\n    uniqueName: \"ARGO_CONFIGMAP_MISSING_PART_OF_LABEL_VALUE_ARGOCD\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-configmap-is-recognized-by-argocd\n    messageOnFailure: Incorrect value for annotation `app.kubernetes.io/part-of` - value should be `argocd`, or ArgoCD won't recognize this resource\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - ConfigMap\n          metadata:\n            properties:\n              name:\n                enum:\n                  - argocd-tls-certs-cm\n                  - argocd-rbac-cm\n                  - argocd-ssh-known-hosts-cm\n                  - argocd-cmd-params-cm\n                  - argocd-cm\n      then:\n        properties:\n          metadata:\n            properties:\n              labels:\n                properties:\n                  app.kubernetes.io/part-of:\n                    type: string\n                    const: argocd\n                required:\n                  - app.kubernetes.io/part-of\n  - id: 38\n    name: \"Ensure Rollout pause step has a configured duration\"\n    uniqueName: \"ARGO_ROLLOUT_MISSING_PAUSE_DURATION\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-rollout-pause-step-has-a-configured-duration\n    messageOnFailure: Missing the key `duration` - prevent the rollout from waiting indefinitely for the pause condition\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Rollout\n      then:\n        properties:\n          spec:\n            properties:\n              strategy:\n                properties:\n                  canary:\n                    type: object\n                    properties:\n                      steps:\n                        type: array\n                        items:\n                          properties:\n                            pause:\n                              type: object\n                              properties:\n                                duration:\n                                  type: string\n                              required:\n                                - duration\n  - id: 39\n    name: \"Ensure Application and AppProject are part of the argocd namespace\"\n    uniqueName: \"ARGO_APP_PROJECT_INCORRECT_NAMESPACE_VALUE\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-application-and-appproject-are-part-of-the-argocd-namespace\n    messageOnFailure: Incorrect value for property `namespace` - Application and AppProject have to be installed on the argocd namespace\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Application\n              - AppProject\n      then:\n        properties:\n          metadata:\n            properties:\n              namespace:\n                type: string\n                const: argocd\n            required:\n              - namespace\n  - id: 40\n    name: \"Prevent Workflow from having an empty retry strategy\"\n    uniqueName: \"ARGO_WORKFLOW_INCORRECT_RETRY_STRATEGY_VALUE_EMPTY\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/prevent-workflow-from-having-an-empty-retry-strategy\n    messageOnFailure: Incorrect value for key `retryStrategy` - empty value (`{}`) can cause failed/errored steps to keep retrying, which can result in OOM issues\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Workflow\n      then:\n        properties:\n          spec:\n            properties:\n              templates:\n                items:\n                  properties:\n                    retryStrategy:\n                      type: object\n                      minProperties: 1\n  - id: 41\n    name: \"Ensure Rollout has revision history set\"\n    uniqueName: \"ARGO_WORKFLOW_INCORRECT_REVISION_HISTORY_LIMIT_VALUE_0\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-rollout-has-revision-history-set\n    messageOnFailure: Incorrect value for key `revisionHistoryLimit` - value above 0 is required to enable rolling back from a failed deployment\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Rollout\n      then:\n        properties:\n          spec:\n            properties:\n              revisionHistoryLimit:\n                minimum: 1\n            required:\n              - revisionHistoryLimit\n  - id: 42\n    name: \"Ensure Rollout allows broadcasting IP table changes\"\n    uniqueName: \"ARGO_ROLLOUT_INCORRECT_SCALE_DOWN_DELAY_VALUE_BELOW_30\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-rollout-allows-broadcasting-ip-table-changes\n    messageOnFailure: Incorrect value for key `scaleDownDelaySeconds` - value should be at least 30 to prevent packets from being sent to a node that killed the pod\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Rollout\n      then:\n        properties:\n          spec:\n            properties:\n              strategy:\n                properties:\n                  blueGreen:\n                    type: object\n                    properties:\n                      scaleDownDelaySeconds:\n                        type: integer\n                        minimum: 30\n                    required:\n                      - scaleDownDelaySeconds\n  - id: 43\n    name: \"Ensure Rollout that is marked as degraded scales down ReplicaSet\"\n    uniqueName: \"ARGO_ROLLOUT_INCORRECT_PROGRESS_DEADLINE_ABORT_VALUE_FALSE\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-rollout-that-is-marked-as-degraded-scales-down-replicaset\n    messageOnFailure: Incorrect value for key `progressDeadlineAbort` - value should be `true` to prevent the rollout pod from retrying indefinitely\n    category: Argo\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Rollout\n          spec:\n            properties:\n              allOf:\n                properties:\n                  progressDeadlineSeconds:\n                    type: integer\n      then:\n        properties:\n          spec:\n            properties:\n              progressDeadlineAbort:\n                const: true\n            required:\n              - progressDeadlineAbort\n  - id: 44\n    name: Ensure Workflow retry policy catches relevant errors only\n    uniqueName: \"ARGO_WORKFLOW_ENSURE_RETRY_ON_BOTH_ERROR_AND_TRANSIENT_ERROR\"\n    enabledByDefault: false\n    documentationUrl: https://hub.datree.io/built-in-rules/ensure-workflow-retry-policy-catches-relevant-errors-only\n    messageOnFailure: Incorrect value for key `retryPolicy` - the expression should include retry on steps that failed either on transient or Argo controller errors\n    category: Argo\n    schema:\n      if:\n        allOf:\n          - properties:\n              kind:\n                enum:\n                  - Workflow\n          - properties:\n              spec:\n                properties:\n                  templates:\n                    type: array\n                    contains:\n                      properties:\n                        retryStrategy:\n                          properties:\n                            retryPolicy:\n                              const: Always\n      then:\n        properties:\n          spec:\n            properties:\n              templates:\n                type: array\n                contains:\n                  properties:\n                    retryStrategy:\n                      properties:\n                        retryPolicy:\n                          const: Always\n                        expression:\n                          const: lastRetry.status == \"Error\" or (lastRetry.status == \"Failed\" and asInt(lastRetry.exitCode) not in [0])\n                      required:\n                        - retryPolicy\n                        - expression\n  - id: 45\n    name: Ensure each container has a read-only root filesystem\n    uniqueName: CONTAINERS_INCORRECT_READONLYROOTFILESYSTEM_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-read-only-filesystem\"\n    messageOnFailure: Incorrect value for key `readOnlyRootFilesystem` - set to 'true' to protect filesystem from potential attacks\n    category: NSA\n    schema:\n      definitions:\n        containerSecurityPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      securityContext:\n                        properties:\n                          readOnlyRootFilesystem:\n                            const: true\n                        required:\n                          - readOnlyRootFilesystem\n                    required:\n                      - securityContext\n      allOf:\n        - $ref: \"#/definitions/containerSecurityPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 46\n    name: Prevent containers from accessing underlying host\n    uniqueName: CONTAINERS_INCORRECT_KEY_HOSTPATH\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-accessing-underlying-host\"\n    messageOnFailure: Invalid key `hostPath` - refrain from using this mount to prevent an attack on the underlying host\n    category: NSA\n    schema:\n      definitions:\n        specVolumePattern:\n          properties:\n            spec:\n              properties:\n                volumes:\n                  type: array\n                  items:\n                    not:\n                      required:\n                        - hostPath\n      allOf:\n        - $ref: \"#/definitions/specVolumePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 47\n    name: Prevent containers from escalating privileges\n    uniqueName: CONTAINERS_MISSING_KEY_ALLOWPRIVILEGEESCALATION\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-escalating-privileges\"\n    messageOnFailure: Missing key `allowPrivilegeEscalation` - set to false to prevent attackers from exploiting escalated container privileges\n    category: NSA\n    schema:\n      definitions:\n        specContainerPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      securityContext:\n                        properties:\n                          allowPrivilegeEscalation:\n                            const: false\n                        required:\n                          - allowPrivilegeEscalation\n                    required:\n                      - securityContext\n      allOf:\n        - $ref: \"#/definitions/specContainerPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 48\n    name: Prevent containers from allowing command execution\n    uniqueName: CONTAINERS_INCORRECT_RESOURCES_VERBS_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-allowing-command-execution\"\n    messageOnFailure: \"Incorrect value for key `resources` and/or `verbs` - allowing containers to run the exec command can be exploited by attackers\"\n    category: NSA\n    schema:\n      if:\n        properties:\n          kind:\n            enum:\n              - Role\n              - ClusterRole\n      then:\n        properties:\n          rules:\n            type: array\n            items:\n              properties:\n                resources:\n                  type: array\n                  not:\n                    items:\n                      enum:\n                        - \"*\"\n                        - \"pods/exec\"\n                verbs:\n                  type: array\n                  not:\n                    items:\n                      enum:\n                        - \"create\"\n                        - \"*\"\n  - id: 49\n    name: Prevent containers from having insecure capabilities\n    uniqueName: CONTAINERS_INVALID_CAPABILITIES_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-insecure-capabilities\"\n    messageOnFailure: \"Incorrect value for key `add` - refrain from using insecure capabilities to prevent access to sensitive components\"\n    category: NSA\n    schema:\n      definitions:\n        specContainerPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      securityContext:\n                        properties:\n                          capabilities:\n                            properties:\n                              add:\n                                type: array\n                                items:\n                                  not:\n                                    enum:\n                                      - \"SETPCAP\"\n                                      - \"NET_ADMIN\"\n                                      - \"NET_RAW\"\n                                      - \"SYS_MODULE\"\n                                      - \"SYS_RAWIO\"\n                                      - \"SYS_PTRACE\"\n                                      - \"SYS_ADMIN\"\n                                      - \"SYS_BOOT\"\n                                      - \"MAC_OVERRIDE\"\n                                      - \"MAC_ADMIN\"\n                                      - \"PERFMON\"\n                                      - \"ALL\"\n                                      - \"BPF\"\n      allOf:\n        - $ref: \"#/definitions/specContainerPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 50\n    name: Prevent containers from insecurely exposing workload\n    uniqueName: CONTAINERS_INCORRECT_KEY_HOSTPORT\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-insecurely-exposing-workload\"\n    messageOnFailure: \"Incorrect key `hostPort` - refrain from using this key to prevent insecurely exposing your workload\"\n    category: NSA\n    schema:\n      definitions:\n        specContainerPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      ports:\n                        type: array\n                        items:\n                          not:\n                            required:\n                              - hostPort\n\n      allOf:\n        - $ref: \"#/definitions/specContainerPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 51\n    name: Prevent containers from accessing host files by using high GIDs\n    uniqueName: CONTAINERS_INCORRECT_RUNASGROUP_VALUE_LOWGID\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-accessing-host-files-by-using-high-gids\"\n    messageOnFailure: \"Invalid value for key `runAsGroup` - must be greater than 999 to ensure container is running with non-root group membership\"\n    category: NSA\n    schema:\n      definitions:\n        specContainerPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      securityContext:\n                        properties:\n                          runAsGroup:\n                            minimum: 1000\n        podSecurityContextPattern:\n          if:\n            properties:\n              kind:\n                enum:\n                  - Pod\n          then:\n            properties:\n              spec:\n                properties:\n                  securityContext:\n                    properties:\n                      runAsGroup:\n                        minimum: 1000\n\n      allOf:\n        - $ref: \"#/definitions/specContainerPattern\"\n        - $ref: \"#/definitions/podSecurityContextPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 52\n    name: Prevent container from running with root privileges\n    uniqueName: CONTAINERS_INCORRECT_RUNASNONROOT_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-running-with-root-privileges\"\n    messageOnFailure: \"Invalid value for key `runAsNonRoot` - must be set to `true` to prevent unnecessary privileges\"\n    category: NSA\n    schema:\n      definitions:\n        containerSecurityPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      securityContext:\n                        properties:\n                          runAsNonRoot:\n                            const: true\n                        required:\n                          - runAsNonRoot\n                    required:\n                      - securityContext\n        podSecurityContextPattern:\n          if:\n            properties:\n              kind:\n                enum:\n                  - Pod\n          then:\n            properties:\n              spec:\n                properties:\n                  securityContext:\n                    properties:\n                      runAsNonRoot:\n                        const: true\n                    required:\n                      - runAsNonRoot\n      allOf:\n        - $ref: \"#/definitions/containerSecurityPattern\"\n        - $ref: \"#/definitions/podSecurityContextPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 53\n    name: Prevent service account token auto-mounting on pods\n    uniqueName: SRVACC_INCORRECT_AUTOMOUNTSERVICEACCOUNTTOKEN_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-service-account-token-auto-mount\"\n    messageOnFailure: \"Invalid value for key `automountServiceAccountToken` - must be set to `false` to prevent granting unnecessary access to the service account\"\n    category: NSA\n    schema:\n      definitions:\n        podPattern:\n          if:\n            properties:\n              kind:\n                enum:\n                  - Pod\n          then:\n            properties:\n              spec:\n                properties:\n                  automountServiceAccountToken:\n                    const: false\n                required:\n                  - automountServiceAccountToken\n        serviceAccountPattern:\n          if:\n            properties:\n              kind:\n                enum:\n                  - ServiceAccount\n          then:\n            properties:\n              automountServiceAccountToken:\n                const: false\n            required:\n              - automountServiceAccountToken\n      allOf:\n        - $ref: \"#/definitions/podPattern\"\n        - $ref: \"#/definitions/serviceAccountPattern\"\n  - id: 54\n    name: Ensure resource has a configured name\n    uniqueName: RESOURCE_MISSING_NAME\n    enabledByDefault: true\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-resource-name\"\n    messageOnFailure: \"Missing key `name` or `generateName` - one of them must be set to apply resource to a cluster\"\n    category: Other\n    schema:\n      definitions:\n        metadataNamePattern:\n          properties:\n            metadata:\n              type: object\n              properties:\n                name:\n                  type: string\n              required:\n                - name\n          required:\n            - metadata\n        metadataGenerateNamePattern:\n          properties:\n            metadata:\n              type: object\n              properties:\n                generateName:\n                  type: string\n              required:\n                - generateName\n          required:\n            - metadata\n      if:\n        properties:\n          kind:\n            not:\n              enum:\n                - Kustomization\n      then:\n        anyOf:\n          - $ref: \"#/definitions/metadataNamePattern\"\n          - $ref: \"#/definitions/metadataGenerateNamePattern\"\n  - id: 55\n    name: Ensure each container probe has an initial delay configured\n    uniqueName: CONTAINERS_INCORRECT_INITIALDELAYSECONDS_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-initial-probe-delay\"\n    messageOnFailure: \"Incorrect value for key `initialDelaySeconds` - set explicitly to control the start time before a probe is initiated (min 0)\"\n    category: Containers\n    schema:\n      definitions:\n        probePattern:\n          if:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      anyOf:\n                        - required:\n                          - livenessProbe\n                        - required:\n                          - readinessProbe\n                        - required:\n                          - startupProbe\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      properties:\n                        livenessProbe:\n                          properties:\n                            initialDelaySeconds:\n                              minimum: 0\n                          required:\n                          - initialDelaySeconds\n                        readinessProbe:\n                          properties:\n                            initialDelaySeconds:\n                              minimum: 0\n                          required:\n                          - initialDelaySeconds\n                        startupProbe:\n                          properties:\n                            initialDelaySeconds:\n                              minimum: 0\n                          required:\n                          - initialDelaySeconds\n      allOf:\n        - $ref: \"#/definitions/probePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 56\n    name: Ensure each container probe has a configured frequency\n    uniqueName: CONTAINERS_INCORRECT_PERIODSECONDS_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-probe-frequency\"\n    messageOnFailure: \"Incorrect value for key `periodSeconds` - set explicitly to control how often a probe is performed (min 1)\"\n    category: Containers\n    schema:\n      definitions:\n        probePattern:\n          if:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      anyOf:\n                        - required:\n                          - livenessProbe\n                        - required:\n                          - readinessProbe\n                        - required:\n                          - startupProbe\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      properties:\n                        livenessProbe:\n                          properties:\n                            periodSeconds:\n                              minimum: 1\n                          required:\n                          - periodSeconds\n                        readinessProbe:\n                          properties:\n                            periodSeconds:\n                              minimum: 1\n                          required:\n                          - periodSeconds\n                        startupProbe:\n                          properties:\n                            periodSeconds:\n                              minimum: 1\n                          required:\n                          - periodSeconds\n      allOf:\n        - $ref: \"#/definitions/probePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 57\n    name: Ensure each container probe has a configured timeout\n    uniqueName: CONTAINERS_INCORRECT_TIMEOUTSECONDS_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-probe-timeout\"\n    messageOnFailure: \"Incorrect value for key `timeoutSeconds` - set explicitly to control when a probe times out (min 1)\"\n    category: Containers\n    schema:\n      definitions:\n        probePattern:\n          if:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      anyOf:\n                        - required:\n                          - livenessProbe\n                        - required:\n                          - readinessProbe\n                        - required:\n                          - startupProbe\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      properties:\n                        livenessProbe:\n                          properties:\n                            timeoutSeconds:\n                              minimum: 1\n                          required:\n                          - timeoutSeconds\n                        readinessProbe:\n                          properties:\n                            timeoutSeconds:\n                              minimum: 1\n                          required:\n                          - timeoutSeconds\n                        startupProbe:\n                          properties:\n                            timeoutSeconds:\n                              minimum: 1\n                          required:\n                          - timeoutSeconds\n      allOf:\n        - $ref: \"#/definitions/probePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 58\n    name: Ensure each container probe has a configured minimum success threshold\n    uniqueName: CONTAINERS_INCORRECT_SUCCESSTHRESHOLD_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-probe-min-success-threshold\"\n    messageOnFailure: \"Incorrect value for key `successThreshold` - set explicitly to control when a probe is considered successful after having failed\"\n    category: Containers\n    schema:\n      definitions:\n        probePattern:\n          if:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      anyOf:\n                        - required:\n                          - livenessProbe\n                        - required:\n                          - readinessProbe\n                        - required:\n                          - startupProbe\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      properties:\n                        livenessProbe:\n                          properties:\n                            successThreshold:\n                              const: 1\n                          required:\n                          - successThreshold\n                        readinessProbe:\n                          properties:\n                            successThreshold:\n                              minimum: 1\n                          required:\n                          - successThreshold\n                        startupProbe:\n                          properties:\n                            successThreshold:\n                              const: 1\n                          required:\n                          - successThreshold\n      allOf:\n        - $ref: \"#/definitions/probePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 59\n    name: Ensure each container probe has a configured failure threshold\n    uniqueName: CONTAINERS_INCORRECT_FAILURETHRESHOLD_VALUE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-probe-failure-threshold\"\n    messageOnFailure: \"Incorrect value for key `failureThreshold` - set explicitly to control the number of retries after a probe fails (min 1)\"\n    category: Containers\n    schema:\n      definitions:\n        probePattern:\n          if:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      anyOf:\n                        - required:\n                          - livenessProbe\n                        - required:\n                          - readinessProbe\n                        - required:\n                          - startupProbe\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    items:\n                      properties:\n                        livenessProbe:\n                          properties:\n                            failureThreshold:\n                              minimum: 1\n                          required:\n                          - failureThreshold\n                        readinessProbe:\n                          properties:\n                            failureThreshold:\n                              minimum: 1\n                          required:\n                          - failureThreshold\n                        startupProbe:\n                          properties:\n                            failureThreshold:\n                              minimum: 1\n                          required:\n                          - failureThreshold\n      allOf:\n        - $ref: \"#/definitions/probePattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 60\n    name: Ensure each container has a configured pre-stop hook\n    uniqueName: CONTAINERS_MISSING_PRESTOP_KEY\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/ensure-prestop\"\n    messageOnFailure: \"Missing property object `preStop` - set to ensure graceful shutdown of the container\"\n    category: Containers\n    schema:\n      definitions:\n        prestopPattern:\n          properties:\n            spec:\n              properties:\n                containers:\n                  type: array\n                  items:\n                    properties:\n                      lifecycle:\n                        properties:\n                          preStop:\n                            type: object\n                        required:\n                          - preStop\n                    required:\n                      - lifecycle\n      allOf:\n        - $ref: \"#/definitions/prestopPattern\"\n      additionalProperties:\n        $ref: \"#\"\n      items:\n        $ref: \"#\"\n  - id: 61\n    name: \"Prevent containers from having unnecessary system call privileges\"\n    uniqueName: CONTAINERS_INCORRECT_SECCOMP_PROFILE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-system-call-privileges\"\n    messageOnFailure: \"Incorrect value for key seccompProfile - set an explicit value to prevent malicious use of system calls within the container\"\n    category: Containers\n    schema:\n      definitions:\n        seccompExplicit:\n          if: *standardKinds\n          then:\n            properties: \n              spec:\n                oneOf:\n                  - $ref: \"#/$defs/securityContextSeccompReq\"\n                  - $ref: \"#/definitions/seccompExplicitInContainer\"\n        seccompExplicitInContainer:\n          if: *standardKinds\n          then:\n            properties:\n              containers:\n                type: array\n                items:\n                  $ref: \"#/$defs/securityContextSeccompReq\"\n              initContainers:\n                type: array\n                items:\n                  $ref: \"#/$defs/securityContextSeccompReq\"\n              ephemeralContainers:\n                type: array\n                items:\n                  $ref: \"#/$defs/securityContextSeccompReq\"\n        seccompPatternInSpec:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                $ref: \"#/$defs/securityContextSeccomp\"\n        seccompPatternInContainer:\n          if: *standardKinds\n          then:\n            properties:\n              spec:\n                properties:\n                  containers:\n                    type: array\n                    items:\n                      $ref: \"#/$defs/securityContextSeccomp\"\n                  initContainers:\n                    type: array\n                    items:\n                      $ref: \"#/$defs/securityContextSeccomp\"\n                  ephemeralContainers:\n                    type: array\n                    items:\n                      $ref: \"#/$defs/securityContextSeccomp\"\n      allOf:\n        - $ref: \"#/definitions/seccompExplicit\"\n        - $ref: \"#/definitions/seccompPatternInSpec\"\n        - $ref: \"#/definitions/seccompPatternInContainer\"\n      additionalProperties:\n        $ref: \"#\"\n        items:\n          $ref: \"#\"\n      $defs:\n        securityContextSeccompReq:\n          required:\n            - securityContext\n          properties:\n            securityContext:\n              type: object\n              required:\n                - seccompProfile\n              properties:\n                seccompProfile:\n                  type: object\n                  required:\n                    - type\n        securityContextSeccomp:\n          properties:\n            securityContext:\n              type: object\n              properties:\n                seccompProfile:\n                  type: object\n                  properties:\n                    type:\n                      not:\n                        enum:\n                          - \"unconfined\"\n                          - \"Unconfined\"\n  - id: 62\n    name: Prevent exposed BitBucket secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_BITBUCKET\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-bitbucket\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:bitbucket)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9]{32})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 63\n    name: Prevent exposed Datadog secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_DATADOG\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-datadog\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:datadog)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9]{40})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 64\n    name: Prevent exposed GCP secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_GCP\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-gcp\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: \\b(AIza[0-9A-Za-z\\\\-_]{35})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 65\n    name: Prevent exposed AWS secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_AWS\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-aws\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (A3T[A-Z0-9]|AKIA|AGPA|AIDA|AROA|AIPA|ANPA|ANVA|ASIA)[A-Z0-9]{16}\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 66\n    name: Prevent exposed GitHub secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_GITHUB\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-github\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (ghu|ghs)_[0-9a-zA-Z]{36}\n            - pattern: gho_[0-9a-zA-Z]{36}\n            - pattern: ghp_[0-9a-zA-Z]{36}\n            - pattern: ghr_[0-9a-zA-Z]{36}\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 67\n    name: Prevent exposed GitLab secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_GITLAB\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-gitlab\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: glpat-[0-9a-zA-Z\\-\\_]{20}\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 68\n    name: Prevent exposed Terraform secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_TERRAFORM\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-terraform\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: '[a-z0-9]{14}\\.atlasv1\\.[a-z0-9\\-_=]{60,70}'\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 69\n    name: Prevent exposed Heroku secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_HEROKU\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-heroku\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:heroku)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 70\n    name: Prevent exposed JWT secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_JWT\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-jwt\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: \\b(ey[0-9a-z]{30,34}\\.ey[0-9a-z-\\/_]{30,500}\\.[0-9a-zA-Z-\\/_]{10,200})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 71\n    name: Prevent exposed LaunchDarkly secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_LAUNCHDARKLY\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-launchdarkly\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:launchdarkly)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9=_\\-]{40})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 72\n    name: Prevent exposed New Relic secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_NEWRELIC\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-newrelic\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:new-relic|newrelic|new_relic)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}(NRJS-[a-f0-9]{19})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n            - pattern: (?:new-relic|newrelic|new_relic)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9]{64})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n            - pattern: (?:new-relic|newrelic|new_relic)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}(NRAK-[a-z0-9]{27})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 73\n    name: Prevent exposed npm secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_NPM\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-npm\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: \\b(npm_[a-z0-9]{36})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 74\n    name: Prevent exposed Okta secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_OKTA\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-okta\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:okta)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9=_\\-]{42})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 75\n    name: Prevent exposed Stripe secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_STRIPE\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-stripe\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (sk|pk)_(test|live)_[0-9a-z]{10,32}\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 76\n    name: Prevent exposed SumoLogic secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_SUMOLOGIC\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-sumologic\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?:sumo)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9]{14})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n            - pattern: (?:sumo)(?:[0-9a-z\\-_\\t .]{0,20})(?:[\\s|']|[\\s|\"]){0,3}(?:=|>|:=|\\|\\|:|<=|=>|:)(?:'|\\\"|\\s|=|\\x60){0,5}([a-z0-9]{64})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 77\n    name: Prevent exposed Twilio secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_TWILIO\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-twilio\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: SK[0-9a-fA-F]{32}\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 78\n    name: Prevent exposed Vault secrets in objects\n    uniqueName: ALL_EXPOSED_SECRET_VAULT\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-vault\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: \\b(hvb\\.[a-z0-9_-]{138,212})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n            - pattern: \\b(hvs\\.[a-z0-9_-]{90,100})(?:['|\\\"|\\n|\\r|\\s|\\x60|;]|$)\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n  - id: 79\n    name: Prevent exposed private keys in objects\n    uniqueName: ALL_EXPOSED_SECRET_PRIVATEKEY\n    enabledByDefault: false\n    documentationUrl: \"https://hub.datree.io/built-in-rules/prevent-exposed-secrets-privatekey\"\n    messageOnFailure: \"Secret data found in config - keep your sensitive data elsewhere to prevent it from being stolen\"\n    category: Secrets\n    schema:\n      definitions:\n        regexes:\n          anyOf:\n            - pattern: (?i)-----BEGIN[ A-Z0-9_-]{0,100}PRIVATE KEY-----[\\s\\S-]*KEY----\n      if: *notKindSecret\n      then: *recursiveDontAllowValue\n",
+  "isAnonymous": false
+}

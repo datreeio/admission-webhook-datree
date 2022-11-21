@@ -42,35 +42,15 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 	}
 }
 
-func (c *CliClient) CreateToken() (*cliClient.CreateTokenResponse, error) {
-	if c.networkValidator.IsLocalMode() {
-		return &cliClient.CreateTokenResponse{}, nil
+func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutClient HTTPClient, httpErrors []string, networkValidator cliClient.NetworkValidator, flagsHeaders map[string]string) *CliClient {
+	return &CliClient{
+		baseUrl:          baseUrl,
+		httpClient:       httpClient,
+		timeoutClient:    timeoutClient,
+		httpErrors:       httpErrors,
+		networkValidator: networkValidator,
+		flagsHeaders:     flagsHeaders,
 	}
-
-	headers := map[string]string{}
-	res, err := c.httpClient.Request(http.MethodPost, "/cli/tokens/", nil, headers)
-
-	if err != nil {
-		networkErr := c.networkValidator.IdentifyNetworkError(err)
-		if networkErr != nil {
-			return nil, networkErr
-		}
-
-		if c.networkValidator.IsLocalMode() {
-			return &cliClient.CreateTokenResponse{}, nil
-		}
-
-		return nil, err
-	}
-
-	createTokenResponse := &cliClient.CreateTokenResponse{}
-	err = json.Unmarshal(res.Body, &createTokenResponse)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return createTokenResponse, nil
 }
 
 func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.EvaluationPrerunDataResponse, error) {

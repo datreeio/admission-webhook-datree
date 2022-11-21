@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"io"
 	"net/http"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/google/uuid"
@@ -21,10 +22,14 @@ import (
 	"github.com/datreeio/datree/pkg/utils"
 )
 
-type ValidationController struct{}
+type ValidationController struct {
+	ValidationService *services.ValidationService
+}
 
 func NewValidationController() *ValidationController {
-	return &ValidationController{}
+	return &ValidationController{
+		ValidationService: services.NewValidationService(),
+	}
 }
 
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
@@ -67,7 +72,7 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 	}()
 
 	internalLogger.LogIncoming(admissionReviewReq)
-	admissionReview, isSkipped := services.Validate(admissionReviewReq, &warningMessages, internalLogger)
+	admissionReview, isSkipped := c.ValidationService.Validate(admissionReviewReq, &warningMessages, internalLogger)
 	writer.WriteBody(admissionReview)
 	internalLogger.LogOutgoing(admissionReview, isSkipped)
 }

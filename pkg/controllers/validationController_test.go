@@ -3,18 +3,26 @@ package controllers
 import (
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	"github.com/datreeio/admission-webhook-datree/pkg/services"
+	"github.com/datreeio/datree/pkg/httpClient"
+	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
 )
 
 //go:embed test_fixtures/applyNotAllowedRequest.json
 var applyRequestNotAllowedJson string
+
+//go:embed test_fixtures/getPrerunDataResponse.json
+var getPrerunDataResponse []byte
 
 //go:embed test_fixtures/applyAllowedRequest.json
 var applyRequestAllowedJson string
@@ -66,7 +74,7 @@ func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	validationController := NewValidationController()
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -93,46 +101,63 @@ func TestValidateRequestBody(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	validationController := NewValidationController()
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+	})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusOK)
 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Result.Message, "We're good!")
 }
 
-// func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
-// 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
-// 	request.Header.Set("Content-Type", "application/json")
-// 	responseRecorder := httptest.NewRecorder()
+func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
+	t.Setenv("DATREE_ENFORCE", "true")
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
 
-// 	validationController := NewValidationController()
-// 	validationController.Validate(responseRecorder, request)
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
 
-// 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
-// }
+	validationController.Validate(responseRecorder, request)
+	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
+}
 
-// func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
-// 	t.Setenv("DATREE_ENFORCE", "false")
-// 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
-// 	request.Header.Set("Content-Type", "application/json")
-// 	responseRecorder := httptest.NewRecorder()
+func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
+	t.Setenv("DATREE_ENFORCE", "false")
+	var applyRequestNotAllowed admission.AdmissionReview
+	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
+	resourceKind := applyRequestNotAllowed.Request.Kind.Kind
+	resourceName := applyRequestNotAllowed.Request.Name
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
 
-// 	validationController := NewValidationController()
-// 	validationController.Validate(responseRecorder, request)
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
+	validationController.Validate(responseRecorder, request)
 
-// 	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
-
-// 	assert.Equal(t, admissionResponse.Allowed, true)
-// 	assert.Contains(t, admissionResponse.Warnings[0], "🚩 Some objects failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations/")
-// 	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
-// }
+	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
+	warningMessage := fmt.Sprintf("🚩 Object with name %s and kind %s failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations", resourceName, resourceKind)
+	assert.Equal(t, admissionResponse.Allowed, true)
+	assert.Contains(t, admissionResponse.Warnings[0], warningMessage)
+	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
+}
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
-	validationController := NewValidationController()
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
+
 	validationController.Validate(responseRecorder, request)
 
 	body := responseRecorder.Body.String()
@@ -145,7 +170,10 @@ func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
-	validationController := NewValidationController()
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
 	validationController.Validate(responseRecorder, request)
 
 	body := responseRecorder.Body.String()
@@ -158,7 +186,10 @@ func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
-	validationController := NewValidationController()
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
 	validationController.Validate(responseRecorder, request)
 
 	body := responseRecorder.Body.String()
@@ -174,4 +205,22 @@ func responseToAdmissionResponse(response string) *admission.AdmissionResponse {
 	}
 
 	return admissionReview.Response
+}
+
+type MockHttpClient struct {
+	mockedResponse httpClient.Response
+}
+
+func (mhc *MockHttpClient) Request(method string, resourceURI string, body interface{}, headers map[string]string) (httpClient.Response, error) {
+	return mhc.mockedResponse, nil
+}
+
+func mockValidationController(mockedResponse httpClient.Response) *ValidationController {
+	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
+	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
+	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient)
+
+	return &ValidationController{
+		ValidationService: mockedValidationService,
+	}
 }
