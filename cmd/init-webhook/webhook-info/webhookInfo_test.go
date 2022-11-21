@@ -52,7 +52,7 @@ func TestGetWebhookServerReplicas(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			os.Setenv("WEBHOOK_REPLICAS", test.envVarValue)
+			os.Setenv("WEBHOOK_SERVER_REPLICAS", test.envVarValue)
 			replicas := GetWebhookServerReplicas()
 			assert.True(t, test.expected.condition(replicas), test.expected.message, replicas)
 		})
@@ -144,7 +144,7 @@ func TestGetWebhookServiceName(t *testing.T) {
 				condition: func(actual string) bool {
 					return actual == "datree-webhook-server"
 				},
-				message: "expected selector to be 'datree-webhook-server', got %d",
+				message: "expected service name to be 'datree-webhook-server', got %d",
 			},
 		},
 		"should return 'datree-service' when selector is set to 'datree-service'": {
@@ -153,7 +153,7 @@ func TestGetWebhookServiceName(t *testing.T) {
 				condition: func(actual string) bool {
 					return actual == "datree-service"
 				},
-				message: "expected selector to be 'datree-service', got %d",
+				message: "expected service name to be 'datree-service', got %d",
 			},
 		},
 	}

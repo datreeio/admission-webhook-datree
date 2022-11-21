@@ -10,7 +10,7 @@ import (
 
 func GetWebhookServiceName() string {
 	webhookServiceName, isFound := os.LookupEnv("WEBHOOK_SERVICE")
-	if !isFound {
+	if !isFound || webhookServiceName == "" {
 		loggerUtil.Log("required environment variable WEBHOOK_SERVICE is missing")
 		return "datree-webhook-server"
 	}
@@ -20,7 +20,7 @@ func GetWebhookServiceName() string {
 
 func GetWebhookNamespace() string {
 	webhookNamespace, isFound := os.LookupEnv("WEBHOOK_NAMESPACE")
-	if !isFound {
+	if !isFound || webhookNamespace == "" {
 		loggerUtil.Log("required environment variable WEBHOOK_NAMESPACE is missing")
 		return "datree"
 	}
@@ -30,7 +30,7 @@ func GetWebhookNamespace() string {
 
 func GetWebhookSelector() string {
 	webhookSelector, isFound := os.LookupEnv("WEBHOOK_SELECTOR")
-	if !isFound {
+	if !isFound || webhookSelector == "" {
 		loggerUtil.Log("required environment variable WEBHOOK_SELECTOR is missing")
 		return "admission.datree/validate"
 	}
@@ -50,7 +50,7 @@ func GetWebhookCABundle() ([]byte, error) {
 
 func GetWebhookServerReplicas() int {
 	replicasStr, isFound := os.LookupEnv("WEBHOOK_SERVER_REPLICAS")
-	if !isFound {
+	if !isFound || replicasStr == "" {
 		loggerUtil.Log("required environment variable WEBHOOK_SERVER_REPLICAS is missing")
 		return 2
 	}
