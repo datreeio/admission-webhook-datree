@@ -12,6 +12,9 @@ customLabels: {}
 # Additional annotations to add to all resources.
 customAnnotations: {}
 
+# Run the webhook-server in debug mode, this will log debug information to the console.
+debug: true
+
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
