@@ -217,7 +217,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		allowed = true
 		if isFailedPolicyCheck {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
-			warningUTMMessage := fmt.Sprintf("🚩 Object with name %s and kind %s failed the policy check, get the full report at: %s/cli/invocations/%d?webhook=true",resourceName ,resourceKind , baseUrl, cliEvaluationId)
+			warningUTMMessage := fmt.Sprintf("🚩 Object with name %s and kind %s failed the policy check, get the full report at: %s/cli/invocations/%d?webhook=true", resourceName, resourceKind, baseUrl, cliEvaluationId)
 			*warningMessages = append([]string{warningUTMMessage}, *warningMessages...)
 		}
 	}

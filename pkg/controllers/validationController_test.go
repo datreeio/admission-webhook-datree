@@ -21,7 +21,7 @@ import (
 //go:embed test_fixtures/applyNotAllowedRequest.json
 var applyRequestNotAllowedJson string
 
-//go:embed test_fixtures/mockServerResponse.json
+//go:embed test_fixtures/getPrerunDataResponse.json
 var getPrerunDataResponse []byte
 
 //go:embed test_fixtures/applyAllowedRequest.json
