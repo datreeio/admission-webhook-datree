@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
-	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/webhook-init/k8s-client"
-	"github.com/datreeio/admission-webhook-datree/cmd/webhook-init/utils"
+	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/k8s-client"
+	webhookinfo "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/webhook-info"
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/api/core/v1"
@@ -43,18 +43,18 @@ func InitWebhook(k8sClient k8sClientInterface) error {
 		return err
 	}
 
-	err = k8sClient.WaitUntilPodsAreRunning(context.Background(), utils.GetWebhookNamespace(), utils.GetWebhookSelector(), utils.GetWebhookServerReplicas())
+	err = k8sClient.WaitUntilPodsAreRunning(context.Background(), webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookSelector(), webhookinfo.GetWebhookServerReplicas())
 	if err != nil {
 		loggerUtil.Logf("failed to wait for pods, err: %v", err)
 		return err
 	}
 
-	caBundle, _ := utils.GetWebhookCABundle()
-	_, err = k8sClient.CreateValidatingWebhookConfiguration(utils.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
+	caBundle, _ := webhookinfo.GetWebhookCABundle()
+	_, err = k8sClient.CreateValidatingWebhookConfiguration(webhookinfo.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
 		MetaName:    "datree-webhook",
-		ServiceName: utils.GetWebhookServiceName(),
+		ServiceName: webhookinfo.GetWebhookServiceName(),
 		CaBundle:    caBundle,
-		Selector:    utils.GetWebhookSelector(),
+		Selector:    webhookinfo.GetWebhookSelector(),
 		WebhookName: "webhook-server.datree.svc",
 	})
 	if err != nil {

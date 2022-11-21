@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/webhook-init/k8s-client"
-	"github.com/datreeio/admission-webhook-datree/cmd/webhook-init/utils"
+	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/k8s-client"
+	webhookinfo "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/webhook-info"
 	"github.com/stretchr/testify/mock"
 	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/api/core/v1"
@@ -62,12 +62,12 @@ func TestInitWebhook(t *testing.T) {
 		_ = InitWebhook(k8sClient)
 
 		k8sClient.AssertCalled(t, "DeleteExistingValidatingWebhook", "datree-webhook")
-		k8sClient.AssertCalled(t, "WaitUntilPodsAreRunning", mock.Anything, utils.GetWebhookNamespace(), utils.GetWebhookSelector(), utils.GetWebhookServerReplicas())
-		k8sClient.AssertCalled(t, "CreateValidatingWebhookConfiguration", utils.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
+		k8sClient.AssertCalled(t, "WaitUntilPodsAreRunning", mock.Anything, webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookSelector(), webhookinfo.GetWebhookServerReplicas())
+		k8sClient.AssertCalled(t, "CreateValidatingWebhookConfiguration", webhookinfo.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
 			MetaName:    "datree-webhook",
-			ServiceName: utils.GetWebhookServiceName(),
+			ServiceName: webhookinfo.GetWebhookServiceName(),
 			CaBundle:    nil,
-			Selector:    utils.GetWebhookSelector(),
+			Selector:    webhookinfo.GetWebhookSelector(),
 			WebhookName: "webhook-server.datree.svc",
 		})
 	})

@@ -1,4 +1,4 @@
-package utils
+package webhookinfo
 
 import (
 	"os"
