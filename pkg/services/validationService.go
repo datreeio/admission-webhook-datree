@@ -3,11 +3,12 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
