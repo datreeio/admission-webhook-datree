@@ -3,15 +3,15 @@ package main
 import (
 	"bytes"
 	"os"
-	"time"
 
+	"github.com/datreeio/admission-webhook-datree/cmd/cert-generator/renewer"
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 )
 
 type fileWriter struct{}
 
 // WriteFile writes data in the file at the given path
-func (fw *fileWriter) writeFile(filepath string, sCert *bytes.Buffer) error {
+func (fw *fileWriter) WriteFile(filepath string, sCert *bytes.Buffer) error {
 	f, err := os.Create(filepath)
 	if err != nil {
 		return err
@@ -38,18 +38,15 @@ func main() {
 		return
 	}
 
-	now := time.Now()
-	validity := certValidityDuration{begin: now.Add(-1 * time.Hour), end: now.Add(5 * 365 * 24 * time.Hour)} // 5 years validity
+	renewer := renewer.NewCertRenewer(&fileWriter{})
 
-	renewer := newRenewer(&fileWriter{})
-
-	caPrivKey, caCert, err := renewer.renewCA(tlsDir, validity)
+	caPrivKey, caCert, err := renewer.RenewCA(tlsDir)
 	if err != nil {
 		loggerUtil.Log(err.Error())
 		return
 	}
 
-	err = renewer.renewTLS(tlsDir, caCert, caPrivKey, validity)
+	err = renewer.RenewTLS(tlsDir, caCert, caPrivKey)
 	if err != nil {
 		loggerUtil.Log(err.Error())
 		return
