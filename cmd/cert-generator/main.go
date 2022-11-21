@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/datreeio/admission-webhook-datree/cmd/cert-generator/renewer"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 )
 
 type fileWriter struct{}
@@ -28,13 +28,13 @@ func (fw *fileWriter) WriteFile(filepath string, sCert *bytes.Buffer) error {
 func main() {
 	tlsDir, isFound := os.LookupEnv("WEBHOOK_CERTS_DIR")
 	if !isFound {
-		loggerUtil.Log("required directory for certificates is missing, verify env varaible WEBHOOK_CERTS_DIR in deployment")
+		logger.LogUtil("required directory for certificates is missing, verify env varaible WEBHOOK_CERTS_DIR in deployment")
 		return
 	}
 
 	err := os.MkdirAll(tlsDir, 0666)
 	if err != nil {
-		loggerUtil.Log(err.Error())
+		logger.LogUtil(err.Error())
 		return
 	}
 
@@ -42,15 +42,15 @@ func main() {
 
 	caPrivKey, caCert, err := renewer.RenewCA(tlsDir)
 	if err != nil {
-		loggerUtil.Log(err.Error())
+		logger.LogUtil(err.Error())
 		return
 	}
 
 	err = renewer.RenewTLS(tlsDir, caCert, caPrivKey)
 	if err != nil {
-		loggerUtil.Log(err.Error())
+		logger.LogUtil(err.Error())
 		return
 	}
 
-	loggerUtil.Log("horray! successfully generated self-signed CA and signed webhook server certificate using this CA!")
+	logger.LogUtil("horray! successfully generated self-signed CA and signed webhook server certificate using this CA!")
 }

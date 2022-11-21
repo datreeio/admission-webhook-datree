@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
-	"k8s.io/client-go/kubernetes"
 
 	"net/http"
 	"os"
@@ -17,7 +15,6 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
@@ -50,7 +47,7 @@ func start(port string) {
 		}
 	}()
 
-	loggerUtil.Log("initializing k8s metadata")
+	logger.LogUtil("initializing k8s metadata")
 	k8sMetadataUtil.InitK8sMetadataUtil()
 	initMetadataLogsCronjob()
 	server.InitServerVars()
@@ -71,7 +68,7 @@ func start(port string) {
 	// start server
 	err = http.ListenAndServeTLS(":"+port, certPath, keyPath, nil)
 	if err != nil {
-		loggerUtil.Log(err.Error())
+		logger.LogUtil(err.Error())
 		http.ListenAndServe(":"+port, nil)
 	}
 }
@@ -80,61 +77,4 @@ func initMetadataLogsCronjob() {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@every 1h", services.SendMetadataInBatch)
 	cornJob.Start()
-}
-
-func createValidationWebhookConfig(caCert []byte) error {
-	config := ctrl.GetConfigOrDie()
-	kubeClient, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return err // panic("failed to set go -client")
-	}
-	// webhookNamespace, _ := os.LookupEnv("WEBHOOK_NAMESPACE")
-	validationCfgName := "datree-webhook"
-
-	path := "/validate"
-	sideEffects := admissionregistrationv1.SideEffectClassNone
-
-	validationWebhookConfig := &admissionregistrationv1.ValidatingWebhookConfiguration{
-		ObjectMeta: metav1.ObjectMeta{
-			Name: validationCfgName,
-		},
-		Webhooks: []admissionregistrationv1.ValidatingWebhook{{
-			Name: "webhook-server.datree.svc",
-			ClientConfig: admissionregistrationv1.WebhookClientConfig{
-				CABundle: caCert, // CA bundle created earlier
-				Service: &admissionregistrationv1.ServiceReference{
-					Name:      "datree-webhook-server", // datree-webhook-server
-					Namespace: "datree",
-					Path:      &path,
-				},
-			},
-			Rules: []admissionregistrationv1.RuleWithOperations{{Operations: []admissionregistrationv1.OperationType{
-				admissionregistrationv1.Create,
-				admissionregistrationv1.Update,
-			},
-				Rule: admissionregistrationv1.Rule{
-					APIGroups:   []string{"*"},
-					APIVersions: []string{"*"},
-					Resources:   []string{"*"},
-				},
-			}},
-			SideEffects:             &sideEffects,
-			AdmissionReviewVersions: []string{"v1", "v1beta1"},
-			TimeoutSeconds:          &[]int32{30}[0],
-			NamespaceSelector: &metav1.LabelSelector{
-				MatchExpressions: []metav1.LabelSelectorRequirement{
-					{ // only validate pods in namespaces with the label "admission.datree/validate"
-						Key:      "admission.datree/validate",
-						Operator: metav1.LabelSelectorOpDoesNotExist,
-					},
-				},
-			},
-		}},
-	}
-
-	if _, err = kubeClient.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), validationWebhookConfig, metav1.CreateOptions{}); err != nil {
-		return err
-	}
-
-	return nil
 }

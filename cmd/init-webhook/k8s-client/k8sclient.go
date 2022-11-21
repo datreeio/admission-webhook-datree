@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
-
+	"github.com/gardener/controller-manager-library/pkg/logger"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -97,7 +96,7 @@ func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *
 		return nil, err
 	}
 
-	loggerUtil.Debugf("created validating webhook configuration: %v", vw)
+	logger.Debugf("created validating webhook configuration: %v", vw)
 	return vw, nil
 }
 
@@ -136,13 +135,13 @@ func (k *K8sClient) CreatePodWatcher(ctx context.Context, namespace string, sele
 }
 
 func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace string, selector string, replicas int) error {
-	loggerUtil.Debugf("creating watcher for POD with label:%s ...", selector)
+	logger.Debugf("creating watcher for POD with label:%s ...", selector)
 	watcher, err := k.CreatePodWatcher(ctx, namespace, selector)
 	if err != nil {
 		return err
 	}
 
-	loggerUtil.Debug("watch out! Succuessfuly created watcher for PODs.")
+	logger.Debug("watch out! Succuessfuly created watcher for PODs.")
 	defer watcher.Stop()
 
 	count := 0
@@ -154,9 +153,9 @@ func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace strin
 			if pod.Status.Phase == v1.PodRunning {
 				if k.IsPodReady(pod) {
 					count++
-					loggerUtil.Debugf("the POD \"%s\" is running", selector)
+					logger.Debugf("the POD \"%s\" is running", selector)
 					if count == replicas {
-						loggerUtil.Debug("all PODs are running")
+						logger.Debug("all PODs are running")
 						return nil
 					}
 				}
@@ -164,11 +163,11 @@ func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace strin
 			}
 
 		case <-time.After(180 * time.Second):
-			loggerUtil.Debug("exit from waitPodRunning for POD \"%s\" because the time is over")
+			logger.Debug("exit from waitPodRunning for POD \"%s\" because the time is over")
 			return nil
 
 		case <-ctx.Done():
-			loggerUtil.Debugf("exit from waitPodRunning for POD \"%s\" because the context is done", selector)
+			logger.Debugf("exit from waitPodRunning for POD \"%s\" because the context is done", selector)
 			return nil
 		}
 	}

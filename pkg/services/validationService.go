@@ -16,8 +16,6 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
-	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
-
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"

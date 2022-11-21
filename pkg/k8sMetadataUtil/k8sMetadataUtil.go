@@ -9,7 +9,7 @@ import (
 	cliclient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	licensemanagerclient "github.com/datreeio/admission-webhook-datree/pkg/licenseManagerClient"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
@@ -109,7 +109,8 @@ func runDailyAWSCheckoutLicenseCronJob(k8sClient *kubernetes.Clientset, cliClien
 	licenseCheckerCornJob.AddFunc("@daily", func() {
 		nodesCount, err := getNodesCount(k8sClient)
 		if err != nil {
-			loggerUtil.Debug(fmt.Sprint("failed counting nodes for checkout", err))
+			// should be on debug
+			logger.LogUtil(fmt.Sprint("failed counting nodes for checkout", err))
 			cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
 				ClusterUuid:   clusterUuid,
 				Token:         os.Getenv(enums.Token),
@@ -119,10 +120,12 @@ func runDailyAWSCheckoutLicenseCronJob(k8sClient *kubernetes.Clientset, cliClien
 			return
 		}
 
-		loggerUtil.Debug(fmt.Sprint("checking aws marketplace license with nodes count", nodesCount))
+		// should be on debug
+		logger.LogUtil(fmt.Sprint("checking aws marketplace license with nodes count", nodesCount))
 		err = licenseManagerClient.CheckoutLicense(nodesCount)
 		if err != nil {
-			loggerUtil.Debug(fmt.Sprint("checkout license failed: ", err))
+			// should be on debug
+			logger.LogUtil(fmt.Sprint("checkout license failed: ", err))
 			cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
 				ClusterUuid:   clusterUuid,
 				Token:         os.Getenv(enums.Token),

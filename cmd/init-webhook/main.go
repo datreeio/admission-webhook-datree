@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/k8s-client"
 	webhookinfo "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/webhook-info"
-	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -14,14 +15,14 @@ import (
 func main() {
 	k8sClient := k8sclient.New(nil)
 	if k8sClient == nil {
-		loggerUtil.Logf("failed to set k8s go -client, err")
+		logger.LogUtil("failed to set k8s go -client, err")
 	}
 
 	err := InitWebhook(k8sClient)
 	if err != nil {
-		loggerUtil.Logf("failed to init webhook, err: %v", err)
+		logger.LogUtil(fmt.Sprint("failed to init webhook, err: %v", err))
 	}
-	loggerUtil.Log("horray! succesfully created datree validating admission webhook")
+	logger.LogUtil("horray! succesfully created datree validating admission webhook")
 
 	// wait forever to prevent the container from restrating
 	waitForever()
@@ -39,13 +40,13 @@ type k8sClientInterface interface {
 func InitWebhook(k8sClient k8sClientInterface) error {
 	err := k8sClient.DeleteExistingValidatingWebhook("datree-webhook")
 	if err != nil {
-		loggerUtil.Logf("failed to delete existed validation webhook config, err: %v", err)
+		logger.LogUtil(fmt.Sprint("failed to delete existed validation webhook config, err: %v", err))
 		return err
 	}
 
 	err = k8sClient.WaitUntilPodsAreRunning(context.Background(), webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookSelector(), webhookinfo.GetWebhookServerReplicas())
 	if err != nil {
-		loggerUtil.Logf("failed to wait for pods, err: %v", err)
+		logger.LogUtil(fmt.Sprint("failed to wait for pods, err: %v", err))
 		return err
 	}
 
