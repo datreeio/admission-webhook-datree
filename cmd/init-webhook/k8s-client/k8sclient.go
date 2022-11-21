@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/datreeio/admission-webhook-datree/cmd/webhook-init/utils"
 	"github.com/datreeio/admission-webhook-datree/pkg/loggerUtil"
 
 	v1 "k8s.io/api/core/v1"
@@ -184,5 +183,15 @@ func (k *K8sClient) IsPodReady(pod *v1.Pod) bool {
 		return condition.Type == v1.ContainersReady && condition.Status == "True"
 	}
 
-	return utils.FindIndex(checkPodReadyCondition, pod.Status.Conditions) > 0 && utils.FindIndex(checkPodContainersCondition, pod.Status.Conditions) > 0
+	return findIndex(checkPodReadyCondition, pod.Status.Conditions) > 0 && findIndex(checkPodContainersCondition, pod.Status.Conditions) > 0
+}
+
+// util function, should be in a separate file but for the sake of simplicity it's here
+func findIndex[T interface{}, K []T](findFn func(element T) bool, array K) (idx int) {
+	for i, v := range array {
+		if findFn(v) {
+			return i
+		}
+	}
+	return -1
 }
