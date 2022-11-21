@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY . .
 # cache the build
-RUN --mount=type=cache,target=/root/.cache/go-build go build -o webhook-init -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" ./cmd/init-webhook
+RUN --mount=type=cache,target=/root/.cache/go-build go build -o init-webhook -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" ./cmd/init-webhook
 
 FROM alpine:3.14
 COPY --from=builder /go/src/app/init-webhook /
