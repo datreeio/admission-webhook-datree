@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -34,13 +35,15 @@ func main() {
 
 func start(port string) {
 	internalLogger := logger.New("")
+
+	basicNetrowkValidator := networkValidator.NewNetworkValidator()
+	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetrowkValidator)
+	basicLocalConfigClient := localConfig.NewLocalConfigClient(basicCliClient, basicNetrowkValidator)
+	errorReporter := errorReporter.NewErrorReporter(basicCliClient, basicLocalConfigClient)
+
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
-			validator := networkValidator.NewNetworkValidator()
-			newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
-			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
-			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
-			reporter.ReportPanicError(panicErr)
+			errorReporter.ReportPanicError(panicErr)
 			internalLogger.LogError(fmt.Sprintf("Datree Webhook failed to start due to Unexpected error: %s\n", utils.ParseErrorToString(panicErr)))
 			os.Exit(DefaultErrExitCode)
 		}
@@ -54,7 +57,7 @@ func start(port string) {
 		panic(err)
 	}
 
-	validationController := controllers.NewValidationController()
+	validationController := controllers.NewValidationController(errorReporter)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
