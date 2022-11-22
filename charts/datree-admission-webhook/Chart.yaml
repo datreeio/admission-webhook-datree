@@ -21,3 +21,9 @@ version: 0.3.14
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.1.35"
+#appVersion: "0.1.21"
+
+dependencies:
+  - name: datree-lib
+    version: 0.1.0
+    repository: file://../datree-lib

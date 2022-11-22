@@ -64,7 +64,7 @@ func readConfigScanningFilters() (skipList []string, err error) {
 }
 
 func ValidateCertificate() (certPath string, keyPath string, err error) {
-	tlsDir := `/run/secrets/tls`
+	tlsDir := `/etc/webhook/certs`
 	tlsCertFile := `tls.crt`
 	tlsKeyFile := `tls.key`
 

@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
+
 	"net/http"
 	"os"
 	"time"
@@ -28,7 +30,6 @@ func main() {
 	if port == "" {
 		port = "8443"
 	}
-
 	start(port)
 }
 
@@ -46,6 +47,7 @@ func start(port string) {
 		}
 	}()
 
+	logger.LogUtil("initializing k8s metadata")
 	k8sMetadataUtil.InitK8sMetadataUtil()
 	initMetadataLogsCronjob()
 	server.InitServerVars()
@@ -64,7 +66,9 @@ func start(port string) {
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
-	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+	err = http.ListenAndServeTLS(":"+port, certPath, keyPath, nil)
+	if err != nil {
+		logger.LogUtil(err.Error())
 		http.ListenAndServe(":"+port, nil)
 	}
 }
