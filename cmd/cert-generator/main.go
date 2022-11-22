@@ -8,23 +8,6 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 )
 
-type fileWriter struct{}
-
-// WriteFile writes data in the file at the given path
-func (fw *fileWriter) WriteFile(filepath string, sCert *bytes.Buffer) error {
-	f, err := os.Create(filepath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.Write(sCert.Bytes())
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func main() {
 	tlsDir, isFound := os.LookupEnv("WEBHOOK_CERTS_DIR")
 	if !isFound {
@@ -53,4 +36,21 @@ func main() {
 	}
 
 	logger.LogUtil("horray! successfully generated self-signed CA and signed webhook server certificate using this CA!")
+}
+
+type fileWriter struct{}
+
+// WriteFile writes data in the file at the given path
+func (fw *fileWriter) WriteFile(filepath string, sCert *bytes.Buffer) error {
+	f, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	_, err = f.Write(sCert.Bytes())
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -37,6 +37,7 @@ func (r *CertRenewer) RenewCA(tlsDir string) (*rsa.PrivateKey, *x509.Certificate
 	if err != nil {
 		return nil, nil, err
 	}
+
 	err = r.writeCABundleFile(tlsDir, caCert.Raw)
 	if err != nil {
 		return nil, nil, err
