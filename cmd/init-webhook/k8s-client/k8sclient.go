@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gardener/controller-manager-library/pkg/logger"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
@@ -96,7 +96,8 @@ func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *
 		return nil, err
 	}
 
-	logger.Debugf("created validating webhook configuration: %v", vw)
+	// should be debug
+	logger.LogUtil(fmt.Sprintf("created validating webhook configuration: %v", vw))
 	return vw, nil
 }
 
@@ -135,13 +136,13 @@ func (k *K8sClient) CreatePodWatcher(ctx context.Context, namespace string, sele
 }
 
 func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace string, selector string, replicas int) error {
-	logger.Debugf("creating watcher for POD with label:%s ...", selector)
+	logger.LogUtil(fmt.Sprintf("creating watcher for POD with label:%s ...", selector))
 	watcher, err := k.CreatePodWatcher(ctx, namespace, selector)
 	if err != nil {
 		return err
 	}
 
-	logger.Debug("watch out! Succuessfuly created watcher for PODs.")
+	logger.LogUtil("watch out! Succuessfuly created watcher for PODs.")
 	defer watcher.Stop()
 
 	count := 0
@@ -153,9 +154,9 @@ func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace strin
 			if pod.Status.Phase == v1.PodRunning {
 				if k.IsPodReady(pod) {
 					count++
-					logger.Debugf("the POD \"%s\" is running", selector)
+					logger.LogUtil(fmt.Sprintf("the POD \"%s\" is running", selector))
 					if count == replicas {
-						logger.Debug("all PODs are running")
+						logger.LogUtil(fmt.Sprintf("all PODs are running"))
 						return nil
 					}
 				}
@@ -163,11 +164,11 @@ func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace strin
 			}
 
 		case <-time.After(180 * time.Second):
-			logger.Debug("exit from waitPodRunning for POD \"%s\" because the time is over")
+			logger.LogUtil(fmt.Sprintf("exit from waitPodRunning for POD \"%s\" because the time is over", selector))
 			return nil
 
 		case <-ctx.Done():
-			logger.Debugf("exit from waitPodRunning for POD \"%s\" because the context is done", selector)
+			logger.LogUtil(fmt.Sprintf("exit from waitPodRunning for POD \"%s\" because the context is done", selector))
 			return nil
 		}
 	}
