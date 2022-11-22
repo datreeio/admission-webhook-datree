@@ -124,11 +124,9 @@ func (k *K8sClient) GetValidatingWebhookConfiguration(name string) *admissionreg
 }
 
 func (k *K8sClient) CreatePodWatcher(ctx context.Context, namespace string, selector string) (watch.Interface, error) {
-	labelSelector := fmt.Sprint(selector)
-
 	opts := metav1.ListOptions{
 		TypeMeta:      metav1.TypeMeta{},
-		LabelSelector: labelSelector,
+		LabelSelector: selector,
 		FieldSelector: "",
 	}
 

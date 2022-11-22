@@ -44,7 +44,7 @@ func InitWebhook(k8sClient k8sClientInterface) error {
 		return err
 	}
 
-	err = k8sClient.WaitUntilPodsAreRunning(context.Background(), webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookSelector(), webhookinfo.GetWebhookServerReplicas())
+	err = k8sClient.WaitUntilPodsAreRunning(context.Background(), webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookPodsSelector(), webhookinfo.GetWebhookServerReplicas())
 	if err != nil {
 		logger.LogUtil(fmt.Sprintf("failed to wait for pods, err: %v", err))
 		return err

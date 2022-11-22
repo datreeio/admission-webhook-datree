@@ -63,3 +63,12 @@ func GetWebhookServerReplicas() int {
 
 	return replicas
 }
+
+func GetWebhookPodsSelector() string {
+	podsSelector, isFound := os.LookupEnv("WEBHOOK_POD_SELECTOR")
+	if !isFound || podsSelector == "" {
+		logger.LogUtil("required environment variable WEBHOOK_POD_SELECTOR is missing")
+		return "app=datree-webhook-server"
+	}
+	return podsSelector
+}

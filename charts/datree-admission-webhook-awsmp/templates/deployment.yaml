@@ -33,13 +33,15 @@ spec:
         image: "{{ .Values.imageWebhook.repository }}:{{ .Values.imageWebhook.tag | default .Chart.AppVersion }}"
         imagePullPolicy: IfNotPresent
         volumeMounts:
-            - mountPath: /etc/webhook/certs
-              name: webhook-certs
+        - mountPath: /etc/webhook/certs
+          name: webhook-certs
         env:
         - name: WEBHOOK_NAMESPACE
           value: {{ template "datree.namespace" . }}
         - name: WEBHOOK_SERVICE
           value: "datree-webhook-server"
+        - name: WEBHOOK_POD_SELECTOR
+          value: "app=datree-webhook-server"
         - name: WEBHOOK_SELECTOR
           value: "admission.datree/validate"
         - name: WEBHOOK_SERVER_REPLICAS
@@ -75,7 +77,7 @@ spec:
         - name: DATREE_TOKEN
           value: {{.Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}
         - name: DATREE_POLICY
-          value: {{.Values.datree.policy |  | default "Starter" }}
+          value: {{.Values.datree.policy | default "Starter" }}
         - name: DATREE_VERBOSE
           value: {{.Values.datree.verbose}}
         - name: DATREE_OUTPUT
@@ -83,7 +85,7 @@ spec:
         - name: DATREE_NO_RECORD
           value: {{.Values.datree.noRecord}}
         - name: DATREE_ENFORCE	
-              value: "{{.Values.datree.enforce}}"
+          value: "{{.Values.datree.enforce}}"
          # AWS Marketplace varaibles
         - name: AWS_MP_PRODUCT_ID
           value: {{ .Values.aws.productId }}
@@ -99,8 +101,8 @@ spec:
         - name: AWS_ROLE_ARN
           valueFrom:
             secretKeyRef:
-                name: {{ .Values.aws.licenseConfigSecretName }}
-                key: iam_role
+              name: {{ .Values.aws.licenseConfigSecretName }}
+              key: iam_role
         {{- end}}
         # add aws marketplace license config to the licensed container application env
         volumeMounts:
@@ -108,7 +110,7 @@ spec:
           name: webhook-certs
           readOnly: true
         - name: webhook-config	
-              mountPath: /config
+          mountPath: /config
         {{- if .Values.aws.licenseConfigSecretName }}
         - name: awsmp-product-license
           mountPath: "/var/run/secrets/awsmp-product-license"

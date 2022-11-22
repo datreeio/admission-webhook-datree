@@ -167,3 +167,39 @@ func TestGetWebhookServiceName(t *testing.T) {
 	}
 
 }
+
+func TestGetWebhookServerPodSelector(t *testing.T) {
+	type testCase struct {
+		envVarValue string
+		expected    ExpectedCondition[string]
+	}
+
+	tests := map[string]*testCase{
+		"should return 'app=app=datree-webhook-server' when pod selector is not set": {
+			envVarValue: "",
+			expected: ExpectedCondition[string]{
+				condition: func(actual string) bool {
+					return actual == "app=datree-webhook-server"
+				},
+				message: "expected pod selector to be 'app=datree-webhook-server', got %d",
+			},
+		},
+		"should return 'app=test' when pod selector is set to 'app=test'": {
+			envVarValue: "app=test",
+			expected: ExpectedCondition[string]{
+				condition: func(actual string) bool {
+					return actual == "app=test"
+				},
+				message: "expected pod selector to be 'app=test', got %d",
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			os.Setenv("WEBHOOK_POD_SELECTOR", test.envVarValue)
+			podSelector := GetWebhookPodsSelector()
+			assert.True(t, test.expected.condition(podSelector), test.expected.message, podSelector)
+		})
+	}
+}

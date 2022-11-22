@@ -62,7 +62,7 @@ func TestInitWebhook(t *testing.T) {
 		_ = InitWebhook(k8sClient)
 
 		k8sClient.AssertCalled(t, "DeleteExistingValidatingWebhook", "datree-webhook")
-		k8sClient.AssertCalled(t, "WaitUntilPodsAreRunning", mock.Anything, webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookSelector(), webhookinfo.GetWebhookServerReplicas())
+		k8sClient.AssertCalled(t, "WaitUntilPodsAreRunning", mock.Anything, webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookPodsSelector(), webhookinfo.GetWebhookServerReplicas())
 		k8sClient.AssertCalled(t, "CreateValidatingWebhookConfiguration", webhookinfo.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
 			MetaName:    "datree-webhook",
 			ServiceName: webhookinfo.GetWebhookServiceName(),
