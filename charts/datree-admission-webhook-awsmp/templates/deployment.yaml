@@ -1,3 +1,5 @@
+{{- $emptyTokenMessage := "\n\t❌ The installation failed since the token that was provided is invalid.\n\t💡 To fix this issue:\n\t\t1. Get your token at: https://app.datree.io/settings/token-management\n\t\t2. Reinstall Datree and set your token using helm:\n\n\t\thelm install -n datree datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<YOUR_TOKEN>\n" -}}	
+{{- $uuidv4RegexPattern := "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -71,15 +73,17 @@ spec:
           value: "{{ .Values.debug }}"
         # Datree webhook varaibles
         - name: DATREE_TOKEN
-          value: {{.Values.datree.token}}
+          value: {{.Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}
         - name: DATREE_POLICY
-          value: {{.Values.datree.policy}}
+          value: {{.Values.datree.policy |  | default "Starter" }}
         - name: DATREE_VERBOSE
           value: {{.Values.datree.verbose}}
         - name: DATREE_OUTPUT
           value: {{.Values.datree.output}}
         - name: DATREE_NO_RECORD
           value: {{.Values.datree.noRecord}}
+        - name: DATREE_ENFORCE	
+              value: "{{.Values.datree.enforce}}"
          # AWS Marketplace varaibles
         - name: AWS_MP_PRODUCT_ID
           value: {{ .Values.aws.productId }}
@@ -103,6 +107,8 @@ spec:
         - mountPath: /etc/webhook/certs
           name: webhook-certs
           readOnly: true
+        - name: webhook-config	
+              mountPath: /config
         {{- if .Values.aws.licenseConfigSecretName }}
         - name: awsmp-product-license
           mountPath: "/var/run/secrets/awsmp-product-license"
@@ -110,6 +116,10 @@ spec:
       volumes:
         - name: webhook-certs
           emptyDir: {}
+        - name: webhook-config	
+          configMap:	
+            name: webhook-scanning-filters	
+            optional: true
         {{- if .Values.aws.licenseConfigSecretName }}
         - name: awsmp-product-license
           secret:

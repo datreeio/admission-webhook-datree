@@ -1,4 +1,4 @@
-{{- define "datree-lib.namespace-post-delete" -}}
+{{- define "datree-lib.cleanup-pre-delete" -}}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -6,7 +6,7 @@ metadata:
   labels: {{include "datree.labels" . | nindent 4}}
   namespace: {{template "datree.namespace" .}}
   annotations: 
-    "helm.sh/hook": pre-delete
+    "helm.sh/hook": pre-delete, pre-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
   {{- if .Values.customAnnotations }}
     {{- toYaml .Values.customAnnotations }}
