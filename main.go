@@ -36,9 +36,9 @@ func main() {
 func start(port string) {
 	internalLogger := logger.New("")
 
-	basicNetrowkValidator := networkValidator.NewNetworkValidator()
-	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetrowkValidator)
-	basicLocalConfigClient := localConfig.NewLocalConfigClient(basicCliClient, basicNetrowkValidator)
+	basicNetworkValidator := networkValidator.NewNetworkValidator()
+	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
+	basicLocalConfigClient := localConfig.NewLocalConfigClient(basicCliClient, basicNetworkValidator)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, basicLocalConfigClient)
 
 	defer func() {
