@@ -19,14 +19,14 @@ import (
 )
 
 type ValidationController struct {
-	ValidationService     *services.ValidationService
-	FallbackErrorReporter *errorReporter.ErrorReporter
+	ValidationService *services.ValidationService
+	ErrorReporter     *errorReporter.ErrorReporter
 }
 
 func NewValidationController(errorReporter *errorReporter.ErrorReporter) *ValidationController {
 	return &ValidationController{
-		ValidationService:     services.NewValidationService(),
-		FallbackErrorReporter: errorReporter,
+		ValidationService: services.NewValidationService(),
+		ErrorReporter:     errorReporter,
 	}
 }
 
@@ -58,7 +58,7 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 	// global panic errors handler
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
-			c.FallbackErrorReporter.ReportPanicError(panicErr)
+			c.ErrorReporter.ReportPanicError(panicErr)
 			internalLogger.LogError(utils.ParseErrorToString(panicErr))
 			warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
 			writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
