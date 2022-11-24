@@ -33,6 +33,8 @@ datree:
   noRecord: ""
   # Block resources that fail the policy check. (boolean ,optional)
   enforce: ""
+  # The name of the cluster. (string ,optional)
+  context: ""
 # The Datree webhook-server image to use.
 image:
   # Image repository
