@@ -123,4 +123,43 @@ helm-uninstall:
 helm-install-staging:
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}" --set scan_job.image.repository="datree/scan-job-staging" \
 	--set scan_job.image.tag="latest" --set image.repository="datree/webhook-staging" --set image.tag="latest"
+
 # to be continued...
+
+deploy-datree-awsmp-rc:
+# helm lint chart 
+	helm lint ./charts/datree-admission-webhook-awsmp
+# docker build image
+	$(MAKE) build-image-webhook-server-awsmp
+	${MAKE} build-image-init-webhook-awsmp
+	${MAKE} build-image-cert-generator-awsmp
+
+# docker login
+	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 709825985650.dkr.ecr.us-east-1.amazonaws.com
+
+# docker push image to ECR
+	IMAGE_VERSION=$(yq '.initContainer.tag' ./charts/datree-admission-webhook-awsmp/values.yaml)
+#	docker tag webhook-server:latest 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator:${IMAGE_VERSION}
+	docker tag webhook-server:latest localhost:5000/cert-generator:${IMAGE_VERSION}
+#	docker push 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator:${IMAGE_VERSION}
+
+	IMAGE_VERSION=$(yq '.imageWebhook.tag' ./charts/datree-admission-webhook-awsmp/values.yaml)
+	docker tag webhook-server:latest localhost:5000/webhook-server:${IMAGE_VERSION}
+#	docker tag init-webhook:latest 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init:${IMAGE_VERSION}
+#	docker push 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init:${IMAGE_VERSION}
+
+	IMAGE_VERSION=$(yq '.image.tag' ./charts/datree-admission-webhook-awsmp/values.yaml)
+	docker tag init-webhook:latest localhost:5000/init-webhook:${IMAGE_VERSION}
+#	docker tag webhook-server:latest 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-admission-webhook:${IMAGE_VERSION}
+#	docker push 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-admission-webhook:${IMAGE_VERSION}
+
+# bump version 
+	HELM_CHART_VERSION=$(helm show chart ./charts/datree-admission-webhook-awsmp | grep version: | awk 'NR==2{print $2}')
+	HELM_CHART_VERSION=$(shell echo $${HELM_CHART_VERSION} | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
+
+# helm package chart
+	sed -i '' -e 's/version: .*/version: $(HELM_CHART_VERSION)/' ./charts/datree-admission-webhook-awsmp/Chart.yaml
+	helm package ./charts/datree-admission-webhook-awsmp --version ${HELM_CHART_VERSION}
+# helm push chart to ECR
+	aws ecr get-login-password --region us-east-1 | helm login --username AWS --password-stdin 000000000000.dkr.ecr.us-east-1.amazonaws.com
+#	helm push datree-admission-webhook-awsmp-${HELM_CHART_VERSION}.tgz 000000000000.dkr.ecr.us-east-1.amazonaws.com
