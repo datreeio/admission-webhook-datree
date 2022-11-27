@@ -129,7 +129,8 @@ helm-install-staging:
 deploy-datree-awsmp-rc:
 # helm lint chart 
 	helm lint ./charts/datree-admission-webhook-awsmp
-# docker build image
+
+# docker build binaries images
 	$(MAKE) build-image-webhook-server-awsmp
 	${MAKE} build-image-init-webhook-awsmp
 	${MAKE} build-image-cert-generator-awsmp
@@ -139,16 +140,24 @@ deploy-datree-awsmp-rc:
 
 # docker push image to ECR
 	IMAGE_VERSION=$(yq '.initContainer.tag' ./charts/datree-admission-webhook-awsmp/values.yaml)
+	IMAGE_VERSION=$(shell echo $${IMAGE_VERSION} | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
+	yq eval '.initContainer.tag = "${IMAGE_VERSION}"' -i ./charts/datree-admission-webhook-awsmp/values.yaml
 #	docker tag webhook-server:latest 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator:${IMAGE_VERSION}
-	docker tag webhook-server:latest localhost:5000/cert-generator:${IMAGE_VERSION}
+	docker tag cert-generator:latest localhost:5000/cert-generator:${IMAGE_VERSION}
 #	docker push 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator:${IMAGE_VERSION}
 
 	IMAGE_VERSION=$(yq '.imageWebhook.tag' ./charts/datree-admission-webhook-awsmp/values.yaml)
+	IMAGE_VERSION=$(shell echo $${IMAGE_VERSION} | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
+	yq eval '.imageWebhook.tag = "${IMAGE_VERSION}"' -i ./charts/datree-admission-webhook-awsmp/values.yaml
+
 	docker tag webhook-server:latest localhost:5000/webhook-server:${IMAGE_VERSION}
 #	docker tag init-webhook:latest 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init:${IMAGE_VERSION}
 #	docker push 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init:${IMAGE_VERSION}
 
 	IMAGE_VERSION=$(yq '.image.tag' ./charts/datree-admission-webhook-awsmp/values.yaml)
+	IMAGE_VERSION=$(shell echo $${IMAGE_VERSION} | awk -F. '/[0-9]+\./{$NF++;print}' OFS=.)
+	yq eval '.image.tag = "${IMAGE_VERSION}"' -i ./charts/datree-admission-webhook-awsmp/values.yaml
+	
 	docker tag init-webhook:latest localhost:5000/init-webhook:${IMAGE_VERSION}
 #	docker tag webhook-server:latest 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-admission-webhook:${IMAGE_VERSION}
 #	docker push 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-admission-webhook:${IMAGE_VERSION}
