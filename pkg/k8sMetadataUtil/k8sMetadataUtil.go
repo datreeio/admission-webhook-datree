@@ -2,11 +2,14 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
-	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
+	cliclient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
+	licensemanagerclient "github.com/datreeio/admission-webhook-datree/pkg/licenseManagerClient"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
@@ -17,31 +20,48 @@ import (
 )
 
 func InitK8sMetadataUtil() {
-
 	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
-
-	var clusterUuid k8sTypes.UID
+	cliClient := cliclient.NewCliServiceClient(deploymentConfig.URL, validator)
 
 	k8sClient, err := getClientSet()
-
 	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+		cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
+			ClusterUuid:   "",
+			Token:         os.Getenv(enums.Token),
+			NodesCount:    -1,
+			NodesCountErr: err.Error(),
+		})
 		return
 	}
 
-	clusterUuid, err = getClusterUuid(k8sClient)
+	clusterUuid, err := getClusterUuid(k8sClient)
 	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+		cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
+			ClusterUuid:   clusterUuid,
+			Token:         os.Getenv(enums.Token),
+			NodesCount:    -1,
+			NodesCountErr: err.Error(),
+		})
 	}
 
-	nodesCount, nodesCountErr := getNodesCount(k8sClient)
-	sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+	runHourlyNodesCountCronJob(k8sClient, cliClient, clusterUuid)
 
+	if os.Getenv(enums.AWSMarketplaceEnableCheckEntitlement) == "true" {
+		runDailyAWSCheckoutLicenseCronJob(k8sClient, cliClient, clusterUuid)
+	}
+
+}
+
+func runHourlyNodesCountCronJob(k8sClient *kubernetes.Clientset, cliClient *cliclient.CliClient, clusterUuid k8sTypes.UID) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
 		nodesCount, nodesCountErr := getNodesCount(k8sClient)
-		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+		cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
+			ClusterUuid:   clusterUuid,
+			Token:         os.Getenv(enums.Token),
+			NodesCount:    nodesCount,
+			NodesCountErr: nodesCountErr.Error(),
+		})
 	})
 	cornJob.Start()
 }
@@ -80,18 +100,39 @@ func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
 	return clusterMetadata.UID, nil
 }
 
-func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
-	token := os.Getenv(enums.Token)
+// run chckout license cron job daily to check if aws marketplace license is valid with the nodes number
+func runDailyAWSCheckoutLicenseCronJob(k8sClient *kubernetes.Clientset, cliClient *cliclient.CliClient, clusterUuid k8sTypes.UID) {
+	licenseManagerClient := licensemanagerclient.NewLicenseManagerClient()
 
-	var nodesCountErrString string
-	if nodesCountErr != nil {
-		nodesCountErrString = nodesCountErr.Error()
-	}
+	licenseCheckerCornJob := cron.New(cron.WithLocation(time.UTC))
+	// @daily means run once a day, midnight. On debug mode it's very nice to run it once a minute i.e '@every 1min'
+	licenseCheckerCornJob.AddFunc("@daily", func() {
+		nodesCount, err := getNodesCount(k8sClient)
+		if err != nil {
+			// should be on debug
+			logger.LogUtil(fmt.Sprint("failed counting nodes for checkout", err))
+			cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
+				ClusterUuid:   clusterUuid,
+				Token:         os.Getenv(enums.Token),
+				NodesCount:    -1,
+				NodesCountErr: err.Error(),
+			})
+			return
+		}
 
-	client.ReportK8sMetadata(&cliClient.ReportK8sMetadataRequest{
-		ClusterUuid:   clusterUuid,
-		Token:         token,
-		NodesCount:    nodesCount,
-		NodesCountErr: nodesCountErrString,
+		// should be on debug
+		logger.LogUtil(fmt.Sprint("checking aws marketplace license with nodes count", nodesCount))
+		err = licenseManagerClient.CheckoutLicense(nodesCount)
+		if err != nil {
+			// should be on debug
+			logger.LogUtil(fmt.Sprint("checkout license failed: ", err))
+			cliClient.ReportK8sMetadata(&cliclient.ReportK8sMetadataRequest{
+				ClusterUuid:   clusterUuid,
+				Token:         os.Getenv(enums.Token),
+				NodesCount:    -1,
+				NodesCountErr: err.Error(),
+			})
+		}
 	})
+	licenseCheckerCornJob.Start()
 }
