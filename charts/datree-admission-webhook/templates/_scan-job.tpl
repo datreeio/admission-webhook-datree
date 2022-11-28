@@ -36,7 +36,7 @@ spec:
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
             - name: DATREE_CONTEXT
-              value {{.Values.datree.context}}
+              value: {{.Values.datree.context}}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
