@@ -135,8 +135,6 @@ spec:
             - mountPath: /etc/webhook/certs
               name: webhook-certs
           env:
-          - name: WEBHOOK_CERTS_DIR
-            value: /etc/webhook/certs
           - name: WEBHOOK_SERVER_DNS
             value: {{ printf "datree-webhook-server.%s.svc" (include "datree.namespace" .)}}
           
