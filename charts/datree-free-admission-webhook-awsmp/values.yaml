@@ -43,22 +43,27 @@ datree:
 
 # The Datree webhook-server image to use.
 image:
-  # Image repository
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-free-admission-webhook-awsmp
-  # Image tag
-  tag: 0.1.24-rc.2
-  # Image pull policy
-  pullPolicy: Always
+  webhookServer:
+    # Image repository
+    repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-free-admission-webhook-awsmp
+    # Image tag
+    tag: 0.1.24-rc.2
+    # Image pull policy
+    pullPolicy: IfNotPresent
+  # The Datree init-webhook image to use.
+  initWebhook:
+    # Image repository
+    repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-free-webhook-init
+    # Image tag
+    tag: 1.0-rc.1
+    # Image pull policy
+    pullPolicy: IfNotPresent
 
 initContainer:
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-free-cert-generator
-  tag: 1.0-rc.1
-
-imageWebhook:
-  # Image repository
-  repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-free-webhook-init
-  # Image tag
-  tag: 1.0-rc.1
+  image:
+    repository: 709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-free-cert-generator
+    tag: 1.0-rc.1
+    pullPolicy: IfNotPresent
 
 # Security context for the containers
 securityContext:

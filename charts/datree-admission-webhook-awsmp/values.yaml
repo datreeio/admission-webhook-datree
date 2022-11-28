@@ -41,24 +41,29 @@ datree:
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord: ""
 
-# The Datree webhook-server image to use.
 image:
-  # Image repository
-  repository: localhost:5000/webhook-server #localhost:5000/datree-admission-webhook #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
-  # Image tag
-  tag: 0.1-rc.1-prerebase #1.0-rc.3
-  # Image pull policy
-  pullPolicy: Always
+  # The Datree webhook-server image to use.
+  webhookServer:
+    # Image repository
+    repository: localhost:5000/webhook-server #localhost:5000/datree-admission-webhook #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
+    # Image tag
+    tag: 0.1-rc.1-prerebase #1.0-rc.3
+    # Image pull policy
+    pullPolicy: IfNotPresent
+  # The Datree init-webhook image to use.
+  initWebhook:
+    # Image repository
+    repository: localhost:5000/init-webhook #localhost:5000/webhook-init #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init
+    # Image tag
+    tag: 0.1-rc.2-prerebase #0.1.1-rc.3
+    # Image pull policy
+    pullPolicy: IfNotPresent
 
 initContainer:
-  repository: localhost:5000/cert-generator # localhost:5000/gen-cert  #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator
-  tag: 0.1-rc.1-prerebase # 0.1.2-rc.2 #0.1.1-rc.1
-
-imageWebhook:
-  # Image repository
-  repository: localhost:5000/init-webhook #localhost:5000/webhook-init #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init
-  # Image tag
-  tag: 0.1-rc.2-prerebase #0.1.1-rc.3
+  image:
+    repository: localhost:5000/cert-generator # localhost:5000/gen-cert  #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator
+    tag: 0.1-rc.1-prerebase # 0.1.2-rc.2 #0.1.1-rc.1
+    pullPolicy: IfNotPresent
 
 # Security context for the containers
 securityContext:
