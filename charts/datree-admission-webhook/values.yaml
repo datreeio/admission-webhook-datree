@@ -49,7 +49,7 @@ scan_job:
     # Image repository
     repository: datree/scan-job
     # Image tag
-    tag: 0.0.8
+    tag: 0.0.9
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
