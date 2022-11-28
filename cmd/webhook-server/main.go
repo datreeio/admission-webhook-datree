@@ -68,6 +68,7 @@ func start(port string) {
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+		internalLogger.LogError(fmt.Sprintf("Datree Webhook failed to start due to: %s\n", err.Error()))
 		http.ListenAndServe(":"+port, nil)
 	}
 }

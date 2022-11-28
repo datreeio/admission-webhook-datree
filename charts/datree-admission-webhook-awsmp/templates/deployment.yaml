@@ -28,7 +28,7 @@ spec:
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
-      - name: webhook-init
+      - name: init-webhook
         image: "{{ .Values.image.initWebhook.repository }}:{{ .Values.image.initWebhook.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.initWebhook.pullPolicy }}
         volumeMounts:
@@ -45,7 +45,7 @@ spec:
           value: "admission.datree/validate"
         - name: WEBHOOK_SERVER_REPLICAS
           value: "{{ .Values.replicaCount }}"
-      - name: server
+      - name: webhook-server
         securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
         livenessProbe:
             httpGet:
@@ -127,7 +127,7 @@ spec:
             secretName: {{ .Values.aws.licenseConfigSecretName }}
         {{- end}}
       initContainers:
-        - name: generate-cert
+        - name: cert-generator
           image: "{{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}"
           imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
           volumeMounts:
