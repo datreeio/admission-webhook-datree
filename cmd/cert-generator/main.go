@@ -9,11 +9,7 @@ import (
 )
 
 func main() {
-	tlsDir, isFound := os.LookupEnv("WEBHOOK_CERTS_DIR")
-	if !isFound {
-		logger.LogUtil("required directory for certificates is missing, verify env varaible WEBHOOK_CERTS_DIR in deployment")
-		return
-	}
+	tlsDir := "/etc/webhook/certs"
 
 	err := os.MkdirAll(tlsDir, 0666)
 	if err != nil {

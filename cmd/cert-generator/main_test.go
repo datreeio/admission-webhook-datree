@@ -4,14 +4,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestMain(m *testing.M) {
-	os.Setenv("WEBHOOK_CERTS_DIR", "/tmp")
 	m.Run()
 }
 
