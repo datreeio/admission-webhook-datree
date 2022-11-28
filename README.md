@@ -6,13 +6,18 @@ on a resource.
 ## TL;DR
 
 ```bash
+  helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
+  helm repo update
+  helm install -n datree datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<DATREE_TOKEN> --set datree.context=$(kubectl config current-context)
+```
+
+```bash
   # Install and create namespace with Helm
   helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
   helm repo update
-
   # Already existing `datree` namespace
   kubectl create ns datree
-  helm install -n datree datree-webhook datree-webhook/datree-admission-webhook --set datree.token=<DATREE_TOKEN>
+  helm install -n datree datree-webhook datree-webhook/datree-admission-webhook --set datree.token=<DATREE_TOKEN> --set datree.context=$(kubectl config current-context)
 ```
 
 ### Prerequisites
