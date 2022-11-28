@@ -33,7 +33,7 @@ datree:
   output: ""                # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
   noRecord: ""              # Don’t send policy checks metadata to the backend. (boolean ,optional)
   enforce: ""               # Block resources that fail the policy check. (boolean ,optional)
-  context: ""               # The name of the cluster. (string ,optional)
+  context: ""               # The name of the cluster link for cluster name in your dashboard. (string ,optional)
 ```
 
 For further information about Datree flags see [CLI arguments](https://hub.datree.io/setup/cli-arguments).
@@ -56,7 +56,7 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 | securityContext                       | Security context applied on the container.                                                | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true,"runAsUser":25000}                                   |
 | resources                             | The resource request/limits for the container image.                                      | limits :cpu: 1000m, memory: 512Mi requests: cpu:100m, memory:256Mi                                                                        |
 | datree.token                          | The token used to link the CLI to your dashboard. (required)                              | nil                                                                                                                                       |
-| datree.context                        | The name of the cluster                                                                   | cluster uuid                                                                                                                              |
+| datree.context                        | The name of the cluster link for cluster name in your dashboard                           | cluster uuid                                                                                                                              |
 | datree.policy                         | The name of the policy to check, e.g: staging. (optional)                                 | "" (i.e "default")                                                                                                                        |
 | datree.verbose                        | Display 'How to Fix' link for failed rules in output. (optional)                          | false                                                                                                                                     |
 | datree.output                         | The format output of the policy check results: yaml, json, xml, simple, JUnit. (optional) | "" (i.e beautiful😊)                                                                                                                      |
