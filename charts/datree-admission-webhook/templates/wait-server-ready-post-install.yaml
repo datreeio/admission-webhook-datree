@@ -28,3 +28,4 @@ spec:
           - "-c"
           - >-
             kubectl wait --for=condition=ready pod -l app=datree-webhook-server --timeout="{{ default "180s" .Values.hooks.timeoutTime }}"
+# {{- include "datree-lib.wait-server-ready-post-install" .}}
