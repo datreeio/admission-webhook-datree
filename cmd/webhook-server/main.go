@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"net/http"
-	"os"
-	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
+
+	"net/http"
+	"os"
+	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -29,26 +30,24 @@ func main() {
 	if port == "" {
 		port = "8443"
 	}
-
 	start(port)
 }
 
 func start(port string) {
 	internalLogger := logger.New("")
-
-	basicNetworkValidator := networkValidator.NewNetworkValidator()
-	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
-	basicLocalConfigClient := localConfig.NewLocalConfigClient(basicCliClient, basicNetworkValidator)
-	errorReporter := errorReporter.NewErrorReporter(basicCliClient, basicLocalConfigClient)
-
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
-			errorReporter.ReportPanicError(panicErr)
+			validator := networkValidator.NewNetworkValidator()
+			newCliClient := cliClient.NewCliClient(deploymentConfig.URL, validator)
+			newLocalConfigClient := localConfig.NewLocalConfigClient(newCliClient, validator)
+			reporter := errorReporter.NewErrorReporter(newCliClient, newLocalConfigClient)
+			reporter.ReportPanicError(panicErr)
 			internalLogger.LogError(fmt.Sprintf("Datree Webhook failed to start due to Unexpected error: %s\n", utils.ParseErrorToString(panicErr)))
 			os.Exit(DefaultErrExitCode)
 		}
 	}()
 
+	logger.LogUtil("initializing k8s metadata")
 	k8sMetadataUtil.InitK8sMetadataUtil()
 	initMetadataLogsCronjob()
 	server.InitServerVars()
@@ -57,7 +56,7 @@ func start(port string) {
 		panic(err)
 	}
 
-	validationController := controllers.NewValidationController(errorReporter)
+	validationController := controllers.NewValidationController()
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
@@ -67,7 +66,9 @@ func start(port string) {
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
-	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+	err = http.ListenAndServeTLS(":"+port, certPath, keyPath, nil)
+	if err != nil {
+		logger.LogUtil(err.Error())
 		http.ListenAndServe(":"+port, nil)
 	}
 }
