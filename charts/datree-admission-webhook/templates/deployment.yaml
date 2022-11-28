@@ -111,4 +111,3 @@ spec:
           secret:
             secretName: {{ .Values.aws.licenseConfigSecretName }}
       {{- end}}
-# {{- include "datree-lib.deployment" .}}
