@@ -2,11 +2,13 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"time"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
@@ -16,34 +18,48 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+var ClusterUuid k8sTypes.UID = ""
+
 func InitK8sMetadataUtil() {
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
-	var clusterUuid k8sTypes.UID
-
 	k8sClient, err := getClientSet()
 
 	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+		sendK8sMetadata(-1, err, ClusterUuid, cliClient)
 		return
 	}
 
-	clusterUuid, err = getClusterUuid(k8sClient)
+	err = setClusterUuid(k8sClient)
 	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+		sendK8sMetadata(-1, err, ClusterUuid, cliClient)
 	}
 
 	nodesCount, nodesCountErr := getNodesCount(k8sClient)
-	sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+	sendK8sMetadata(nodesCount, nodesCountErr, ClusterUuid, cliClient)
 
-	cornJob := cron.New(cron.WithLocation(time.UTC))
-	cornJob.AddFunc("@hourly", func() {
+	cronJob := cron.New(cron.WithLocation(time.UTC))
+	cronJob.AddFunc("@hourly", func() {
 		nodesCount, nodesCountErr := getNodesCount(k8sClient)
-		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+		sendK8sMetadata(nodesCount, nodesCountErr, ClusterUuid, cliClient)
 	})
-	cornJob.Start()
+
+	var setClusterUuidJobEntryID cron.EntryID
+
+	setClusterUuidJobEntryID, err = cronJob.AddFunc("@every 1m", func() {
+		setClusterUuid(k8sClient)
+		if ClusterUuid != "" && setClusterUuidJobEntryID != 0 {
+			cronJob.Remove(setClusterUuidJobEntryID)
+		}
+		logger.LogUtil("ClusterUuid wasn't set yet, trying again in a minute")
+	})
+	if err != nil {
+		logger.LogUtil(fmt.Sprintf("Could not create setClusterUuid cronjob err: %s", err.Error()))
+	}
+
+	cronJob.Start()
 }
 
 func getNodesCount(clientset *kubernetes.Clientset) (int, error) {
@@ -69,15 +85,17 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-var ClusterUuid k8sTypes.UID = ""
+func setClusterUuid(clientset *kubernetes.Clientset) error {
+	if ClusterUuid != "" {
+		return nil
+	}
 
-func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
 	clusterMetadata, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 	if err != nil {
-		return "", err
+		return err
 	}
 	ClusterUuid = clusterMetadata.UID
-	return clusterMetadata.UID, nil
+	return nil
 }
 
 func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
