@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -40,7 +42,7 @@ func TestHeaderValidation(t *testing.T) {
 
 	request.Header.Set("Content-Type", "text/html")
 	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter)
+	validationController := NewValidationController(mockErrorReporter, nil)
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -53,7 +55,7 @@ func TestValidateHttpMethod(t *testing.T) {
 
 	request.Header.Set("Content-Type", "application/json")
 	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter)
+	validationController := NewValidationController(mockErrorReporter, nil)
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusMethodNotAllowed)
@@ -66,7 +68,7 @@ func TestValidateRequestBodyEmpty(t *testing.T) {
 
 	request.Header.Set("Content-Type", "application/json")
 	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter)
+	validationController := NewValidationController(mockErrorReporter, nil)
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -222,7 +224,8 @@ func (mhc *MockHttpClient) Request(method string, resourceURI string, body inter
 func mockValidationController(mockedResponse httpClient.Response) *ValidationController {
 	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
 	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
-	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient)
+	mockK8sMetadataUtil := k8sMetadataUtil.NewK8sMetadataUtilMock()
+	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil)
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,

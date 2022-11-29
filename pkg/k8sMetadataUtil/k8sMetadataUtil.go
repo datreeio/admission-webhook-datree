@@ -5,6 +5,8 @@ import (
 	"os"
 	"time"
 
+	"k8s.io/client-go/kubernetes/fake"
+
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
@@ -16,7 +18,46 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func InitK8sMetadataUtil() {
+type K8sMetadataUtil struct {
+	ClientSet kubernetes.Interface
+}
+
+func NewK8sMetadataUtil() *K8sMetadataUtil {
+	clientset, err := getClientSet()
+	if err != nil {
+		return &K8sMetadataUtil{}
+	}
+	return &K8sMetadataUtil{
+		ClientSet: clientset,
+	}
+}
+
+func NewK8sMetadataUtilMock() *K8sMetadataUtil {
+	return &K8sMetadataUtil{
+		ClientSet: fake.NewSimpleClientset(),
+	}
+}
+
+//func NewK8sMetadataUtilMock() *K8sMetadataUtilMock {
+//	return &K8sMetadataUtilMock{
+//		//ClientSet: ,
+//		ClientSet: fakeclientset.NewSimpleClientset(&v1.Pod{
+//			ObjectMeta: metav1.ObjectMeta{
+//				Name:        "influxdb-v2",
+//				Namespace:   "default",
+//				Annotations: map[string]string{},
+//			},
+//		}, &v1.Pod{
+//			ObjectMeta: metav1.ObjectMeta{
+//				Name:        "chronograf",
+//				Namespace:   "default",
+//				Annotations: map[string]string{},
+//			},
+//		}),
+//	}
+//}
+
+func (k8sMDU *K8sMetadataUtil) InitK8sMetadataUtil() {
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
@@ -30,7 +71,7 @@ func InitK8sMetadataUtil() {
 		return
 	}
 
-	clusterUuid, err = getClusterUuid(k8sClient)
+	clusterUuid, err = k8sMDU.GetClusterUuid()
 	if err != nil {
 		sendK8sMetadata(-1, err, clusterUuid, cliClient)
 	}
@@ -71,8 +112,8 @@ func getClientSet() (*kubernetes.Clientset, error) {
 
 var ClusterUuid k8sTypes.UID = ""
 
-func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
-	clusterMetadata, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
+func (k8sMDU *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
+	clusterMetadata, err := k8sMDU.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
