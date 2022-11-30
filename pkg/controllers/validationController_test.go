@@ -19,6 +19,7 @@ import (
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 //go:embed test_fixtures/applyNotAllowedRequest.json
@@ -224,7 +225,9 @@ func (mhc *MockHttpClient) Request(method string, resourceURI string, body inter
 func mockValidationController(mockedResponse httpClient.Response) *ValidationController {
 	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
 	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
-	mockK8sMetadataUtil := k8sMetadataUtil.NewK8sMetadataUtilMock()
+	mockK8sMetadataUtil := &k8sMetadataUtil.K8sMetadataUtil{
+		ClientSet: fake.NewSimpleClientset(),
+	}
 	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil)
 
 	return &ValidationController{

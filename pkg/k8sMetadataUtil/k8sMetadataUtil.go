@@ -5,8 +5,6 @@ import (
 	"os"
 	"time"
 
-	"k8s.io/client-go/kubernetes/fake"
-
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
@@ -22,6 +20,8 @@ type K8sMetadataUtil struct {
 	ClientSet kubernetes.Interface
 }
 
+var ClusterUuid k8sTypes.UID = ""
+
 func NewK8sMetadataUtil() *K8sMetadataUtil {
 	clientset, err := getClientSet()
 	if err != nil {
@@ -31,31 +31,6 @@ func NewK8sMetadataUtil() *K8sMetadataUtil {
 		ClientSet: clientset,
 	}
 }
-
-func NewK8sMetadataUtilMock() *K8sMetadataUtil {
-	return &K8sMetadataUtil{
-		ClientSet: fake.NewSimpleClientset(),
-	}
-}
-
-//func NewK8sMetadataUtilMock() *K8sMetadataUtilMock {
-//	return &K8sMetadataUtilMock{
-//		//ClientSet: ,
-//		ClientSet: fakeclientset.NewSimpleClientset(&v1.Pod{
-//			ObjectMeta: metav1.ObjectMeta{
-//				Name:        "influxdb-v2",
-//				Namespace:   "default",
-//				Annotations: map[string]string{},
-//			},
-//		}, &v1.Pod{
-//			ObjectMeta: metav1.ObjectMeta{
-//				Name:        "chronograf",
-//				Namespace:   "default",
-//				Annotations: map[string]string{},
-//			},
-//		}),
-//	}
-//}
 
 func (k8sMDU *K8sMetadataUtil) InitK8sMetadataUtil() {
 
@@ -110,9 +85,11 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-var ClusterUuid k8sTypes.UID = ""
-
 func (k8sMDU *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
+	if ClusterUuid != "" {
+		return ClusterUuid, nil
+	}
+
 	clusterMetadata, err := k8sMDU.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 	if err != nil {
 		return "", err
