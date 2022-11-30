@@ -35,8 +35,8 @@ spec:
               value: {{.Values.datree.token}}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
-            - name: DATREE_CONTEXT
-              value: {{.Values.datree.context}}
+            - name: CLUSTER_NAME
+              value: {{.Values.datree.clusterName}}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
