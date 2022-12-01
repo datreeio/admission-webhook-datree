@@ -35,8 +35,8 @@ spec:
               value: {{.Values.datree.token}}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
-            - name: DATREE_CONTEXT
-              value: {{.Values.datree.context}}
+            - name: CLUSTER_NAME
+              value: {{.Values.datree.clusterName}}
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -46,11 +46,5 @@ spec:
               type: RuntimeDefault
           image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
           imagePullPolicy: Always
-          resources:
-            limits:
-              cpu: {{ .Values.scanJob.resources.limits.cpu }}
-              memory: {{ .Values.scanJob.resources.limits.memory }}
-            requests:
-              cpu: {{ .Values.scanJob.resources.requests.cpu }}
-              memory: {{ .Values.scanJob.resources.requests.memory }}
+          resources: {{- toYaml .Values.resources | nindent 12 }}
 {{- end -}}

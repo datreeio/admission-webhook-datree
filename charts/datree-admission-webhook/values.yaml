@@ -34,13 +34,13 @@ datree:
   # Block resources that fail the policy check. (boolean ,optional)
   enforce: ""
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
-  context: ""
+  clusterName: ""
 # The Datree webhook-server image to use.
 image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.35
+  tag: 0.1.36
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -49,26 +49,27 @@ scan_job:
     # Image repository
     repository: datree/scan-job
     # Image tag
-    tag: 0.0.9
+    tag: 0.0.10
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 25000
-resources:
-  limits:
-    memory: 512Mi
-  requests:
-    cpu: 1000m
-    memory: 512Mi
+resources: {}
+# limits:
+#   cpu: 200m
+#   memory: 256Mi
+# requests:
+#   cpu: 200m
+#   memory: 48Mi
 scanJob:
-  resources:
-    limits:
-      cpu: 1000m
-      memory: 512Mi
-    requests:
-      cpu: 500m
-      memory: 256Mi
+  resources: {}
+  # limits:
+  #   cpu: 1000m
+  #   memory: 1048Mi
+  # requests:
+  #   cpu: 200m
+  #   memory: 256Mi
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
