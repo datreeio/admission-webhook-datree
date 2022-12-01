@@ -17,7 +17,8 @@ import (
 )
 
 type K8sMetadataUtil struct {
-	ClientSet kubernetes.Interface
+	ClientSet            kubernetes.Interface
+	CreateClientSetError error
 }
 
 var ClusterUuid k8sTypes.UID = ""
@@ -25,7 +26,9 @@ var ClusterUuid k8sTypes.UID = ""
 func NewK8sMetadataUtil() *K8sMetadataUtil {
 	clientset, err := getClientSet()
 	if err != nil {
-		return &K8sMetadataUtil{}
+		return &K8sMetadataUtil{
+			CreateClientSetError: err,
+		}
 	}
 	return &K8sMetadataUtil{
 		ClientSet: clientset,
@@ -39,30 +42,28 @@ func (k8sMDU *K8sMetadataUtil) InitK8sMetadataUtil() {
 
 	var clusterUuid k8sTypes.UID
 
-	k8sClient, err := getClientSet()
-
-	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+	if k8sMDU.CreateClientSetError != nil {
+		sendK8sMetadata(-1, k8sMDU.CreateClientSetError, clusterUuid, cliClient)
 		return
 	}
 
-	clusterUuid, err = k8sMDU.GetClusterUuid()
+	clusterUuid, err := k8sMDU.GetClusterUuid()
 	if err != nil {
 		sendK8sMetadata(-1, err, clusterUuid, cliClient)
 	}
 
-	nodesCount, nodesCountErr := getNodesCount(k8sClient)
+	nodesCount, nodesCountErr := getNodesCount(k8sMDU.ClientSet)
 	sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
-		nodesCount, nodesCountErr := getNodesCount(k8sClient)
+		nodesCount, nodesCountErr := getNodesCount(k8sMDU.ClientSet)
 		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
 	cornJob.Start()
 }
 
-func getNodesCount(clientset *kubernetes.Clientset) (int, error) {
+func getNodesCount(clientset kubernetes.Interface) (int, error) {
 	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return -1, err
@@ -90,12 +91,17 @@ func (k8sMDU *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 		return ClusterUuid, nil
 	}
 
-	clusterMetadata, err := k8sMDU.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
-	if err != nil {
-		return "", err
+	if k8sMDU.CreateClientSetError != nil {
+		return "", k8sMDU.CreateClientSetError
+	} else {
+		clusterMetadata, err := k8sMDU.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
+		if err != nil {
+			return "", err
+		}
+		ClusterUuid = clusterMetadata.UID
 	}
-	ClusterUuid = clusterMetadata.UID
-	return clusterMetadata.UID, nil
+
+	return ClusterUuid, nil
 }
 
 func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
