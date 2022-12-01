@@ -93,6 +93,14 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		panic(err)
 	}
 
+	if token == "" {
+		*warningMessages = append(*warningMessages, err.Error())
+		// maybe save to logs
+		//clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, true, "", "", nil, clusterK8sVersion, "", "", server.ConfigMapScanningFilters)
+		//saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, "no token provided (this is the message)", *warningMessages), false
+	}
+
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 
