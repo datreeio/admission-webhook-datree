@@ -35,29 +35,29 @@ func NewK8sMetadataUtil() *K8sMetadataUtil {
 	}
 }
 
-func (k8sMDU *K8sMetadataUtil) InitK8sMetadataUtil() {
+func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
 	var clusterUuid k8sTypes.UID
 
-	if k8sMDU.CreateClientSetError != nil {
-		sendK8sMetadata(-1, k8sMDU.CreateClientSetError, clusterUuid, cliClient)
+	if k8sMetadataUtil.CreateClientSetError != nil {
+		sendK8sMetadata(-1, k8sMetadataUtil.CreateClientSetError, clusterUuid, cliClient)
 		return
 	}
 
-	clusterUuid, err := k8sMDU.GetClusterUuid()
+	clusterUuid, err := k8sMetadataUtil.GetClusterUuid()
 	if err != nil {
 		sendK8sMetadata(-1, err, clusterUuid, cliClient)
 	}
 
-	nodesCount, nodesCountErr := getNodesCount(k8sMDU.ClientSet)
+	nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
 	sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
-		nodesCount, nodesCountErr := getNodesCount(k8sMDU.ClientSet)
+		nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
 		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
 	cornJob.Start()
@@ -86,15 +86,15 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-func (k8sMDU *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
+func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 	if ClusterUuid != "" {
 		return ClusterUuid, nil
 	}
 
-	if k8sMDU.CreateClientSetError != nil {
-		return "", k8sMDU.CreateClientSetError
+	if k8sMetadataUtil.CreateClientSetError != nil {
+		return "", k8sMetadataUtil.CreateClientSetError
 	} else {
-		clusterMetadata, err := k8sMDU.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
+		clusterMetadata, err := k8sMetadataUtil.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 		if err != nil {
 			return "", err
 		}
