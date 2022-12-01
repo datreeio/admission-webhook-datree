@@ -13,7 +13,6 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
-	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/datreeio/datree/pkg/httpClient"
 	"github.com/datreeio/datree/pkg/networkValidator"
@@ -42,8 +41,7 @@ func TestHeaderValidation(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "text/html")
-	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter, nil)
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -55,8 +53,7 @@ func TestValidateHttpMethod(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter, nil)
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusMethodNotAllowed)
@@ -68,8 +65,7 @@ func TestValidateRequestBodyEmpty(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter, nil)
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
