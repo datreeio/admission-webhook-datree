@@ -119,6 +119,8 @@ type WebhookEvaluationRequestData struct {
 	ClusterUuid    k8sTypes.UID
 	Namespace      string
 	IsEnforceMode  bool
+	Kind           string
+	MetadataName   string
 }
 
 type EvaluationResultRequest struct {
@@ -134,6 +136,8 @@ type EvaluationResultRequest struct {
 	PolicyCheckResults map[string]map[string]*cliClient.FailedRule `json:"policyCheckResults"`
 	ClusterUuid        k8sTypes.UID                                `json:"clusterUuid,omitempty"`
 	Namespace          string                                      `json:"namespace,omitempty"`
+	Kind               string                                      `json:"kind"`
+	MetadataName       string                                      `json:"metadataName"`
 }
 
 type Metadata struct {

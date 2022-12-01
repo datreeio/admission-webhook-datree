@@ -159,8 +159,11 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
+	resource := filesConfigurations[0].Configurations[0]
+	kind := resource.Kind
+	metadataName := resource.MetadataName
 	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
-		policyCheckResults, namespace)
+		policyCheckResults, namespace, kind, metadataName)
 
 	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
@@ -284,6 +287,8 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 		PolicyCheckResults: evaluationRequestData.EvaluationData.PolicyCheckResults,
 		ClusterUuid:        evaluationRequestData.ClusterUuid,
 		Namespace:          evaluationRequestData.Namespace,
+		Kind:               evaluationRequestData.Kind,
+		MetadataName:       evaluationRequestData.MetadataName,
 	})
 
 	return sendEvaluationResultsResponse, err
@@ -440,7 +445,7 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 }
 
 func getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
-	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string) cliClient.WebhookEvaluationRequestData {
+	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
@@ -457,6 +462,8 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 		ClusterUuid:    k8sMetadataUtil.ClusterUuid,
 		IsEnforceMode:  isEnforceMode(),
 		Namespace:      evaluationNamespace,
+		Kind:           kind,
+		MetadataName:   metadataName,
 	}
 
 	return evaluationRequestData
