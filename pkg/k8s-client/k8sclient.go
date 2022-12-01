@@ -2,12 +2,15 @@ package k8sclient
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 
@@ -45,6 +48,46 @@ type ValidatingWebhookOpts struct {
 	WebhookName string
 }
 
+func (k *K8sClient) LabelNamespace(ns string, labels map[string]string) error {
+	_, err := k.clientset.CoreV1().Namespaces().Get(context.Background(), ns, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf(fmt.Sprintf("failed to get namespace %s: %v", ns, err))
+	}
+
+	jsonLabels, _ := json.Marshal(labels)
+	_, err = k.clientset.CoreV1().Namespaces().Patch(context.Background(), ns, types.MergePatchType, []byte(fmt.Sprintf(`{"metadata":{"labels":%s}}`, jsonLabels)), metav1.PatchOptions{})
+	if err != nil {
+		return fmt.Errorf(fmt.Sprintf("failed to add label to namespace %s: %v", ns, err))
+	}
+
+	logger.Logf("added label to namespace %s", ns)
+	return nil
+}
+
+func (k *K8sClient) RemoveNamespaceLabels(ns string, labels map[string]string) error {
+	namespace, err := k.clientset.CoreV1().Namespaces().Get(context.Background(), ns, metav1.GetOptions{})
+	if err != nil {
+		return fmt.Errorf(fmt.Sprintf("failed to get namespace %s: %v", ns, err))
+	}
+
+	nsLabels := namespace.GetLabels()
+	if nsLabels == nil {
+		return fmt.Errorf(fmt.Sprintf("namespace %s has no labels", ns))
+	}
+
+	for k := range labels {
+		delete(nsLabels, k)
+	}
+
+	jsonLabels, _ := json.Marshal(nsLabels)
+	_, err = k.clientset.CoreV1().Namespaces().Patch(context.Background(), ns, types.MergePatchType, []byte(fmt.Sprintf(`{"metadata":{"labels":%s}}`, jsonLabels)), metav1.PatchOptions{})
+	if err != nil {
+		return fmt.Errorf(fmt.Sprintf("failed to remove label from namespace %s: %v", ns, err))
+	}
+
+	return nil
+}
+
 func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *ValidatingWebhookOpts) (*admissionregistrationV1.ValidatingWebhookConfiguration, error) {
 	if cfg == nil {
 		return nil, fmt.Errorf("invalid validating webhook configuration")
@@ -67,16 +110,18 @@ func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *
 					Path:      &path,
 				},
 			},
-			Rules: []admissionregistrationV1.RuleWithOperations{{Operations: []admissionregistrationV1.OperationType{
-				admissionregistrationV1.Create,
-				admissionregistrationV1.Update,
-			},
-				Rule: admissionregistrationV1.Rule{
-					APIGroups:   []string{"*"},
-					APIVersions: []string{"*"},
-					Resources:   []string{"*"},
-				},
-			}},
+			Rules: []admissionregistrationV1.RuleWithOperations{
+				{
+					Operations: []admissionregistrationV1.OperationType{
+						admissionregistrationV1.Create,
+						admissionregistrationV1.Update,
+					},
+					Rule: admissionregistrationV1.Rule{
+						APIGroups:   []string{"*"},
+						APIVersions: []string{"*"},
+						Resources:   []string{"*"},
+					},
+				}},
 			SideEffects:             &sideEffects,
 			AdmissionReviewVersions: []string{"v1", "v1beta1"},
 			TimeoutSeconds:          &[]int32{30}[0],
@@ -91,14 +136,17 @@ func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *
 		}},
 	}
 
-	vw, err := k.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), vw, metav1.CreateOptions{})
-	if err != nil {
-		return nil, err
+	existed := k.GetValidatingWebhookConfiguration(cfg.MetaName)
+	if existed == nil {
+		vw, err := k.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), vw, metav1.CreateOptions{})
+		if err != nil {
+			return nil, err
+		}
+		return vw, nil
 	}
 
-	// should be debug
-	logger.LogUtil(fmt.Sprintf("created validating webhook configuration: %v", vw))
-	return vw, nil
+	logger.Logf("validating webhook configuration %s already exists", existed.Name)
+	return existed, nil
 }
 
 // search for validating webhook and delete if exists
@@ -116,7 +164,11 @@ func (k *K8sClient) DeleteValidatingWebhookConfiguration(name string) error {
 
 func (k *K8sClient) GetValidatingWebhookConfiguration(name string) *admissionregistrationV1.ValidatingWebhookConfiguration {
 	vw, err := k.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Get(context.Background(), name, metav1.GetOptions{})
+	if err != nil && !errors.IsNotFound(err) {
+		fmt.Printf("failed to get validating webhook configuration %s: %v", name, err)
+	}
 	if (vw != nil && vw.Name == name) && err == nil {
+		fmt.Printf("found validating webhook configuration %s", vw.Name)
 		return vw
 	}
 
@@ -134,13 +186,11 @@ func (k *K8sClient) CreatePodWatcher(ctx context.Context, namespace string, sele
 }
 
 func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace string, selector string, replicas int) error {
-	logger.LogUtil(fmt.Sprintf("creating watcher for POD with label:%s ...", selector))
 	watcher, err := k.CreatePodWatcher(ctx, namespace, selector)
 	if err != nil {
 		return err
 	}
 
-	logger.LogUtil("watch out! Succuessfuly created watcher for PODs.")
 	defer watcher.Stop()
 
 	count := 0
@@ -152,9 +202,8 @@ func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace strin
 			if pod.Status.Phase == v1.PodRunning {
 				if k.IsPodReady(pod) {
 					count++
-					logger.LogUtil(fmt.Sprintf("the POD \"%s\" is running", selector))
+					logger.Logf("the POD '%s' is running. UID: %v", selector, pod.UID)
 					if count == replicas {
-						logger.LogUtil(fmt.Sprintf("all PODs are running"))
 						return nil
 					}
 				}
@@ -162,11 +211,11 @@ func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace strin
 			}
 
 		case <-time.After(180 * time.Second):
-			logger.LogUtil(fmt.Sprintf("exit from waitPodRunning for POD \"%s\" because the time is over", selector))
+			logger.Logf("exit from waitPodRunning for POD '%s' because the time is over", selector)
 			return nil
 
 		case <-ctx.Done():
-			logger.LogUtil(fmt.Sprintf("exit from waitPodRunning for POD \"%s\" because the context is done", selector))
+			logger.Logf("exit from waitPodRunning for POD '%s' because the context is done", selector)
 			return nil
 		}
 	}

@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	k8sclient "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/k8s-client"
-	webhookinfo "github.com/datreeio/admission-webhook-datree/cmd/init-webhook/webhook-info"
+	config "github.com/datreeio/admission-webhook-datree/pkg/config"
+	k8sclient "github.com/datreeio/admission-webhook-datree/pkg/k8s-client"
 	"github.com/stretchr/testify/mock"
 	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
 	v1 "k8s.io/api/core/v1"
@@ -48,6 +48,16 @@ func (m *mockK8sClient) IsPodReady(pod *v1.Pod) bool {
 	return args.Bool(0)
 }
 
+func (m *mockK8sClient) LabelNamespace(namespace string, labels map[string]string) error {
+	args := m.Called(namespace, labels)
+	return args.Error(0)
+}
+
+func (m *mockK8sClient) RemoveNamespaceLabels(ns string, labels map[string]string) error {
+	args := m.Called(ns, labels)
+	return args.Error(0)
+}
+
 func TestInitWebhook(t *testing.T) {
 	k8sClient := &mockK8sClient{
 		clientset: testclient.NewSimpleClientset(),
@@ -62,12 +72,12 @@ func TestInitWebhook(t *testing.T) {
 		_ = InitWebhook(k8sClient)
 
 		k8sClient.AssertCalled(t, "DeleteExistingValidatingWebhook", "datree-webhook")
-		k8sClient.AssertCalled(t, "WaitUntilPodsAreRunning", mock.Anything, webhookinfo.GetWebhookNamespace(), webhookinfo.GetWebhookPodsSelector(), webhookinfo.GetWebhookServerReplicas())
-		k8sClient.AssertCalled(t, "CreateValidatingWebhookConfiguration", webhookinfo.GetWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
-			MetaName:    "datree-webhook",
-			ServiceName: webhookinfo.GetWebhookServiceName(),
+		k8sClient.AssertCalled(t, "WaitUntilPodsAreRunning", mock.Anything, config.GetDatreeValidatingWebhookNamespace(), config.GetDatreeValidatingWebhookPodsSelector(), config.GetDatreeValidatingWebhookServerReplicas())
+		k8sClient.AssertCalled(t, "CreateValidatingWebhookConfiguration", config.GetDatreeValidatingWebhookNamespace(), &k8sclient.ValidatingWebhookOpts{
+			MetaName:    config.GetDatreeValidatingWebhookName(),
+			ServiceName: config.GetDatreeValidatingWebhookServiceName(),
 			CaBundle:    nil,
-			Selector:    webhookinfo.GetWebhookSelector(),
+			Selector:    config.GetDatreeValidatingWebhookNamespaceSelector(),
 			WebhookName: "webhook-server.datree.svc",
 		})
 	})

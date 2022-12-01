@@ -1,1 +1,0 @@
-{{- include "datree-lib.cleanup-pre-delete" .}}

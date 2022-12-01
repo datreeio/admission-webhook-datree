@@ -59,14 +59,14 @@ func start(port string) {
 
 	validationController := controllers.NewValidationController(errorReporter)
 	healthController := controllers.NewHealthController()
+
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
 
-	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
-
 	// start server
+	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
 		internalLogger.LogError(fmt.Sprintf("Datree Webhook failed to start due to: %s\n", err.Error()))
 		http.ListenAndServe(":"+port, nil)

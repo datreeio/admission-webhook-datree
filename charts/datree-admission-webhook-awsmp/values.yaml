@@ -3,7 +3,7 @@
 # The name of the namespace all resources will be created in, if not specified in the release.
 namespace: ""
 # The number of Datree webhook-server replicas to deploy for the webhook.
-replicaCount: 2
+replicaCount: 1
 # Additional labels to add to all resources.
 customLabels: {}
 # Additional annotations to add to all resources.
@@ -40,22 +40,22 @@ image:
     # Image repository
     repository: localhost:5000/webhook-server #localhost:5000/datree-admission-webhook #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/awsmp-datree-admission-webhook
     # Image tag
-    tag: 0.1-rc.2 #1.0-rc.3
+    tag: latest # 0.1-rc.2 #1.0-rc.3
     # Image pull policy
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   # The Datree init-webhook image to use.
   initWebhook:
     # Image repository
     repository: localhost:5000/init-webhook #localhost:5000/webhook-init #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-webhook-init
     # Image tag
-    tag: 0.1-rc.3 #0.1.1-rc.3
+    tag: latest #0.1-rc.3 #0.1.1-rc.3
     # Image pull policy
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 initContainer:
   image:
     repository: localhost:5000/cert-generator # localhost:5000/gen-cert  #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/datree-cert-generator
-    tag: 0.1-rc.2 # 0.1.2-rc.2 #0.1.1-rc.1
-    pullPolicy: IfNotPresent
+    tag: latest # 0.1.2-rc.2 #0.1.1-rc.1
+    pullPolicy: Always
 # Security context for the containers
 securityContext:
   allowPrivilegeEscalation: false
@@ -77,7 +77,7 @@ hooks:
   # The image for running kubectl commands
   image:
     repository: bitnami/kubectl #709825985650.dkr.ecr.us-east-1.amazonaws.com/datree/bitnami-kubectl
-    sha: sha256:1841cb16fddd9660c34f9b5bcec51f8c77bedba76c56381537753976b24649df #sha256:2c963c1aae87f544a53242348d64dce4bc39739211989394833322d29364b73c
+    sha: sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039 # sha256:1841cb16fddd9660c34f9b5bcec51f8c77bedba76c56381537753976b24649df #
     pullPolicy: IfNotPresent
 # AWS Marketplace configuration
 aws:

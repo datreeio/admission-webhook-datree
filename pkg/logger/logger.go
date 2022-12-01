@@ -3,6 +3,7 @@ package logger
 import (
 	"encoding/json"
 	"fmt"
+
 	"go.uber.org/zap"
 	admission "k8s.io/api/admission/v1"
 )
@@ -58,6 +59,11 @@ func (l *Logger) LogInfo(objectToLog any) {
 func LogUtil(msg string) {
 	logger := New("")
 	logger.LogInfo(msg)
+}
+
+func Logf(msg string, a ...any) {
+	logger := New("")
+	logger.LogInfo(fmt.Sprintf(msg, a...))
 }
 
 func (l *Logger) logInfo(objectToLog any, requestDirection string) {

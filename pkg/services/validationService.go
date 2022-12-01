@@ -51,8 +51,13 @@ type Metadata struct {
 	Labels            map[string]string `json:"labels"`
 }
 
+type configurationClient interface {
+	HandleConfigurationChange(request *admission.AdmissionRequest)
+}
+
 type ValidationService struct {
 	CliServiceClient *cliClient.CliClient
+	configHandler    configurationClient
 }
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
@@ -64,6 +69,7 @@ func isEnforceMode() bool {
 func NewValidationService() *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
+		configHandler:    config.NewConfigurationClient(nil),
 	}
 }
 
@@ -89,6 +95,12 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
+
+	// intercept datree configuration requests
+	if config.IsConfigurationChangeEvent(admissionReviewReq.Request) {
+		vs.configHandler.HandleConfigurationChange(admissionReviewReq.Request)
+	}
+
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
 		saveRequestMetadataLogInAggregator(clusterRequestMetadata)

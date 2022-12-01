@@ -1,4 +1,4 @@
-package webhookinfo
+package config
 
 import (
 	"os"
@@ -14,7 +14,7 @@ type ExpectedCondition[T any] struct {
 	message   string
 }
 
-func TestGetWebhookServerReplicas(t *testing.T) {
+func TestGetDatreeValidatingWebhookServerReplicas(t *testing.T) {
 	type testCase struct {
 		envVarValue string
 		expected    ExpectedCondition[int]
@@ -53,13 +53,13 @@ func TestGetWebhookServerReplicas(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			os.Setenv("WEBHOOK_SERVER_REPLICAS", test.envVarValue)
-			replicas := GetWebhookServerReplicas()
+			replicas := GetDatreeValidatingWebhookServerReplicas()
 			assert.True(t, test.expected.condition(replicas), test.expected.message, replicas)
 		})
 	}
 }
 
-func TestGetWebhookSelector(t *testing.T) {
+func TestGetDatreeValidatingWebhookNamespaceLabel(t *testing.T) {
 	type testCase struct {
 		envVarValue string
 		expected    ExpectedCondition[string]
@@ -88,14 +88,14 @@ func TestGetWebhookSelector(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			os.Setenv("WEBHOOK_SELECTOR", test.envVarValue)
-			selector := GetWebhookSelector()
+			os.Setenv("WEBHOOK_NAMESPACE_SELECTOR", test.envVarValue)
+			selector := GetDatreeValidatingWebhookNamespaceSelector()
 			assert.True(t, test.expected.condition(selector), test.expected.message, selector)
 		})
 	}
 }
 
-func TestGetWebhookNamespace(t *testing.T) {
+func TestGetDatreeValidatingWebhookNamespace(t *testing.T) {
 	type testCase struct {
 		envVarValue string
 		expected    ExpectedCondition[string]
@@ -125,13 +125,13 @@ func TestGetWebhookNamespace(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			os.Setenv("WEBHOOK_NAMESPACE", test.envVarValue)
-			ns := GetWebhookNamespace()
+			ns := GetDatreeValidatingWebhookNamespace()
 			assert.True(t, test.expected.condition(ns), test.expected.message, ns)
 		})
 	}
 }
 
-func TestGetWebhookServiceName(t *testing.T) {
+func TestGetDatreeValidatingWebhookServiceName(t *testing.T) {
 	type testCase struct {
 		envVarValue string
 		expected    ExpectedCondition[string]
@@ -161,7 +161,7 @@ func TestGetWebhookServiceName(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			os.Setenv("WEBHOOK_SERVICE", test.envVarValue)
-			serviceName := GetWebhookServiceName()
+			serviceName := GetDatreeValidatingWebhookServiceName()
 			assert.True(t, test.expected.condition(serviceName), test.expected.message, serviceName)
 		})
 	}
@@ -198,7 +198,7 @@ func TestGetWebhookServerPodSelector(t *testing.T) {
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
 			os.Setenv("WEBHOOK_POD_SELECTOR", test.envVarValue)
-			podSelector := GetWebhookPodsSelector()
+			podSelector := GetDatreeValidatingWebhookPodsSelector()
 			assert.True(t, test.expected.condition(podSelector), test.expected.message, podSelector)
 		})
 	}

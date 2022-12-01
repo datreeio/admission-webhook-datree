@@ -8,8 +8,6 @@ metadata:
     owner: datree
     app: "datree-webhook-server"
   annotations: 
-    "helm.sh/hook": post-install
-    "helm.sh/hook-weight": "5"
   {{- if .Values.customAnnotations }}
     {{- toYaml .Values.customAnnotations | nindent 4 }}
   {{- end }}
@@ -27,7 +25,9 @@ spec:
       {{- end }}
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
+      terminationGracePeriodSeconds: 180
       containers:
+
       - name: init-webhook
         image: "{{ .Values.image.initWebhook.repository }}:{{ .Values.image.initWebhook.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.initWebhook.pullPolicy }}
@@ -45,8 +45,19 @@ spec:
           value: "admission.datree/validate"
         - name: WEBHOOK_SERVER_REPLICAS
           value: "{{ .Values.replicaCount }}"
+
+      - name: kubectl-label
+        image: "{{ .Values.hooks.image.repository }}@{{ .Values.hooks.image.sha }}"
+        imagePullPolicy: Always
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "kubectl label ns kube-system {{template "datree.namespace" .}} datree.io/skip-;"] 
+        command: ["/bin/sh", "-c", "kubectl label ns kube-system {{template "datree.namespace" .}} datree.io/skip=true; sleep 300;"]
+
       - name: webhook-server
         securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
+          
         livenessProbe:
             httpGet:
                 path: /health
