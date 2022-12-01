@@ -442,9 +442,9 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 	return namespace, resourceKind, resourceName, managers
 }
 
-func (t ValidationService) getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
+func (vs ValidationService) getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string) cliClient.WebhookEvaluationRequestData {
-	clusterUuid, _ := t.K8sMetadataUtil.GetClusterUuid()
+	clusterUuid, _ := vs.K8sMetadataUtil.GetClusterUuid()
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
