@@ -1,1 +1,13 @@
 Datree installed, in order to activate please provide a token
+
+if (token) {
+ return "
+    🚀 Datree installed successfully!
+ "
+}else{
+    return "
+       🚀 Datree installed successfully!
+       ⚠️ To start using Datree, please provide your token
+       🔗 Check out the docs for instructions: https://hub.datree.io/configuration/behavior#setchange-token
+    "
+}
