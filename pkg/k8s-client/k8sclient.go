@@ -89,8 +89,6 @@ func (k *K8sClient) GetValidatingWebhookConfiguration(name string) (*admissionre
 
 // watch for pods given namespace to be ready, the selector is used to filter pods
 func (k *K8sClient) WaitUntilPodsAreRunning(ctx context.Context, namespace string, podsSelector string, replicas int) error {
-	// ctx := context.Background()
-
 	watcher, err := k.createPodWatcher(ctx, namespace, podsSelector)
 	if err != nil {
 		return err

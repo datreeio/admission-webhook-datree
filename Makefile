@@ -45,7 +45,7 @@ run-in-minikube:
 #################
 
 test:
-    DATREE_ENFORCE="true" go test ./...
+	DATREE_ENFORCE="true" go test ./...
 
 .PHONY: test-in-minikube
 test-in-minikube:
@@ -97,11 +97,11 @@ connect-minikube-docker:
 LOCAL_REGISTRY := localhost:5000
 IMAGE_TAG_LATEST := latest
 
-deploy-latest-image-init-webhook-local:
-	@echo "Deploying init-webhook image with tag ${IMAGE_TAG_LATEST} to local registry"
-	$(MAKE) image-build-init-webhook -e BUILD_ENVIRONMENT=main 
-	docker tag init-webhook ${LOCAL_REGISTRY}/init-webhook:${IMAGE_TAG_LATEST}
-	docker push ${LOCAL_REGISTRY}/init-webhook:${IMAGE_TAG_LATEST}
+# deploy-latest-image-init-webhook-local:
+# 	@echo "Deploying init-webhook image with tag ${IMAGE_TAG_LATEST} to local registry"
+# 	$(MAKE) image-build-init-webhook -e BUILD_ENVIRONMENT=main 
+# 	docker tag init-webhook ${LOCAL_REGISTRY}/init-webhook:${IMAGE_TAG_LATEST}
+# 	docker push ${LOCAL_REGISTRY}/init-webhook:${IMAGE_TAG_LATEST}
 
 deploy-latest-image-cert-generator-local:
 	@echo "Deploying cert-generator image with tag ${IMAGE_TAG_LATEST} to local registry"
@@ -116,24 +116,23 @@ deploy-latest-image-webhook-server-local:
 	docker push ${LOCAL_REGISTRY}/webhook-server:${IMAGE_TAG_LATEST}
 
 install-latest-datree-awsmp-local:
-	$(MAKE) deploy-latest-image-init-webhook-local
+#	$(MAKE) deploy-latest-image-init-webhook-local
 	$(MAKE) deploy-latest-image-cert-generator-local
 	$(MAKE) deploy-latest-image-webhook-server-local
 
 	helm install datree-webhook ./charts/datree-admission-webhook-awsmp --namespace datree --create-namespace \
-                --set image.webhookServer.tag=latest --set image.webhookServer.repository=${LOCAL_REGISTRY}/webhook-server \
-                --set image.initWebhook.tag=latest --set image.initWebhook.repository=${LOCAL_REGISTRY}/init-webhook \
+                --set image.tag=latest --set image.repository=${LOCAL_REGISTRY}/webhook-server \
                 --set initContainer.image.tag=latest --set initContainer.image.repository=${LOCAL_REGISTRY}/cert-generator \
                 --debug
 
 
 deploy-and-bump-all-local:
 	$(MAKE) deploy-latest-image-init-webhook-local
-	$(eval VERSION=$(shell yq '.image.webhookServer.tag' ${HELM_CHART_DIR}-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
+	$(eval VERSION=$(shell yq '.image.tag' ${HELM_CHART_DIR}-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
 	docker tag webhook-server ${LOCAL_REGISTRY}/webhook-server:${VERSION}
 	docker push ${LOCAL_REGISTRY}/webhook-server:${VERSION}
-	tag=${VERSION} yq e --inplace '.image.webhookServer."tag" |= strenv(tag)' ${HELM_CHART_DIR}-awsmp/values.yaml
-	registry=${LOCAL_REGISTRY} yq e --inplace '.image.webhookServer."repository" |= strenv(registry)' ${HELM_CHART_DIR}-awsmp/values.yaml
+	tag=${VERSION} yq e --inplace '.image."tag" |= strenv(tag)' ${HELM_CHART_DIR}-awsmp/values.yaml
+	registry=${LOCAL_REGISTRY} yq e --inplace '.image."repository" |= strenv(registry)' ${HELM_CHART_DIR}-awsmp/values.yaml
 
 	$(eval VERSION := $(shell yq '.initContainer.image.tag' ./charts/datree-admission-webhook-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
 	docker tag cert-generator ${LOCAL_REGISTRY}/cert-generator:${VERSION}
@@ -141,11 +140,11 @@ deploy-and-bump-all-local:
 	tag=${VERSION} yq e --inplace '.initContainer.image."tag" |= strenv(tag)' ./charts/datree-admission-webhook-awsmp/values.yaml
 	registry=${LOCAL_REGISTRY} yq e --inplace '.initContainer.image."repository" |= strenv(registry)' ./charts/datree-admission-webhook-awsmp/values.yaml
 
-	$(eval VERSION=$(shell yq '.image.initWebhook.tag' ./charts/datree-admission-webhook-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
-	docker tag init-webhook ${LOCAL_REGISTRY}/init-webhook:${VERSION}
-	docker push ${LOCAL_REGISTRY}/init-webhook:${VERSION}
-    tag=${VERSION} yq e --inplace '.image.initWebhook."tag" |= strenv(tag)' ./charts/datree-admission-webhook-awsmp/values.yaml
-    registry=${LOCAL_REGISTRY} yq e --inplace '.image.initWebhook."repository" |= strenv(registry)' ./charts/datree-admission-webhook-awsmp/values.yaml
+#	$(eval VERSION=$(shell yq '.image.initWebhook.tag' ./charts/datree-admission-webhook-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
+#	docker tag init-webhook ${LOCAL_REGISTRY}/init-webhook:${VERSION}
+#	docker push ${LOCAL_REGISTRY}/init-webhook:${VERSION}
+#    tag=${VERSION} yq e --inplace '.image.initWebhook."tag" |= strenv(tag)' ./charts/datree-admission-webhook-awsmp/values.yaml
+#    registry=${LOCAL_REGISTRY} yq e --inplace '.image.initWebhook."repository" |= strenv(registry)' ./charts/datree-admission-webhook-awsmp/values.yaml
 
 
 #########################
@@ -175,27 +174,24 @@ verify-ecr-registry:
 	aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${ECR_REGISTRY}
 deploy-image-webhook-server-ecr: 
 	$(MAKE) verify-ecr-registry
-	$(eval VERSION=$(shell yq '.image.webhookServer.tag' ${HELM_CHART_DIR}-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
-	docker tag webhook-server:${VERSION} ${ECR_REGISTRY}/datree/datree-admission-webhook:$(VERSION)
-	docker push ${ECR_REGISTRY}/datree-admission-webhook:${VERSION}
-
-deploy-image-init-webhook-ecr:
-	$(MAKE) verify-ecr-registry
-	$(eval VERSION=$(shell yq '.image.initWebhook.tag' ${HELM_CHART_DIR}-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
-	docker tag init-webhook ${ECR_REGISTRY}/datree/init-webhook:$(VERSION)
-	docker push ${ECR_REGISTRY}/init-webhook:${VERSION}
+	$(eval VERSION=$(shell yq '.image.tag' ${HELM_CHART_DIR}-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
+	docker tag webhook-server ${ECR_REGISTRY}/datree/datree-admission-webhook:$(VERSION)
+#	docker push ${ECR_REGISTRY}/datree-admission-webhook:${VERSION}
 
 deploy-image-cert-generator-ecr:
 	$(MAKE) verify-ecr-registry
 	$(eval VERSION := $(shell yq '.initContainer.image.tag' ${HELM_CHART_DIR}-awsmp/values.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
-	docker tag cert-generator ${ECR_REGISTRY}/datree/cert-generator:$(VERSION)
-	docker push ${ECR_REGISTRY}/cert-generator:${VERSION}
+	docker tag cert-generator ${ECR_REGISTRY}/datree/datree-cert-generator:$(VERSION)
+	docker push ${ECR_REGISTRY}/datree-cert-generator:${VERSION}
 
 
 ##################
 #    RELEASE     #
 ##################
 
+verify-helm-registry:
+	aws ecr get-login-password --region us-east-1 | helm registry login --username AWS --password-stdin ${ECR_REGISTRY}
+	
 release-chart-datree-awsmp:
 # verify that the chart is valid
 	helm lint ${HELM_CHART_DIR}-awsmp
@@ -208,7 +204,7 @@ release-chart-datree-awsmp:
 	helm package ${HELM_CHART_DIR}-awsmp
 
 # helm push chart to ECR
-#	aws ecr get-login-password --region us-east-1 | helm login --username AWS --password-stdin ${ECR_REGISTRY}
+#	$(MAKE) verify-helm-registry
 #	helm push datree-admission-webhook-awsmp-${HELM_CHART_VERSION}.tgz 709825985650.dkr.ecr.us-east-1.amazonaws.com
 
 
