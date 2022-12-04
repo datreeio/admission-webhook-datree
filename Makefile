@@ -115,7 +115,7 @@ install-latest-datree-awsmp-local:
 	$(MAKE) deploy-latest-image-webhook-server-local
 
 	helm install datree-webhook ./charts/datree-admission-webhook-awsmp --namespace datree --create-namespace \
-                --set datree.token=${TOKEN} \
+		 --set datree.token=${TOKEN} \
                 --set image.webhookServer.tag=latest --set image.webhookServer.repository=${LOCAL_REGISTRY}/webhook-server \
                 --set image.initWebhook.tag=latest --set image.initWebhook.repository=${LOCAL_REGISTRY}/init-webhook \
                 --set initContainer.image.tag=latest --set initContainer.image.repository=${LOCAL_REGISTRY}/cert-generator \
