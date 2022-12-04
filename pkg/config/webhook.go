@@ -5,8 +5,6 @@ import (
 	"strconv"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
-	admission "k8s.io/api/admission/v1"
-	"sigs.k8s.io/yaml"
 )
 
 const (
@@ -14,10 +12,6 @@ const (
 	datreeValidatingWebhookName      = "datree-webhook"
 	datreeValidatingWebhookSkipLabel = "admission.datree/skip"
 )
-
-func IsConfigurationChangeEvent(request *admission.AdmissionRequest) bool {
-	return request.Resource.Resource == "configmaps" && request.Name == datreeWebhookConfigMapName
-}
 
 func GetDatreeValidatingWebhookName() string {
 	return datreeValidatingWebhookName
@@ -29,10 +23,6 @@ func GetDatreeValidatingWebhookServiceName() string {
 
 func GetDatreeValidatingWebhookNamespace() string {
 	return getEnvWithFallback("WEBHOOK_NAMESPACE", "datree")
-}
-
-func GetDatreeValidatingWebhookLabels() map[string]string {
-	return map[string]string{datreeValidatingWebhookSkipLabel: "true"}
 }
 
 func GetDatreeValidatingWebhookNamespaceSelector() string {
@@ -59,26 +49,4 @@ func getEnvWithFallback(name, fallback string) string {
 		return value
 	}
 	return fallback
-}
-
-type configuration struct {
-	Detach bool `json:"enable"`
-}
-
-func parseWebhookConfiguration(request *admission.AdmissionRequest) (*configuration, error) {
-	config := &configuration{}
-
-	var resource map[string]interface{}
-	yamlObj, _ := yaml.JSONToYAML(request.Object.Raw)
-	err := yaml.Unmarshal(yamlObj, &resource)
-	if err != nil {
-		return nil, err
-	}
-
-	configMapData := resource["data"].(map[string]interface{})
-	if configMapData != nil {
-		config.Detach = configMapData["detach"] == "true"
-	}
-
-	return config, nil
 }

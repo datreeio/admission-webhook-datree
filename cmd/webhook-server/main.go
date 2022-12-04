@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
+	k8sclient "github.com/datreeio/admission-webhook-datree/pkg/k8s-client"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/robfig/cron/v3"
@@ -64,6 +65,14 @@ func start(port string) {
 	http.HandleFunc("/validate", validationController.Validate)
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
+
+	k8sClient := k8sclient.New(nil)
+	go func() {
+		err := InitDatreeValidatingWebhook(k8sClient)
+		if err != nil {
+			logger.Logf("failed to init webhook: %v", err)
+		}
+	}()
 
 	// start server
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))

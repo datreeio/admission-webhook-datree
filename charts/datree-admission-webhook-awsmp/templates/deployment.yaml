@@ -24,38 +24,17 @@ spec:
       {{- end }}
     spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
-      terminationGracePeriodSeconds: 180
       containers:
-
-      - name: init-webhook
-        image: "{{ .Values.image.initWebhook.repository }}:{{ .Values.image.initWebhook.tag | default .Chart.AppVersion }}"
-        imagePullPolicy: {{ .Values.image.initWebhook.pullPolicy }}
-        volumeMounts:
-        - mountPath: /etc/webhook/certs
-          name: webhook-certs
-        env:
-        - name: WEBHOOK_NAMESPACE
-          value: {{ template "datree.namespace" . }}
-        - name: WEBHOOK_SERVICE
-          value: "datree-webhook-server"
-        - name: WEBHOOK_POD_SELECTOR
-          value: "app=datree-webhook-server"
-        - name: WEBHOOK_SELECTOR
-          value: "admission.datree/validate"
-        - name: WEBHOOK_SERVER_REPLICAS
-          value: "{{ .Values.replicaCount }}"
-
       - name: webhook-cleanup
         image: "{{ .Values.hooks.image.repository }}@{{ .Values.hooks.image.sha }}"
         imagePullPolicy: Always
         lifecycle:
           postStart:
             exec:
-              command: [
-                "/bin/sh", 
-                "-c", 
-                "kubectl label ns kube-system {{template "datree.namespace" .}} datree.io/skip=true --overwrite"
-              ]
+              command:
+              - sh
+              - "-c" 
+              - "kubectl label ns kube-system {{template "datree.namespace" .}} datree.io/skip=true --overwrite"
           preStop:
             exec:
               command: 
@@ -64,6 +43,7 @@ spec:
               - >-
                 kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n {{template "datree.namespace" .}};
                 kubectl label ns kube-system {{template "datree.namespace" .}} datree.io/skip-;
+                
         command: [ "/bin/bash", "-c", "--" ]
         args: [ "while true; do sleep 30; done;" ]
 
@@ -95,6 +75,16 @@ spec:
         env:
         - name: DEBUG
           value: "{{ .Values.debug }}"
+        - name: WEBHOOK_NAMESPACE
+          value: {{ template "datree.namespace" . }}
+        - name: WEBHOOK_SERVICE
+          value: "datree-webhook-server"
+        - name: WEBHOOK_POD_SELECTOR
+          value: "app=datree-webhook-server"
+        - name: WEBHOOK_SELECTOR
+          value: "admission.datree/validate"
+        - name: WEBHOOK_SERVER_REPLICAS
+          value: "{{ .Values.replicaCount }}"
         # Datree webhook varaibles
         - name: DATREE_TOKEN
           value: {{.Values.datree.token}}

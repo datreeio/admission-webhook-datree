@@ -95,42 +95,6 @@ func TestGetDatreeValidatingWebhookNamespaceLabel(t *testing.T) {
 	}
 }
 
-func TestGetDatreeValidatingWebhookNamespace(t *testing.T) {
-	type testCase struct {
-		envVarValue string
-		expected    ExpectedCondition[string]
-	}
-
-	tests := map[string]*testCase{
-		"should return datree namespace when namespace is not set": {
-			envVarValue: "",
-			expected: ExpectedCondition[string]{
-				condition: func(actual string) bool {
-					return actual == "datree"
-				},
-				message: "expected namespace to be 'datree', got %d",
-			},
-		},
-		"should return default namespace when namespace is set to default": {
-			envVarValue: "default",
-			expected: ExpectedCondition[string]{
-				condition: func(actual string) bool {
-					return actual == "default"
-				},
-				message: "expected namesapce to be 'default', got %d",
-			},
-		},
-	}
-
-	for name, test := range tests {
-		t.Run(name, func(t *testing.T) {
-			os.Setenv("WEBHOOK_NAMESPACE", test.envVarValue)
-			ns := GetDatreeValidatingWebhookNamespace()
-			assert.True(t, test.expected.condition(ns), test.expected.message, ns)
-		})
-	}
-}
-
 func TestGetDatreeValidatingWebhookServiceName(t *testing.T) {
 	type testCase struct {
 		envVarValue string
@@ -160,7 +124,7 @@ func TestGetDatreeValidatingWebhookServiceName(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			os.Setenv("WEBHOOK_SERVICE", test.envVarValue)
+			os.Setenv("WEBHOOK_SERVICE_NAME", test.envVarValue)
 			serviceName := GetDatreeValidatingWebhookServiceName()
 			assert.True(t, test.expected.condition(serviceName), test.expected.message, serviceName)
 		})

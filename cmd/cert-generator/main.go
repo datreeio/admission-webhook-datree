@@ -8,9 +8,9 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 )
 
-func main() {
-	tlsDir := "/etc/webhook/certs"
+var tlsDir = "/etc/webhook/certs"
 
+func main() {
 	err := os.MkdirAll(tlsDir, 0666)
 	if err != nil {
 		logger.LogUtil(err.Error())

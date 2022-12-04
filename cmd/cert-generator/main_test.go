@@ -10,6 +10,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	tlsDir = "/tmp"
 	m.Run()
 }
 

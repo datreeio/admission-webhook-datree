@@ -1,11 +1,11 @@
 package k8sclient
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	admissionregistrationV1 "k8s.io/api/admissionregistration/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	testclient "k8s.io/client-go/kubernetes/fake"
 )
 
@@ -22,54 +22,28 @@ type Expected[T any] struct {
 }
 
 func TestCreateValidatingWebhookConfiguration(t *testing.T) {
-	type testArgs struct {
-		namespace string
-		cfg       *ValidatingWebhookOpts
-	}
-
 	type testCase struct {
-		args            *testArgs
-		expectedErr     Expected[error]
-		expectedWebhook ExpectedCondition[*admissionregistrationV1.ValidatingWebhookConfiguration]
+		webhookArg  *admissionregistrationV1.ValidatingWebhookConfiguration
+		expectedErr ExpectedCondition[error]
 	}
 
 	tests := map[string]*testCase{
-		"should create a validating webhook configuration": {
-			args: &testArgs{namespace: "test-namespace", cfg: &ValidatingWebhookOpts{
-				MetaName:    "datree-webhook",
-				ServiceName: "webhook-server",
-				CaBundle:    []byte("caBundle"),
-				Selector:    "app=webhook-server",
-				WebhookName: "webhook-server.datree.svc",
-			}},
-			expectedWebhook: ExpectedCondition[*admissionregistrationV1.ValidatingWebhookConfiguration]{
-				condition: func(actual *admissionregistrationV1.ValidatingWebhookConfiguration) bool {
-					isNameValid := actual.Name == "datree-webhook"
-					isNamespaceValid := actual.Webhooks[0].ClientConfig.Service.Namespace == "test-namespace"
-					isWebhookNameValid := actual.Webhooks[0].Name == "webhook-server.datree.svc"
-					isWebhookServiceNameValid := actual.Webhooks[0].ClientConfig.Service.Name == "webhook-server"
-					isWebhookCABundleValid := string(actual.Webhooks[0].ClientConfig.CABundle) == string([]byte("caBundle"))
-					isWebhookSelectorValid := actual.Webhooks[0].NamespaceSelector.MatchExpressions[0].Key == "app=webhook-server"
-					return isNameValid && isNamespaceValid && isWebhookNameValid && isWebhookServiceNameValid && isWebhookCABundleValid && isWebhookSelectorValid
+		"should call client to create a validating webhook configuration": {
+			webhookArg: &admissionregistrationV1.ValidatingWebhookConfiguration{},
+			expectedErr: ExpectedCondition[error]{
+				condition: func(actual error) bool {
+					return actual == nil
 				},
-				message: "webhook should use the correct values from the args",
-			},
-			expectedErr: Expected[error]{
-				value:   nil,
-				message: "should not return an error",
+				message: "expected no error",
 			},
 		},
 		"should not create validating webhook since opts is nil": {
-			args: &testArgs{namespace: "test-namespace", cfg: nil},
-			expectedWebhook: ExpectedCondition[*admissionregistrationV1.ValidatingWebhookConfiguration]{
-				message: "webhook should be nil",
-				condition: func(actual *admissionregistrationV1.ValidatingWebhookConfiguration) bool {
-					return actual == nil
+			webhookArg: nil,
+			expectedErr: ExpectedCondition[error]{
+				condition: func(actual error) bool {
+					return actual != nil
 				},
-			},
-			expectedErr: Expected[error]{
-				value:   fmt.Errorf("invalid validating webhook configuration"),
-				message: "should return an error",
+				message: "expected error",
 			},
 		},
 	}
@@ -79,9 +53,76 @@ func TestCreateValidatingWebhookConfiguration(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			actualVW, actualErr := k8sClient.CreateValidatingWebhookConfiguration(tc.args.namespace, tc.args.cfg)
-			assert.Equal(t, tc.expectedErr.value, actualErr, tc.expectedErr.message)
-			assert.True(t, tc.expectedWebhook.condition(actualVW), tc.expectedWebhook.message)
+			actualErr := k8sClient.CreateValidatingWebhookConfiguration(&admissionregistrationV1.ValidatingWebhookConfiguration{})
+			assert.True(t, tc.expectedErr.condition(actualErr), tc.expectedErr.message)
+		})
+	}
+}
+
+// test get validating webhook configuration
+func TestGetValidatingWebhookConfiguration(t *testing.T) {
+	type testArgs struct {
+		name            string
+		clientsetReturn *admissionregistrationV1.ValidatingWebhookConfiguration
+	}
+
+	type testCase struct {
+		args        testArgs
+		expectedErr ExpectedCondition[error]
+		expected    Expected[*admissionregistrationV1.ValidatingWebhookConfiguration]
+	}
+
+	tests := map[string]*testCase{
+		"should call client to get a validating webhook configuration": {
+			args: testArgs{
+				name: "test",
+				clientsetReturn: &admissionregistrationV1.ValidatingWebhookConfiguration{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "test",
+					},
+				},
+			},
+			expectedErr: ExpectedCondition[error]{
+				condition: func(actual error) bool {
+					return actual == nil
+				},
+				message: "expected no error",
+			},
+			expected: Expected[*admissionregistrationV1.ValidatingWebhookConfiguration]{
+				value: &admissionregistrationV1.ValidatingWebhookConfiguration{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "test",
+					},
+				},
+				message: "expected a validating webhook configuration",
+			},
+		},
+		"should not get validating webhook since name is empty": {
+			args: testArgs{
+				name:            "",
+				clientsetReturn: &admissionregistrationV1.ValidatingWebhookConfiguration{},
+			},
+			expectedErr: ExpectedCondition[error]{
+				condition: func(actual error) bool {
+					return actual != nil
+				},
+				message: "expected error",
+			},
+			expected: Expected[*admissionregistrationV1.ValidatingWebhookConfiguration]{
+				value:   nil,
+				message: "expected no validating webhook configuration",
+			},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			client := testclient.NewSimpleClientset(tc.args.clientsetReturn)
+			k8sClient := New(client)
+
+			actual, actualErr := k8sClient.GetValidatingWebhookConfiguration(tc.args.name)
+			assert.True(t, tc.expectedErr.condition(actualErr), tc.expectedErr.message)
+			assert.Equal(t, tc.expected.value, actual, tc.expected.message)
 		})
 	}
 }
