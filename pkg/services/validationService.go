@@ -162,11 +162,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
-	resource := filesConfigurations[0].Configurations[0]
-	kind := resource.Kind
-	metadataName := resource.MetadataName
 	evaluationRequestData := vs.getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
-		policyCheckResults, namespace, kind, metadataName)
+		policyCheckResults, namespace, resourceKind, resourceName)
 
 	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
