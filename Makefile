@@ -12,6 +12,7 @@ BUILD_ENVIRONMENT ?= staging
 BUILD_DIR ?= $(WEBHOOK_SERVER_DIR)
 HELM_CHART_DIR ?= ./charts/datree-admission-webhook
 
+
 #################
 #      RUN      #
 #################
@@ -86,6 +87,12 @@ image-build-webhook-server:
 deploy-in-minikube:
 	bash ./scripts/deploy-in-minikube.sh
 
+# to connect minikube docker to local docker daemon (for local image building)
+.PHONY: connect-minikube-docker
+connect-minikube-docker:
+	minikube addons enable registry
+	docker run --rm -it --network=host alpine ash -c "apk add socat && socat TCP-LISTEN:5000,reuseaddr,fork TCP:$(minikube ip):5000"
+
 
 LOCAL_REGISTRY := localhost:5000
 IMAGE_TAG_LATEST := latest
@@ -108,18 +115,17 @@ deploy-latest-image-webhook-server-local:
 	docker tag webhook-server ${LOCAL_REGISTRY}/webhook-server:${IMAGE_TAG_LATEST}
 	docker push ${LOCAL_REGISTRY}/webhook-server:${IMAGE_TAG_LATEST}
 
-TOKEN := 62a8574c-643f-4127-a897-7f18a9023e6d
 install-latest-datree-awsmp-local:
 	$(MAKE) deploy-latest-image-init-webhook-local
 	$(MAKE) deploy-latest-image-cert-generator-local
 	$(MAKE) deploy-latest-image-webhook-server-local
 
 	helm install datree-webhook ./charts/datree-admission-webhook-awsmp --namespace datree --create-namespace \
-                --set datree.token=${TOKEN} \
                 --set image.webhookServer.tag=latest --set image.webhookServer.repository=${LOCAL_REGISTRY}/webhook-server \
                 --set image.initWebhook.tag=latest --set image.initWebhook.repository=${LOCAL_REGISTRY}/init-webhook \
                 --set initContainer.image.tag=latest --set initContainer.image.repository=${LOCAL_REGISTRY}/cert-generator \
                 --debug
+
 
 deploy-and-bump-all-local:
 	$(MAKE) deploy-latest-image-init-webhook-local
@@ -154,17 +160,14 @@ helm-install-local-in-minikube:
 helm-upgrade-local:
     helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook --reuse-values --set datree.enforce="true"
 
-helm-uninstall:
-	helm uninstall -n datree datree-webhook
-
 helm-install-staging:
     helm install -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}" --set scan_job.image.repository="datree/scan-job-staging" \
     --set scan_job.image.tag="latest" --set image.repository="datree/webhook-staging" --set image.tag="latest"
 
 
-################
-#  DEPLOY ECR  #
-################
+############################
+#  DEPLOY AWS MARKETPLACE  #
+############################
 
 ECR_REGISTRY := 709825985650.dkr.ecr.us-east-1.amazonaws.com
 
@@ -201,8 +204,22 @@ release-chart-datree-awsmp:
 	$(eval HELM_CHART_VERSION=$(shell yq '.version' ${HELM_CHART_DIR}-awsmp/Chart.yaml | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'))
 	version=${HELM_CHART_VERSION} yq e --inplace '."version" |= strenv(version)' ./charts/datree-admission-webhook-awsmp/Chart.yaml
 
-# helm push chart to ECR
+# helm package the chart
 	helm package ${HELM_CHART_DIR}-awsmp
-	aws ecr get-login-password --region us-east-1 | helm login --username AWS --password-stdin ${ECR_REGISTRY}
-	helm push datree-admission-webhook-awsmp-${HELM_CHART_VERSION}.tgz 709825985650.dkr.ecr.us-east-1.amazonaws.com
 
+# helm push chart to ECR
+#	aws ecr get-login-password --region us-east-1 | helm login --username AWS --password-stdin ${ECR_REGISTRY}
+#	helm push datree-admission-webhook-awsmp-${HELM_CHART_VERSION}.tgz 709825985650.dkr.ecr.us-east-1.amazonaws.com
+
+
+##################
+#    CLEANUP     #
+##################
+
+.PHONY: helm-uninstall
+helm-uninstall:
+	helm uninstall -n datree datree-webhook
+
+delete-eks-addon: 
+	kubectl delete deployment datree-webhook-server -n datree
+	$(MAKE) helm-uninstall

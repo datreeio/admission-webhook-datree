@@ -48,16 +48,6 @@ func (m *mockK8sClient) IsPodReady(pod *v1.Pod) bool {
 	return args.Bool(0)
 }
 
-func (m *mockK8sClient) LabelNamespace(namespace string, labels map[string]string) error {
-	args := m.Called(namespace, labels)
-	return args.Error(0)
-}
-
-func (m *mockK8sClient) RemoveNamespaceLabels(ns string, labels map[string]string) error {
-	args := m.Called(ns, labels)
-	return args.Error(0)
-}
-
 func TestInitWebhook(t *testing.T) {
 	k8sClient := &mockK8sClient{
 		clientset: testclient.NewSimpleClientset(),

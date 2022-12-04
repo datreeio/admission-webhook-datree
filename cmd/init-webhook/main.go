@@ -29,8 +29,6 @@ func main() {
 
 	// wait forever to prevent the container from restrating
 	waitForever()
-	// var configHandler = config.NewConfigurationClient(k8sClient)
-	// listenToSignals(configHandler)
 
 }
 
@@ -41,8 +39,6 @@ type k8sClientInterface interface {
 	GetValidatingWebhookConfiguration(name string) *admissionregistrationV1.ValidatingWebhookConfiguration
 	CreatePodWatcher(ctx context.Context, namespace string, selector string) (watch.Interface, error)
 	IsPodReady(pod *v1.Pod) bool
-	LabelNamespace(namespace string, labels map[string]string) error
-	RemoveNamespaceLabels(ns string, labels map[string]string) error
 }
 
 func InitWebhook(k8sClient k8sClientInterface) error {
@@ -60,18 +56,8 @@ func InitWebhook(k8sClient k8sClientInterface) error {
 		logger.Logf("pods are running")
 	}
 
-	err = k8sClient.LabelNamespace(config.GetDatreeValidatingWebhookNamespace(), config.GetDatreeValidatingWebhookLabels())
-	if err != nil {
-		return fmt.Errorf(fmt.Sprintf("failed to label namespace, err: %v", err))
-	}
-
-	err = k8sClient.LabelNamespace("kube-system", config.GetDatreeValidatingWebhookLabels())
-	if err != nil {
-		return fmt.Errorf(fmt.Sprintf("failed to label kube-system namespace, err: %v", err))
-	}
-
 	caBundle, _ := getWebhookCABundle()
-	logger.Logf("got ca bundle")
+
 	if k8sClient.GetValidatingWebhookConfiguration("datree-webhook") != nil {
 		logger.Logf("webhook already exists")
 		return nil
@@ -105,22 +91,3 @@ func getWebhookCABundle() ([]byte, error) {
 
 	return caPEM, nil
 }
-
-// func listenToSignals(configHandler *config.ConfigurationClient) {
-// 	sigs := make(chan os.Signal, 1)
-// 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
-
-// 	done := make(chan bool, 1)
-
-// 	go func() {
-// 		sig := <-sigs
-// 		fmt.Println()
-// 		fmt.Println(sig)
-// 		done <- true
-// 	}()
-
-// 	fmt.Println("awaiting signal")
-// 	<-done
-// 	configHandler.DeleteWebhook()
-// 	fmt.Println("exiting")
-// }
