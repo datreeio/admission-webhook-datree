@@ -106,17 +106,14 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 
 	// no token provided - skip validation
-	if token == "" {
-		*warningMessages = append(*warningMessages, err.Error())
+	if token == "<DATREE_TOKEN>" {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, true, resourceKind, resourceName, managers, clusterK8sVersion, policyName, namespace, server.ConfigMapScanningFilters)
 		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 
-		const warningMessage = `
-
-⚠️ Datree is installed, but not activated since you didn't set your token.
-🔗 Check out the docs for instructions: https://hub.datree.io/configuration/behavior#setchange-token
-`
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, warningMessage, *warningMessages), false
+		const warningMessage1 = `⚠️  Datree is installed, but not activated since you didn't set your token.`
+		const warningMessage2 = `🔗 Check out the docs for instructions: https://hub.datree.io/configuration/behavior#setchange-token`
+		*warningMessages = append(*warningMessages, warningMessage1, warningMessage2)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, "", *warningMessages), false
 	}
 
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
