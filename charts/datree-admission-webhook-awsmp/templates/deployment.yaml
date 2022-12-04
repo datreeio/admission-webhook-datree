@@ -1,4 +1,3 @@
-{{- $uuidv4RegexPattern := "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -85,7 +84,7 @@ spec:
           value: "{{ .Values.debug }}"
         # Datree webhook varaibles
         - name: DATREE_TOKEN
-          value: {{.Values.datree.token | regexFind $uuidv4RegexPattern }}
+          value: {{.Values.datree.token}}
         - name: DATREE_POLICY
           value: {{.Values.datree.policy | default "Starter" }}
         - name: DATREE_VERBOSE

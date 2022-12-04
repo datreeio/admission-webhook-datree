@@ -22,10 +22,10 @@ rbac:
     create: true
     # The ClusterRole name
     name: datree-webhook-server-read
-# Datree webhook configuration, checkout more details at htttps://hub.datree.com
+# Datree webhook configuration, checkout more details at https://hub.datree.com
 datree:
   # The token used to link the CLI to your dashboard.
-  token: <DATREE_TOKEN>
+  token: <DATREE_TOKEN> # beware when altering the default value "<DATREE_TOKEN>" as it is used throughout the codebase
   # The name of the policy to check, e.g: staging. (string, optional)
   policy: ""
   # Display 'How to Fix' link for failed rules in output. (boolean ,optional)

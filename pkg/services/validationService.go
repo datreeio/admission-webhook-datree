@@ -88,17 +88,32 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
+
+	rootObject := getResourceRootObject(admissionReviewReq)
+	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
+
+	clientId := getClientId()
+	policyName := os.Getenv(enums.Policy)
+
 	token, err := getToken(cliServiceClient)
 	if err != nil {
 		panic(err)
 	}
 
-	rootObject := getResourceRootObject(admissionReviewReq)
-	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
-
 	// intercept datree configuration requests
 	if config.IsConfigurationChangeEvent(admissionReviewReq.Request) {
 		vs.configHandler.HandleConfigurationChange(admissionReviewReq.Request)
+	}
+
+	// no token provided - skip validation
+	if token == "<DATREE_TOKEN>" {
+		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, true, resourceKind, resourceName, managers, clusterK8sVersion, policyName, namespace, server.ConfigMapScanningFilters)
+		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+
+		const warningMessage1 = `⚠️  Datree is installed, but not activated since you didn't set your token.`
+		const warningMessage2 = `🔗 Check out the docs for instructions: https://hub.datree.io/configuration/behavior#setchange-token`
+		*warningMessages = append(*warningMessages, warningMessage1, warningMessage2)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, "", *warningMessages), false
 	}
 
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
@@ -106,9 +121,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
-
-	clientId := getClientId()
-	policyName := os.Getenv(enums.Policy)
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
