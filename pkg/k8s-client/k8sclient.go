@@ -100,53 +100,50 @@ func (k *K8sClient) CreateValidatingWebhookConfiguration(namespace string, cfg *
 		ObjectMeta: metav1.ObjectMeta{
 			Name: cfg.MetaName,
 		},
-		Webhooks: []admissionregistrationV1.ValidatingWebhook{{
-			Name: cfg.WebhookName,
-			ClientConfig: admissionregistrationV1.WebhookClientConfig{
-				CABundle: cfg.CaBundle, // CA bundle created earlier
-				Service: &admissionregistrationV1.ServiceReference{
-					Name:      cfg.ServiceName, // datree-webhook-server
-					Namespace: namespace,
-					Path:      &path,
-				},
-			},
-			Rules: []admissionregistrationV1.RuleWithOperations{
-				{
-					Operations: []admissionregistrationV1.OperationType{
-						admissionregistrationV1.Create,
-						admissionregistrationV1.Update,
-					},
-					Rule: admissionregistrationV1.Rule{
-						APIGroups:   []string{"*"},
-						APIVersions: []string{"*"},
-						Resources:   []string{"*"},
-					},
-				}},
-			SideEffects:             &sideEffects,
-			AdmissionReviewVersions: []string{"v1", "v1beta1"},
-			TimeoutSeconds:          &[]int32{30}[0],
-			NamespaceSelector: &metav1.LabelSelector{
-				MatchExpressions: []metav1.LabelSelectorRequirement{
-					{ // only validate pods in namespaces with the label "admission.datree/validate"
-						Key:      cfg.Selector,
-						Operator: metav1.LabelSelectorOpDoesNotExist,
+		Webhooks: []admissionregistrationV1.ValidatingWebhook{
+			{
+				Name: cfg.WebhookName,
+				ClientConfig: admissionregistrationV1.WebhookClientConfig{
+					CABundle: cfg.CaBundle, // CA bundle created earlier
+					Service: &admissionregistrationV1.ServiceReference{
+						Name:      cfg.ServiceName,
+						Namespace: namespace,
+						Path:      &path,
 					},
 				},
+				Rules: []admissionregistrationV1.RuleWithOperations{
+					{
+						Operations: []admissionregistrationV1.OperationType{
+							admissionregistrationV1.Create,
+							admissionregistrationV1.Update,
+						},
+						Rule: admissionregistrationV1.Rule{
+							APIGroups:   []string{"*"},
+							APIVersions: []string{"*"},
+							Resources:   []string{"*"},
+						},
+					}},
+				SideEffects:             &sideEffects,
+				AdmissionReviewVersions: []string{"v1", "v1beta1"},
+				TimeoutSeconds:          &[]int32{30}[0],
+				NamespaceSelector: &metav1.LabelSelector{
+					MatchExpressions: []metav1.LabelSelectorRequirement{
+						{ // only validate pods in namespaces with the label "admission.datree/validate"
+							Key:      cfg.Selector,
+							Operator: metav1.LabelSelectorOpDoesNotExist,
+						},
+					},
+				},
 			},
-		}},
+		},
 	}
 
-	existed := k.GetValidatingWebhookConfiguration(cfg.MetaName)
-	if existed == nil {
-		vw, err := k.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), vw, metav1.CreateOptions{})
-		if err != nil {
-			return nil, err
-		}
-		return vw, nil
+	vw, err := k.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Create(context.Background(), vw, metav1.CreateOptions{})
+	if err != nil {
+		return nil, fmt.Errorf(fmt.Sprintf("failed to create validating webhook configuration: %v", err))
 	}
 
-	logger.Logf("validating webhook configuration %s already exists", existed.Name)
-	return existed, nil
+	return vw, nil
 }
 
 // search for validating webhook and delete if exists

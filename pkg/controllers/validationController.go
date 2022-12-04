@@ -13,7 +13,7 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/responseWriter"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
-	admission "k8s.io/api/admission/v1"
+	v1 "k8s.io/api/admission/v1"
 
 	"github.com/datreeio/datree/pkg/utils"
 )
@@ -79,8 +79,8 @@ func headerValidation(req *http.Request) error {
 	return nil
 }
 
-func ParseHTTPRequestBodyToAdmissionReview(body io.ReadCloser) (*admission.AdmissionReview, error) {
-	var admissionReviewReq admission.AdmissionReview
+func ParseHTTPRequestBodyToAdmissionReview(body io.ReadCloser) (*v1.AdmissionReview, error) {
+	var admissionReviewReq v1.AdmissionReview
 
 	err := json.NewDecoder(body).Decode(&admissionReviewReq)
 	if err != nil {

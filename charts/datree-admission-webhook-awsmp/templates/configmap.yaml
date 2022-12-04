@@ -1,7 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: datree-webhook-config
-  namespace: default
-data:
-  detach: "false"
