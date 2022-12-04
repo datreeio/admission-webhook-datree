@@ -100,16 +100,17 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		panic(err)
 	}
 
+	// intercept datree configuration requests
+	if config.IsConfigurationChangeEvent(admissionReviewReq.Request) {
+		vs.configHandler.HandleConfigurationChange(admissionReviewReq.Request)
+	}
+
+	// no token provided - skip validation
 	if token == "" {
 		*warningMessages = append(*warningMessages, err.Error())
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, true, resourceKind, resourceName, managers, clusterK8sVersion, policyName, namespace, server.ConfigMapScanningFilters)
 		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, "no token provided (this is the message)", *warningMessages), false
-	}
-
-	// intercept datree configuration requests
-	if config.IsConfigurationChangeEvent(admissionReviewReq.Request) {
-		vs.configHandler.HandleConfigurationChange(admissionReviewReq.Request)
 	}
 
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
