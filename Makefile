@@ -143,7 +143,7 @@ deploy-and-bump-all-local:
 
 
 #########################
-#    DEPLOPY (HELM)     #
+#    DEPLOY (HELM)     #
 #########################
 
 helm-install-local-in-minikube:

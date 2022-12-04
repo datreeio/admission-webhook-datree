@@ -88,6 +88,13 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
+
+	rootObject := getResourceRootObject(admissionReviewReq)
+	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
+
+	clientId := getClientId()
+	policyName := os.Getenv(enums.Policy)
+
 	token, err := getToken(cliServiceClient)
 	if err != nil {
 		panic(err)
@@ -95,14 +102,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	if token == "" {
 		*warningMessages = append(*warningMessages, err.Error())
-		// maybe save to logs
-		//clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, true, "", "", nil, clusterK8sVersion, "", "", server.ConfigMapScanningFilters)
-		//saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, true, resourceKind, resourceName, managers, clusterK8sVersion, policyName, namespace, server.ConfigMapScanningFilters)
+		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, "no token provided (this is the message)", *warningMessages), false
 	}
-
-	rootObject := getResourceRootObject(admissionReviewReq)
-	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 
 	// intercept datree configuration requests
 	if config.IsConfigurationChangeEvent(admissionReviewReq.Request) {
@@ -114,9 +117,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
-
-	clientId := getClientId()
-	policyName := os.Getenv(enums.Policy)
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
