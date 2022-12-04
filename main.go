@@ -49,7 +49,9 @@ func start(port string) {
 		}
 	}()
 
-	k8sMetadataUtil.InitK8sMetadataUtil()
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil()
+	k8sMetadataUtilInstance.InitK8sMetadataUtil()
+
 	initMetadataLogsCronjob()
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
@@ -57,7 +59,7 @@ func start(port string) {
 		panic(err)
 	}
 
-	validationController := controllers.NewValidationController(errorReporter)
+	validationController := controllers.NewValidationController(errorReporter, k8sMetadataUtilInstance)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)

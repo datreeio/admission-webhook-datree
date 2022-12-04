@@ -16,37 +16,54 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-func InitK8sMetadataUtil() {
+type K8sMetadataUtil struct {
+	ClientSet            kubernetes.Interface
+	CreateClientSetError error
+}
+
+var ClusterUuid k8sTypes.UID = ""
+
+func NewK8sMetadataUtil() *K8sMetadataUtil {
+	clientset, err := getClientSet()
+	if err != nil {
+		return &K8sMetadataUtil{
+			CreateClientSetError: err,
+		}
+	}
+	return &K8sMetadataUtil{
+		ClientSet: clientset,
+	}
+}
+
+func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
 	var clusterUuid k8sTypes.UID
 
-	k8sClient, err := getClientSet()
-
-	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+	if k8sMetadataUtil.CreateClientSetError != nil {
+		sendK8sMetadata(-1, k8sMetadataUtil.CreateClientSetError, clusterUuid, cliClient)
 		return
 	}
 
-	clusterUuid, err = getClusterUuid(k8sClient)
+	clusterUuid, err := k8sMetadataUtil.GetClusterUuid()
 	if err != nil {
 		sendK8sMetadata(-1, err, clusterUuid, cliClient)
 	}
 
-	nodesCount, nodesCountErr := getNodesCount(k8sClient)
+	nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
 	sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
-		nodesCount, nodesCountErr := getNodesCount(k8sClient)
+		nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
 		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
 	cornJob.Start()
 }
 
-func getNodesCount(clientset *kubernetes.Clientset) (int, error) {
+func getNodesCount(clientset kubernetes.Interface) (int, error) {
 	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
 		return -1, err
@@ -69,15 +86,22 @@ func getClientSet() (*kubernetes.Clientset, error) {
 	return clientset, nil
 }
 
-var ClusterUuid k8sTypes.UID = ""
-
-func getClusterUuid(clientset *kubernetes.Clientset) (k8sTypes.UID, error) {
-	clusterMetadata, err := clientset.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
-	if err != nil {
-		return "", err
+func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
+	if ClusterUuid != "" {
+		return ClusterUuid, nil
 	}
-	ClusterUuid = clusterMetadata.UID
-	return clusterMetadata.UID, nil
+
+	if k8sMetadataUtil.CreateClientSetError != nil {
+		return "", k8sMetadataUtil.CreateClientSetError
+	} else {
+		clusterMetadata, err := k8sMetadataUtil.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
+		if err != nil {
+			return "", err
+		}
+		ClusterUuid = clusterMetadata.UID
+	}
+
+	return ClusterUuid, nil
 }
 
 func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {

@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -23,9 +25,9 @@ type ValidationController struct {
 	ErrorReporter     *errorReporter.ErrorReporter
 }
 
-func NewValidationController(errorReporter *errorReporter.ErrorReporter) *ValidationController {
+func NewValidationController(errorReporter *errorReporter.ErrorReporter, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationController {
 	return &ValidationController{
-		ValidationService: services.NewValidationService(),
+		ValidationService: services.NewValidationService(k8sMetadataUtilInstance),
 		ErrorReporter:     errorReporter,
 	}
 }

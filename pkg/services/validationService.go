@@ -53,6 +53,7 @@ type Metadata struct {
 
 type ValidationService struct {
 	CliServiceClient *cliClient.CliClient
+	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
 }
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
@@ -61,15 +62,17 @@ func isEnforceMode() bool {
 	return os.Getenv(enums.Enforce) == "true"
 }
 
-func NewValidationService() *ValidationService {
+func NewValidationService(k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
+		K8sMetadataUtil:  k8sMetadataUtilInstance,
 	}
 }
 
-func NewValidationServiceWithCustomCliServiceClient(cliServiceClient *cliClient.CliClient) *ValidationService {
+func NewValidationServiceWithCustomCliServiceClient(cliServiceClient *cliClient.CliClient, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
+		K8sMetadataUtil:  k8sMetadataUtilInstance,
 	}
 }
 
@@ -82,7 +85,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := getK8sVersion()
-	token, err := getToken(cliServiceClient)
+	token, err := getToken()
 	if err != nil {
 		panic(err)
 	}
@@ -159,7 +162,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
-	evaluationRequestData := getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
+	evaluationRequestData := vs.getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
 		policyCheckResults, namespace)
 
 	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
@@ -350,7 +353,7 @@ func getK8sVersion() string {
 	return clusterK8sVersion
 }
 
-func getToken(cliClient *cliClient.CliClient) (string, error) {
+func getToken() (string, error) {
 	token := os.Getenv(enums.Token)
 
 	if token == "" {
@@ -439,8 +442,9 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 	return namespace, resourceKind, resourceName, managers
 }
 
-func getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
+func (vs ValidationService) getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string) cliClient.WebhookEvaluationRequestData {
+	clusterUuid, _ := vs.K8sMetadataUtil.GetClusterUuid()
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
@@ -454,7 +458,7 @@ func getEvaluationRequestData(token string, clientId string, clusterK8sVersion s
 			EvaluationDurationSeconds: evaluationDurationSeconds,
 		},
 		WebhookVersion: config.WebhookVersion,
-		ClusterUuid:    k8sMetadataUtil.ClusterUuid,
+		ClusterUuid:    clusterUuid,
 		IsEnforceMode:  isEnforceMode(),
 		Namespace:      evaluationNamespace,
 	}
