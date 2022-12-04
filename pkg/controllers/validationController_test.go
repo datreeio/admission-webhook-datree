@@ -9,14 +9,16 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
-	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/datreeio/datree/pkg/httpClient"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
+	"k8s.io/client-go/kubernetes/fake"
 )
 
 //go:embed test_fixtures/applyNotAllowedRequest.json
@@ -39,8 +41,7 @@ func TestHeaderValidation(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "text/html")
-	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter)
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -52,8 +53,7 @@ func TestValidateHttpMethod(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter)
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusMethodNotAllowed)
@@ -65,8 +65,7 @@ func TestValidateRequestBodyEmpty(t *testing.T) {
 	responseRecorder := httptest.NewRecorder()
 
 	request.Header.Set("Content-Type", "application/json")
-	mockErrorReporter := &errorReporter.ErrorReporter{}
-	validationController := NewValidationController(mockErrorReporter)
+	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
 	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
@@ -222,7 +221,10 @@ func (mhc *MockHttpClient) Request(method string, resourceURI string, body inter
 func mockValidationController(mockedResponse httpClient.Response) *ValidationController {
 	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
 	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
-	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient)
+	mockK8sMetadataUtil := &k8sMetadataUtil.K8sMetadataUtil{
+		ClientSet: fake.NewSimpleClientset(),
+	}
+	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil)
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,
