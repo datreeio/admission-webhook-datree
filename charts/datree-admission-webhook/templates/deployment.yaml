@@ -24,6 +24,9 @@ spec:
       annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
       {{- end }}
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
         - name: server
