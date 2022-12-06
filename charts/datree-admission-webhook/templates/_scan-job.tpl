@@ -26,6 +26,9 @@ spec:
   backoffLimit: 4
   template:
     spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
       serviceAccountName: cluster-scan-job-service-account
       restartPolicy: Never
       containers:
