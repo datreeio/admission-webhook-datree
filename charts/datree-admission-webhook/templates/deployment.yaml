@@ -8,8 +8,8 @@ metadata:
   labels: {{ include "datree.labels" . | nindent 4 }}
     owner: datree
     app: "datree-webhook-server"
-  {{- if .Values.customAnnotations }}
-  annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+  {{- with .Values.customAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 spec:
   replicas: {{ .Values.replicaCount }}
@@ -20,8 +20,8 @@ spec:
     metadata:
       labels: {{ include "datree.labels" . | nindent 8 }}
         app: "datree-webhook-server"
-      {{- if .Values.customAnnotations }}
-      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- with .Values.customAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
       {{- if .Values.nodeSelector }}
@@ -34,7 +34,7 @@ spec:
           # changing the order will harm resource patching
           env:
             - name: DATREE_TOKEN
-              value: "{{ .Values.datree.token | regexFind $uuidv4RegexPattern | required $emptyTokenMessage }}"
+              value: "{{ .Values.datree.token }}"
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
             - name: DATREE_VERBOSE
