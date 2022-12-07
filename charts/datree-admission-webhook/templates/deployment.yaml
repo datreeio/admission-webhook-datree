@@ -27,7 +27,7 @@ spec:
       {{- if .Values.nodeSelector }}
       nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
       {{- end }}
-      {{- if or .Values.affinity }}
+      {{- if .Values.affinity }}
       affinity:
       {{- end }}
         {{- with .Values.affinity }}
