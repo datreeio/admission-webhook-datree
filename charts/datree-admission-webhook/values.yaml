@@ -56,13 +56,14 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 25000
 resources: {}
-nodeSelector: {}
 # limits:
 #   cpu: 200m
 #   memory: 256Mi
 # requests:
 #   cpu: 200m
 #   memory: 48Mi
+nodeSelector: {}
+affinity: {}
 scanJob:
   resources: {}
   # limits:

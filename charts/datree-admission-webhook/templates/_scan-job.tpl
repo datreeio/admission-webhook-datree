@@ -29,6 +29,9 @@ spec:
       {{- if .Values.nodeSelector }}
       nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
       {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+        {{- end }}
       serviceAccountName: cluster-scan-job-service-account
       restartPolicy: Never
       containers:
