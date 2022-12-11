@@ -118,7 +118,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
+	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
@@ -131,7 +131,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			}
 		}
 
-		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
+		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
 		if err != nil {
 			internalLogger.LogError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
 			*warningMessages = append(*warningMessages, err.Error())
@@ -379,28 +379,12 @@ func getClientId() string {
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
 	yamlSchema, _ := yaml.JSONToYAML(admissionReviewReq.Object.Raw)
-	var annotations map[string]interface{}
-	var rawYaml map[string]interface{}
-	err := yaml.Unmarshal(yamlSchema, &rawYaml)
-	if err == nil {
-		metadata := rawYaml["metadata"].(map[string]interface{})
-		if metadata != nil && metadata["annotations"] != nil {
-			annotations = metadata["annotations"].(map[string]interface{})
-		}
-	}
-
-	config := extractor.Configuration{
-		MetadataName: admissionReviewReq.Name,
-		Kind:         admissionReviewReq.Kind.Kind,
-		ApiVersion:   admissionReviewReq.Kind.Version,
-		Payload:      yamlSchema,
-		Annotations:  annotations,
-	}
+	configs, _ := extractor.ParseYaml(string(yamlSchema))
 
 	var filesConfigurations []*extractor.FileConfigurations
 	filesConfigurations = append(filesConfigurations, &extractor.FileConfigurations{
 		FileName:       fmt.Sprintf("webhook-%s-%s.tmp.yaml\n\n", admissionReviewReq.Name, admissionReviewReq.Kind.Kind),
-		Configurations: []extractor.Configuration{config},
+		Configurations: *configs,
 	})
 
 	return filesConfigurations
