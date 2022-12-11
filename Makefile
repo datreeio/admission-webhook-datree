@@ -31,8 +31,7 @@ test-in-minikube:
 
 helm-install-local-in-minikube:
 	eval $(minikube docker-env) && \
-	./scripts/build-docker-image.sh && \
-	helm install -n datree datree-webhook ./charts/datree-admission-webhook --set datree.token="${DATREE_TOKEN}"
+	helm install -n datree datree-webhook ./charts/datree-admission-webhook --create-namespace --set datree.token="${DATREE_TOKEN}" --set datree.clusterName=$(kubectl config current-context) --debug
 
 helm-upgrade-local:
 	helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook --reuse-values --set datree.enforce="true"
