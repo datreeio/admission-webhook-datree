@@ -118,7 +118,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
+	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
@@ -131,7 +131,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			}
 		}
 
-		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules)
+		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
 		if err != nil {
 			internalLogger.LogError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
 			*warningMessages = append(*warningMessages, err.Error())

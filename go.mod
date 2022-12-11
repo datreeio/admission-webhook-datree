@@ -3,7 +3,7 @@ module github.com/datreeio/admission-webhook-datree
 go 1.18
 
 require (
-	github.com/datreeio/datree v1.6.6
+	github.com/datreeio/datree v1.8.8
 	github.com/ghodss/yaml v1.0.0
 	github.com/lithammer/shortuuid v3.0.0+incompatible
 	github.com/stretchr/testify v1.8.0
@@ -11,13 +11,23 @@ require (
 	k8s.io/api v0.24.2
 	k8s.io/apimachinery v0.24.2
 	k8s.io/client-go v0.24.2
-	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9
+	k8s.io/utils v0.0.0-20220823124924-e9cbc92d1a73
 )
 
 require (
+	github.com/a8m/envsubst v1.3.0 // indirect
+	github.com/alecthomas/participle/v2 v2.0.0-beta.5 // indirect
+	github.com/elliotchance/orderedmap v1.4.0 // indirect
 	github.com/evanphx/json-patch v4.12.0+incompatible // indirect
+	github.com/goccy/go-json v0.9.11 // indirect
+	github.com/goccy/go-yaml v1.9.5 // indirect
+	github.com/jinzhu/copier v0.3.5 // indirect
+	github.com/mikefarah/yq/v4 v4.27.3 // indirect
+	github.com/owenrumney/go-sarif/v2 v2.1.2 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
+	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
+	gopkg.in/op/go-logging.v1 v1.0.0-20160211212156-b2cb9fa56473 // indirect
 )
 
 require (
@@ -46,7 +56,7 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kyokomi/emoji v2.2.4+incompatible // indirect
 	github.com/lufia/plan9stats v0.0.0-20220517141722-cf486979b281 // indirect
-	github.com/magiconair/properties v1.8.1 // indirect
+	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
@@ -79,9 +89,9 @@ require (
 	github.com/xeipuuv/gojsonschema v1.2.0 // indirect
 	github.com/yannh/kubeconform v0.4.14 // indirect
 	github.com/yusufpapurcu/wmi v1.2.2 // indirect
-	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
+	golang.org/x/net v0.0.0-20220708220712-1185a9018129 // indirect
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8 // indirect
-	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20220210224613-90d013bbcef8 // indirect
