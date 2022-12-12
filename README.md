@@ -40,4 +40,6 @@ The following table lists the configurable parameters of the Datree chart and th
 | hooks.waitForServerRollout.sleepyTime | The waiting time before the webhook-server is ready to receive requests.                  | nil|
 | hooks.waitForServerRollout.image      | An image for running sleep command                                                        | {"repository": "alpine", "sha":"sha256:1304f174557314a7ed9eddb4eab12fed12cb0cd9809e4c28f29af86979a3c870", "pullPolicy":"Always"}          |
 | hooks.labelNamespace.image.           | An image for running kubectl label command                                                | {"repository": "bitnami/kubectl", "sha":"sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039", "pullPolicy":"Always"} |
+| nodeSelector                          | Used to select on which node a pod is scheduled to run | nil |
+| affinity                              | Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes | nil |
 
