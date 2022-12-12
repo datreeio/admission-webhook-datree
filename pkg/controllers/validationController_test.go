@@ -131,8 +131,6 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	t.Setenv("DATREE_ENFORCE", "false")
 	var applyRequestNotAllowed admission.AdmissionReview
 	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
-	// resourceKind := applyRequestNotAllowed.Request.Kind.Kind
-	// resourceName := applyRequestNotAllowed.Request.Name
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
