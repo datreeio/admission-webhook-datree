@@ -7,15 +7,15 @@ metadata:
   annotations: 
     "helm.sh/hook": pre-delete, pre-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
-  {{- if .Values.customAnnotations }}
-    {{- toYaml .Values.customAnnotations }}
-  {{- end }}
+    {{- with .Values.customAnnotations }}
+    {{ toYaml . }}
+    {{- end}}
 spec:
   template:
     metadata:
       labels: {{include "datree.labels" . | nindent 8}}
-      {{- if .Values.customAnnotations }}
-      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- with .Values.customAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
       restartPolicy: OnFailure

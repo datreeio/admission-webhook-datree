@@ -52,5 +52,5 @@ spec:
               type: RuntimeDefault
           image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
           imagePullPolicy: Always
-          resources: {{- toYaml .Values.resources | nindent 12 }}
+          resources: {{- toYaml .Values.scanJob.resources | nindent 12 }}
 {{- end -}}

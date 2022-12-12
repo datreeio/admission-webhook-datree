@@ -14,9 +14,9 @@ app.kubernetes.io/part-of: "datree"
 meta.helm.sh/release-name: "{{ .Chart.Name }}"
 meta.helm.sh/release-namespace: "{{ .Release.Namespace}}" 
 helm.sh/chart: {{ template "datree.chart" . }}
-    {{- if .Values.customLabels -}}
-        {{ toYaml .Values.customLabels }}
-    {{- end -}}
+{{- with .Values.customLabels }}
+{{ toYaml . }}
+{{- end }}
 {{- end -}}
 
 {{/* The namespace name. */}}

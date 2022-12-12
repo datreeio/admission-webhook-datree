@@ -8,15 +8,15 @@ metadata:
     "helm.sh/hook": post-install, post-upgrade
     "helm.sh/hook-weight": "-5"
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
-    {{- if .Values.customAnnotations }}
-      {{- toYaml .Values.customAnnotations }}
+    {{- with .Values.customAnnotations }}
+    {{ toYaml . }}
     {{- end }}
 spec:
   template:
     metadata:
       labels: {{include "datree.labels" . | nindent 8}}
-      {{- if .Values.customAnnotations }}
-      annotations: {{- toYaml .Values.customAnnotations | nindent 4 }}
+      {{- with .Values.customAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
       {{- end }}
     spec:
       serviceAccount: datree-label-namespaces-hook-post-install
