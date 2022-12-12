@@ -3,7 +3,6 @@ package controllers
 import (
 	_ "embed"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -132,8 +131,8 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	t.Setenv("DATREE_ENFORCE", "false")
 	var applyRequestNotAllowed admission.AdmissionReview
 	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
-	resourceKind := applyRequestNotAllowed.Request.Kind.Kind
-	resourceName := applyRequestNotAllowed.Request.Name
+	// resourceKind := applyRequestNotAllowed.Request.Kind.Kind
+	// resourceName := applyRequestNotAllowed.Request.Name
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
@@ -145,10 +144,15 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	validationController.Validate(responseRecorder, request)
 
 	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
-	warningMessage := fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check, get the full report at: https://app.staging.datree.io/cli/invocations", resourceName, resourceKind)
+
+	expectedWarningMessages := []string{
+		"🚩 Object with name \"my-deployment\" and kind \"Scale\" failed the policy check",
+		"👉 Get the full report https://app.staging.datree.io/cli/invocations/",
+	}
 	assert.Equal(t, admissionResponse.Allowed, true)
-	assert.Contains(t, admissionResponse.Warnings[0], warningMessage)
-	assert.Contains(t, admissionResponse.Warnings[0], "?webhook=true")
+	assert.Contains(t, admissionResponse.Warnings[0], expectedWarningMessages[0])
+	assert.Contains(t, admissionResponse.Warnings[1], expectedWarningMessages[1])
+	assert.Contains(t, admissionResponse.Warnings[1], "webhook=true")
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
