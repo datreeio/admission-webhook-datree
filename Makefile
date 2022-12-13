@@ -40,6 +40,7 @@ helm-install-local-in-minikube:
 	--set scan_job.image.tag="latest" \
 	--set image.repository="webhook-server" \
 	--set image.pullPolicy="Never" \
+	--set image.tag=latest \
 	--set replicaCount=1 \
 	--debug
 
