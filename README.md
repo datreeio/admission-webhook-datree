@@ -17,7 +17,6 @@ The following table lists the configurable parameters of the Datree chart and th
 
 | Parameter                             | Description               | Default       |
 | ------------------------------------- | -------------------- | ------------------------------- |
-| namespace                             | The name of the namespace all resources will be created in.   |   datree       |
 | replicaCount                          | The number of Datree webhook-server replicas to deploy for the webhook.                   | 2                    |
 | customLabels                          | Additional labels for Datree webhook-server pods.                                         | {}      |
 | customAnnotations                     | Additional annotations to add to all resources.                                           | {}              |
@@ -31,7 +30,7 @@ The following table lists the configurable parameters of the Datree chart and th
 | securityContext                       | Security context applied on the container.                                                | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true,"runAsUser":25000} |
 | resources                             | The resource request/limits for the container image.                                      | limits :cpu: 1000m, memory: 512Mi requests: cpu:100m, memory:256Mi|
 | datree.token                          | The token used to link the CLI to your dashboard. (required)                              | nil|
-| datree.clusterName                    | The name of the cluster link for cluster name in your dashboard                           | cluster uuid|
+| datree.clusterName                    | The name of the cluster link for cluster name in your dashboard                           | nil |
 | datree.policy                         | The name of the policy to check, e.g: staging. (optional)                                 | "" (i.e "default")|
 | datree.verbose                        | Display 'How to Fix' link for failed rules in output. (optional)                          | false|
 | datree.output                         | The format output of the policy check results: yaml, json, xml, simple, JUnit. (optional) | "" (i.e beautiful😊)|
