@@ -54,7 +54,6 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 25000
 resources: {}
 # limits:
 #   cpu: 200m
