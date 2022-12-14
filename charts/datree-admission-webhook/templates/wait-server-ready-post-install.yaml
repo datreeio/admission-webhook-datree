@@ -21,7 +21,7 @@ spec:
       restartPolicy: Never
       containers:
       - name: kubectl-client
-        image: "{{ .Values.hooks.image.repository }}@{{ .Values.hooks.image.sha }}"
+        image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.sha }}"
         imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
         command:
           - sh
