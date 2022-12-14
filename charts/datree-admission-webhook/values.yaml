@@ -81,7 +81,7 @@ hooks:
   # The image for running kubectl commands
   image:
     repository: clastix/kubectl
-    sha: v1.25
+    tag: v1.25
     pullPolicy: IfNotPresent
 validatingWebhookConfiguration:
   failurePolicy: Ignore
