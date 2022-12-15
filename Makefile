@@ -53,7 +53,7 @@ helm-uninstall:
 	kubectl delete ns datree
 
 helm-install-staging:
-	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
+	helm install -n datree datree-webhook ./charts/datree-admission-webhook --debug \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set scan_job.image.repository="datree/scan-job-staging" \
