@@ -47,6 +47,7 @@ spec:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
             runAsNonRoot: true
+            runAsUser: 25000
             seccompProfile:
               type: RuntimeDefault
           image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
