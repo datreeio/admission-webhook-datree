@@ -46,6 +46,4 @@ kind: Job
 metadata:
   name: scan-job
   namespace: datree
-  annotations:
-    "helm.sh/hook": post-install
 {{ include "datree.scanJob" . }}

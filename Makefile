@@ -49,8 +49,6 @@ helm-upgrade-local:
 
 helm-uninstall:
 	helm uninstall -n datree datree-webhook
-	kubectl delete jobs.batch scan-job -n datree
-	kubectl delete ns datree
 
 helm-install-staging:
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
