@@ -53,7 +53,11 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 | image.repository                      | Image repository.                                                                         | datree/admission-webhook                                                                                                                 |
 | image.tag                             | The image release tag to use.                                                             | Defaults to Chart appVersion                                                                                                             |
 | image.pullPolicy                      | Image pull policy                                                                         | Always                                                                                                                                   |
+<<<<<<< HEAD
 | securityContext                       | Security context applied on the container.                                                | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true}                                   |
+=======
+| securityContext                       | Security context applied on the container.                                                | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true, "runAsUser":25000}                                   |
+>>>>>>> f4b0511 (fix: make securityContext configurable in helm chart)
 | resources                             | The resource request/limits for the container image.                                      | limits :cpu: 1000m, memory: 512Mi requests: cpu:100m, memory:256Mi                                                                       |
 | datree.token                          | The token used to link the CLI to your dashboard. (required)                              | nil                                                                                                                                      |
 | datree.clusterName                        | The name of the cluster link for cluster name in your dashboard                           | cluster uuid                                                                                                                             |
