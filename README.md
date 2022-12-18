@@ -27,7 +27,7 @@ The following table lists the configurable parameters of the Datree chart and th
 | image.repository                      | Image repository.                                                                         | datree/admission-webhook |
 | image.tag                             | The image release tag to use.                                                             | Defaults to Chart appVersion |
 | image.pullPolicy                      | Image pull policy                                                                         | Always |
-| securityContext                       | Security context applied on the container.                                                | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true} |
+| securityContext                       | Security context applied on the container.                                                | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true, "runAsUser":25000} |
 | resources                             | The resource request/limits for the container image.                                      | limits :cpu: 1000m, memory: 512Mi requests: cpu:100m, memory:256Mi|
 | datree.token                          | The token used to link the CLI to your dashboard. (required)                              | nil|
 | datree.clusterName                    | The name of the cluster link for cluster name in your dashboard                           | nil |

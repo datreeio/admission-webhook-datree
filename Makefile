@@ -59,4 +59,11 @@ helm-install-staging:
 	--set scan_job.image.repository="datree/scan-job-staging" \
 	--set scan_job.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
-	--set image.tag="latest"
+	--set image.tag="latest" --debug
+helm-template-staging:
+	helm template -n datree datree-webhook ./charts/datree-admission-webhook \
+	--create-namespace \
+	--set datree.token="${DATREE_TOKEN}" \
+	--set scan_job.image.repository="datree/scan-job-staging" \
+	--set scan_job.image.tag="latest" \
+	--set image.repository="datree/webhook-staging"

@@ -44,9 +44,9 @@ spec:
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName}}
           securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
+            {{- with .Values.securityContext }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
             seccompProfile:
               type: RuntimeDefault
           image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
