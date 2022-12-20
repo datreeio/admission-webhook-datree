@@ -52,4 +52,13 @@ spec:
           image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
           imagePullPolicy: Always
           resources: {{- toYaml .Values.scanJob.resources | nindent 12 }}
+          volumeMounts:
+            - name: webhook-config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: webhook-config
+          configMap:
+            name: webhook-scanning-filters
+            optional: true
 {{- end -}}
