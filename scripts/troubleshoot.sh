@@ -29,9 +29,9 @@ run_command kubectl get ns
 
 run_command helm list -n datree
 
-run_command kubectl get ns kube-system -o jsonpath='{.metadata.uid}'
-
 run_command kubectl get all -n datree
+
+run_command kubectl get ns kube-system -o jsonpath='{.metadata.uid}'
 
 # get image version of datree scan-job
 run_command kubectl get job.batch/scan-job -n datree -o jsonpath='{.spec.template.spec.containers[0].image}'
