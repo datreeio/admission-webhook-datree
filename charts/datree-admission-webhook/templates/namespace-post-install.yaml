@@ -25,7 +25,7 @@ spec:
         kubernetes.io/os: linux
       containers:
         - name: kubectl-label
-          image: "{{ .Values.hooks.image.repository }}@{{ .Values.hooks.image.sha }}"
+          image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
           imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
           args:
             - label
