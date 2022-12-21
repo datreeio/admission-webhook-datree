@@ -1,0 +1,13 @@
+name: Release Helm Chart Post Successful Production Release
+
+on:
+  workflow_run:
+    workflows: ["Release to Prod"]
+    types:
+      - completed
+
+jobs:
+  release-helm-chart:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/reusable_release_helm_chart.yml
+    secrets: inherit
