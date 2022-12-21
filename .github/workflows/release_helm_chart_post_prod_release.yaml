@@ -9,5 +9,5 @@ on:
 jobs:
   release-helm-chart:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
-    uses: ./.github/workflows/reusable_release_helm_chart.yml
+    uses: ./.github/workflows/reusable_release_helm_chart.yaml
     secrets: inherit
