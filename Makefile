@@ -36,8 +36,8 @@ helm-install-local-in-minikube:
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set datree.clusterName=$(kubectl config current-context) \
-	--set scan_job.image.repository="datree/scan-job-staging" \
-	--set scan_job.image.tag="latest" \
+	--set scanJob.image.repository="datree/scan-job-staging" \
+	--set scanJob.image.tag="latest" \
 	--set image.repository="webhook-server" \
 	--set image.pullPolicy="Never" \
 	--set image.tag="latest" \
@@ -54,14 +54,14 @@ helm-install-staging:
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
-	--set scan_job.image.repository="datree/scan-job-staging" \
-	--set scan_job.image.tag="latest" \
+	--set scanJob.image.repository="datree/scan-job-staging" \
+	--set scanJob.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
 	--set image.tag="latest" --debug
 helm-template-staging:
 	helm template -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
-	--set scan_job.image.repository="datree/scan-job-staging" \
-	--set scan_job.image.tag="latest" \
+	--set scanJob.image.repository="datree/scan-job-staging" \
+	--set scanJob.image.tag="latest" \
 	--set image.repository="datree/webhook-staging"
