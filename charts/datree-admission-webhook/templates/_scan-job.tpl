@@ -49,7 +49,7 @@ spec:
             {{- end }}
             seccompProfile:
               type: RuntimeDefault
-          image: "{{ .Values.scan_job.image.repository }}:{{ .Values.scan_job.image.tag }}"
+          image: "{{ .Values.scanJob.image.repository }}:{{ .Values.scanJob.image.tag }}"
           imagePullPolicy: Always
           resources: {{- toYaml .Values.scanJob.resources | nindent 12 }}
           volumeMounts:
