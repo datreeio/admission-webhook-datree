@@ -58,7 +58,7 @@ resources: {}
 #   memory: 48Mi
 nodeSelector: {}
 affinity: {}
-tolerations:
+tolerations: []
 scanJob:
   resources: {}
   image:
