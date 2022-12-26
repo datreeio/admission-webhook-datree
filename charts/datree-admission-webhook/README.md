@@ -33,7 +33,7 @@ datree:
   output: ""                # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
   noRecord: ""              # Don’t send policy checks metadata to the backend. (boolean ,optional)
   enforce: ""               # Block resources that fail the policy check. (boolean ,optional)
-  clusterName: ""               # The name of the cluster link for cluster name in your dashboard. (string ,optional)
+  clusterName: ""           # The name of the cluster link for cluster name in your dashboard. (string ,optional)
 ```
 
 For further information about Datree flags see [CLI arguments](https://hub.datree.io/setup/cli-arguments).
