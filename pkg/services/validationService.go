@@ -436,6 +436,9 @@ func (vs ValidationService) getEvaluationRequestData(token string, clientId stri
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
 	clusterUuid, _ := vs.K8sMetadataUtil.GetClusterUuid()
 	clusterName := os.Getenv(enums.ClusterName)
+	if clusterName == "" {
+		clusterName = (string)(clusterUuid)
+	}
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
