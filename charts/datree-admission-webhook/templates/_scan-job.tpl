@@ -31,7 +31,10 @@ spec:
       {{- end }}
       {{- with .Values.affinity }}
       affinity: {{ toYaml . | nindent 8 }}
-        {{- end }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
       serviceAccountName: cluster-scan-job-service-account
       restartPolicy: Never
       containers:
