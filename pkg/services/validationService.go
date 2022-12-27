@@ -289,7 +289,6 @@ func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationReque
 		AllEvaluatedFiles:  evaluationRequestData.EvaluationData.FilesData,
 		PolicyCheckResults: evaluationRequestData.EvaluationData.PolicyCheckResults,
 		ClusterUuid:        evaluationRequestData.ClusterUuid,
-		ClusterName:        evaluationRequestData.ClusterName,
 		Namespace:          evaluationRequestData.Namespace,
 		Kind:               evaluationRequestData.Kind,
 		MetadataName:       evaluationRequestData.MetadataName,
@@ -435,10 +434,6 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 func (vs ValidationService) getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
 	clusterUuid, _ := vs.K8sMetadataUtil.GetClusterUuid()
-	clusterName := os.Getenv(enums.ClusterName)
-	if clusterName == "" {
-		clusterName = (string)(clusterUuid)
-	}
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
@@ -453,7 +448,6 @@ func (vs ValidationService) getEvaluationRequestData(token string, clientId stri
 		},
 		WebhookVersion: config.WebhookVersion,
 		ClusterUuid:    clusterUuid,
-		ClusterName:    clusterName,
 		IsEnforceMode:  isEnforceMode(),
 		Namespace:      evaluationNamespace,
 		Kind:           kind,

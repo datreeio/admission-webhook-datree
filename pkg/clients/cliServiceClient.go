@@ -117,7 +117,6 @@ type WebhookEvaluationRequestData struct {
 	EvaluationData evaluation.EvaluationRequestData
 	WebhookVersion string
 	ClusterUuid    k8sTypes.UID
-	ClusterName    string
 	Namespace      string
 	IsEnforceMode  bool
 	Kind           string
@@ -136,7 +135,6 @@ type EvaluationResultRequest struct {
 	AllEvaluatedFiles  []cliClient.FileData                        `json:"allEvaluatedFiles"`
 	PolicyCheckResults map[string]map[string]*cliClient.FailedRule `json:"policyCheckResults"`
 	ClusterUuid        k8sTypes.UID                                `json:"clusterUuid,omitempty"`
-	ClusterName        string                                      `json:"clusterName,omitempty"`
 	Namespace          string                                      `json:"namespace,omitempty"`
 	Kind               string                                      `json:"kind"`
 	MetadataName       string                                      `json:"metadataName"`
