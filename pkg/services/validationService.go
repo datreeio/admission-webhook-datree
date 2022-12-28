@@ -103,7 +103,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
-		internalLogger.LogError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
+		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 		*warningMessages = append(*warningMessages, err.Error())
 	}
 
@@ -123,7 +123,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
 		so we are validating against default policy */
-		internalLogger.LogError(fmt.Sprintf("Extracting policy out of policies yaml err1: %s", err.Error()))
+		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Extracting policy out of policies yaml err1: %s", err.Error()))
 
 		for _, policy := range prerunData.PoliciesJson.Policies {
 			if policy.IsDefault {
@@ -133,7 +133,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
 		if err != nil {
-			internalLogger.LogError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
+			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
 			*warningMessages = append(*warningMessages, err.Error())
 			panic(err.Error())
 		}
@@ -151,7 +151,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
 	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 	if err != nil {
-		internalLogger.LogError(fmt.Sprintf("Evaluate err: %s", err.Error()))
+		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Evaluate err: %s", err.Error()))
 	}
 
 	results := policyCheckResults.FormattedResults
@@ -183,7 +183,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			cliEvaluationId = evaluationResultResp.EvaluationId
 		} else {
 			cliEvaluationId = -2
-			internalLogger.LogError("saving evaluation results failed")
+			internalLogger.LogAndReportUnexpectedError("saving evaluation results failed")
 			*warningMessages = append(*warningMessages, "saving evaluation results failed")
 		}
 	}
@@ -200,7 +200,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	})
 
 	if err != nil {
-		internalLogger.LogError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
+		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
 	}
 
 	var allowed bool

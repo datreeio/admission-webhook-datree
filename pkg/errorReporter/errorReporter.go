@@ -39,6 +39,9 @@ func NewErrorReporter(client CliClient, localConfig LocalConfig) *ErrorReporter 
 func (reporter *ErrorReporter) ReportPanicError(panicErr interface{}) {
 	reporter.ReportError(panicErr, "/report-webhook-panic-error")
 }
+func (reporter *ErrorReporter) ReportUnexpectedError(panicErr interface{}) {
+	reporter.ReportError(panicErr, "/report-webhook-unexpected-error")
+}
 
 func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	errorMessage := utils.ParseErrorToString(error)

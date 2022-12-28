@@ -34,12 +34,12 @@ func main() {
 }
 
 func start(port string) {
-	internalLogger := logger.New("")
 
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
 	basicLocalConfigClient := localConfig.NewLocalConfigClient(basicCliClient, basicNetworkValidator)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, basicLocalConfigClient)
+	internalLogger := logger.New("", errorReporter)
 
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
