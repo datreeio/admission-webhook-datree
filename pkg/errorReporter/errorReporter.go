@@ -2,7 +2,6 @@ package errorReporter
 
 import (
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"os"
 
 	"runtime/debug"
@@ -54,7 +53,8 @@ func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	}, uri)
 
 	if err != nil {
-		logger.LogUtil(fmt.Sprintf("ReportError status code: %d, err: %s", statusCode, err.Error()))
+		// using fmt.Println instead of logger to avoid circular dependency
+		fmt.Println(fmt.Sprintf("ReportError status code: %d, err: %s", statusCode, err.Error()))
 	}
 }
 
