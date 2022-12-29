@@ -108,6 +108,7 @@ type ClusterRequestMetadataBatchReqBody struct {
 func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator ClusterRequestMetadataBatchReqBody) {
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
+		// using fmt.Println instead of logger to avoid circular dependency
 		fmt.Println(fmt.Sprintf("SendRequestMetadataBatch status code: %d, err: %s", httpRes.StatusCode, err.Error()))
 	}
 }
