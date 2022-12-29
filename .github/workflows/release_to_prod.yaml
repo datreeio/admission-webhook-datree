@@ -53,7 +53,6 @@ jobs:
         uses: mikefarah/yq@master
         with:
           cmd: |
-            yq -i '(with(select(.spec.template.spec.containers[0].image);.spec.template.spec.containers[0].image = "${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.define_version.outputs.version }}"))' 'kube/core-resources.yaml'
             yq e -i '.appVersion = "${{ steps.define_version.outputs.version }}"' charts/datree-admission-webhook/Chart.yaml
             yq e -i '.image.tag = "${{ steps.define_version.outputs.version }}"' charts/datree-admission-webhook/values.yaml
       - name: Auto commit changes
@@ -62,10 +61,7 @@ jobs:
           commit_message: "build: Automated Change - Bump webhook-image version to ${{ steps.define_version.outputs.version }}"
       - name: Copy files to S3 bucket
         run: |
-          aws s3 cp ./scripts/install.sh s3://get.datree.io/admission-webhook --acl public-read
           aws s3 cp ./scripts/uninstall.sh s3://get.datree.io/admission-webhook-uninstall --acl public-read
-          aws s3 cp ./kube/core-resources.yaml s3://get.datree.io/core-resources.yaml --acl public-read
-          aws s3 cp ./kube/validating-webhook-configuration.yaml s3://get.datree.io/validating-webhook-configuration.yaml --acl public-read
       - name: Invalidate CloudFront
         run: |
           echo "Cloudfront: Invalidating /*"

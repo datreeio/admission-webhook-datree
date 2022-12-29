@@ -22,12 +22,6 @@ build-production:
 test:
 	DATREE_ENFORCE="true" go test ./...
 
-deploy-in-minikube:
-	bash ./scripts/deploy-in-minikube.sh
-run-in-minikube:
-	bash ./scripts/run-in-minikube.sh
-test-in-minikube:
-	bash ./scripts/test-in-minikube.sh
 
 helm-install-local-in-minikube:
 	eval $(minikube docker-env) && \
