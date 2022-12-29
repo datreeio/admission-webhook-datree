@@ -39,11 +39,28 @@ spec:
   # get the current time, subtract 5 minutes, extract the minutes and inject it into the cron expression
   # if helm installation was done at 13:35, the cron expression will be 30 * * * *, which means the job will run at 14:30, 15:30, 16:30, etc.
   schedule: "{{ now | dateModify "-5m" | date "04" }} * * * *" # every hour, starting 55 minutes after helm installation
-  jobTemplate: {{ include "datree.scanJob" . | nindent 4 }}
+  jobTemplate:
+    spec:
+      ttlSecondsAfterFinished: {{.Values.scanJob.ttlSecondsAfterFinished | default "100" }}
+      template:      
+        spec:
+          containers:
+          - name: scan-job
+            image: {{.Values.scanJob.image.repository | default "datree/scan-job" }}:{{.Values.scanJob.image.tag | default "0.0.14" }}
+          restartPolicy: {{.Values.scanJob.restartPolicy | default "Never" }}
+  
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: scan-job
   namespace: datree
-{{ include "datree.scanJob" . }}
+spec:
+  ttlSecondsAfterFinished: {{.Values.scanJob.ttlSecondsAfterFinished | default "100" }}
+  template:
+    spec:
+      containers:
+      - name: scan-job
+        image: {{.Values.scanJob.image.repository | default "datree/scan-job" }}:{{.Values.scanJob.image.tag | default "0.0.14" }}
+      restartPolicy: {{.Values.scanJob.restartPolicy | default "Never" }}
+

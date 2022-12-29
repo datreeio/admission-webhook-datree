@@ -61,11 +61,13 @@ affinity: {}
 tolerations: []
 scanJob:
   resources: {}
+  ttlSecondsAfterFinished: 100
   image:
     # Image repository
     repository: datree/scan-job
     # Image tag
     tag: 0.0.14
+    restartPolicy: Never
   # limits:
   #   cpu: 1000m
   #   memory: 1048Mi
