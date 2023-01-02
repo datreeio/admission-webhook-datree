@@ -27,7 +27,7 @@ type ValidationController struct {
 
 func NewValidationController(errorReporter *errorReporter.ErrorReporter, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationController {
 	return &ValidationController{
-		ValidationService: services.NewValidationService(k8sMetadataUtilInstance),
+		ValidationService: services.NewValidationService(k8sMetadataUtilInstance, errorReporter),
 		ErrorReporter:     errorReporter,
 	}
 }
