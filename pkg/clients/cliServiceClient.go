@@ -29,10 +29,6 @@ type CliClient struct {
 	flagsHeaders     map[string]string
 }
 
-func (c *CliClient) ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
-	return 200, nil
-}
-
 func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator) *CliClient {
 	httpClient := httpClient.NewClient(url, nil)
 	return &CliClient{
@@ -88,6 +84,11 @@ func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.Eval
 // SendEvaluationResult needed to override cliClient for evaluation
 func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
 	return nil, nil
+}
+
+// ReportCliError override for mocks
+func (c *CliClient) ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
+	return 200, nil
 }
 
 type ClusterRequestMetadata struct {
