@@ -14,15 +14,15 @@ import (
 	"github.com/datreeio/datree/pkg/cliClient"
 )
 
-type CliClient interface {
+type ErrorReporterClient interface {
 	ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error)
 }
 
 type ErrorReporter struct {
-	client CliClient
+	client ErrorReporterClient
 }
 
-func NewErrorReporter(client CliClient) *ErrorReporter {
+func NewErrorReporter(client ErrorReporterClient) *ErrorReporter {
 	return &ErrorReporter{
 		client: client,
 	}
