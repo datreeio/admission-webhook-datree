@@ -238,13 +238,13 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockK8sMetadataUtil := &k8sMetadataUtil.K8sMetadataUtil{
 		ClientSet: fake.NewSimpleClientset(),
 	}
-	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil)
-
 	mockErrorReporterClient := &MockErrorReporterClient{}
 	mockErrorReporterClient.On("ReportCliError", mock.Anything, mock.Anything).Return(200, nil)
+	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient)
+	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil, errorReporter)
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,
-		ErrorReporter:     errorReporter.NewErrorReporter(mockErrorReporterClient),
+		ErrorReporter:     errorReporter,
 	}
 }

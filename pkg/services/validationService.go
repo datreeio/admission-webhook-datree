@@ -2,7 +2,9 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"net/http"
 	"os"
 	"strings"
@@ -54,6 +56,7 @@ type Metadata struct {
 type ValidationService struct {
 	CliServiceClient *cliClient.CliClient
 	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
+	errorReporter    *errorReporter.ErrorReporter
 }
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
@@ -62,17 +65,19 @@ func isEnforceMode() bool {
 	return os.Getenv(enums.Enforce) == "true"
 }
 
-func NewValidationService(k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationService {
+func NewValidationService(k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
 		K8sMetadataUtil:  k8sMetadataUtilInstance,
+		errorReporter:    errorReporter,
 	}
 }
 
-func NewValidationServiceWithCustomCliServiceClient(cliServiceClient *cliClient.CliClient, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationService {
+func NewValidationServiceWithCustomCliServiceClient(cliServiceClient *cliClient.CliClient, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
 		K8sMetadataUtil:  k8sMetadataUtilInstance,
+		errorReporter:    errorReporter,
 	}
 }
 
@@ -84,8 +89,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	ciContext := ciContext.Extract()
 
-	clusterK8sVersion := getK8sVersion()
-	token, err := getToken()
+	clusterK8sVersion := vs.getK8sVersion()
+	token, err := vs.getToken()
 	if err != nil {
 		panic(err)
 	}
@@ -94,11 +99,11 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
-		saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
-	clientId := getClientId()
+	clientId := vs.getClientId()
 	policyName := os.Getenv(enums.Policy)
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
@@ -229,7 +234,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 
 	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
-	saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
@@ -237,9 +242,10 @@ type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMeta
 
 var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 
-func saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
+		vs.errorReporter.ReportUnexpectedError(err)
 		logger.LogUtil(err.Error())
 		return
 	}
@@ -341,7 +347,7 @@ func getClusterK8sVersion() (string, error) {
 	return serverInfo.GitVersion, nil
 }
 
-func getK8sVersion() string {
+func (vs *ValidationService) getK8sVersion() string {
 	var err error
 	clusterK8sVersion := os.Getenv("CLUSTER_K8S_VERSION")
 	if clusterK8sVersion == "" {
@@ -352,29 +358,35 @@ func getK8sVersion() string {
 
 		err = os.Setenv("CLUSTER_K8S_VERSION", clusterK8sVersion)
 		if err != nil {
-			logger.LogUtil(fmt.Sprintf("couldn't set CLUSTER_K8S_VERSION env variable %s", err))
+			formattedErrorMessage := fmt.Sprintf("couldn't set CLUSTER_K8S_VERSION env variable %s", err)
+			vs.errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
+			logger.LogUtil(formattedErrorMessage)
 		}
 	}
 	return clusterK8sVersion
 }
 
-func getToken() (string, error) {
+func (vs *ValidationService) getToken() (string, error) {
 	token := os.Getenv(enums.Token)
 
 	if token == "" {
-		logger.LogUtil("No DATREE_TOKEN was found in env")
+		errorMessage := "No DATREE_TOKEN was found in env"
+		vs.errorReporter.ReportUnexpectedError(errors.New(errorMessage))
+		logger.LogUtil(errorMessage)
 	}
 	return token, nil
 }
 
-func getClientId() string {
+func (vs *ValidationService) getClientId() string {
 	clientId := os.Getenv(enums.ClientId)
 	if clientId == "" {
 		clientId = shortuuid.New()
 
 		err := os.Setenv(enums.ClientId, clientId)
 		if err != nil {
-			logger.LogUtil(fmt.Sprintf("couldn't set DATREE_CLIENT_ID env variable %s", err))
+			formattedErrorMessage := fmt.Sprintf("couldn't set DATREE_CLIENT_ID env variable %s", err)
+			vs.errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
+			logger.LogUtil(formattedErrorMessage)
 		}
 	}
 	return clientId
