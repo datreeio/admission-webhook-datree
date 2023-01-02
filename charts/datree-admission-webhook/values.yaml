@@ -40,7 +40,7 @@ image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.41
+  tag: 0.1.43
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -65,13 +65,13 @@ scanJob:
     # Image repository
     repository: datree/scan-job
     # Image tag
-    tag: 0.0.13
-  # limits:
-  #   cpu: 1000m
-  #   memory: 1048Mi
-  # requests:
-  #   cpu: 200m
-  #   memory: 256Mi
+    tag: 0.0.15
+    # limits:
+    #   cpu: 1000m
+    #   memory: 1048Mi
+    # requests:
+    #   cpu: 200m
+    #   memory: 256Mi
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
