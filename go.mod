@@ -26,6 +26,7 @@ require (
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/mikefarah/yq/v4 v4.27.3 // indirect
 	github.com/owenrumney/go-sarif/v2 v2.1.2 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
 	go.uber.org/atomic v1.4.0 // indirect
 	go.uber.org/multierr v1.1.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect

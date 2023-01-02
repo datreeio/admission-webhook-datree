@@ -2,7 +2,9 @@ package logger
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"go.uber.org/zap"
 	admission "k8s.io/api/admission/v1"
 )
@@ -15,16 +17,17 @@ import (
 
 // Logger - instructions to get the logs are under /guides/developer-guide.md
 type Logger struct {
-	zapLogger *zap.SugaredLogger
-	requestId string
+	zapLogger     *zap.SugaredLogger
+	requestId     string
+	errorReporter *errorReporter.ErrorReporter
 }
 
-func New(requestId string) Logger {
+func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
 	zapLogger, _ := zap.NewProduction()
 	defer zapLogger.Sync() // flushes buffer, if any
 	sugar := zapLogger.Sugar()
 
-	return Logger{zapLogger: sugar, requestId: requestId}
+	return Logger{zapLogger: sugar, requestId: requestId, errorReporter: errorReporter}
 }
 
 func (l *Logger) LogError(message string) {
@@ -32,6 +35,11 @@ func (l *Logger) LogError(message string) {
 		// Structured context as loosely typed key-value pairs.
 		"requestId", l.requestId,
 	)
+}
+
+func (l *Logger) LogAndReportUnexpectedError(message string) {
+	l.LogError(message)
+	l.errorReporter.ReportUnexpectedError(errors.New(message))
 }
 
 func (l *Logger) LogIncoming(admissionReview *admission.AdmissionReview) {
@@ -56,7 +64,7 @@ func (l *Logger) LogInfo(objectToLog any) {
 // LogUtil this method creates a new logger instance on every call, and does not have a requestId
 // please prefer using the logger instance from the context instead
 func LogUtil(msg string) {
-	logger := New("")
+	logger := New("", nil)
 	logger.LogInfo(msg)
 }
 

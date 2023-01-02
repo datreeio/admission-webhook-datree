@@ -33,7 +33,7 @@ func NewValidationController(errorReporter *errorReporter.ErrorReporter, k8sMeta
 }
 
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
-	internalLogger := logger.New(uuid.NewString())
+	internalLogger := logger.New(uuid.NewString(), c.ErrorReporter)
 
 	var warningMessages []string
 	writer := responseWriter.New(w)
@@ -45,14 +45,14 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 
 	err := headerValidation(req)
 	if err != nil {
-		internalLogger.LogError(fmt.Sprintf("header validation failed: %s", err))
+		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("header validation failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
 
 	admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
 	if err != nil {
-		internalLogger.LogError(fmt.Sprintf("parsing request body failed: %s", err))
+		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("parsing request body failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}

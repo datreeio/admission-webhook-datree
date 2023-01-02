@@ -2,13 +2,11 @@ package errorReporter
 
 import (
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"os"
 
 	"runtime/debug"
 
 	"github.com/datreeio/datree/cmd"
-	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/utils"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -16,28 +14,25 @@ import (
 	"github.com/datreeio/datree/pkg/cliClient"
 )
 
-type LocalConfig interface {
-	GetLocalConfiguration() (*localConfig.LocalConfig, error)
-}
-
-type CliClient interface {
+type ErrorReporterClient interface {
 	ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error)
 }
 
 type ErrorReporter struct {
-	config LocalConfig
-	client CliClient
+	client ErrorReporterClient
 }
 
-func NewErrorReporter(client CliClient, localConfig LocalConfig) *ErrorReporter {
+func NewErrorReporter(client ErrorReporterClient) *ErrorReporter {
 	return &ErrorReporter{
 		client: client,
-		config: localConfig,
 	}
 }
 
 func (reporter *ErrorReporter) ReportPanicError(panicErr interface{}) {
 	reporter.ReportError(panicErr, "/report-webhook-panic-error")
+}
+func (reporter *ErrorReporter) ReportUnexpectedError(unexpectedError error) {
+	reporter.ReportError(unexpectedError, "/report-webhook-unexpected-error")
 }
 
 func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
@@ -51,22 +46,7 @@ func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	}, uri)
 
 	if err != nil {
-		logger.LogUtil(fmt.Sprintf("ReportError status code: %d, err: %s", statusCode, err.Error()))
+		// using fmt.Println instead of logger to avoid circular dependency
+		fmt.Println(fmt.Sprintf("ReportError status code: %d, err: %s", statusCode, err.Error()))
 	}
-}
-
-func (reporter *ErrorReporter) getLocalConfig() (unknownLocalConfig *localConfig.LocalConfig) {
-	unknownLocalConfig = &localConfig.LocalConfig{ClientId: "unknown", Token: "unknown"}
-	defer func() {
-		_ = recover()
-
-	}()
-
-	config, err := reporter.config.GetLocalConfiguration()
-	if err != nil {
-		return unknownLocalConfig
-	} else {
-		return config
-	}
-
 }
