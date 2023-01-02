@@ -17,7 +17,6 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
-	"github.com/datreeio/datree/pkg/localConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/utils"
 )
@@ -37,8 +36,7 @@ func start(port string) {
 
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
-	basicLocalConfigClient := localConfig.NewLocalConfigClient(basicCliClient, basicNetworkValidator)
-	errorReporter := errorReporter.NewErrorReporter(basicCliClient, basicLocalConfigClient)
+	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
 	internalLogger := logger.New("", errorReporter)
 
 	defer func() {

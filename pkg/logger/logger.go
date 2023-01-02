@@ -2,6 +2,7 @@ package logger
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"go.uber.org/zap"
@@ -38,7 +39,7 @@ func (l *Logger) LogError(message string) {
 
 func (l *Logger) LogAndReportUnexpectedError(message string) {
 	l.LogError(message)
-	l.errorReporter.ReportUnexpectedError(message)
+	l.errorReporter.ReportUnexpectedError(errors.New(message))
 }
 
 func (l *Logger) LogIncoming(admissionReview *admission.AdmissionReview) {

@@ -3,6 +3,7 @@ package controllers
 import (
 	_ "embed"
 	"encoding/json"
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -230,5 +231,6 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,
+		ErrorReporter:     errorReporter.NewErrorReporter(mockedCliServiceClient),
 	}
 }

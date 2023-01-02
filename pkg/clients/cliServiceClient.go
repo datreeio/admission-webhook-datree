@@ -29,6 +29,10 @@ type CliClient struct {
 	flagsHeaders     map[string]string
 }
 
+func (c *CliClient) ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
+	return 200, nil
+}
+
 func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator) *CliClient {
 	httpClient := httpClient.NewClient(url, nil)
 	return &CliClient{
