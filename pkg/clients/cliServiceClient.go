@@ -86,11 +86,6 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 	return nil, nil
 }
 
-// ReportCliError override for mocks
-func (c *CliClient) ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
-	return 200, nil
-}
-
 type ClusterRequestMetadata struct {
 	CliEvaluationId          int                                 `json:"cliEvaluationId"`
 	Token                    string                              `json:"token"`
