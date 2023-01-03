@@ -33,6 +33,12 @@ func main() {
 }
 
 func start(port string) {
+	// get DATREE_POD_NAME from env
+	podName := os.Getenv("DATREE_POD_NAME")
+	fmt.Println("-----------------------------------")
+	fmt.Println("pod name:")
+	fmt.Println(podName)
+	fmt.Println("-----------------------------------")
 
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
