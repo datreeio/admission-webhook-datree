@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
+	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	"net/http"
 	"os"
 	"time"
@@ -33,13 +36,6 @@ func main() {
 }
 
 func start(port string) {
-	// get DATREE_POD_NAME from env
-	podName := os.Getenv("DATREE_POD_NAME")
-	fmt.Println("-----------------------------------")
-	fmt.Println("pod name:")
-	fmt.Println(podName)
-	fmt.Println("-----------------------------------")
-
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
@@ -53,7 +49,13 @@ func start(port string) {
 		}
 	}()
 
-	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil()
+	k8sClientInstance, err := k8sClient.NewK8sClient()
+	var leaderElectionLeaseGetter v1.LeasesGetter = nil
+	if err == nil && k8sClientInstance != nil {
+		leaderElectionLeaseGetter = k8sClientInstance.CoordinationV1()
+	}
+	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
 	initMetadataLogsCronjob()

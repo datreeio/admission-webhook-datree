@@ -2,6 +2,7 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
 	"os"
 	"time"
 
@@ -13,25 +14,26 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 )
 
 type K8sMetadataUtil struct {
 	ClientSet            kubernetes.Interface
 	CreateClientSetError error
+	leaderElection       *leaderElection.LeaderElection
 }
 
 var ClusterUuid k8sTypes.UID = ""
 
-func NewK8sMetadataUtil() *K8sMetadataUtil {
-	clientset, err := getClientSet()
-	if err != nil {
+func NewK8sMetadataUtil(clientset *kubernetes.Clientset, createClientSetError error, leaderElection *leaderElection.LeaderElection) *K8sMetadataUtil {
+	if createClientSetError != nil {
 		return &K8sMetadataUtil{
-			CreateClientSetError: err,
+			CreateClientSetError: createClientSetError,
+			leaderElection:       leaderElection,
 		}
 	}
 	return &K8sMetadataUtil{
-		ClientSet: clientset,
+		ClientSet:      clientset,
+		leaderElection: leaderElection,
 	}
 }
 
@@ -43,22 +45,22 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 	var clusterUuid k8sTypes.UID
 
 	if k8sMetadataUtil.CreateClientSetError != nil {
-		sendK8sMetadata(-1, k8sMetadataUtil.CreateClientSetError, clusterUuid, cliClient)
+		k8sMetadataUtil.sendK8sMetadataIfLeader(-1, k8sMetadataUtil.CreateClientSetError, clusterUuid, cliClient)
 		return
 	}
 
 	clusterUuid, err := k8sMetadataUtil.GetClusterUuid()
 	if err != nil {
-		sendK8sMetadata(-1, err, clusterUuid, cliClient)
+		k8sMetadataUtil.sendK8sMetadataIfLeader(-1, err, clusterUuid, cliClient)
 	}
 
 	nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-	sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+	k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
 		nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-		sendK8sMetadata(nodesCount, nodesCountErr, clusterUuid, cliClient)
+		k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
 	cornJob.Start()
 }
@@ -70,20 +72,6 @@ func getNodesCount(clientset kubernetes.Interface) (int, error) {
 	}
 
 	return len(nodes.Items), nil
-}
-
-func getClientSet() (*kubernetes.Clientset, error) {
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, err
-	}
-	return clientset, nil
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
@@ -104,7 +92,10 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 	return ClusterUuid, nil
 }
 
-func sendK8sMetadata(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
+func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
+	if !k8sMetadataUtil.leaderElection.IsLeader() {
+		return
+	}
 	token := os.Getenv(enums.Token)
 
 	var nodesCountErrString string
