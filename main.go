@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
 	"net/http"
 	"os"
 	"time"
@@ -47,8 +48,8 @@ func start(port string) {
 		}
 	}()
 
-	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil()
-	k8sMetadataUtilInstance.InitK8sMetadataUtil()
+	k8sClientInstance, err := k8sClient.NewK8sClient()
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err)
 
 	initMetadataLogsCronjob()
 	server.InitServerVars()

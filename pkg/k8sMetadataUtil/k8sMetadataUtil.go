@@ -13,7 +13,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
 )
 
 type K8sMetadataUtil struct {
@@ -23,11 +22,10 @@ type K8sMetadataUtil struct {
 
 var ClusterUuid k8sTypes.UID = ""
 
-func NewK8sMetadataUtil() *K8sMetadataUtil {
-	clientset, err := getClientSet()
-	if err != nil {
+func NewK8sMetadataUtil(clientset *kubernetes.Clientset, createClientSetError error) *K8sMetadataUtil {
+	if createClientSetError != nil {
 		return &K8sMetadataUtil{
-			CreateClientSetError: err,
+			CreateClientSetError: createClientSetError,
 		}
 	}
 	return &K8sMetadataUtil{
@@ -36,7 +34,6 @@ func NewK8sMetadataUtil() *K8sMetadataUtil {
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
-
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
@@ -70,20 +67,6 @@ func getNodesCount(clientset kubernetes.Interface) (int, error) {
 	}
 
 	return len(nodes.Items), nil
-}
-
-func getClientSet() (*kubernetes.Clientset, error) {
-	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return nil, err
-	}
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		return nil, err
-	}
-	return clientset, nil
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
