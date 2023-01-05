@@ -47,6 +47,8 @@ spec:
               value: {{.Values.datree.policy | default "Starter"}}
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName}}
+            - name: DATREE_NAMESPACE
+              value: {{template "datree.namespace" .}}
           securityContext:
             {{- with .Values.securityContext }}
             {{ toYaml . | nindent 12 }}
