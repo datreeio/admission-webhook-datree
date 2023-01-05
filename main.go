@@ -6,6 +6,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"
@@ -47,7 +49,8 @@ func start(port string) {
 		}
 	}()
 
-	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil()
+	k8sClientInstance, err := k8sClient.NewK8sClient()
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
 	initMetadataLogsCronjob()
