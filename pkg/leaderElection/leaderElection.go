@@ -79,6 +79,7 @@ func (le LeaderElection) init() {
 
 	fmt.Println("got to here1")
 
+	// this function call is blocking
 	leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
 		Lock:            lock,
 		ReleaseOnCancel: true,
@@ -96,7 +97,4 @@ func (le LeaderElection) init() {
 			},
 		},
 	})
-	le.internalLogger.LogInfo("----------------------------")
-	le.internalLogger.LogInfo("we go to the end")
-	le.internalLogger.LogInfo("----------------------------")
 }
