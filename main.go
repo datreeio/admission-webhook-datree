@@ -51,6 +51,7 @@ func start(port string) {
 
 	k8sClientInstance, err := k8sClient.NewK8sClient()
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err)
+	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
 	initMetadataLogsCronjob()
 	server.InitServerVars()
