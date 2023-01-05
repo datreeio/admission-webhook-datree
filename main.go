@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
-	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
-	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
+
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
 
