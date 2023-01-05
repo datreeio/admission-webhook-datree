@@ -51,7 +51,7 @@ spec:
               value: "{{.Values.datree.enforce}}"
             - name: DATREE_NAMESPACE
               value: {{template "datree.namespace" .}}
-            - name: DATREE_POD_NAME
+            - name: POD_NAME
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
