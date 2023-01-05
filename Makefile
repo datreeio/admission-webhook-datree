@@ -35,7 +35,7 @@ helm-install-local-in-minikube:
 	--set image.repository="webhook-server" \
 	--set image.pullPolicy="Never" \
 	--set image.tag="latest" \
-	--set replicaCount=3 \
+	--set replicaCount=1 \
 	--debug
 
 helm-upgrade-local:
@@ -51,14 +51,14 @@ helm-install-staging:
 	--set scanJob.image.repository="datree/scan-job-staging" \
 	--set scanJob.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
-	--set image.tag="latest" --debug
+	--set image.tag="latest" \
+	--debug
+
 helm-template-staging:
 	helm template -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set scanJob.image.repository="datree/scan-job-staging" \
 	--set scanJob.image.tag="latest" \
-	--set image.repository="datree/webhook-staging"
-
-export-logs:
-	mkdir -p ./datree-webhook-logs && for podId in $(kubectl get pods -n datree --output name); do kubectl logs -n datree --since=72h $podId > ./datree-webhook-logs/pod-"$(echo $podId | cut -c 5-)".txt; done
+	--set image.repository="datree/webhook-staging" \
+	--debug

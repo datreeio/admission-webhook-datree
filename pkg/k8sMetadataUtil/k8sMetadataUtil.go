@@ -39,7 +39,6 @@ func NewK8sMetadataUtil(clientset *kubernetes.Clientset, createClientSetError er
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
-
 	validator := networkValidator.NewNetworkValidator()
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 

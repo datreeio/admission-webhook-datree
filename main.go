@@ -9,6 +9,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/services"

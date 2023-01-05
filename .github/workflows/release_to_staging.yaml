@@ -1,7 +1,7 @@
 name: Release to staging
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 jobs:
   release-docker:
     runs-on: ubuntu-latest
