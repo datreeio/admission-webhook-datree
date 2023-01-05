@@ -61,6 +61,8 @@ func start(port string) {
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
+	fmt.Println("got here 7")
+
 	initMetadataLogsCronjob()
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
