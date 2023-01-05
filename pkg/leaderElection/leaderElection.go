@@ -36,7 +36,7 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 			internalLogger:       internalLogger,
 			isLeader:             false,
 		}
-		go le.init()
+		le.init()
 		return le
 	}
 }
@@ -74,9 +74,9 @@ func (le LeaderElection) init() {
 			Identity: uniquePodName,
 		},
 	}
-	
-	// this function call is blocking
-	leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
+
+	// this function call is blocking, therefore we run it in a goroutine
+	go leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
 		Lock:            lock,
 		ReleaseOnCancel: true,
 		LeaseDuration:   12 * time.Second,
