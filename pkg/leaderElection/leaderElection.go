@@ -49,6 +49,10 @@ func (le LeaderElection) IsLeader() bool {
 func (le LeaderElection) init() {
 	fmt.Println("got to here2")
 	uniquePodName := os.Getenv(enums.DatreePodName)
+	namespace := os.Getenv(enums.Namespace)
+	if namespace == "" {
+		namespace = "datree"
+	}
 
 	// handle terminations
 	ctx, cancel := context.WithCancel(context.Background())
@@ -65,7 +69,7 @@ func (le LeaderElection) init() {
 	lock := &resourcelock.LeaseLock{
 		LeaseMeta: metav1.ObjectMeta{
 			Name:      "datree-webhook-server-lease",
-			Namespace: enums.DatreeNamespace,
+			Namespace: namespace,
 		},
 		Client: *le.k8sClientLeaseGetter,
 		LockConfig: resourcelock.ResourceLockConfig{
