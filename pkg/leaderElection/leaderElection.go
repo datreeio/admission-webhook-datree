@@ -23,7 +23,6 @@ type LeaderElection struct {
 }
 
 func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *LeaderElection {
-	fmt.Println("got to here3")
 	if k8sClientLeaseGetter == nil {
 		internalLogger.LogAndReportUnexpectedError("leaderElection: k8s client is nil")
 		return &LeaderElection{
@@ -47,7 +46,6 @@ func (le LeaderElection) IsLeader() bool {
 }
 
 func (le LeaderElection) init() {
-	fmt.Println("got to here2")
 	uniquePodName := os.Getenv(enums.DatreePodName)
 	namespace := os.Getenv(enums.Namespace)
 	if namespace == "" {
