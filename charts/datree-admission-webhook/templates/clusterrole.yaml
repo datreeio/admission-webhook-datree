@@ -13,6 +13,7 @@ rules:
     resources:
       - "nodes"
       - "namespaces"
+      - "leases"
     verbs:
       - "get"
       - "list"

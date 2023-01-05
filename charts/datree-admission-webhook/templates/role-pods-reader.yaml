@@ -8,10 +8,12 @@ metadata:
   {{- end }}
 rules:
   - apiGroups:
+      - "coordination.k8s.io"
       - ""
     resources:
       - "pods"
       - "jobs"
+      - "leases"
     verbs:
       - "get"
       - "list"
