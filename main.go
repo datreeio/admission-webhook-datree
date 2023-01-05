@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
