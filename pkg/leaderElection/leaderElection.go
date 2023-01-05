@@ -76,9 +76,7 @@ func (le LeaderElection) init() {
 			Identity: uniquePodName,
 		},
 	}
-
-	fmt.Println("got to here1")
-
+	
 	// this function call is blocking
 	leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
 		Lock:            lock,
