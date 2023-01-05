@@ -19,7 +19,7 @@ rbac:
     # Create the ClusterRole
     create: true
     # The ClusterRole name
-    name: datree-webhook-server-read
+    name: datree-webhook-server-read-write
 datree:
   # The token used to link the CLI to your dashboard.
   token: <DATREE_TOKEN>

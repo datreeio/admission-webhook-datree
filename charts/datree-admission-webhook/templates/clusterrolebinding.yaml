@@ -10,7 +10,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{.Values.rbac.clusterRole.name}} # datree-webhook-server-read
+  name: {{.Values.rbac.clusterRole.name}} # datree-webhook-server-read-write
 subjects:
   - kind: ServiceAccount
     name: {{.Values.rbac.serviceAccount.name}} # datree-webhook-server
