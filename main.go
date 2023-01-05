@@ -36,6 +36,7 @@ func main() {
 }
 
 func start(port string) {
+	fmt.Println("got here 4")
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
@@ -49,11 +50,13 @@ func start(port string) {
 		}
 	}()
 
+	fmt.Println("got here 5")
 	k8sClientInstance, err := k8sClient.NewK8sClient()
 	var leaderElectionLeaseGetter v1.LeasesGetter = nil
 	if err == nil && k8sClientInstance != nil {
 		leaderElectionLeaseGetter = k8sClientInstance.CoordinationV1()
 	}
+	fmt.Println("got here 6")
 	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()

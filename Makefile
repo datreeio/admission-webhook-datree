@@ -35,7 +35,7 @@ helm-install-local-in-minikube:
 	--set image.repository="webhook-server" \
 	--set image.pullPolicy="Never" \
 	--set image.tag="latest" \
-	--set replicaCount=1 \
+	--set replicaCount=3 \
 	--debug
 
 helm-upgrade-local:

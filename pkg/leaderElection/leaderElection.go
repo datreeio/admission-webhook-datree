@@ -23,6 +23,7 @@ type LeaderElection struct {
 }
 
 func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *LeaderElection {
+	fmt.Println("got to here3")
 	if k8sClientLeaseGetter == nil {
 		internalLogger.LogAndReportUnexpectedError("leaderElection: k8s client is nil")
 		return &LeaderElection{
@@ -46,6 +47,7 @@ func (le LeaderElection) IsLeader() bool {
 }
 
 func (le LeaderElection) init() {
+	fmt.Println("got to here2")
 	uniquePodName := os.Getenv(enums.DatreePodName)
 
 	// handle terminations
@@ -62,7 +64,7 @@ func (le LeaderElection) init() {
 	// create the leader election config
 	lock := &resourcelock.LeaseLock{
 		LeaseMeta: metav1.ObjectMeta{
-			Name:      "datree-webhook-server-lease-lock",
+			Name:      "datree-webhook-server-lease",
 			Namespace: enums.DatreeNamespace,
 		},
 		Client: *le.k8sClientLeaseGetter,
@@ -70,6 +72,8 @@ func (le LeaderElection) init() {
 			Identity: uniquePodName,
 		},
 	}
+
+	fmt.Println("got to here1")
 
 	leaderelection.RunOrDie(ctx, leaderelection.LeaderElectionConfig{
 		Lock:            lock,

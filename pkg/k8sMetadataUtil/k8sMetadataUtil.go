@@ -2,6 +2,7 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
 	"os"
 	"time"
@@ -96,6 +97,9 @@ func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, 
 	if !k8sMetadataUtil.leaderElection.IsLeader() {
 		return
 	}
+	fmt.Println("----------------")
+	fmt.Println("I'm the leader! sending k8s metadata")
+	fmt.Println("----------------")
 	token := os.Getenv(enums.Token)
 
 	var nodesCountErrString string
