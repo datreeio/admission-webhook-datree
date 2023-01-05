@@ -51,10 +51,6 @@ spec:
               value: "{{.Values.datree.noRecord}}"
             - name: DATREE_ENFORCE
               value: "{{.Values.datree.enforce}}"
-            - name: DATREE_POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
           {{- with .Values.securityContext }}
           securityContext: {{ toYaml . | nindent 12 }}
           {{- end }}
