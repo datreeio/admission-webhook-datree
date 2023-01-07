@@ -1,0 +1,8 @@
+# used by the webhook server for leader election between multiple replicas
+apiVersion: coordination.k8s.io/v1
+kind: Lease
+metadata:
+  name: datree-webhook-server-lease
+  namespace: {{ template "datree.namespace" . }}
+spec:
+  leaseDurationSeconds: 12
