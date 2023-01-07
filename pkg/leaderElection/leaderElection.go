@@ -38,7 +38,7 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 			isLeader:             false,
 		}
 		// this function call is blocking, therefore we run it in a goroutine
-		go le.init()
+		go le.listenForChangesInLeader()
 		return le
 	}
 }
@@ -47,7 +47,7 @@ func (le LeaderElection) IsLeader() bool {
 	return le.isLeader
 }
 
-func (le LeaderElection) init() {
+func (le LeaderElection) listenForChangesInLeader() {
 	uniquePodName := os.Getenv(enums.PodName)
 	namespace := os.Getenv(enums.Namespace)
 	if uniquePodName == "" {
