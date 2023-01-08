@@ -23,6 +23,7 @@ rules:
     verbs:
       - "get"
       - "update"
+      - "create"
 {{- end}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
