@@ -39,15 +39,17 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 		}
 		// this function call is blocking, therefore we run it in a goroutine
 		go le.listenForChangesInLeader()
+		// block for 1 millisecond to allow the first leader election to take place
+		time.Sleep(time.Millisecond)
 		return le
 	}
 }
 
-func (le LeaderElection) IsLeader() bool {
+func (le *LeaderElection) IsLeader() bool {
 	return le.isLeader
 }
 
-func (le LeaderElection) listenForChangesInLeader() {
+func (le *LeaderElection) listenForChangesInLeader() {
 	uniquePodName := os.Getenv(enums.PodName)
 	namespace := os.Getenv(enums.Namespace)
 	if uniquePodName == "" {
