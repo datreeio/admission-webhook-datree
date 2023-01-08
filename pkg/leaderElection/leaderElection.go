@@ -38,10 +38,15 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 			internalLogger:       internalLogger,
 			isLeader:             false,
 		}
-		// this function call is blocking, therefore we run it in a goroutine
-		go le.listenForChangesInLeader()
-		// block for 500ms to allow the first leader election to take place, in minikube it only takes 70ms
-		time.Sleep(500 * time.Millisecond)
+		// le.listenForChangesInLeader is a blocking function call, therefore we run it in a goroutine
+		// we also wait for the first leader election to be done, before returning the leaderElection object, with a 5000ms timeout
+		firstLeaderElectionDoneChannel := make(chan bool)
+		go le.listenForChangesInLeader(firstLeaderElectionDoneChannel)
+		go func() {
+			time.Sleep(5000 * time.Millisecond)
+			firstLeaderElectionDoneChannel <- true
+		}()
+		<-firstLeaderElectionDoneChannel
 		return le
 	}
 }
@@ -50,7 +55,7 @@ func (le *LeaderElection) IsLeader() bool {
 	return le.isLeader
 }
 
-func (le *LeaderElection) listenForChangesInLeader() {
+func (le *LeaderElection) listenForChangesInLeader(firstLeaderElectionDoneChannel chan bool) {
 	uniquePodName := os.Getenv(enums.PodName)
 	if uniquePodName == "" {
 		le.isLeader = true
@@ -101,6 +106,9 @@ func (le *LeaderElection) listenForChangesInLeader() {
 			OnStoppedLeading: func() {
 				le.isLeader = false
 				le.internalLogger.LogInfo(fmt.Sprintf("leader election lost for %s", uniquePodName))
+			},
+			OnNewLeader: func(identity string) {
+				firstLeaderElectionDoneChannel <- true
 			},
 		},
 	})
