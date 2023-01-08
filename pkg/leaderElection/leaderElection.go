@@ -2,7 +2,6 @@ package leaderElection
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
@@ -53,12 +52,16 @@ func (le *LeaderElection) IsLeader() bool {
 
 func (le *LeaderElection) listenForChangesInLeader() {
 	uniquePodName := os.Getenv(enums.PodName)
-	namespace := os.Getenv(enums.Namespace)
 	if uniquePodName == "" {
-		panic(errors.New(fmt.Sprintf("env variable %s is not set", enums.PodName)))
+		le.isLeader = true
+		le.internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("env variable %s is not set", enums.PodName))
+		return
 	}
+	namespace := os.Getenv(enums.Namespace)
 	if namespace == "" {
-		panic(errors.New(fmt.Sprintf("env variable %s is not set", enums.Namespace)))
+		le.isLeader = true
+		le.internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("env variable %s is not set", enums.Namespace))
+		return
 	}
 
 	// call cancel() on terminations, to release the leader lock
