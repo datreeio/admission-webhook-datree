@@ -9,4 +9,5 @@ const (
 	Output    = "DATREE_OUTPUT"
 	Enforce   = "DATREE_ENFORCE"
 	Namespace = "DATREE_NAMESPACE"
+	PodName   = "POD_NAME"
 )

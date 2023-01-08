@@ -2,9 +2,13 @@ package main
 
 import (
 	"fmt"
+
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
 
@@ -35,7 +39,6 @@ func main() {
 }
 
 func start(port string) {
-
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
@@ -50,7 +53,12 @@ func start(port string) {
 	}()
 
 	k8sClientInstance, err := k8sClient.NewK8sClient()
-	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err)
+	var leaderElectionLeaseGetter v1.LeasesGetter = nil
+	if err == nil && k8sClientInstance != nil {
+		leaderElectionLeaseGetter = k8sClientInstance.CoordinationV1()
+	}
+	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
 	initMetadataLogsCronjob()

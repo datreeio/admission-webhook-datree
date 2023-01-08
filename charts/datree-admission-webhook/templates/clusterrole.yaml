@@ -16,6 +16,13 @@ rules:
     verbs:
       - "get"
       - "list"
+  - apiGroups:
+      - "coordination.k8s.io"
+    resources:
+      - "leases"
+    verbs:
+      - "get"
+      - "update"
 {{- end}}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
