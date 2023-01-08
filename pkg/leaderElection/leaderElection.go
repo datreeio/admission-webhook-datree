@@ -39,8 +39,8 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 		}
 		// this function call is blocking, therefore we run it in a goroutine
 		go le.listenForChangesInLeader()
-		// block for 1 millisecond to allow the first leader election to take place
-		time.Sleep(time.Millisecond)
+		// block for 500ms to allow the first leader election to take place, in minikube it only takes 70ms
+		time.Sleep(500 * time.Millisecond)
 		return le
 	}
 }
