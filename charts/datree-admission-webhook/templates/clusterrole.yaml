@@ -22,7 +22,6 @@ rules:
       - "leases"
     verbs:
       - "get"
-      - "create"
       - "update"
 {{- end}}
 ---
