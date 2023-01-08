@@ -2,7 +2,6 @@ package k8sMetadataUtil
 
 import (
 	"context"
-	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"os"
@@ -63,8 +62,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 	k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-	cornJob.AddFunc("* * * * *", func() {
-		fmt.Println("running cron")
+	cornJob.AddFunc("@hourly", func() {
 		nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
 		k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient)
 	})
@@ -100,10 +98,8 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 
 func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
 	if !k8sMetadataUtil.leaderElection.IsLeader() {
-		fmt.Println("not leader")
 		return
 	}
-	fmt.Println("sending k8s metadata")
 	token := os.Getenv(enums.Token)
 
 	var nodesCountErrString string

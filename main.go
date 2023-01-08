@@ -58,7 +58,7 @@ func start(port string) {
 		leaderElectionLeaseGetter = k8sClientInstance.CoordinationV1()
 	}
 	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
-	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance)
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
 	initMetadataLogsCronjob()
