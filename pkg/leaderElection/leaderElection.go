@@ -48,6 +48,7 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 		}()
 		hasSucceededFirstLeaderElection := <-hasSucceededFirstLeaderElectionChannel
 		if !hasSucceededFirstLeaderElection {
+			internalLogger.LogAndReportUnexpectedError("leaderElection: first leader election failed")
 			le.isLeader = true
 		}
 		return le
