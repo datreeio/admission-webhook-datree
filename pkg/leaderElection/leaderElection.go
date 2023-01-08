@@ -40,13 +40,16 @@ func New(k8sClientLeaseGetter *v1.LeasesGetter, internalLogger logger.Logger) *L
 		}
 		// le.listenForChangesInLeader is a blocking function call, therefore we run it in a goroutine
 		// we also wait for the first leader election to be done, before returning the leaderElection object, with a 5000ms timeout
-		firstLeaderElectionDoneChannel := make(chan bool)
-		go le.listenForChangesInLeader(firstLeaderElectionDoneChannel)
+		hasSucceededFirstLeaderElectionChannel := make(chan bool)
+		go le.listenForChangesInLeader(hasSucceededFirstLeaderElectionChannel)
 		go func() {
 			time.Sleep(5000 * time.Millisecond)
-			firstLeaderElectionDoneChannel <- true
+			hasSucceededFirstLeaderElectionChannel <- false
 		}()
-		<-firstLeaderElectionDoneChannel
+		hasSucceededFirstLeaderElection := <-hasSucceededFirstLeaderElectionChannel
+		if !hasSucceededFirstLeaderElection {
+			le.isLeader = true
+		}
 		return le
 	}
 }
@@ -55,16 +58,16 @@ func (le *LeaderElection) IsLeader() bool {
 	return le.isLeader
 }
 
-func (le *LeaderElection) listenForChangesInLeader(firstLeaderElectionDoneChannel chan bool) {
+func (le *LeaderElection) listenForChangesInLeader(hasSucceededFirstLeaderElectionChannel chan bool) {
 	uniquePodName := os.Getenv(enums.PodName)
 	if uniquePodName == "" {
-		le.isLeader = true
+		hasSucceededFirstLeaderElectionChannel <- false
 		le.internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("env variable %s is not set", enums.PodName))
 		return
 	}
 	namespace := os.Getenv(enums.Namespace)
 	if namespace == "" {
-		le.isLeader = true
+		hasSucceededFirstLeaderElectionChannel <- false
 		le.internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("env variable %s is not set", enums.Namespace))
 		return
 	}
@@ -108,7 +111,7 @@ func (le *LeaderElection) listenForChangesInLeader(firstLeaderElectionDoneChanne
 				le.internalLogger.LogInfo(fmt.Sprintf("leader election lost for %s", uniquePodName))
 			},
 			OnNewLeader: func(identity string) {
-				firstLeaderElectionDoneChannel <- true
+				hasSucceededFirstLeaderElectionChannel <- true
 			},
 		},
 	})
