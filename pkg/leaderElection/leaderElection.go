@@ -17,6 +17,8 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 )
 
+// official k8s example: https://github.com/kubernetes/client-go/blob/master/examples/leader-election
+
 type LeaderElection struct {
 	k8sClientLeaseGetter *v1.LeasesGetter
 	internalLogger       logger.Logger
