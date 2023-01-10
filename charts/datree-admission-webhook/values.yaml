@@ -79,6 +79,7 @@ scanJob:
 hooks:
   # The timeout time the hook will wait for the webhook-server is ready.
   timeoutTime:
+  ttlSecondsAfterFinished:
   # The image for running kubectl commands
   image:
     repository: clastix/kubectl
