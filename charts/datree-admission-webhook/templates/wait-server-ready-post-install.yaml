@@ -12,6 +12,7 @@ metadata:
     {{ toYaml . }}
     {{- end }}
 spec:
+  ttlSecondsAfterFinished: {{.Values.hooks.ttlSecondsAfterFinished | default "1" }}
   template:
     metadata:
       name: datree-wait-server-ready-hook-post-install
