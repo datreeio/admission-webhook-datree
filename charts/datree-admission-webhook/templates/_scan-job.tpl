@@ -24,7 +24,7 @@ for 1.19.0 <= kubernetes version < 1.21.0 use batch/v1beta1
 {{- define "datree.scanJob" -}}
 spec:
   backoffLimit: 4
-  ttlSecondsAfterFinished: {{.Values.scanJob.ttlSecondsAfterFinished | default "100" }}
+  ttlSecondsAfterFinished: {{.Values.scanJob.ttlSecondsAfterFinished | default "1" }}
   template:
     spec:
       {{- if .Values.nodeSelector }}
