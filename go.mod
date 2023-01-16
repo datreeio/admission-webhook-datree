@@ -3,7 +3,7 @@ module github.com/datreeio/admission-webhook-datree
 go 1.18
 
 require (
-	github.com/datreeio/datree v1.8.12
+	github.com/datreeio/datree v1.8.14
 	github.com/ghodss/yaml v1.0.0
 	github.com/lithammer/shortuuid v3.0.0+incompatible
 	github.com/stretchr/testify v1.8.0
