@@ -60,7 +60,7 @@ nodeSelector: {}
 affinity: {}
 tolerations: []
 scanJob:
-  ttlSecondsAfterFinished: 100
+  ttlSecondsAfterFinished: 1
   resources: {}
   image:
     # Image repository
