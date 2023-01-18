@@ -110,7 +110,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if err != nil {
 		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 
-		prerunWarningMsg := "Validation skipped due to getting preliminary data failure"
+		prerunWarningMsg := "Datree failed to run policy check - an error occurred when pulling your policy"
 		*warningMessages = append(*warningMessages, prerunWarningMsg)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
