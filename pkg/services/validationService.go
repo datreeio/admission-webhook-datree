@@ -109,7 +109,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
 		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
-		*warningMessages = append(*warningMessages, err.Error())
+
+		prerunWarningMsg := "Validation skipped due to getting preliminary data failure"
+		*warningMessages = append(*warningMessages, prerunWarningMsg)
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
 	// convert default rules string into DefaultRulesDefinitions structure
