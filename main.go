@@ -7,7 +7,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
@@ -67,6 +69,21 @@ func start(port string) {
 	if err != nil {
 		panic(err)
 	}
+
+	clusterUuid, _ := k8sMetadataUtilInstance.GetClusterUuid()
+	k8sVersion, _ := k8sMetadataUtilInstance.GetClusterK8sVersion()
+	state := servicestate.GetState()
+	state.SetServiceType(servicestate.WEBHOOK)
+	state.SetClusterUuid(clusterUuid)
+	state.SetClientId(os.Getenv(enums.ClientId))
+	state.SetToken(os.Getenv(enums.Token))
+	state.SetClusterName(os.Getenv(enums.ClusterName))
+	state.SetK8sVersion(k8sVersion)
+	state.SetPolicyName(os.Getenv(enums.Policy))
+	state.SetIsEnforceMode(os.Getenv(enums.Enforce) == "true")
+	state.SetServiceVersion(config.WebhookVersion)
+
+	internalLogger.LogInfo(fmt.Sprintf("state: %+v\n", state))
 
 	validationController := controllers.NewValidationController(errorReporter, k8sMetadataUtilInstance)
 	healthController := controllers.NewHealthController()

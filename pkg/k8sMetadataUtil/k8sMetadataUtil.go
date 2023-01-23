@@ -2,10 +2,11 @@ package k8sMetadataUtil
 
 import (
 	"context"
-	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"os"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -14,7 +15,9 @@ import (
 	"github.com/robfig/cron/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 type K8sMetadataUtil struct {
@@ -94,6 +97,24 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 	}
 
 	return ClusterUuid, nil
+}
+
+func (k8sMetadataUtil *K8sMetadataUtil) GetClusterK8sVersion() (string, error) {
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		return "", err
+	}
+	discClient, err := discovery.NewDiscoveryClientForConfig(config)
+	if err != nil {
+		return "", err
+	}
+
+	serverInfo, err := discClient.ServerVersion()
+	if err != nil {
+		return "", err
+	}
+
+	return serverInfo.GitVersion, nil
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
