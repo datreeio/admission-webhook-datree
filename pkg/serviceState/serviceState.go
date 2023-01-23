@@ -21,6 +21,10 @@ type ServiceState struct {
 var state *ServiceState
 
 func GetState() *ServiceState {
+	if state == nil {
+		state = &ServiceState{}
+	}
+
 	return state
 }
 
