@@ -3,13 +3,13 @@ package controllers
 import (
 	_ "embed"
 	"encoding/json"
-	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
-	"github.com/datreeio/datree/pkg/cliClient"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
@@ -227,7 +227,7 @@ type MockErrorReporterClient struct {
 	mock.Mock
 }
 
-func (m *MockErrorReporterClient) ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
+func (m *MockErrorReporterClient) ReportError(reportCliErrorRequest clients.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
 	m.Called(reportCliErrorRequest, uri)
 	return 200, nil
 }
@@ -239,7 +239,7 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 		ClientSet: fake.NewSimpleClientset(),
 	}
 	mockErrorReporterClient := &MockErrorReporterClient{}
-	mockErrorReporterClient.On("ReportCliError", mock.Anything, mock.Anything).Return(200, nil)
+	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
 	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient)
 	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil, errorReporter)
 
