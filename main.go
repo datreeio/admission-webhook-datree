@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
@@ -23,7 +24,6 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
-	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/utils"
@@ -42,7 +42,7 @@ func main() {
 
 func start(port string) {
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
-	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
+	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
 	internalLogger := logger.New("", errorReporter)
 

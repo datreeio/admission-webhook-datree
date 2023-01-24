@@ -2,20 +2,17 @@ package errorReporter
 
 import (
 	"fmt"
-	"os"
 
 	"runtime/debug"
 
-	"github.com/datreeio/datree/cmd"
 	"github.com/datreeio/datree/pkg/utils"
 
-	"github.com/datreeio/admission-webhook-datree/pkg/enums"
-
-	"github.com/datreeio/datree/pkg/cliClient"
+	"github.com/datreeio/admission-webhook-datree/pkg/clients"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 )
 
 type ErrorReporterClient interface {
-	ReportCliError(reportCliErrorRequest cliClient.ReportCliErrorRequest, uri string) (StatusCode int, Error error)
+	ReportError(reportCliErrorRequest clients.ReportCliErrorRequest, uri string) (StatusCode int, Error error)
 }
 
 type ErrorReporter struct {
@@ -37,12 +34,19 @@ func (reporter *ErrorReporter) ReportUnexpectedError(unexpectedError error) {
 
 func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	errorMessage := utils.ParseErrorToString(error)
-	statusCode, err := reporter.client.ReportCliError(cliClient.ReportCliErrorRequest{
-		ClientId:     os.Getenv(enums.ClientId),
-		Token:        os.Getenv(enums.Token),
-		CliVersion:   cmd.CliVersion,
-		ErrorMessage: errorMessage,
-		StackTrace:   string(debug.Stack()),
+	state := servicestate.GetState()
+	statusCode, err := reporter.client.ReportError(clients.ReportCliErrorRequest{
+		ClientId:       state.ClientId,
+		Token:          state.Token,
+		ClusterName:    state.ClusterName,
+		ClusterUuid:    state.ClusterUuid,
+		K8sVersion:     state.K8sVersion,
+		PolicyName:     state.PolicyName,
+		IsEnforceMode:  state.IsEnforceMode,
+		ServiceVersion: state.ServiceVersion,
+		ServiceType:    state.ServiceType,
+		ErrorMessage:   errorMessage,
+		StackTrace:     string(debug.Stack()),
 	}, uri)
 
 	if err != nil {
