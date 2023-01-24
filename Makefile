@@ -36,6 +36,7 @@ helm-install-local-in-minikube:
 	--set image.pullPolicy="Never" \
 	--set image.tag="latest" \
 	--set replicaCount=1 \
+	--set scanJob.ttlSecondsAfterFinished=100 \
 	--debug
 
 helm-upgrade-local:
