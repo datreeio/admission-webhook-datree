@@ -16,7 +16,6 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
-	"github.com/datreeio/admission-webhook-datree/pkg/services"
 	"github.com/datreeio/datree/pkg/httpClient"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/stretchr/testify/assert"
@@ -248,17 +247,8 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockErrorReporterClient := &MockErrorReporterClient{}
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
 	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
-	mockedValidationService := &services.ValidationService{
-		CliServiceClient: mockedCliServiceClient,
-		State:            mockState,
-		K8sMetadataUtil:  mockK8sMetadataUtil,
-		ErrorReporter:    mockErrorReporter,
-	}
 
-	return &ValidationController{
-		ValidationService: mockedValidationService,
-		ErrorReporter:     mockErrorReporter,
-	}
+	return NewValidationController(mockedCliServiceClient, mockState, mockErrorReporter, mockK8sMetadataUtil)
 }
 
 func mockValidationControllerWithCustomState(mockedResponse httpClient.Response, state *servicestate.ServiceState) *ValidationController {
@@ -271,15 +261,6 @@ func mockValidationControllerWithCustomState(mockedResponse httpClient.Response,
 	mockErrorReporterClient := &MockErrorReporterClient{}
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
 	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, state)
-	mockedValidationService := &services.ValidationService{
-		CliServiceClient: mockedCliServiceClient,
-		State:            state,
-		K8sMetadataUtil:  mockK8sMetadataUtil,
-		ErrorReporter:    mockErrorReporter,
-	}
 
-	return &ValidationController{
-		ValidationService: mockedValidationService,
-		ErrorReporter:     mockErrorReporter,
-	}
+	return NewValidationController(mockedCliServiceClient, state, mockErrorReporter, mockK8sMetadataUtil)
 }
