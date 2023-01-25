@@ -11,6 +11,7 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
+	"github.com/datreeio/datree/pkg/deploymentConfig"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
@@ -56,7 +57,7 @@ type ValidationService struct {
 	State            *servicestate.ServiceState
 }
 
-var cliServiceClient = cliClient.NewCliServiceClient("https://ab9a-84-110-69-94.ngrok.io", networkValidator.NewNetworkValidator())
+var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
 func NewValidationService(state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
