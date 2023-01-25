@@ -89,10 +89,12 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	ciContext := ciContext.Extract()
 
-	clusterK8sVersion := vs.State.GetK8sVersion()
-	token, err := vs.getToken()
-	if err != nil {
-		panic(err)
+	clusterK8sVersion := vs.getK8sVersion()
+	token := vs.State.GetToken()
+	if token == "" {
+		errorMessage := "No DATREE_TOKEN was found in env"
+		vs.errorReporter.ReportUnexpectedError(errors.New(errorMessage))
+		logger.LogUtil(errorMessage)
 	}
 
 	rootObject := getResourceRootObject(admissionReviewReq)
@@ -332,15 +334,17 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 	}
 }
 
-func (vs *ValidationService) getToken() (string, error) {
-	token := os.Getenv(enums.Token)
-
-	if token == "" {
-		errorMessage := "No DATREE_TOKEN was found in env"
-		vs.errorReporter.ReportUnexpectedError(errors.New(errorMessage))
-		logger.LogUtil(errorMessage)
+func (vs *ValidationService) getK8sVersion() string {
+	k8sVersion, err := vs.K8sMetadataUtil.GetClusterK8sVersion()
+	if err != nil {
+		return vs.State.GetK8sVersion()
 	}
-	return token, nil
+
+	if k8sVersion != vs.State.GetK8sVersion() {
+		vs.State.SetK8sVersion(k8sVersion)
+	}
+
+	return vs.State.GetK8sVersion()
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
