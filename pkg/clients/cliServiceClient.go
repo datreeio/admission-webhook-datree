@@ -10,7 +10,7 @@ import (
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
-	"k8s.io/apimachinery/pkg/types"
+
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 
 	"github.com/datreeio/datree/pkg/cliClient"
@@ -228,17 +228,17 @@ func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
 }
 
 type ReportCliErrorRequest struct {
-	ClientId       string    `json:"clientId"`
-	Token          string    `json:"token"`
-	ClusterUuid    types.UID `json:"clusterUuid"`
-	ClusterName    string    `json:"clusterName"`
-	K8sVersion     string    `json:"k8sVersion"`
-	PolicyName     string    `json:"policyName"`
-	IsEnforceMode  bool      `json:"isEnforceMode"`
-	ServiceVersion string    `json:"serviceVersion"`
-	ServiceType    string    `json:"serviceType"`
-	ErrorMessage   string    `json:"errorMessage"`
-	StackTrace     string    `json:"stackTrace"`
+	ClientId       string       `json:"clientId"`
+	Token          string       `json:"token"`
+	ClusterUuid    k8sTypes.UID `json:"clusterUuid"`
+	ClusterName    string       `json:"clusterName"`
+	K8sVersion     string       `json:"k8sVersion"`
+	PolicyName     string       `json:"policyName"`
+	IsEnforceMode  bool         `json:"isEnforceMode"`
+	ServiceVersion string       `json:"serviceVersion"`
+	ServiceType    string       `json:"serviceType"`
+	ErrorMessage   string       `json:"errorMessage"`
+	StackTrace     string       `json:"stackTrace"`
 }
 
 func (c *CliClient) ReportError(reportCliErrorRequest ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
