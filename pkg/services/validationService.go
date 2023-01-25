@@ -11,7 +11,6 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
@@ -27,7 +26,6 @@ import (
 	baseCliClient "github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"github.com/datreeio/datree/pkg/extractor"
-	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/printer"
 	"github.com/datreeio/datree/pkg/utils"
 
@@ -56,8 +54,6 @@ type ValidationService struct {
 	ErrorReporter    *errorReporter.ErrorReporter
 	State            *servicestate.ServiceState
 }
-
-var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
 func NewValidationServiceWithCustomDependencies(cliServiceClient *cliClient.CliClient, state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
@@ -160,7 +156,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	evaluationRequestData := vs.getEvaluationRequestData(policy.Name, startTime,
 		policyCheckResults, namespace, resourceKind, resourceName)
 
-	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
+	verifyVersionResponse, err := vs.CliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 	} else {
@@ -173,7 +169,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
-		evaluationResultResp, err := sendEvaluationResult(cliServiceClient, evaluationRequestData)
+		evaluationResultResp, err := vs.sendEvaluationResult(evaluationRequestData)
 		if err == nil {
 			cliEvaluationId = evaluationResultResp.EvaluationId
 		} else {
@@ -248,24 +244,24 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 	}
 
 	if len(clusterRequestMetadataAggregator) >= 500 {
-		SendMetadataInBatch()
+		vs.SendMetadataInBatch()
 	}
 }
 
-func SendMetadataInBatch() {
+func (vs *ValidationService) SendMetadataInBatch() {
 	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
-	go cliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
+	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 
-func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
+func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
 	var OSInfoFn = utils.NewOSInfo
 	osInfo := OSInfoFn()
 
-	sendEvaluationResultsResponse, err := cliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
+	sendEvaluationResultsResponse, err := vs.CliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
 		K8sVersion: evaluationRequestData.EvaluationData.K8sVersion,
 		ClientId:   evaluationRequestData.EvaluationData.ClientId,
 		Token:      evaluationRequestData.EvaluationData.Token,

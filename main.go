@@ -68,7 +68,6 @@ func start(port string) {
 	state.SetClusterUuid(clusterUuid)
 	state.SetK8sVersion(k8sVersion)
 
-	initMetadataLogsCronjob()
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
@@ -82,6 +81,8 @@ func start(port string) {
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
 
+	initMetadataLogsCronjob(validationController.ValidationService)
+
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
@@ -90,8 +91,8 @@ func start(port string) {
 	}
 }
 
-func initMetadataLogsCronjob() {
+func initMetadataLogsCronjob(validationService *services.ValidationService) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-	cornJob.AddFunc("@every 1h", services.SendMetadataInBatch)
+	cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
 	cornJob.Start()
 }
