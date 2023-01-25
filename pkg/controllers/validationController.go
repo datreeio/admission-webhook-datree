@@ -25,14 +25,19 @@ import (
 type ValidationController struct {
 	ValidationService *services.ValidationService
 	ErrorReporter     *errorReporter.ErrorReporter
-	State             *servicestate.ServiceState
 }
 
 func NewValidationController(cliServiceClient *clients.CliClient, state *servicestate.ServiceState, errorReporter *errorReporter.ErrorReporter, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationController {
+	validationService := &services.ValidationService{
+		CliServiceClient: cliServiceClient,
+		State:            state,
+		K8sMetadataUtil:  k8sMetadataUtilInstance,
+		ErrorReporter:    errorReporter,
+	}
+
 	return &ValidationController{
-		ValidationService: services.NewValidationServiceWithCustomDependencies(cliServiceClient, state, k8sMetadataUtilInstance, errorReporter),
+		ValidationService: validationService,
 		ErrorReporter:     errorReporter,
-		State:             state,
 	}
 }
 

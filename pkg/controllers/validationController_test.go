@@ -247,13 +247,17 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 
 	mockErrorReporterClient := &MockErrorReporterClient{}
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
-	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
-	mockedValidationService := services.NewValidationServiceWithCustomDependencies(mockedCliServiceClient, mockState, mockK8sMetadataUtil, errorReporter)
+	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
+	mockedValidationService := &services.ValidationService{
+		CliServiceClient: mockedCliServiceClient,
+		State:            mockState,
+		K8sMetadataUtil:  mockK8sMetadataUtil,
+		ErrorReporter:    mockErrorReporter,
+	}
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,
-		ErrorReporter:     errorReporter,
-		State:             mockState,
+		ErrorReporter:     mockErrorReporter,
 	}
 }
 
@@ -266,12 +270,16 @@ func mockValidationControllerWithCustomState(mockedResponse httpClient.Response,
 
 	mockErrorReporterClient := &MockErrorReporterClient{}
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
-	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, state)
-	mockedValidationService := services.NewValidationServiceWithCustomDependencies(mockedCliServiceClient, state, mockK8sMetadataUtil, errorReporter)
+	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, state)
+	mockedValidationService := &services.ValidationService{
+		CliServiceClient: mockedCliServiceClient,
+		State:            state,
+		K8sMetadataUtil:  mockK8sMetadataUtil,
+		ErrorReporter:    mockErrorReporter,
+	}
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,
-		ErrorReporter:     errorReporter,
-		State:             state,
+		ErrorReporter:     mockErrorReporter,
 	}
 }
