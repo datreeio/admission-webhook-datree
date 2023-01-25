@@ -19,8 +19,6 @@ import (
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
-	"github.com/datreeio/admission-webhook-datree/pkg/config"
-
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
 	policyFactory "github.com/datreeio/datree/bl/policy"
@@ -60,10 +58,6 @@ type ValidationService struct {
 
 var cliServiceClient = cliClient.NewCliServiceClient("https://ab9a-84-110-69-94.ngrok.io", networkValidator.NewNetworkValidator())
 
-func isEnforceMode() bool {
-	return os.Getenv(enums.Enforce) == "true"
-}
-
 func NewValidationService(state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
@@ -90,9 +84,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := vs.getK8sVersion()
+	policyName := vs.State.GetPolicyName()
 	token := vs.State.GetToken()
 	if token == "" {
-		errorMessage := "No DATREE_TOKEN was found in env"
+		errorMessage := "no DATREE_TOKEN was found in env"
 		vs.errorReporter.ReportUnexpectedError(errors.New(errorMessage))
 		logger.LogUtil(errorMessage)
 	}
@@ -104,9 +99,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
-
-	clientId := vs.State.GetClientId()
-	policyName := os.Getenv(enums.Policy)
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
@@ -172,7 +164,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
-	evaluationRequestData := vs.getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
+	evaluationRequestData := vs.getEvaluationRequestData(policy.Name, startTime,
 		policyCheckResults, namespace, resourceKind, resourceName)
 
 	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
@@ -226,7 +218,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		allowed = true
 	}
 
-	if !isEnforceMode() {
+	if !vs.State.GetIsEnforceMode() {
 		allowed = true
 		if isFailedPolicyCheck {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
@@ -398,24 +390,23 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 	return namespace, resourceKind, resourceName, managers
 }
 
-func (vs ValidationService) getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
+func (vs ValidationService) getEvaluationRequestData(policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
-	clusterUuid, _ := vs.K8sMetadataUtil.GetClusterUuid()
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
-			Token:                     token,
-			ClientId:                  clientId,
-			K8sVersion:                clusterK8sVersion,
+			Token:                     vs.State.GetToken(),
+			ClientId:                  vs.State.GetClientId(),
+			K8sVersion:                vs.State.GetK8sVersion(),
 			PolicyName:                policyName,
 			RulesData:                 policyCheckResults.RulesData,
 			FilesData:                 policyCheckResults.FilesData,
 			PolicyCheckResults:        policyCheckResults.RawResults,
 			EvaluationDurationSeconds: evaluationDurationSeconds,
 		},
-		WebhookVersion: config.WebhookVersion,
-		ClusterUuid:    clusterUuid,
-		IsEnforceMode:  isEnforceMode(),
+		WebhookVersion: vs.State.GetServiceVersion(),
+		ClusterUuid:    vs.State.GetClusterUuid(),
+		IsEnforceMode:  vs.State.GetIsEnforceMode(),
 		Namespace:      evaluationNamespace,
 		Kind:           kind,
 		MetadataName:   metadataName,
