@@ -38,6 +38,18 @@ func New() *ServiceState {
 	}
 }
 
+func NewWithCustomDependencies(clientId string, token string, clusterName string, policyName string, isEnforceMode bool) *ServiceState {
+	return &ServiceState{
+		clientId:       clientId,
+		serviceType:    WEBHOOK,
+		token:          token,
+		clusterName:    clusterName,
+		policyName:     policyName,
+		isEnforceMode:  isEnforceMode,
+		serviceVersion: config.WebhookVersion,
+	}
+}
+
 func (s *ServiceState) SetClusterUuid(clusterUuid types.UID) {
 	s.clusterUuid = clusterUuid
 }

@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 	"github.com/stretchr/testify/mock"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
@@ -121,10 +122,11 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
-	validationController := mockValidationController(httpClient.Response{
+	mockState := servicestate.NewWithCustomDependencies("test-client-id", "test-token", "test-cluster-name", "test-policy-name", true)
+	validationController := mockValidationControllerWithCustomState(httpClient.Response{
 		StatusCode: http.StatusOK,
 		Body:       getPrerunDataResponse,
-	})
+	}, mockState)
 
 	validationController.Validate(responseRecorder, request)
 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
@@ -238,13 +240,38 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockK8sMetadataUtil := &k8sMetadataUtil.K8sMetadataUtil{
 		ClientSet: fake.NewSimpleClientset(),
 	}
+
+	mockState := servicestate.NewWithCustomDependencies("test-client-id", "test-token", "test-cluster-name", "test-policy-name", false)
+	mockState.SetClusterUuid("test-cluster-uuid")
+	mockState.SetK8sVersion("1.18.0")
+
 	mockErrorReporterClient := &MockErrorReporterClient{}
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
-	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient)
-	mockedValidationService := services.NewValidationServiceWithCustomCliServiceClient(mockedCliServiceClient, mockK8sMetadataUtil, errorReporter)
+	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
+	mockedValidationService := services.NewValidationServiceWithCustomDependencies(mockedCliServiceClient, mockState, mockK8sMetadataUtil, errorReporter)
 
 	return &ValidationController{
 		ValidationService: mockedValidationService,
 		ErrorReporter:     errorReporter,
+		State:             mockState,
+	}
+}
+
+func mockValidationControllerWithCustomState(mockedResponse httpClient.Response, state *servicestate.ServiceState) *ValidationController {
+	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
+	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
+	mockK8sMetadataUtil := &k8sMetadataUtil.K8sMetadataUtil{
+		ClientSet: fake.NewSimpleClientset(),
+	}
+
+	mockErrorReporterClient := &MockErrorReporterClient{}
+	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
+	errorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, state)
+	mockedValidationService := services.NewValidationServiceWithCustomDependencies(mockedCliServiceClient, state, mockK8sMetadataUtil, errorReporter)
+
+	return &ValidationController{
+		ValidationService: mockedValidationService,
+		ErrorReporter:     errorReporter,
+		State:             state,
 	}
 }
