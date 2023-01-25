@@ -55,15 +55,6 @@ type ValidationService struct {
 	State            *servicestate.ServiceState
 }
 
-func NewValidationServiceWithCustomDependencies(cliServiceClient *cliClient.CliClient, state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
-	return &ValidationService{
-		CliServiceClient: cliServiceClient,
-		K8sMetadataUtil:  k8sMetadataUtilInstance,
-		ErrorReporter:    errorReporter,
-		State:            state,
-	}
-}
-
 func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
