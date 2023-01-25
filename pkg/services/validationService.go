@@ -53,7 +53,7 @@ type Metadata struct {
 type ValidationService struct {
 	CliServiceClient *cliClient.CliClient
 	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
-	errorReporter    *errorReporter.ErrorReporter
+	ErrorReporter    *errorReporter.ErrorReporter
 	State            *servicestate.ServiceState
 }
 
@@ -63,7 +63,7 @@ func NewValidationServiceWithCustomDependencies(cliServiceClient *cliClient.CliC
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
 		K8sMetadataUtil:  k8sMetadataUtilInstance,
-		errorReporter:    errorReporter,
+		ErrorReporter:    errorReporter,
 		State:            state,
 	}
 }
@@ -81,7 +81,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	token := vs.State.GetToken()
 	if token == "" {
 		errorMessage := "no DATREE_TOKEN was found in env"
-		vs.errorReporter.ReportUnexpectedError(errors.New(errorMessage))
+		vs.ErrorReporter.ReportUnexpectedError(errors.New(errorMessage))
 		logger.LogUtil(errorMessage)
 	}
 
@@ -235,7 +235,7 @@ var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
-		vs.errorReporter.ReportUnexpectedError(err)
+		vs.ErrorReporter.ReportUnexpectedError(err)
 		logger.LogUtil(err.Error())
 		return
 	}
