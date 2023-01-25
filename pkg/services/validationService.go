@@ -4,14 +4,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
@@ -34,12 +35,9 @@ import (
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 
 	"github.com/ghodss/yaml"
-	"github.com/lithammer/shortuuid"
 	admission "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/rest"
 )
 
 type ManagedFields struct {
@@ -57,19 +55,21 @@ type ValidationService struct {
 	CliServiceClient *cliClient.CliClient
 	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
 	errorReporter    *errorReporter.ErrorReporter
+	State            *servicestate.ServiceState
 }
 
-var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
+var cliServiceClient = cliClient.NewCliServiceClient("https://ab9a-84-110-69-94.ngrok.io", networkValidator.NewNetworkValidator())
 
 func isEnforceMode() bool {
 	return os.Getenv(enums.Enforce) == "true"
 }
 
-func NewValidationService(k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
+func NewValidationService(state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
 		K8sMetadataUtil:  k8sMetadataUtilInstance,
 		errorReporter:    errorReporter,
+		State:            state,
 	}
 }
 
@@ -89,7 +89,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	ciContext := ciContext.Extract()
 
-	clusterK8sVersion := vs.getK8sVersion()
+	clusterK8sVersion := vs.State.GetK8sVersion()
 	token, err := vs.getToken()
 	if err != nil {
 		panic(err)
@@ -103,7 +103,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
-	clientId := vs.getClientId()
+	clientId := vs.State.GetClientId()
 	policyName := os.Getenv(enums.Policy)
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
@@ -332,43 +332,6 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 	}
 }
 
-func getClusterK8sVersion() (string, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return "", err
-	}
-	discClient, err := discovery.NewDiscoveryClientForConfig(config)
-	if err != nil {
-		return "", err
-	}
-
-	serverInfo, err := discClient.ServerVersion()
-	if err != nil {
-		return "", err
-	}
-
-	return serverInfo.GitVersion, nil
-}
-
-func (vs *ValidationService) getK8sVersion() string {
-	var err error
-	clusterK8sVersion := os.Getenv("CLUSTER_K8S_VERSION")
-	if clusterK8sVersion == "" {
-		clusterK8sVersion, err = getClusterK8sVersion()
-		if err != nil {
-			clusterK8sVersion = "unknown k8s version"
-		}
-
-		err = os.Setenv("CLUSTER_K8S_VERSION", clusterK8sVersion)
-		if err != nil {
-			formattedErrorMessage := fmt.Sprintf("couldn't set CLUSTER_K8S_VERSION env variable %s", err)
-			vs.errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
-			logger.LogUtil(formattedErrorMessage)
-		}
-	}
-	return clusterK8sVersion
-}
-
 func (vs *ValidationService) getToken() (string, error) {
 	token := os.Getenv(enums.Token)
 
@@ -378,21 +341,6 @@ func (vs *ValidationService) getToken() (string, error) {
 		logger.LogUtil(errorMessage)
 	}
 	return token, nil
-}
-
-func (vs *ValidationService) getClientId() string {
-	clientId := os.Getenv(enums.ClientId)
-	if clientId == "" {
-		clientId = shortuuid.New()
-
-		err := os.Setenv(enums.ClientId, clientId)
-		if err != nil {
-			formattedErrorMessage := fmt.Sprintf("couldn't set DATREE_CLIENT_ID env variable %s", err)
-			vs.errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
-			logger.LogUtil(formattedErrorMessage)
-		}
-	}
-	return clientId
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {

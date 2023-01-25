@@ -17,11 +17,13 @@ type ErrorReporterClient interface {
 
 type ErrorReporter struct {
 	client ErrorReporterClient
+	state  *servicestate.ServiceState
 }
 
-func NewErrorReporter(client ErrorReporterClient) *ErrorReporter {
+func NewErrorReporter(client ErrorReporterClient, state *servicestate.ServiceState) *ErrorReporter {
 	return &ErrorReporter{
 		client: client,
+		state:  state,
 	}
 }
 
@@ -34,23 +36,22 @@ func (reporter *ErrorReporter) ReportUnexpectedError(unexpectedError error) {
 
 func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	errorMessage := utils.ParseErrorToString(error)
-	state := servicestate.GetState()
 	statusCode, err := reporter.client.ReportError(clients.ReportCliErrorRequest{
-		ClientId:       state.ClientId,
-		Token:          state.Token,
-		ClusterName:    state.ClusterName,
-		ClusterUuid:    state.ClusterUuid,
-		K8sVersion:     state.K8sVersion,
-		PolicyName:     state.PolicyName,
-		IsEnforceMode:  state.IsEnforceMode,
-		ServiceVersion: state.ServiceVersion,
-		ServiceType:    state.ServiceType,
+		ClientId:       reporter.state.GetClientId(),
+		Token:          reporter.state.GetToken(),
+		ClusterName:    reporter.state.GetClusterName(),
+		ClusterUuid:    reporter.state.GetClusterUuid(),
+		K8sVersion:     reporter.state.GetK8sVersion(),
+		PolicyName:     reporter.state.GetPolicyName(),
+		IsEnforceMode:  reporter.state.GetIsEnforceMode(),
+		ServiceVersion: reporter.state.GetServiceVersion(),
+		ServiceType:    reporter.state.GetServiceType(),
 		ErrorMessage:   errorMessage,
 		StackTrace:     string(debug.Stack()),
 	}, uri)
 
 	if err != nil {
 		// using fmt.Println instead of logger to avoid circular dependency
-		fmt.Println(fmt.Sprintf("ReportError status code: %d, err: %s", statusCode, err.Error()))
+		fmt.Printf("ReportError status code: %d, err: %s", statusCode, err.Error())
 	}
 }

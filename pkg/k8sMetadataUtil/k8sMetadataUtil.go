@@ -100,18 +100,24 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) GetClusterK8sVersion() (string, error) {
+	unknownVersion := "unknown k8s version"
+
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		return "", err
+		return unknownVersion, err
 	}
 	discClient, err := discovery.NewDiscoveryClientForConfig(config)
 	if err != nil {
-		return "", err
+		return unknownVersion, err
 	}
 
 	serverInfo, err := discClient.ServerVersion()
 	if err != nil {
-		return "", err
+		return unknownVersion, err
+	}
+
+	if serverInfo.GitVersion == "" {
+		return unknownVersion, nil
 	}
 
 	return serverInfo.GitVersion, nil

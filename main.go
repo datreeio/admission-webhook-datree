@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/clients"
-	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
@@ -41,9 +40,10 @@ func main() {
 }
 
 func start(port string) {
+	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator)
-	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
+	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
 	internalLogger := logger.New("", errorReporter)
 
 	defer func() {
@@ -63,6 +63,11 @@ func start(port string) {
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
+	clusterUuid, _ := k8sMetadataUtilInstance.GetClusterUuid()
+	k8sVersion, _ := k8sMetadataUtilInstance.GetClusterK8sVersion()
+	state.SetClusterUuid(clusterUuid)
+	state.SetK8sVersion(k8sVersion)
+
 	initMetadataLogsCronjob()
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
@@ -70,22 +75,7 @@ func start(port string) {
 		panic(err)
 	}
 
-	clusterUuid, _ := k8sMetadataUtilInstance.GetClusterUuid()
-	k8sVersion, _ := k8sMetadataUtilInstance.GetClusterK8sVersion()
-	state := servicestate.GetState()
-	state.SetServiceType(servicestate.WEBHOOK)
-	state.SetClusterUuid(clusterUuid)
-	state.SetClientId(os.Getenv(enums.ClientId))
-	state.SetToken(os.Getenv(enums.Token))
-	state.SetClusterName(os.Getenv(enums.ClusterName))
-	state.SetK8sVersion(k8sVersion)
-	state.SetPolicyName(os.Getenv(enums.Policy))
-	state.SetIsEnforceMode(os.Getenv(enums.Enforce) == "true")
-	state.SetServiceVersion(config.WebhookVersion)
-
-	internalLogger.LogInfo(fmt.Sprintf("state: %+v\n", state))
-
-	validationController := controllers.NewValidationController(errorReporter, k8sMetadataUtilInstance)
+	validationController := controllers.NewValidationController(state, errorReporter, k8sMetadataUtilInstance)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
