@@ -75,7 +75,7 @@ func start(port string) {
 		panic(err)
 	}
 
-	validationController := controllers.NewValidationController(state, errorReporter, k8sMetadataUtilInstance)
+	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)

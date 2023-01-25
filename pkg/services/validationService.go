@@ -59,15 +59,6 @@ type ValidationService struct {
 
 var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
 
-func NewValidationService(state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
-	return &ValidationService{
-		CliServiceClient: cliServiceClient,
-		K8sMetadataUtil:  k8sMetadataUtilInstance,
-		errorReporter:    errorReporter,
-		State:            state,
-	}
-}
-
 func NewValidationServiceWithCustomDependencies(cliServiceClient *cliClient.CliClient, state *servicestate.ServiceState, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
 	return &ValidationService{
 		CliServiceClient: cliServiceClient,
