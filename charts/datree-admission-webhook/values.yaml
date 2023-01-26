@@ -66,7 +66,7 @@ scanJob:
     # Image repository
     repository: datree/scan-job
     # Image tag
-    tag: 0.0.16
+    tag: 0.0.17
     # limits:
     #   cpu: 1000m
     #   memory: 1048Mi
