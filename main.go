@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"net/http"
@@ -63,10 +64,23 @@ func start(port string) {
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
-	clusterUuid, _ := k8sMetadataUtilInstance.GetClusterUuid()
-	k8sVersion, _ := k8sMetadataUtilInstance.GetClusterK8sVersion()
-	state.SetClusterUuid(clusterUuid)
-	state.SetK8sVersion(k8sVersion)
+	clusterUuid, err := k8sMetadataUtilInstance.GetClusterUuid()
+	if err != nil {
+		formattedErrorMessage := fmt.Sprintf("couldn't get cluster uuid %s", err)
+		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
+		internalLogger.LogInfo(formattedErrorMessage)
+	} else {
+		state.SetClusterUuid(clusterUuid)
+	}
+
+	k8sVersion, err := k8sMetadataUtilInstance.GetClusterK8sVersion()
+	if err != nil {
+		formattedErrorMessage := fmt.Sprintf("couldn't get k8s version %s", err)
+		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
+		internalLogger.LogInfo(formattedErrorMessage)
+	} else {
+		state.SetK8sVersion(k8sVersion)
+	}
 
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()

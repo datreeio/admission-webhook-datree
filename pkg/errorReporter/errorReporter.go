@@ -12,7 +12,7 @@ import (
 )
 
 type ErrorReporterClient interface {
-	ReportError(reportCliErrorRequest clients.ReportCliErrorRequest, uri string) (StatusCode int, Error error)
+	ReportError(reportCliErrorRequest clients.ReportErrorRequest, uri string) (StatusCode int, Error error)
 }
 
 type ErrorReporter struct {
@@ -36,7 +36,7 @@ func (reporter *ErrorReporter) ReportUnexpectedError(unexpectedError error) {
 
 func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 	errorMessage := utils.ParseErrorToString(error)
-	statusCode, err := reporter.client.ReportError(clients.ReportCliErrorRequest{
+	statusCode, err := reporter.client.ReportError(clients.ReportErrorRequest{
 		ClientId:       reporter.state.GetClientId(),
 		Token:          reporter.state.GetToken(),
 		ClusterName:    reporter.state.GetClusterName(),
@@ -45,7 +45,6 @@ func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 		PolicyName:     reporter.state.GetPolicyName(),
 		IsEnforceMode:  reporter.state.GetIsEnforceMode(),
 		ServiceVersion: reporter.state.GetServiceVersion(),
-		ServiceType:    reporter.state.GetServiceType(),
 		ErrorMessage:   errorMessage,
 		StackTrace:     string(debug.Stack()),
 	}, uri)

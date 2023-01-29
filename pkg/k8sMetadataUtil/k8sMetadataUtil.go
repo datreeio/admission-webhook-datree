@@ -28,6 +28,7 @@ type K8sMetadataUtil struct {
 }
 
 var ClusterUuid k8sTypes.UID = ""
+var ClusterK8sVersion string = ""
 
 func NewK8sMetadataUtil(clientset *kubernetes.Clientset, createClientSetError error, leaderElection *leaderElection.LeaderElection, internalLogger logger.Logger) *K8sMetadataUtil {
 	if createClientSetError != nil {
@@ -100,26 +101,35 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) GetClusterK8sVersion() (string, error) {
+	if ClusterK8sVersion != "" {
+		return ClusterK8sVersion, nil
+	}
+
 	unknownVersion := "unknown k8s version"
 
 	config, err := rest.InClusterConfig()
 	if err != nil {
+		ClusterK8sVersion = unknownVersion
 		return unknownVersion, err
 	}
 	discClient, err := discovery.NewDiscoveryClientForConfig(config)
 	if err != nil {
+		ClusterK8sVersion = unknownVersion
 		return unknownVersion, err
 	}
 
 	serverInfo, err := discClient.ServerVersion()
 	if err != nil {
+		ClusterK8sVersion = unknownVersion
 		return unknownVersion, err
 	}
 
 	if serverInfo.GitVersion == "" {
+		ClusterK8sVersion = unknownVersion
 		return unknownVersion, nil
 	}
 
+	ClusterK8sVersion = serverInfo.GitVersion
 	return serverInfo.GitVersion, nil
 }
 

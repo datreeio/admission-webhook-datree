@@ -9,10 +9,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 )
 
-const (
-	WEBHOOK string = "Webhook"
-)
-
 type ServiceState struct {
 	clientId       string
 	token          string
@@ -22,30 +18,16 @@ type ServiceState struct {
 	policyName     string
 	isEnforceMode  bool
 	serviceVersion string
-	serviceType    string
 }
 
 func New() *ServiceState {
 
 	return &ServiceState{
 		clientId:       shortuuid.New(),
-		serviceType:    WEBHOOK,
 		token:          os.Getenv(enums.Token),
 		clusterName:    os.Getenv(enums.ClusterName),
 		policyName:     os.Getenv(enums.Policy),
 		isEnforceMode:  os.Getenv(enums.Enforce) == "true",
-		serviceVersion: config.WebhookVersion,
-	}
-}
-
-func NewWithCustomDependencies(clientId string, token string, clusterName string, policyName string, isEnforceMode bool) *ServiceState {
-	return &ServiceState{
-		clientId:       clientId,
-		serviceType:    WEBHOOK,
-		token:          token,
-		clusterName:    clusterName,
-		policyName:     policyName,
-		isEnforceMode:  isEnforceMode,
 		serviceVersion: config.WebhookVersion,
 	}
 }
@@ -88,8 +70,4 @@ func (s *ServiceState) GetIsEnforceMode() bool {
 
 func (s *ServiceState) GetServiceVersion() string {
 	return s.serviceVersion
-}
-
-func (s *ServiceState) GetServiceType() string {
-	return s.serviceType
 }

@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 	"github.com/stretchr/testify/mock"
@@ -38,7 +39,15 @@ var applyAllowedRequestFluxCDJson string
 //go:embed test_fixtures/applyAllowedRequestFluxCDNoLabels.json
 var applyAllowedRequestFluxCDJsonNoLabels string
 
+func setMockEnv(t *testing.T) {
+	t.Setenv(enums.Token, "test-token")
+	t.Setenv(enums.ClusterName, "test-cluster-name")
+	t.Setenv(enums.Policy, "test-policy-name")
+	t.Setenv(enums.Enforce, "true")
+}
+
 func TestHeaderValidation(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", nil)
 	responseRecorder := httptest.NewRecorder()
 
@@ -51,6 +60,7 @@ func TestHeaderValidation(t *testing.T) {
 }
 
 func TestValidateHttpMethod(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodGet, "/validate", nil)
 	responseRecorder := httptest.NewRecorder()
 
@@ -63,6 +73,7 @@ func TestValidateHttpMethod(t *testing.T) {
 }
 
 func TestValidateRequestBodyEmpty(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(""))
 	responseRecorder := httptest.NewRecorder()
 
@@ -75,6 +86,7 @@ func TestValidateRequestBodyEmpty(t *testing.T) {
 }
 
 func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(`{"id":1}`))
 	responseRecorder := httptest.NewRecorder()
 
@@ -88,6 +100,7 @@ func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
 
 func TestValidateRequestBody(t *testing.T) {
 	config.WebhookVersion = "0.0.1"
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(`{
   "request": {
     "uid": "123",
@@ -116,23 +129,24 @@ func TestValidateRequestBody(t *testing.T) {
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
+	setMockEnv(t)
 	t.Setenv("DATREE_ENFORCE", "true")
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
 
-	mockState := servicestate.NewWithCustomDependencies("test-client-id", "test-token", "test-cluster-name", "test-policy-name", true)
-	validationController := mockValidationControllerWithCustomState(httpClient.Response{
+	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
 		Body:       getPrerunDataResponse,
-	}, mockState)
+	})
 
 	validationController.Validate(responseRecorder, request)
 	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
-	t.Setenv("DATREE_ENFORCE", "false")
+	setMockEnv(t)
+	t.Setenv(enums.Enforce, "false")
 	var applyRequestNotAllowed admission.AdmissionReview
 	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
@@ -158,6 +172,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
@@ -175,6 +190,7 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 }
 
 func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyAllowedRequestFluxCDJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
@@ -191,6 +207,7 @@ func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 }
 
 func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
+	setMockEnv(t)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyAllowedRequestFluxCDJsonNoLabels))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()
@@ -228,7 +245,7 @@ type MockErrorReporterClient struct {
 	mock.Mock
 }
 
-func (m *MockErrorReporterClient) ReportError(reportCliErrorRequest clients.ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
+func (m *MockErrorReporterClient) ReportError(reportCliErrorRequest clients.ReportErrorRequest, uri string) (StatusCode int, Error error) {
 	m.Called(reportCliErrorRequest, uri)
 	return 200, nil
 }
@@ -240,7 +257,7 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 		ClientSet: fake.NewSimpleClientset(),
 	}
 
-	mockState := servicestate.NewWithCustomDependencies("test-client-id", "test-token", "test-cluster-name", "test-policy-name", false)
+	mockState := servicestate.New()
 	mockState.SetClusterUuid("test-cluster-uuid")
 	mockState.SetK8sVersion("1.18.0")
 
@@ -249,18 +266,4 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
 
 	return NewValidationController(mockedCliServiceClient, mockState, mockErrorReporter, mockK8sMetadataUtil)
-}
-
-func mockValidationControllerWithCustomState(mockedResponse httpClient.Response, state *servicestate.ServiceState) *ValidationController {
-	mockedHttpClient := &MockHttpClient{mockedResponse: mockedResponse}
-	mockedCliServiceClient := clients.NewCustomCliServiceClient("", mockedHttpClient, nil, []string{}, networkValidator.NewNetworkValidator(), make(map[string]string))
-	mockK8sMetadataUtil := &k8sMetadataUtil.K8sMetadataUtil{
-		ClientSet: fake.NewSimpleClientset(),
-	}
-
-	mockErrorReporterClient := &MockErrorReporterClient{}
-	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
-	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, state)
-
-	return NewValidationController(mockedCliServiceClient, state, mockErrorReporter, mockK8sMetadataUtil)
 }

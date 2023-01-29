@@ -227,7 +227,7 @@ func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
 	c.httpClient.Request(http.MethodPost, "/cli/clusterEvents", request, c.flagsHeaders)
 }
 
-type ReportCliErrorRequest struct {
+type ReportErrorRequest struct {
 	ClientId       string       `json:"clientId"`
 	Token          string       `json:"token"`
 	ClusterUuid    k8sTypes.UID `json:"clusterUuid"`
@@ -236,12 +236,11 @@ type ReportCliErrorRequest struct {
 	PolicyName     string       `json:"policyName"`
 	IsEnforceMode  bool         `json:"isEnforceMode"`
 	ServiceVersion string       `json:"serviceVersion"`
-	ServiceType    string       `json:"serviceType"`
 	ErrorMessage   string       `json:"errorMessage"`
 	StackTrace     string       `json:"stackTrace"`
 }
 
-func (c *CliClient) ReportError(reportCliErrorRequest ReportCliErrorRequest, uri string) (StatusCode int, Error error) {
+func (c *CliClient) ReportError(reportCliErrorRequest ReportErrorRequest, uri string) (StatusCode int, Error error) {
 	headers := map[string]string{}
 	res, err := c.httpClient.Request(
 		http.MethodPost,
