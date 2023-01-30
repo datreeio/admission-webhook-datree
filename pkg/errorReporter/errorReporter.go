@@ -44,7 +44,7 @@ func (reporter *ErrorReporter) ReportError(error interface{}, uri string) {
 		K8sVersion:     reporter.state.GetK8sVersion(),
 		PolicyName:     reporter.state.GetPolicyName(),
 		IsEnforceMode:  reporter.state.GetIsEnforceMode(),
-		ServiceVersion: reporter.state.GetServiceVersion(),
+		WebhookVersion: reporter.state.GetServiceVersion(),
 		ErrorMessage:   errorMessage,
 		StackTrace:     string(debug.Stack()),
 	}, uri)

@@ -235,7 +235,7 @@ type ReportErrorRequest struct {
 	K8sVersion     string       `json:"k8sVersion"`
 	PolicyName     string       `json:"policyName"`
 	IsEnforceMode  bool         `json:"isEnforceMode"`
-	ServiceVersion string       `json:"serviceVersion"`
+	WebhookVersion string       `json:"webhookVersion"`
 	ErrorMessage   string       `json:"errorMessage"`
 	StackTrace     string       `json:"stackTrace"`
 }
