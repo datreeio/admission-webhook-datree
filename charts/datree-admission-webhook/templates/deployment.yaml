@@ -37,6 +37,8 @@ spec:
       containers:
         - name: server
           env:
+            - name: CLUSTER_NAME
+              value: {{.Values.datree.clusterName}}
             - name: DATREE_TOKEN
               value: "{{ .Values.datree.token }}"
             - name: DATREE_POLICY

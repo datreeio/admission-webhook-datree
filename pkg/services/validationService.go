@@ -4,21 +4,20 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
-	"github.com/datreeio/datree/pkg/deploymentConfig"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
-
-	"github.com/datreeio/admission-webhook-datree/pkg/config"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
@@ -27,19 +26,15 @@ import (
 	baseCliClient "github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"github.com/datreeio/datree/pkg/extractor"
-	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/printer"
 	"github.com/datreeio/datree/pkg/utils"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 
 	"github.com/ghodss/yaml"
-	"github.com/lithammer/shortuuid"
 	admission "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/discovery"
-	"k8s.io/client-go/rest"
 )
 
 type ManagedFields struct {
@@ -56,29 +51,8 @@ type Metadata struct {
 type ValidationService struct {
 	CliServiceClient *cliClient.CliClient
 	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
-	errorReporter    *errorReporter.ErrorReporter
-}
-
-var cliServiceClient = cliClient.NewCliServiceClient(deploymentConfig.URL, networkValidator.NewNetworkValidator())
-
-func isEnforceMode() bool {
-	return os.Getenv(enums.Enforce) == "true"
-}
-
-func NewValidationService(k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
-	return &ValidationService{
-		CliServiceClient: cliServiceClient,
-		K8sMetadataUtil:  k8sMetadataUtilInstance,
-		errorReporter:    errorReporter,
-	}
-}
-
-func NewValidationServiceWithCustomCliServiceClient(cliServiceClient *cliClient.CliClient, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, errorReporter *errorReporter.ErrorReporter) *ValidationService {
-	return &ValidationService{
-		CliServiceClient: cliServiceClient,
-		K8sMetadataUtil:  k8sMetadataUtilInstance,
-		errorReporter:    errorReporter,
-	}
+	ErrorReporter    *errorReporter.ErrorReporter
+	State            *servicestate.ServiceState
 }
 
 func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
@@ -89,10 +63,13 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	ciContext := ciContext.Extract()
 
-	clusterK8sVersion := vs.getK8sVersion()
-	token, err := vs.getToken()
-	if err != nil {
-		panic(err)
+	clusterK8sVersion := vs.State.GetK8sVersion()
+	policyName := vs.State.GetPolicyName()
+	token := vs.State.GetToken()
+	if token == "" {
+		errorMessage := "no DATREE_TOKEN was found in env"
+		vs.ErrorReporter.ReportUnexpectedError(errors.New(errorMessage))
+		logger.LogUtil(errorMessage)
 	}
 
 	rootObject := getResourceRootObject(admissionReviewReq)
@@ -102,9 +79,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
-
-	clientId := vs.getClientId()
-	policyName := os.Getenv(enums.Policy)
 
 	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
 	if err != nil {
@@ -170,10 +144,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
 
-	evaluationRequestData := vs.getEvaluationRequestData(token, clientId, clusterK8sVersion, policy.Name, startTime,
+	evaluationRequestData := vs.getEvaluationRequestData(policy.Name, startTime,
 		policyCheckResults, namespace, resourceKind, resourceName)
 
-	verifyVersionResponse, err := cliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
+	verifyVersionResponse, err := vs.CliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 	} else {
@@ -186,7 +160,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
-		evaluationResultResp, err := sendEvaluationResult(cliServiceClient, evaluationRequestData)
+		evaluationResultResp, err := vs.sendEvaluationResult(evaluationRequestData)
 		if err == nil {
 			cliEvaluationId = evaluationResultResp.EvaluationId
 		} else {
@@ -224,7 +198,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		allowed = true
 	}
 
-	if !isEnforceMode() {
+	if !vs.State.GetIsEnforceMode() {
 		allowed = true
 		if isFailedPolicyCheck {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
@@ -248,7 +222,7 @@ var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
 func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
-		vs.errorReporter.ReportUnexpectedError(err)
+		vs.ErrorReporter.ReportUnexpectedError(err)
 		logger.LogUtil(err.Error())
 		return
 	}
@@ -261,24 +235,24 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 	}
 
 	if len(clusterRequestMetadataAggregator) >= 500 {
-		SendMetadataInBatch()
+		vs.SendMetadataInBatch()
 	}
 }
 
-func SendMetadataInBatch() {
+func (vs *ValidationService) SendMetadataInBatch() {
 	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
-	go cliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
+	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
 }
 
-func sendEvaluationResult(cliServiceClient *cliClient.CliClient, evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
+func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
 	var OSInfoFn = utils.NewOSInfo
 	osInfo := OSInfoFn()
 
-	sendEvaluationResultsResponse, err := cliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
+	sendEvaluationResultsResponse, err := vs.CliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
 		K8sVersion: evaluationRequestData.EvaluationData.K8sVersion,
 		ClientId:   evaluationRequestData.EvaluationData.ClientId,
 		Token:      evaluationRequestData.EvaluationData.Token,
@@ -332,69 +306,6 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 	}
 }
 
-func getClusterK8sVersion() (string, error) {
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		return "", err
-	}
-	discClient, err := discovery.NewDiscoveryClientForConfig(config)
-	if err != nil {
-		return "", err
-	}
-
-	serverInfo, err := discClient.ServerVersion()
-	if err != nil {
-		return "", err
-	}
-
-	return serverInfo.GitVersion, nil
-}
-
-func (vs *ValidationService) getK8sVersion() string {
-	var err error
-	clusterK8sVersion := os.Getenv("CLUSTER_K8S_VERSION")
-	if clusterK8sVersion == "" {
-		clusterK8sVersion, err = getClusterK8sVersion()
-		if err != nil {
-			clusterK8sVersion = "unknown k8s version"
-		}
-
-		err = os.Setenv("CLUSTER_K8S_VERSION", clusterK8sVersion)
-		if err != nil {
-			formattedErrorMessage := fmt.Sprintf("couldn't set CLUSTER_K8S_VERSION env variable %s", err)
-			vs.errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
-			logger.LogUtil(formattedErrorMessage)
-		}
-	}
-	return clusterK8sVersion
-}
-
-func (vs *ValidationService) getToken() (string, error) {
-	token := os.Getenv(enums.Token)
-
-	if token == "" {
-		errorMessage := "No DATREE_TOKEN was found in env"
-		vs.errorReporter.ReportUnexpectedError(errors.New(errorMessage))
-		logger.LogUtil(errorMessage)
-	}
-	return token, nil
-}
-
-func (vs *ValidationService) getClientId() string {
-	clientId := os.Getenv(enums.ClientId)
-	if clientId == "" {
-		clientId = shortuuid.New()
-
-		err := os.Setenv(enums.ClientId, clientId)
-		if err != nil {
-			formattedErrorMessage := fmt.Sprintf("couldn't set DATREE_CLIENT_ID env variable %s", err)
-			vs.errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
-			logger.LogUtil(formattedErrorMessage)
-		}
-	}
-	return clientId
-}
-
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
 	yamlSchema, _ := yaml.JSONToYAML(admissionReviewReq.Object.Raw)
 	configs, _ := extractor.ParseYaml(string(yamlSchema))
@@ -446,24 +357,23 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 	return namespace, resourceKind, resourceName, managers
 }
 
-func (vs ValidationService) getEvaluationRequestData(token string, clientId string, clusterK8sVersion string, policyName string,
+func (vs ValidationService) getEvaluationRequestData(policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
-	clusterUuid, _ := vs.K8sMetadataUtil.GetClusterUuid()
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{
-			Token:                     token,
-			ClientId:                  clientId,
-			K8sVersion:                clusterK8sVersion,
+			Token:                     vs.State.GetToken(),
+			ClientId:                  vs.State.GetClientId(),
+			K8sVersion:                vs.State.GetK8sVersion(),
 			PolicyName:                policyName,
 			RulesData:                 policyCheckResults.RulesData,
 			FilesData:                 policyCheckResults.FilesData,
 			PolicyCheckResults:        policyCheckResults.RawResults,
 			EvaluationDurationSeconds: evaluationDurationSeconds,
 		},
-		WebhookVersion: config.WebhookVersion,
-		ClusterUuid:    clusterUuid,
-		IsEnforceMode:  isEnforceMode(),
+		WebhookVersion: vs.State.GetServiceVersion(),
+		ClusterUuid:    vs.State.GetClusterUuid(),
+		IsEnforceMode:  vs.State.GetIsEnforceMode(),
 		Namespace:      evaluationNamespace,
 		Kind:           kind,
 		MetadataName:   metadataName,

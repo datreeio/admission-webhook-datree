@@ -10,6 +10,7 @@ import (
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
+
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 
 	"github.com/datreeio/datree/pkg/cliClient"
@@ -224,4 +225,28 @@ type ReportK8sMetadataRequest struct {
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
 	c.httpClient.Request(http.MethodPost, "/cli/clusterEvents", request, c.flagsHeaders)
+}
+
+type ReportErrorRequest struct {
+	ClientId       string       `json:"clientId"`
+	Token          string       `json:"token"`
+	ClusterUuid    k8sTypes.UID `json:"clusterUuid"`
+	ClusterName    string       `json:"clusterName"`
+	K8sVersion     string       `json:"k8sVersion"`
+	PolicyName     string       `json:"policyName"`
+	IsEnforceMode  bool         `json:"isEnforceMode"`
+	WebhookVersion string       `json:"webhookVersion"`
+	ErrorMessage   string       `json:"errorMessage"`
+	StackTrace     string       `json:"stackTrace"`
+}
+
+func (c *CliClient) ReportError(reportCliErrorRequest ReportErrorRequest, uri string) (StatusCode int, Error error) {
+	headers := map[string]string{}
+	res, err := c.httpClient.Request(
+		http.MethodPost,
+		"/cli/public"+uri,
+		reportCliErrorRequest,
+		headers,
+	)
+	return res.StatusCode, err
 }

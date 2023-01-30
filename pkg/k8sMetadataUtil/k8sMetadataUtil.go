@@ -2,10 +2,11 @@ package k8sMetadataUtil
 
 import (
 	"context"
-	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"os"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -14,7 +15,9 @@ import (
 	"github.com/robfig/cron/v3"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
 
 type K8sMetadataUtil struct {
@@ -25,6 +28,7 @@ type K8sMetadataUtil struct {
 }
 
 var ClusterUuid k8sTypes.UID = ""
+var ClusterK8sVersion string = ""
 
 func NewK8sMetadataUtil(clientset *kubernetes.Clientset, createClientSetError error, leaderElection *leaderElection.LeaderElection, internalLogger logger.Logger) *K8sMetadataUtil {
 	if createClientSetError != nil {
@@ -94,6 +98,39 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 	}
 
 	return ClusterUuid, nil
+}
+
+func (k8sMetadataUtil *K8sMetadataUtil) GetClusterK8sVersion() (string, error) {
+	if ClusterK8sVersion != "" {
+		return ClusterK8sVersion, nil
+	}
+
+	unknownVersion := "unknown k8s version"
+
+	config, err := rest.InClusterConfig()
+	if err != nil {
+		ClusterK8sVersion = unknownVersion
+		return unknownVersion, err
+	}
+	discClient, err := discovery.NewDiscoveryClientForConfig(config)
+	if err != nil {
+		ClusterK8sVersion = unknownVersion
+		return unknownVersion, err
+	}
+
+	serverInfo, err := discClient.ServerVersion()
+	if err != nil {
+		ClusterK8sVersion = unknownVersion
+		return unknownVersion, err
+	}
+
+	if serverInfo.GitVersion == "" {
+		ClusterK8sVersion = unknownVersion
+		return unknownVersion, nil
+	}
+
+	ClusterK8sVersion = serverInfo.GitVersion
+	return serverInfo.GitVersion, nil
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {

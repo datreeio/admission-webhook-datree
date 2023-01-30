@@ -1,13 +1,16 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 	v1 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient"
@@ -21,7 +24,6 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
-	"github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/utils"
@@ -39,9 +41,10 @@ func main() {
 }
 
 func start(port string) {
+	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
-	basicCliClient := cliClient.NewCliClient(deploymentConfig.URL, basicNetworkValidator)
-	errorReporter := errorReporter.NewErrorReporter(basicCliClient)
+	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator)
+	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
 	internalLogger := logger.New("", errorReporter)
 
 	defer func() {
@@ -61,19 +64,38 @@ func start(port string) {
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil()
 
-	initMetadataLogsCronjob()
+	clusterUuid, err := k8sMetadataUtilInstance.GetClusterUuid()
+	if err != nil {
+		formattedErrorMessage := fmt.Sprintf("couldn't get cluster uuid %s", err)
+		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
+		internalLogger.LogInfo(formattedErrorMessage)
+	}
+
+	k8sVersion, err := k8sMetadataUtilInstance.GetClusterK8sVersion()
+	if err != nil {
+		formattedErrorMessage := fmt.Sprintf("couldn't get k8s version %s", err)
+		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
+		internalLogger.LogInfo(formattedErrorMessage)
+	}
+
+	state.SetClusterUuid(clusterUuid)
+	state.SetK8sVersion(k8sVersion)
+
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
 		panic(err)
 	}
 
-	validationController := controllers.NewValidationController(errorReporter, k8sMetadataUtilInstance)
+	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
+
+	// use validation service to send metadata in batch
+	initMetadataLogsCronjob(validationController.ValidationService)
 
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
@@ -83,8 +105,8 @@ func start(port string) {
 	}
 }
 
-func initMetadataLogsCronjob() {
+func initMetadataLogsCronjob(validationService *services.ValidationService) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-	cornJob.AddFunc("@every 1h", services.SendMetadataInBatch)
+	cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
 	cornJob.Start()
 }
