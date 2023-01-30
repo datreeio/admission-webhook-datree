@@ -69,8 +69,6 @@ func start(port string) {
 		formattedErrorMessage := fmt.Sprintf("couldn't get cluster uuid %s", err)
 		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
 		internalLogger.LogInfo(formattedErrorMessage)
-	} else {
-		state.SetClusterUuid(clusterUuid)
 	}
 
 	k8sVersion, err := k8sMetadataUtilInstance.GetClusterK8sVersion()
@@ -78,9 +76,10 @@ func start(port string) {
 		formattedErrorMessage := fmt.Sprintf("couldn't get k8s version %s", err)
 		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
 		internalLogger.LogInfo(formattedErrorMessage)
-	} else {
-		state.SetK8sVersion(k8sVersion)
 	}
+
+	state.SetClusterUuid(clusterUuid)
+	state.SetK8sVersion(k8sVersion)
 
 	server.InitServerVars()
 	certPath, keyPath, err := server.ValidateCertificate()
@@ -95,6 +94,7 @@ func start(port string) {
 	http.HandleFunc("/health", healthController.Health)
 	http.HandleFunc("/ready", healthController.Ready)
 
+	// use validation service to send metadata in batch
 	initMetadataLogsCronjob(validationController.ValidationService)
 
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
