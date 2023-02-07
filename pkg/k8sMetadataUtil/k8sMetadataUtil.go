@@ -137,7 +137,16 @@ func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, 
 	if !k8sMetadataUtil.leaderElection.IsLeader() {
 		return
 	}
+
 	token := os.Getenv(enums.Token)
+	isEnforceMode := os.Getenv(enums.Enforce)
+
+	var actionOnFailure string
+	if isEnforceMode == "true" {
+		actionOnFailure = enums.ActionOnFailureEnforce
+	} else {
+		actionOnFailure = enums.ActionOnFailureMonitor
+	}
 
 	var nodesCountErrString string
 	if nodesCountErr != nil {
@@ -149,5 +158,6 @@ func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, 
 		Token:         token,
 		NodesCount:    nodesCount,
 		NodesCountErr: nodesCountErrString,
+		ActionOnFailure: actionOnFailure,
 	})
 }

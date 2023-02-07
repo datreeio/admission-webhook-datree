@@ -221,6 +221,7 @@ type ReportK8sMetadataRequest struct {
 	Token         string       `json:"token"`
 	NodesCount    int          `json:"nodesCount"`
 	NodesCountErr string       `json:"nodesCountErr"`
+	ActionOnFailure string     `json:"actionOnFailure"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
