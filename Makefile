@@ -29,7 +29,7 @@ helm-install-local-in-minikube:
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
-	--set datree.clusterName=$(kubectl config current-context) \
+	--set datree.clusterName="minikube" \
 	--set scanJob.image.repository="datree/scan-job-staging" \
 	--set scanJob.image.tag="latest" \
 	--set image.repository="webhook-server" \
