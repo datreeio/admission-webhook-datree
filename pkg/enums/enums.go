@@ -11,6 +11,12 @@ const (
 	Enforce     = "DATREE_ENFORCE"
 	Namespace   = "DATREE_NAMESPACE"
 	PodName     = "POD_NAME"
-	ActionOnFailureMonitor = "monitor"
-	ActionOnFailureEnforce = "enforce"
+)
+
+
+
+type ActionOnFailure string
+const (
+	EnforceActionOnFailure ActionOnFailure = "enforce"
+	MonitorActionOnFailure  ActionOnFailure = "monitor"	
 )

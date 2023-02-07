@@ -51,24 +51,32 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
 
 	var clusterUuid k8sTypes.UID
+	var actionOnFailure enums.ActionOnFailure
+
+	if os.Getenv(enums.Enforce) == "true" {
+		actionOnFailure = enums.EnforceActionOnFailure
+	} else {
+		actionOnFailure = enums.MonitorActionOnFailure
+	}
+
 
 	if k8sMetadataUtil.CreateClientSetError != nil {
-		k8sMetadataUtil.sendK8sMetadataIfLeader(-1, k8sMetadataUtil.CreateClientSetError, clusterUuid, cliClient)
+		k8sMetadataUtil.sendK8sMetadataIfLeader(-1, k8sMetadataUtil.CreateClientSetError, clusterUuid, cliClient, actionOnFailure)
 		return
 	}
 
 	clusterUuid, err := k8sMetadataUtil.GetClusterUuid()
 	if err != nil {
-		k8sMetadataUtil.sendK8sMetadataIfLeader(-1, err, clusterUuid, cliClient)
+		k8sMetadataUtil.sendK8sMetadataIfLeader(-1, err, clusterUuid, cliClient,actionOnFailure)
 	}
 
 	nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-	k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient)
+	k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient,actionOnFailure)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
 		nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-		k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient)
+		k8sMetadataUtil.sendK8sMetadataIfLeader(nodesCount, nodesCountErr, clusterUuid, cliClient, actionOnFailure)
 	})
 	cornJob.Start()
 }
@@ -133,20 +141,12 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterK8sVersion() (string, error) {
 	return serverInfo.GitVersion, nil
 }
 
-func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient) {
+func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadataIfLeader(nodesCount int, nodesCountErr error, clusterUuid k8sTypes.UID, client *cliClient.CliClient, actionOnFailure enums.ActionOnFailure) {
 	if !k8sMetadataUtil.leaderElection.IsLeader() {
 		return
 	}
 
 	token := os.Getenv(enums.Token)
-	isEnforceMode := os.Getenv(enums.Enforce)
-
-	var actionOnFailure string
-	if isEnforceMode == "true" {
-		actionOnFailure = enums.ActionOnFailureEnforce
-	} else {
-		actionOnFailure = enums.ActionOnFailureMonitor
-	}
 
 	var nodesCountErrString string
 	if nodesCountErr != nil {

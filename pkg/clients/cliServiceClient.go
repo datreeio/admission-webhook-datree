@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	"github.com/datreeio/datree/pkg/ciContext"
@@ -221,7 +222,7 @@ type ReportK8sMetadataRequest struct {
 	Token         string       `json:"token"`
 	NodesCount    int          `json:"nodesCount"`
 	NodesCountErr string       `json:"nodesCountErr"`
-	ActionOnFailure string     `json:"actionOnFailure"`
+	ActionOnFailure enums.ActionOnFailure     `json:"actionOnFailure"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
