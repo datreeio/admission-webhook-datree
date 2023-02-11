@@ -21,8 +21,13 @@ rbac:
     # The ClusterRole name
     name: datree-webhook-server-cluster-role
 datree:
-  # The token used to link the CLI to your dashboard.
+  # It is required to provide either the token or the existingSecret containing the token for correct functionality.
+  # The token used to link the CLI to your dashboard. (string)
   token: <DATREE_TOKEN>
+  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored. 
+  existingSecret:
+    name: "" # Name of the secret containing the datree token (string)
+    key: "" # Key within a given secret that contains the token (string)
   # The name of the policy to check, e.g: staging. (string, optional)
   policy: ""
   # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
@@ -35,6 +40,10 @@ datree:
   enforce: ""
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
   clusterName: ""
+  # Should the initial scan be performed (boolean, optional)
+  initialScan: true
+  # Cron formated schedule for the CronJob, by default runs on an hourly schedule starting from 55min after the installation of this helm. (string, optional)
+  schedule: ""
 # The Datree webhook-server image to use.
 image:
   # Image repository
