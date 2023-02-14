@@ -62,6 +62,7 @@ tolerations: []
 scanJob:
   ttlSecondsAfterFinished: 1
   resources: {}
+  annotations: {}
   image:
     # Image repository
     repository: datree/scan-job
