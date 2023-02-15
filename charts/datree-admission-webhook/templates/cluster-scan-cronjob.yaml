@@ -41,8 +41,7 @@ spec:
   # if helm installation was done at 13:35, the cron expression will be 30 * * * *, which means the job will run at 14:30, 15:30, 16:30, etc.
   schedule: "{{ now | dateModify "-5m" | date "04" }} */{{ .Values.datree.frequency }} * * *" # every hour, starting 55 minutes after helm installation
   {{- else }}
-  # get the current time as above, but add 5 minutes. This will make sure the cron expression will be 5 minutes after the helm installation
-  schedule: "{{ now | dateModify "+5m" | date "04" }} {{ now | date "15" }},*/{{ .Values.datree.frequency }} * * *" # every hour, starting 55 minutes after helm installation
+  schedule: "* */{{ .Values.datree.frequency }} * * *"
   {{- end }}
   jobTemplate: {{ include "datree.scanJob" . | nindent 4 }}
 ---
