@@ -27,6 +27,13 @@ type K8sMetadataUtil struct {
 	internalLogger       logger.Logger
 }
 
+type K8sMetadata struct {
+	ClusterUuid     k8sTypes.UID
+	NodesCount      int
+	NodesCountErr   error
+	ActionOnFailure enums.ActionOnFailure
+}
+
 var ClusterUuid k8sTypes.UID = ""
 var ClusterK8sVersion string = ""
 
@@ -165,13 +172,6 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterK8sVersion() (string, error) {
 
 	ClusterK8sVersion = serverInfo.GitVersion
 	return serverInfo.GitVersion, nil
-}
-
-type K8sMetadata struct {
-	ClusterUuid     k8sTypes.UID
-	NodesCount      int
-	NodesCountErr   error
-	ActionOnFailure enums.ActionOnFailure
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadata(client *cliClient.CliClient, k8sMetadata K8sMetadata) {
