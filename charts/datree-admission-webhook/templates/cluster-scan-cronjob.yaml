@@ -62,4 +62,7 @@ kind: Job
 metadata:
   name: scan-job
   namespace: {{template "datree.namespace" .}}
+  {{- with .Values.scanJob.annotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
 {{ include "datree.scanJob" . }}
