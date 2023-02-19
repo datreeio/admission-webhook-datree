@@ -66,7 +66,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 			ClusterUuid:     clusterUuid,
 			ActionOnFailure: actionOnFailure,
 		}
-		sendK8sMetadata(k8sMetadataUtil, cliClient, k8sMetadataClientSetErr, false)
+		k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataClientSetErr)
 		return
 	}
 
@@ -78,7 +78,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 			ClusterUuid:     clusterUuid,
 			ActionOnFailure: actionOnFailure,
 		}
-		sendK8sMetadata(k8sMetadataUtil, cliClient, k8sMetadataGetClusterUuidErr, false)
+		k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataGetClusterUuidErr)
 	}
 
 	nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
@@ -88,32 +88,23 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
 		ClusterUuid:     clusterUuid,
 		ActionOnFailure: actionOnFailure,
 	}
-	sendK8sMetadata(k8sMetadataUtil, cliClient, k8sMetadataOnInit, false)
+	k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataOnInit)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
-		nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-		k8sMetadataHourly := K8sMetadata{
-			NodesCount:      nodesCount,
-			NodesCountErr:   nodesCountErr,
-			ClusterUuid:     clusterUuid,
-			ActionOnFailure: actionOnFailure,
+		if k8sMetadataUtil.leaderElection.IsLeader() {
+			nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
+			k8sMetadataHourly := K8sMetadata{
+				NodesCount:      nodesCount,
+				NodesCountErr:   nodesCountErr,
+				ClusterUuid:     clusterUuid,
+				ActionOnFailure: actionOnFailure,
+			}
+			k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataHourly)
 		}
-		sendK8sMetadata(k8sMetadataUtil, cliClient, k8sMetadataHourly, true)
 
 	})
 	cornJob.Start()
-}
-
-func sendK8sMetadata(k8sMetadataUtil *K8sMetadataUtil, cliClient *cliClient.CliClient, k8sMetadata K8sMetadata, checkIfIsLeader bool) {
-	if checkIfIsLeader {
-		if k8sMetadataUtil.leaderElection.IsLeader() {
-			k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadata)
-		}
-	} else {
-		k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadata)
-	}
-
 }
 
 func getNodesCount(clientset kubernetes.Interface) (int, error) {
