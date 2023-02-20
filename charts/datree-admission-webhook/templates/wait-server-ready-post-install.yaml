@@ -17,6 +17,9 @@ spec:
     metadata:
       name: datree-wait-server-ready-hook-post-install
       labels: {{ include "datree.labels" . | nindent 8 }}
+      {{- with .Values.customAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       serviceAccountName: datree-wait-server-ready-hook-post-install
       restartPolicy: Never
