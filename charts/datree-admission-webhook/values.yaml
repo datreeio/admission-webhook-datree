@@ -40,8 +40,6 @@ datree:
   enforce: ""
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
   clusterName: ""
-  # Should the initial scan be performed. WARNING: The dashboard is only visible after a scan has been completed, if you have not had a scan previously, you will not be able to access a dashbaord until a scan is complete. (boolean, optional)
-  initialScan: true
   # How often should the scan run in hours. If the inital scan is performed it will happen at least 55 minutes after, if its not performed it will happen 5 minutes after. (int, optional)
   frequency: 1
 # The Datree webhook-server image to use.

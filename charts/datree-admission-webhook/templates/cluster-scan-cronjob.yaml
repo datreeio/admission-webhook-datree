@@ -53,16 +53,11 @@ metadata:
   {{- end }}
 spec:
   concurrencyPolicy: Forbid
-  {{- if .Values.datree.initialScan }}
   # get the current time, subtract 5 minutes, extract the minutes and inject it into the cron expression
   # if helm installation was done at 13:35, the cron expression will be 30 * * * *, which means the job will run at 14:30, 15:30, 16:30, etc.
   schedule: "{{ now | dateModify "-5m" | date "04" }} */{{ .Values.datree.frequency }} * * *" # every hour, starting 55 minutes after helm installation
-  {{- else }}
-  schedule: "0 */{{ .Values.datree.frequency }} * * *"
-  {{- end }}
   jobTemplate: {{ include "datree.scanJob" . | nindent 4 }}
 ---
-{{- if .Values.datree.initialScan }}
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -72,4 +67,3 @@ metadata:
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
 {{ include "datree.scanJob" . }}
-{{- end }}
