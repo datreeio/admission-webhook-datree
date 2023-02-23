@@ -35,6 +35,14 @@ datree:
   enforce: ""
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
   clusterName: ""
+
+  # The Datree webhook-server configuration.
+  config:
+    # the expressions for resources that skip in the policy check. (string ,optional)
+    skiplist:
+      # namespace;kind;name
+      - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+
 # The Datree webhook-server image to use.
 image:
   # Image repository
