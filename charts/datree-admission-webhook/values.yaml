@@ -40,7 +40,7 @@ image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.51
+  tag: 0.1.53
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -62,11 +62,12 @@ tolerations: []
 scanJob:
   ttlSecondsAfterFinished: 1
   resources: {}
+  annotations: {}
   image:
     # Image repository
     repository: datree/scan-job
     # Image tag
-    tag: 0.0.18
+    tag: 0.0.19
     # limits:
     #   cpu: 1000m
     #   memory: 1048Mi
