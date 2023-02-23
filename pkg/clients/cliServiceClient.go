@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
@@ -39,10 +40,17 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 		timeoutClient:    nil,
 		httpErrors:       []string{},
 		networkValidator: networkValidator,
-		flagsHeaders:     make(map[string]string),
+		// TODO: instantiate flagsHeaders and give it values
+		flagsHeaders: map[string]string{
+			"x-cli-flags-policyName":  os.Getenv(enums.Policy),
+			"x-cli-flags-verbose":     os.Getenv(enums.Verbose),
+			"x-cli-flags-output":      os.Getenv(enums.Output),
+			"x-cli-flags-noRecord":    os.Getenv(enums.NoRecord),
+			"x-cli-flags-enforce":     os.Getenv(enums.Enforce),
+			"x-cli-flags-clusterName": os.Getenv(enums.ClusterName),
+		},
 	}
 }
-
 func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutClient HTTPClient, httpErrors []string, networkValidator cliClient.NetworkValidator, flagsHeaders map[string]string) *CliClient {
 	return &CliClient{
 		baseUrl:          baseUrl,
@@ -218,11 +226,11 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 }
 
 type ReportK8sMetadataRequest struct {
-	ClusterUuid   k8sTypes.UID `json:"clusterUuid"`
-	Token         string       `json:"token"`
-	NodesCount    int          `json:"nodesCount"`
-	NodesCountErr string       `json:"nodesCountErr"`
-	ActionOnFailure enums.ActionOnFailure     `json:"actionOnFailure"`
+	ClusterUuid     k8sTypes.UID          `json:"clusterUuid"`
+	Token           string                `json:"token"`
+	NodesCount      int                   `json:"nodesCount"`
+	NodesCountErr   string                `json:"nodesCountErr"`
+	ActionOnFailure enums.ActionOnFailure `json:"actionOnFailure"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
