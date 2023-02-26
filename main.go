@@ -62,7 +62,7 @@ func start(port string) {
 	}
 	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
-	k8sMetadataUtilInstance.InitK8sMetadataUtil()
+	k8sMetadataUtilInstance.InitK8sMetadataUtil(state)
 
 	clusterUuid, err := k8sMetadataUtilInstance.GetClusterUuid()
 	if err != nil {
