@@ -43,7 +43,7 @@ func main() {
 func start(port string) {
 	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
-	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator)
+	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
 	internalLogger := logger.New("", errorReporter)
 
@@ -62,7 +62,7 @@ func start(port string) {
 	}
 	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
 	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
-	k8sMetadataUtilInstance.InitK8sMetadataUtil()
+	k8sMetadataUtilInstance.InitK8sMetadataUtil(state)
 
 	clusterUuid, err := k8sMetadataUtilInstance.GetClusterUuid()
 	if err != nil {

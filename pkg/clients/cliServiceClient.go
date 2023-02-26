@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
@@ -31,7 +33,7 @@ type CliClient struct {
 	flagsHeaders     map[string]string
 }
 
-func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator) *CliClient {
+func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator, state *servicestate.ServiceState) *CliClient {
 	httpClient := httpClient.NewClient(url, nil)
 	return &CliClient{
 		baseUrl:          url,
@@ -39,10 +41,16 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 		timeoutClient:    nil,
 		httpErrors:       []string{},
 		networkValidator: networkValidator,
-		flagsHeaders:     make(map[string]string),
+		flagsHeaders: map[string]string{
+			"x-cli-flags-policyName":  state.GetPolicyName(),
+			"x-cli-flags-verbose":     state.GetVerbose(),
+			"x-cli-flags-output":      state.GetOutput(),
+			"x-cli-flags-noRecord":    state.GetNoRecord(),
+			"x-cli-flags-enforce":     strconv.FormatBool(state.GetIsEnforceMode()),
+			"x-cli-flags-clusterName": state.GetClusterName(),
+		},
 	}
 }
-
 func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutClient HTTPClient, httpErrors []string, networkValidator cliClient.NetworkValidator, flagsHeaders map[string]string) *CliClient {
 	return &CliClient{
 		baseUrl:          baseUrl,
@@ -218,11 +226,11 @@ func (c *CliClient) GetVersionRelatedMessages(webhookVersion string) (*VersionRe
 }
 
 type ReportK8sMetadataRequest struct {
-	ClusterUuid   k8sTypes.UID `json:"clusterUuid"`
-	Token         string       `json:"token"`
-	NodesCount    int          `json:"nodesCount"`
-	NodesCountErr string       `json:"nodesCountErr"`
-	ActionOnFailure enums.ActionOnFailure     `json:"actionOnFailure"`
+	ClusterUuid     k8sTypes.UID          `json:"clusterUuid"`
+	Token           string                `json:"token"`
+	NodesCount      int                   `json:"nodesCount"`
+	NodesCountErr   string                `json:"nodesCountErr"`
+	ActionOnFailure enums.ActionOnFailure `json:"actionOnFailure"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
