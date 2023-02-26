@@ -43,7 +43,7 @@ func main() {
 func start(port string) {
 	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
-	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator)
+	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
 	internalLogger := logger.New("", errorReporter)
 

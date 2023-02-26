@@ -33,8 +33,7 @@ type CliClient struct {
 	flagsHeaders     map[string]string
 }
 
-func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator) *CliClient {
-	state := servicestate.New()
+func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator, state *servicestate.ServiceState) *CliClient {
 	httpClient := httpClient.NewClient(url, nil)
 	return &CliClient{
 		baseUrl:          url,
