@@ -5,10 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
+	"strconv"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
@@ -33,6 +34,7 @@ type CliClient struct {
 }
 
 func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator) *CliClient {
+	state := servicestate.New()
 	httpClient := httpClient.NewClient(url, nil)
 	return &CliClient{
 		baseUrl:          url,
@@ -40,14 +42,13 @@ func NewCliServiceClient(url string, networkValidator cliClient.NetworkValidator
 		timeoutClient:    nil,
 		httpErrors:       []string{},
 		networkValidator: networkValidator,
-		// TODO: instantiate flagsHeaders and give it values
 		flagsHeaders: map[string]string{
-			"x-cli-flags-policyName":  os.Getenv(enums.Policy),
-			"x-cli-flags-verbose":     os.Getenv(enums.Verbose),
-			"x-cli-flags-output":      os.Getenv(enums.Output),
-			"x-cli-flags-noRecord":    os.Getenv(enums.NoRecord),
-			"x-cli-flags-enforce":     os.Getenv(enums.Enforce),
-			"x-cli-flags-clusterName": os.Getenv(enums.ClusterName),
+			"x-cli-flags-policyName":  state.GetPolicyName(),
+			"x-cli-flags-verbose":     state.GetVerbose(),
+			"x-cli-flags-output":      state.GetOutput(),
+			"x-cli-flags-noRecord":    state.GetNoRecord(),
+			"x-cli-flags-enforce":     strconv.FormatBool(state.GetIsEnforceMode()),
+			"x-cli-flags-clusterName": state.GetClusterName(),
 		},
 	}
 }
