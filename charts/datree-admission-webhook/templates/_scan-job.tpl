@@ -42,7 +42,14 @@ spec:
         - name: scan-job
           env:
             - name: DATREE_TOKEN
-              value: {{.Values.datree.token}}
+            {{- if and .Values.datree.existingSecret (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.key "") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.datree.existingSecret.name }}
+                  key: {{ .Values.datree.existingSecret.key }}
+            {{- else }}
+              value: "{{ .Values.datree.token }}"
+            {{- end }}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
             - name: CLUSTER_NAME
