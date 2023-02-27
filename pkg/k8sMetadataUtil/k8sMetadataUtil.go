@@ -7,6 +7,7 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -53,9 +54,9 @@ func NewK8sMetadataUtil(clientset *kubernetes.Clientset, createClientSetError er
 	}
 }
 
-func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil() {
+func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.ServiceState) {
 	validator := networkValidator.NewNetworkValidator()
-	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator)
+	cliClient := cliClient.NewCliServiceClient(deploymentConfig.URL, validator, state)
 
 	var clusterUuid k8sTypes.UID
 	var actionOnFailure enums.ActionOnFailure
