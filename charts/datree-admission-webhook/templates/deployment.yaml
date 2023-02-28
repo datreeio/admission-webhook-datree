@@ -91,6 +91,10 @@ spec:
             - name: webhook-tls-certs
               mountPath: /run/secrets/tls
               readOnly: true
+            - name: custom-skip-list
+              mountPath: /config/datreeSkipList/
+              readOnly: true  
+              # lagacy support for old configmap name
             - name: webhook-config
               mountPath: /config
               readOnly: true
@@ -98,6 +102,11 @@ spec:
         - name: webhook-tls-certs
           secret:
             secretName: webhook-server-tls
+        - name: custom-skip-list
+          configMap:
+            name: custom-scanning-filters
+            optional: true
+        # lagacy support for old configmap name    
         - name: webhook-config
           configMap:
             name: webhook-scanning-filters

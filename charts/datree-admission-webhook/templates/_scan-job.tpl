@@ -63,15 +63,22 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "{{ .Values.scanJob.image.repository }}:{{ .Values.scanJob.image.tag }}"
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           resources: {{- toYaml .Values.scanJob.resources | nindent 12 }}
           volumeMounts:
             - name: webhook-config
               mountPath: /config
               readOnly: true
+            - name: custom-skip-list
+              mountPath: /config/datreeSkipList
+              readOnly: true
       volumes:
         - name: webhook-config
           configMap:
             name: webhook-scanning-filters
+            optional: true
+        - name: custom-skip-list
+          configMap:
+            name: custom-scanning-filters
             optional: true
 {{- end -}}

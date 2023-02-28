@@ -52,15 +52,22 @@ func getScanningFilterFromConfigMap(filePath string) ([]string, error) {
 func readConfigScanningFilters() (skipList []string, err error) {
 	configDir := `/config`
 	configSkipListPath := filepath.Join(configDir, `skiplist`)
+	datreeSkipConfigDir := filepath.Join(configDir, `datreeSkipList`)
+	datreeSkipListPath := filepath.Join(datreeSkipConfigDir, `datreeSkipList`)
+	skipListPaths := []string{datreeSkipListPath, configSkipListPath}
+	skipLists := []string{}
 
-	if validateFileExistence(configSkipListPath) {
-		skipList, err = getScanningFilterFromConfigMap(configSkipListPath)
-		if err != nil {
-			return nil, err
+	for _, skipListPath := range skipListPaths {
+		if validateFileExistence(skipListPath) {
+			skipList, err = getScanningFilterFromConfigMap(skipListPath)
+			if err != nil {
+				return nil, err
+			}
+			skipLists = append(skipLists, skipList...)
+
 		}
 	}
-
-	return skipList, nil
+	return skipLists, nil
 }
 
 func ValidateCertificate() (certPath string, keyPath string, err error) {
