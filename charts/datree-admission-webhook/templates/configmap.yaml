@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-scanning-filters
+  namespace: datree
+data:
+  datreeSkipList: |- 
+{{- range  .Values.datree.customSkipList }} 
+    - {{ . }}
+{{- end }}

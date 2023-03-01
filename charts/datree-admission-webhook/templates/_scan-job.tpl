@@ -63,7 +63,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
           image: "{{ .Values.scanJob.image.repository }}:{{ .Values.scanJob.image.tag }}"
-          imagePullPolicy: Always
+          imagePullPolicy: "{{.Values.scanJob.image.pullPolicy}}"
           resources: {{- toYaml .Values.scanJob.resources | nindent 12 }}
           volumeMounts:
             - name: webhook-config
@@ -71,7 +71,12 @@ spec:
               readOnly: true
       volumes:
         - name: webhook-config
-          configMap:
-            name: webhook-scanning-filters
-            optional: true
+          projected:
+            sources:
+            - configMap:
+                name: custom-scanning-filters
+                optional: true
+            - configMap:
+                name: webhook-scanning-filters
+                optional: true
 {{- end -}}
