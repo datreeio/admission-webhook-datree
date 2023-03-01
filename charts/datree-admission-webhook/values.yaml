@@ -42,9 +42,9 @@ datree:
   clusterName: 
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
-  # Excluded resources for policy checks. (namespace;kind;name ,optional)
+  # Excluded resources from policy checks. ("namespace;kind;name" ,optional)
   customSkipList: 
-    # Recommended resources to exclude from your policy checks. (boolean ,optional; default: true)
+    # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
     
 # The Datree webhook-server image to use.
@@ -78,6 +78,7 @@ scanJob:
   image:
     # Image repository
     repository: datree/scan-job
+    pullPolicy: Always
     # Image tag
     tag: 0.0.19
     # limits:

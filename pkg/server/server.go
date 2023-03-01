@@ -52,8 +52,7 @@ func getScanningFilterFromConfigMap(filePath string) ([]string, error) {
 func readConfigScanningFilters() (skipList []string, err error) {
 	configDir := `/config`
 	configSkipListPath := filepath.Join(configDir, `skiplist`)
-	datreeSkipConfigDir := filepath.Join(configDir, `datreeSkipList`)
-	datreeSkipListPath := filepath.Join(datreeSkipConfigDir, `datreeSkipList`)
+	datreeSkipListPath := filepath.Join(configDir, `datreeSkipList`)
 	skipListPaths := []string{datreeSkipListPath, configSkipListPath}
 	skipLists := []string{}
 
