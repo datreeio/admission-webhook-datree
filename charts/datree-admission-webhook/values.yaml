@@ -80,7 +80,7 @@ scanJob:
     repository: datree/scan-job
     pullPolicy: Always
     # Image tag
-    tag: 0.0.20
+    tag: 0.0.21
     # limits:
     #   cpu: 1000m
     #   memory: 1048Mi
