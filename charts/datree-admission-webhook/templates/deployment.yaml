@@ -99,6 +99,11 @@ spec:
           secret:
             secretName: webhook-server-tls
         - name: webhook-config
-          configMap:
-            name: webhook-scanning-filters
-            optional: true
+          projected:
+            sources:
+            - configMap:
+                name: custom-scanning-filters
+                optional: true
+            - configMap:
+                name: webhook-scanning-filters
+                optional: true
