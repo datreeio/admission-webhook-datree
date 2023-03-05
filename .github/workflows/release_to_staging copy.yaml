@@ -36,8 +36,9 @@ jobs:
         name: Run commands
         id: runcmd
         with:
-          arch: aarch64
-          distro: ubuntu20.04
+          arch: none
+          distro: none
+          base_image: docker:23.0.1-cli-alpine3.17
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
@@ -45,10 +46,6 @@ jobs:
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
-            uname -a
-            apt update && apt upgrade
-            apt install -y curl
-            curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
             docker build -t datree-webhook .
             docker images -a
             docker image inspect --format "{{.ID}} {{.RepoTags}} {{.Architecture}}" $(docker image ls -q)
