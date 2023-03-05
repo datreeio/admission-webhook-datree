@@ -2,7 +2,7 @@ name: Niv test
 on:
   push:
     branches: 
-      - testDAT-4673**
+      - DAT-4673**
 jobs:
   release-docker:
     runs-on: buildjet-4vcpu-ubuntu-2204-arm
