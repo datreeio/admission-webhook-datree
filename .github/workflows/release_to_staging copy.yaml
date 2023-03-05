@@ -7,6 +7,9 @@ jobs:
   armv7_job:
     # The host should always be Linux
     runs-on: ubuntu-20.04
+    env:
+      DOCKERHUB_ORGANIZATION: datree
+      DOCKERHUB_REPO: webhook-staging
     name: Build on ubuntu-latest aarch64
     steps:
       - uses: actions/checkout@v3
