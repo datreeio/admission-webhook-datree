@@ -28,7 +28,7 @@ on:
 jobs:
   armv7_job:
     # The host should always be Linux
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     name: Build on ubuntu-latest aarch64
     steps:
       - uses: actions/checkout@v3
@@ -37,7 +37,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu-latest
+          distro: ubuntu20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
