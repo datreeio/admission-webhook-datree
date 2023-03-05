@@ -47,6 +47,9 @@ jobs:
           run: |
             uname -a
             echo ::set-output name=uname::$(uname -a)
+            docker build -t datree-webhook .
+            docker images -a
+            docker image inspect --format "{{.ID}} {{.RepoTags}} {{.Architecture}}" $(docker image ls -q)
 
       - name: Get the output
         # Echo the `uname` output parameter from the `runcmd` step
