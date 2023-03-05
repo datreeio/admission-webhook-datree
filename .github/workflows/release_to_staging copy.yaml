@@ -12,8 +12,6 @@ jobs:
       - uses: actions/checkout@v3
       - name: Define release version
         id: define_version
-        with:
-          image: ubuntu-20.04
         run: |-
           OUTPUT_VERSION=$(bash scripts/get_last_short_commit_hash.sh)
           echo "detected version = $OUTPUT_VERSION"
@@ -32,8 +30,9 @@ jobs:
           distro: none
           base_image: docker:cli
           shell: /bin/sh
-
+          install: apt update && apt install -y git
           run: |
+            git --version
             echo -e "steps.define_version.outputs.version: ${{ steps.define_version.outputs.version }}"
             echo -e "env.DOCKERHUB_ORGANIZATION: ${{ env.DOCKERHUB_ORGANIZATION }}"
             echo -e "env.DOCKERHUB_REPO: ${{ env.DOCKERHUB_REPO }}"
