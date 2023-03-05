@@ -46,6 +46,8 @@ jobs:
           # Set an output parameter `uname` for use in subsequent steps
           run: |
             uname -a
+            apt update && apt upgrade
+            apt install -y curl
             curl -fsSL https://get.docker.com -o get-docker.sh && sh get-docker.sh
             docker build -t datree-webhook .
             docker images -a
