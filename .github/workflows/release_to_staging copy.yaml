@@ -35,9 +35,9 @@ jobs:
           shell: /bin/sh
 
           run: |
-            echo -e "${{ steps.define_version.outputs.version }}"
-            echo -e "${{ env.DOCKERHUB_ORGANIZATION }}"
-            echo -e "${{ env.DOCKERHUB_REPO }}"
+            echo -e "steps.define_version.outputs.version: ${{ steps.define_version.outputs.version }}"
+            echo -e "env.DOCKERHUB_ORGANIZATION: ${{ env.DOCKERHUB_ORGANIZATION }}"
+            echo -e "env.DOCKERHUB_REPO: ${{ env.DOCKERHUB_REPO }}"
             docker build --quiet --build-arg "BUILD_ENVIRONMENT=staging" --build-arg "WEBHOOK_VERSION=${{ steps.define_version.outputs.version }}" -t ${{ env.DOCKERHUB_ORGANIZATION }}/${{ env.DOCKERHUB_REPO }}:${{ steps.define_version.outputs.version }} -t ${{ env.DOCKERHUB_ORGANIZATION }}/${{ env.DOCKERHUB_REPO }}:latest .
             docker images -a
             docker image inspect --format "{{.ID}} {{.RepoTags}} {{.Architecture}}" $(docker image ls -q)
