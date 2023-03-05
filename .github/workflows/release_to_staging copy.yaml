@@ -28,8 +28,8 @@ on:
 jobs:
   armv7_job:
     # The host should always be Linux
-    runs-on: ubuntu-18.04
-    name: Build on ubuntu-18.04 aarch64
+    runs-on: ubuntu-latest
+    name: Build on ubuntu-latest aarch64
     steps:
       - uses: actions/checkout@v3
       - uses: uraimo/run-on-arch-action@v2
@@ -37,7 +37,7 @@ jobs:
         id: runcmd
         with:
           arch: aarch64
-          distro: ubuntu18.04
+          distro: ubuntu-latest
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
