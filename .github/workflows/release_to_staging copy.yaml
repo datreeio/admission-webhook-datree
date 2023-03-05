@@ -38,11 +38,11 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: docker:dind
+          base_image: ubuntu:20.04
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
-          githubToken: ${{ github.token }}
+          # githubToken: ${{ github.token }}
 
           # Set an output parameter `uname` for use in subsequent steps
           run: |
