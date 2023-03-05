@@ -39,6 +39,9 @@ jobs:
           arch: none
           distro: none
           base_image: docker:cli
+          shell: /bin/sh
+          setup: |
+            mkdir -p /root/.docker 
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
