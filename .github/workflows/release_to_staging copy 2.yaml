@@ -5,7 +5,7 @@ on:
       - DAT-4673**
 jobs:
   release-docker:
-    runs-on: buildjet-4vcpu-ubuntu-2204-arm
+    runs-on: ubuntu-20.04
     env:
       DOCKERHUB_ORGANIZATION: datree
       DOCKERHUB_REPO: webhook-staging
