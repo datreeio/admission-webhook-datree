@@ -3,28 +3,6 @@ on:
   push:
     branches: 
       - DAT-4673**
-# jobs:
-#   release-docker:
-#     runs-on: ubuntu-18.04
-#     env:
-#       DOCKERHUB_ORGANIZATION: datree
-#       DOCKERHUB_REPO: webhook-staging
-#     name: build docker image
-#     steps:
-#       - uses: actions/checkout@v3
-#       - uses: uraimo/run-on-arch-action@v2
-#         name: Run commands
-#         id: runcmd
-#         with:
-#           arch: arm64
-#           distro: ubuntu18.04
-#           # githubToken: ${{ github.token }}
-#           run: |
-#             uname -a
-#             echo ::set-output name=uname::$(uname -a)
-#             docker build -t datree .
-#             docker images -a
-#             docker image inspect --format "{{.ID}} {{.RepoTags}} {{.Architecture}}" $(docker image ls -q)
 jobs:
   armv7_job:
     # The host should always be Linux
@@ -32,6 +10,18 @@ jobs:
     name: Build on ubuntu-latest aarch64
     steps:
       - uses: actions/checkout@v3
+      - name: Define release version
+        id: define_version
+        run: |-
+          OUTPUT_VERSION=$(bash scripts/get_last_short_commit_hash.sh)
+          echo "detected version = $OUTPUT_VERSION"
+          echo "version=$OUTPUT_VERSION" >> $GITHUB_OUTPUT
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+                
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         id: runcmd
@@ -41,14 +31,8 @@ jobs:
           base_image: docker:cli
           shell: /bin/sh
 
-
-          # Not required, but speeds up builds by storing container images in
-          # a GitHub package registry.
-          # githubToken: ${{ github.token }}
-
-          # Set an output parameter `uname` for use in subsequent steps
           run: |
-            docker build -t datree-webhook .
+            docker build --quiet --build-arg "BUILD_ENVIRONMENT=staging" --build-arg "WEBHOOK_VERSION=${{ steps.define_version.outputs.version }}" -t ${{ env.DOCKERHUB_ORGANIZATION }}/${{ env.DOCKERHUB_REPO }}:${{ steps.define_version.outputs.version }} -t ${{ env.DOCKERHUB_ORGANIZATION }}/${{ env.DOCKERHUB_REPO }}:latest .
             docker images -a
             docker image inspect --format "{{.ID}} {{.RepoTags}} {{.Architecture}}" $(docker image ls -q)
 
