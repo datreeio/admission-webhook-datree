@@ -21,7 +21,7 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-                
+
       - uses: uraimo/run-on-arch-action@v2
         name: Run commands
         id: runcmd
@@ -30,7 +30,7 @@ jobs:
           distro: none
           base_image: docker:cli
           shell: /bin/sh
-          install: apt update && apt install -y git
+          install: apk update && apk add git
           run: |
             git --version
             echo -e "steps.define_version.outputs.version: ${{ steps.define_version.outputs.version }}"
