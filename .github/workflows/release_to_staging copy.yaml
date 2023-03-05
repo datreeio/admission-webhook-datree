@@ -38,7 +38,7 @@ jobs:
         with:
           arch: none
           distro: none
-          base_image: ubuntu:20.04
+          base_image: docker:cli
 
           # Not required, but speeds up builds by storing container images in
           # a GitHub package registry.
