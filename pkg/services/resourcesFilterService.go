@@ -40,7 +40,8 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
+	isOKDResourceThatShouldBeEvaluated := isOkdResourceThatShouldBeEvaluated(managedFields)
+	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOKDResourceThatShouldBeEvaluated
 
 	if !isResourceWhiteListed {
 		return false
@@ -202,4 +203,12 @@ func doesRegexMatchString(regex string, str string) bool {
 		return false
 	}
 	return r.MatchString(str)
+}
+
+func isOkdResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
+	if doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager"}) {
+		return true
+	}
+
+	return false
 }
