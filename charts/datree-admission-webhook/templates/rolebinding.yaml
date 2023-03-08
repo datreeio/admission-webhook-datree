@@ -3,6 +3,7 @@ kind: RoleBinding
 metadata:
   name: datree-pods-reader
   labels: {{include "datree.labels" . | nindent 4}}
+  namespace: "{{template "datree.namespace" .}}"
   {{- with .Values.customAnnotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -10,6 +11,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
   name: datree-pods-reader
+  namespace: "{{template "datree.namespace" .}}"
 subjects:
   - kind: ServiceAccount
     name: datree-wait-server-ready-hook-post-install
