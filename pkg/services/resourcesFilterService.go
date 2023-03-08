@@ -206,9 +206,9 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOkdResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	if !doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager"}) {
-		return false
+	if doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager"}) {
+		return true
 	}
 
-	return true
+	return false
 }
