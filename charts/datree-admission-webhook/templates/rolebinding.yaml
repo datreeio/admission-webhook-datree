@@ -3,6 +3,7 @@ kind: RoleBinding
 metadata:
   name: datree-pods-reader
   labels: {{include "datree.labels" . | nindent 4}}
+  namespace: "{{template "datree.namespace" .}}"
   {{- with .Values.customAnnotations }}
   annotations: {{ toYaml . | nindent 4 }}
   {{- end }}
