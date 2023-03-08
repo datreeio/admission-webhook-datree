@@ -51,7 +51,7 @@ image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.58
+  tag: 0.1.59
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
