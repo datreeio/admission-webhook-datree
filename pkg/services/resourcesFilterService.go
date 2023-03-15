@@ -1,9 +1,11 @@
 package services
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
@@ -32,6 +34,8 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted
 
 	if !arePrerequisitesMet {
+		msg := fmt.Sprintf("skipping resource validation. isMetadataNameExists: %v, isUnsupportedKind: %v, isResourceDeleted:%v, arePrerequisitesMet:%v", isMetadataNameExists, isUnsupportedKind, isResourceDeleted, arePrerequisitesMet)
+		logger.LogUtil(msg)
 		return false
 	}
 
@@ -44,6 +48,8 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOKDResourceThatShouldBeEvaluated
 
 	if !isResourceWhiteListed {
+		msg := fmt.Sprintf("skipping resource validation. isOKDResourceThatShouldBeEvaluated:%v, isKubectl: %v, isHelm: %v, isTerraform:%v, isFluxResourceThatShouldBeEvaluated:%v, isArgoResourceThatShouldBeEvaluated:%v", isOKDResourceThatShouldBeEvaluated, isKubectl, isHelm, isTerraform, isFluxResourceThatShouldBeEvaluated, isArgoResourceThatShouldBeEvaluated,)
+		logger.LogUtil(msg)
 		return false
 	}
 

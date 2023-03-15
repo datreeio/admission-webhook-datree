@@ -24,7 +24,7 @@ datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
   token: <DATREE_TOKEN>
-  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored. 
+  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
     key: "" # Key within a given secret that contains the token (string)
@@ -49,9 +49,9 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: datree/admission-webhook
+  repository: noaabarki/datree-webhook-server
   # Image tag
-  tag: 0.1.58
+  sha: 97f6e10ded7aad92c76f26bbe4edccae6d3bed317878be5a70d5ff877f0ce5d2
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -59,7 +59,11 @@ securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 25000
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault
+
 resources: {}
 # limits:
 #   cpu: 200m
