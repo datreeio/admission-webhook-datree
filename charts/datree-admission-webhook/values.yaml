@@ -24,7 +24,7 @@ datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
   token: <DATREE_TOKEN>
-  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored. 
+  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
     key: "" # Key within a given secret that contains the token (string)
@@ -54,17 +54,16 @@ image:
   tag: 0.1.59
   # Image pull policy
   pullPolicy: Always
-# Security context for the containers
 securityContext:
-## OpenShift SecurityContext
+  # Security context for the containers
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  # runAsUser: 25000 > OpenShift assigns a unique UID per namespace
+  runAsUser: 25000
   capabilities:
     drop: ["ALL"]
   seccompProfile:
-    type: RuntimeDefault  
+    type: RuntimeDefault
 resources: {}
 # limits:
 #   cpu: 200m
