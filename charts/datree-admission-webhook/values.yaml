@@ -60,6 +60,10 @@ securityContext:
   readOnlyRootFilesystem: true
   runAsNonRoot: true
   runAsUser: 25000
+  capabilities:
+    drop: ["ALL"]
+  seccompProfile:
+    type: RuntimeDefault  
 resources: {}
 # limits:
 #   cpu: 200m
