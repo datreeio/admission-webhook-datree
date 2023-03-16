@@ -56,11 +56,10 @@ image:
   pullPolicy: Always
 # Security context for the containers
 securityContext:
-## OpenShift SecurityContext
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  # runAsUser: 25000 > OpenShift assigns a unique UID per namespace
+  runAsUser: 25000
   capabilities:
     drop: ["ALL"]
   seccompProfile:
