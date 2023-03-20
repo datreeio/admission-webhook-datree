@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -218,6 +219,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMetadata
 
 var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
+var clusterRequestMetadataMutex = sync.RWMutex{}
 
 func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
@@ -227,9 +229,13 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 		return
 	}
 	logJson := string(logJsonInBytes)
+	clusterRequestMetadataMutex.RLock()
 	currentValue := clusterRequestMetadataAggregator[logJson]
+	clusterRequestMetadataMutex.RUnlock()
 	if currentValue == nil {
+		clusterRequestMetadataMutex.Lock()
 		clusterRequestMetadataAggregator[logJson] = clusterRequestMetadata
+		clusterRequestMetadataMutex.Unlock()
 	} else {
 		currentValue.Occurrences++
 	}
@@ -241,11 +247,16 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 
 func (vs *ValidationService) SendMetadataInBatch() {
 	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
+	clusterRequestMetadataMutex.RLock()
 	for _, value := range clusterRequestMetadataAggregator {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
 	}
+	clusterRequestMetadataMutex.RUnlock()
 	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
+
+	clusterRequestMetadataMutex.Lock()
 	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
+	clusterRequestMetadataMutex.Unlock()
 }
 
 func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
