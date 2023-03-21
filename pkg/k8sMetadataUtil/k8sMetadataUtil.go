@@ -136,7 +136,7 @@ func getK8sDistribution(clientset kubernetes.Interface, nodes *v1.NodeList) stri
 		return "Error getting nodes"
 	}
 
-	localK8sDistributions := []string{"kind", "minikube", "microk8s", "docker-desktop", "k3s", "rke", "k3d"}
+	localK8sDistributions := []string{"minikube", "microk8s", "docker-desktop", "k3s", "k3d", "kind"}
 
 	for _, node := range nodes.Items {
 		_, isControlPlaneLabelExist := node.Labels["node-role.kubernetes.io/control-plane"]
