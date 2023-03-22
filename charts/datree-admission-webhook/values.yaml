@@ -51,7 +51,7 @@ image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 0.1.60
+  tag: 0.1.61
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -63,7 +63,7 @@ securityContext:
   capabilities:
     drop: ["ALL"]
   seccompProfile:
-    type: RuntimeDefault  
+    type: RuntimeDefault
 resources: {}
 # limits:
 #   cpu: 200m
