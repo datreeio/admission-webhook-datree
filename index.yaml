@@ -2,6 +2,26 @@ apiVersion: v1
 entries:
   datree-admission-webhook:
   - apiVersion: v2
+    appVersion: 0.1.61
+    created: "2023-03-22T17:40:41.990618864Z"
+    description: A Helm chart for Datree admission webhook for Kubernetes clusters
+    digest: 0e806a50b0e608707394c18e19cfc27d5ff515c56c42357be81762bda1d66aed
+    home: datree.io
+    icon: https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png
+    keywords:
+    - datree-admission-webhook
+    - policy agent
+    - validating webhook
+    - admissions controller
+    kubeVersion: '>=1.16.0-0'
+    name: datree-admission-webhook
+    sources:
+    - https://github.com/datreeio/admission-webhook-datree
+    type: application
+    urls:
+    - https://github.com/datreeio/admission-webhook-datree/releases/download/datree-admission-webhook-0.3.46/datree-admission-webhook-0.3.46.tgz
+    version: 0.3.46
+  - apiVersion: v2
     appVersion: 0.1.60
     created: "2023-03-16T15:41:04.696760026Z"
     description: A Helm chart for Datree admission webhook for Kubernetes clusters
@@ -901,4 +921,4 @@ entries:
     urls:
     - https://datreeio.github.io/admission-webhook-datree/datree-admission-webhook-0.1.0.tgz
     version: 0.1.0
-generated: "2023-03-16T15:41:04.697289938Z"
+generated: "2023-03-22T17:40:41.991032468Z"
