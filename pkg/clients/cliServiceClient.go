@@ -231,6 +231,7 @@ type ReportK8sMetadataRequest struct {
 	NodesCount      int                   `json:"nodesCount"`
 	NodesCountErr   string                `json:"nodesCountErr"`
 	ActionOnFailure enums.ActionOnFailure `json:"actionOnFailure"`
+	K8sDistribution string                `json:"k8sDistribution"`
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {

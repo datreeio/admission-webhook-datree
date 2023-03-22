@@ -34,7 +34,7 @@ type K8sMetadata struct {
 	ClusterUuid     k8sTypes.UID
 	NodesCount      int
 	NodesCountErr   error
-	k8sDistribution string
+	K8sDistribution string
 	ActionOnFailure enums.ActionOnFailure
 }
 
@@ -99,7 +99,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 		NodesCountErr:   nodesCountErr,
 		ClusterUuid:     clusterUuid,
 		ActionOnFailure: actionOnFailure,
-		k8sDistribution: k8sDistribution,
+		K8sDistribution: k8sDistribution,
 	}
 	k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataOnInit)
 
@@ -113,7 +113,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 				NodesCountErr:   nodesCountErr,
 				ClusterUuid:     clusterUuid,
 				ActionOnFailure: actionOnFailure,
-				k8sDistribution: k8sDistribution,
+				K8sDistribution: k8sDistribution,
 			}
 			k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataHourly)
 		}
@@ -219,5 +219,6 @@ func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadata(client *cliClient.CliCli
 		NodesCount:      k8sMetadata.NodesCount,
 		NodesCountErr:   nodesCountErrString,
 		ActionOnFailure: k8sMetadata.ActionOnFailure,
+		K8sDistribution: k8sMetadata.K8sDistribution,
 	})
 }
