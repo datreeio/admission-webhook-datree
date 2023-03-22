@@ -93,7 +93,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 	}
 
 	nodesCount, nodes, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-	k8sDistribution := getK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
+	k8sDistribution := getLocalK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
 	k8sMetadataOnInit := K8sMetadata{
 		NodesCount:      nodesCount,
 		NodesCountErr:   nodesCountErr,
@@ -107,7 +107,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 	cornJob.AddFunc("@hourly", func() {
 		if k8sMetadataUtil.leaderElection.IsLeader() {
 			nodesCount, nodes, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
-			k8sDistribution := getK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
+			k8sDistribution := getLocalK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
 			k8sMetadataHourly := K8sMetadata{
 				NodesCount:      nodesCount,
 				NodesCountErr:   nodesCountErr,
@@ -131,7 +131,7 @@ func getNodesCount(clientset kubernetes.Interface) (int, *v1.NodeList, error) {
 	return len(nodes.Items), nodes, nil
 }
 
-func getK8sDistribution(clientset kubernetes.Interface, nodes *v1.NodeList) string {
+func getLocalK8sDistribution(clientset kubernetes.Interface, nodes *v1.NodeList) string {
 	if nodes == nil {
 		return "Error getting nodes"
 	}
@@ -151,7 +151,7 @@ func getK8sDistribution(clientset kubernetes.Interface, nodes *v1.NodeList) stri
 		}
 	}
 
-	return ""
+	return "probably not a local distribution"
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
