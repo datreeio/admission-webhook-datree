@@ -3,6 +3,7 @@ package k8sMetadataUtil
 import (
 	"context"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/leaderElection"
@@ -14,6 +15,7 @@ import (
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/robfig/cron/v3"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8sTypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/discovery"
@@ -32,6 +34,7 @@ type K8sMetadata struct {
 	ClusterUuid     k8sTypes.UID
 	NodesCount      int
 	NodesCountErr   error
+	K8sDistribution string
 	ActionOnFailure enums.ActionOnFailure
 }
 
@@ -89,24 +92,28 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 		k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataGetClusterUuidErr)
 	}
 
-	nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
+	nodesCount, nodes, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
+	k8sDistribution := getLocalK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
 	k8sMetadataOnInit := K8sMetadata{
 		NodesCount:      nodesCount,
 		NodesCountErr:   nodesCountErr,
 		ClusterUuid:     clusterUuid,
 		ActionOnFailure: actionOnFailure,
+		K8sDistribution: k8sDistribution,
 	}
 	k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataOnInit)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	cornJob.AddFunc("@hourly", func() {
 		if k8sMetadataUtil.leaderElection.IsLeader() {
-			nodesCount, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
+			nodesCount, nodes, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
+			k8sDistribution := getLocalK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
 			k8sMetadataHourly := K8sMetadata{
 				NodesCount:      nodesCount,
 				NodesCountErr:   nodesCountErr,
 				ClusterUuid:     clusterUuid,
 				ActionOnFailure: actionOnFailure,
+				K8sDistribution: k8sDistribution,
 			}
 			k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataHourly)
 		}
@@ -115,13 +122,36 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 	cornJob.Start()
 }
 
-func getNodesCount(clientset kubernetes.Interface) (int, error) {
+func getNodesCount(clientset kubernetes.Interface) (int, *v1.NodeList, error) {
 	nodes, err := clientset.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{})
 	if err != nil {
-		return -1, err
+		return -1, nil, err
 	}
 
-	return len(nodes.Items), nil
+	return len(nodes.Items), nodes, nil
+}
+
+func getLocalK8sDistribution(clientset kubernetes.Interface, nodes *v1.NodeList) string {
+	if nodes == nil {
+		return "Error getting nodes"
+	}
+
+	localK8sDistributions := []string{"minikube", "microk8s", "docker-desktop", "k3s", "k3d", "kind"}
+
+	for _, node := range nodes.Items {
+		_, isControlPlaneLabelExist := node.Labels["node-role.kubernetes.io/control-plane"]
+		if isControlPlaneLabelExist {
+			for key, value := range node.Labels {
+				for _, localK8sDistribution := range localK8sDistributions {
+					if strings.Contains(key, localK8sDistribution) || strings.Contains(value, localK8sDistribution) {
+						return localK8sDistribution
+					}
+				}
+			}
+		}
+	}
+
+	return "probably not a local distribution"
 }
 
 func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
@@ -189,5 +219,6 @@ func (k8sMetadataUtil *K8sMetadataUtil) sendK8sMetadata(client *cliClient.CliCli
 		NodesCount:      k8sMetadata.NodesCount,
 		NodesCountErr:   nodesCountErrString,
 		ActionOnFailure: k8sMetadata.ActionOnFailure,
+		K8sDistribution: k8sMetadata.K8sDistribution,
 	})
 }
