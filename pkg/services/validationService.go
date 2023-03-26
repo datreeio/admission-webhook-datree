@@ -216,8 +216,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
-type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMetadata
-
 var clusterRequestMetadataAggregator = xsync.NewMapOf[*cliClient.ClusterRequestMetadata]()
 
 func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
