@@ -245,7 +245,6 @@ func (vs *ValidationService) SendMetadataInBatch() {
 		return true
 	})
 	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
-
 	clusterRequestMetadataAggregator.Clear()
 }
 
