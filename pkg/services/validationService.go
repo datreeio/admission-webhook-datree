@@ -226,11 +226,11 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 		return
 	}
 	logJson := string(logJsonInBytes)
-	currentValue, _ := clusterRequestMetadataAggregator.Load(logJson)
-	if currentValue == nil {
-		clusterRequestMetadataAggregator.Store(logJson, clusterRequestMetadata)
-	} else {
+	currentValue, ok := clusterRequestMetadataAggregator.Load(logJson)
+	if ok {
 		currentValue.Occurrences++
+	} else {
+		clusterRequestMetadataAggregator.Store(logJson, clusterRequestMetadata)
 	}
 
 	if clusterRequestMetadataAggregator.Size() >= 500 {
