@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -21,6 +20,7 @@ import (
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
+	"github.com/puzpuzpuz/xsync/v2"
 
 	policyFactory "github.com/datreeio/datree/bl/policy"
 	"github.com/datreeio/datree/pkg/ciContext"
@@ -216,10 +216,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
-type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMetadata
-
-var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
-var clusterRequestMetadataMutex = sync.RWMutex{}
+var clusterRequestMetadataAggregator = xsync.NewMapOf[*cliClient.ClusterRequestMetadata]()
 
 func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
@@ -229,34 +226,26 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 		return
 	}
 	logJson := string(logJsonInBytes)
-	clusterRequestMetadataMutex.RLock()
-	currentValue := clusterRequestMetadataAggregator[logJson]
-	clusterRequestMetadataMutex.RUnlock()
-	if currentValue == nil {
-		clusterRequestMetadataMutex.Lock()
-		clusterRequestMetadataAggregator[logJson] = clusterRequestMetadata
-		clusterRequestMetadataMutex.Unlock()
-	} else {
+	currentValue, ok := clusterRequestMetadataAggregator.Load(logJson)
+	if ok {
 		currentValue.Occurrences++
+	} else {
+		clusterRequestMetadataAggregator.Store(logJson, clusterRequestMetadata)
 	}
 
-	if len(clusterRequestMetadataAggregator) >= 500 {
+	if clusterRequestMetadataAggregator.Size() >= 500 {
 		vs.SendMetadataInBatch()
 	}
 }
 
 func (vs *ValidationService) SendMetadataInBatch() {
-	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
-	clusterRequestMetadataMutex.RLock()
-	for _, value := range clusterRequestMetadataAggregator {
+	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, clusterRequestMetadataAggregator.Size())
+	clusterRequestMetadataAggregator.Range(func(key string, value *cliClient.ClusterRequestMetadata) bool {
 		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
-	}
-	clusterRequestMetadataMutex.RUnlock()
+		return true
+	})
 	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
-
-	clusterRequestMetadataMutex.Lock()
-	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
-	clusterRequestMetadataMutex.Unlock()
+	clusterRequestMetadataAggregator.Clear()
 }
 
 func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
