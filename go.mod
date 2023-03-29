@@ -6,7 +6,6 @@ require (
 	github.com/datreeio/datree v1.8.42
 	github.com/ghodss/yaml v1.0.0
 	github.com/lithammer/shortuuid v3.0.0+incompatible
-	github.com/puzpuzpuz/xsync/v2 v2.4.0
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.10.0
 	k8s.io/api v0.24.2
