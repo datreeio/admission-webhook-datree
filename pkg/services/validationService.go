@@ -221,8 +221,10 @@ func (m *clusterRequestMetadataMap) Len() int {
 }
 
 func (m *clusterRequestMetadataMap) Add(logJson string, clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	if m.Load(logJson) == nil {
+		m.entriesCount += 1
+	}
 	m.clusterRequestMetadataAggregator.Store(logJson, clusterRequestMetadata)
-	m.entriesCount += 1
 }
 
 func (m *clusterRequestMetadataMap) Load(logJson string) *cliClient.ClusterRequestMetadata {
@@ -284,7 +286,7 @@ func (vs *ValidationService) SendMetadataInBatch() {
 
 	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
 
-	clusterRequestMetadataAggregatorMap.Clear() // clear the hash table
+	clusterRequestMetadataAggregatorMap.Clear()
 }
 
 func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
