@@ -219,23 +219,17 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 func (m *clusterRequestMetadataMap) Len() int {
 	return m.entriesCount
 }
-
-func (m *clusterRequestMetadataMap) Add(logJson string, clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
-	if m.Load(logJson) == nil {
-		m.entriesCount += 1
-	}
-	m.clusterRequestMetadataAggregator.Store(logJson, clusterRequestMetadata)
+func (m *clusterRequestMetadataMap) ShouldSendBatchToServer() bool {
+	return m.entriesCount >= 500
 }
 
-func (m *clusterRequestMetadataMap) Load(logJson string) *cliClient.ClusterRequestMetadata {
-	if clusterRequestMetadata, ok := m.clusterRequestMetadataAggregator.Load(logJson); ok {
-		clusterRequestMetadataConverted, validClusterRequestMetadata := clusterRequestMetadata.(*cliClient.ClusterRequestMetadata)
-		if validClusterRequestMetadata {
-			return clusterRequestMetadataConverted
-		}
-		return nil
+func (m *clusterRequestMetadataMap) LoadOrStore(logJson string, clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	existingLog, loaded := m.clusterRequestMetadataAggregator.LoadOrStore(logJson, clusterRequestMetadata)
+	if loaded {
+		existingLog.(*cliClient.ClusterRequestMetadata).Occurrences++
+	} else {
+		m.entriesCount += 1
 	}
-	return nil
 }
 
 func (m *clusterRequestMetadataMap) Clear() {
@@ -265,14 +259,9 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 		return
 	}
 	logJson := string(logJsonInBytes)
-	currentValue := clusterRequestMetadataAggregatorMap.Load(logJson)
-	if currentValue == nil {
-		clusterRequestMetadataAggregatorMap.Add(logJson, clusterRequestMetadata)
-	} else {
-		currentValue.Occurrences++
-	}
+	clusterRequestMetadataAggregatorMap.LoadOrStore(logJson, clusterRequestMetadata)
 
-	if clusterRequestMetadataAggregatorMap.entriesCount >= 500 {
+	if clusterRequestMetadataAggregatorMap.ShouldSendBatchToServer() {
 		vs.SendMetadataInBatch()
 	}
 }
