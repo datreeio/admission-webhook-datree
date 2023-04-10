@@ -31,7 +31,7 @@ func New() *ServiceState {
 		clusterName:    os.Getenv(enums.ClusterName),
 		policyName:     os.Getenv(enums.Policy),
 		isEnforceMode:  os.Getenv(enums.Enforce) == "true",
-		configFromHelm: os.Getenv(enums.ConfigFromHelm) == "true",
+		configFromHelm: os.Getenv(enums.ConfigFromHelm) != "false",
 		serviceVersion: config.WebhookVersion,
 		noRecord:       os.Getenv(enums.NoRecord),
 		output:         os.Getenv(enums.Output),
