@@ -15,9 +15,9 @@ type ServiceState struct {
 	clusterUuid    types.UID
 	clusterName    string
 	k8sVersion     string
+	configFromHelm bool
 	policyName     string
 	isEnforceMode  bool
-	configFromHelm bool
 	serviceVersion string
 	noRecord       string
 	output         string
