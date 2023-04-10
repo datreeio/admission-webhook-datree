@@ -91,7 +91,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetPolicyName(prerunData.ActivePolicy)
-		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == "enforce")
+		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 	}
 
 	// convert default rules string into DefaultRulesDefinitions structure
