@@ -17,6 +17,7 @@ type ServiceState struct {
 	k8sVersion     string
 	policyName     string
 	isEnforceMode  bool
+	configFromHelm bool
 	serviceVersion string
 	NoRecord       string
 	Output         string
@@ -31,6 +32,7 @@ func New() *ServiceState {
 		clusterName:    os.Getenv(enums.ClusterName),
 		policyName:     os.Getenv(enums.Policy),
 		isEnforceMode:  os.Getenv(enums.Enforce) == "true",
+		configFromHelm: os.Getenv(enums.ConfigFromHelm) == "true",
 		serviceVersion: config.WebhookVersion,
 		NoRecord:       os.Getenv(enums.NoRecord),
 		Output:         os.Getenv(enums.Output),
@@ -72,6 +74,10 @@ func (s *ServiceState) GetPolicyName() string {
 
 func (s *ServiceState) GetIsEnforceMode() bool {
 	return s.isEnforceMode
+}
+
+func (s *ServiceState) GetConfigFromHelm() bool {
+	return s.configFromHelm
 }
 
 func (s *ServiceState) GetServiceVersion() string {
