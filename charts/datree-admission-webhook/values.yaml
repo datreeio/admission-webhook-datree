@@ -39,7 +39,7 @@ datree:
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
   
-  # If True, the webhook will be configured from here, otherwise it will be configured from the dashboard.
+  # If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
   # Affected configurations: policy, enforce, customSkipList.
   configFromHelm: false
   # The name of the policy to check, e.g: staging. (string, optional)
