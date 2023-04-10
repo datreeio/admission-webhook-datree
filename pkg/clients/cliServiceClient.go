@@ -69,7 +69,7 @@ type ClusterEvaluationPrerunDataResponse struct {
 	IgnorePatterns  []string
 }
 
-func (c *CliClient) RequestClusterEvaluationPrerunData(tokenId string, clusterUuid string) (*ClusterEvaluationPrerunDataResponse, error) {
+func (c *CliClient) RequestClusterEvaluationPrerunData(tokenId string, clusterUuid k8sTypes.UID) (*ClusterEvaluationPrerunDataResponse, error) {
 	if c.networkValidator.IsLocalMode() {
 		return &ClusterEvaluationPrerunDataResponse{
 			EvaluationPrerunDataResponse: cliClient.EvaluationPrerunDataResponse{
@@ -78,7 +78,7 @@ func (c *CliClient) RequestClusterEvaluationPrerunData(tokenId string, clusterUu
 		}, nil
 	}
 
-	res, err := c.httpClient.Request(http.MethodGet, "/cli/evaluation/policyCheck/tokens/"+tokenId+"/clusters/"+clusterUuid+"/prerun?", nil, c.flagsHeaders)
+	res, err := c.httpClient.Request(http.MethodGet, "/cli/evaluation/policyCheck/tokens/"+tokenId+"/clusters/"+string(clusterUuid)+"/prerun?", nil, c.flagsHeaders)
 
 	if err != nil {
 		networkErr := c.networkValidator.IdentifyNetworkError(err)

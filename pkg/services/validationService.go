@@ -81,7 +81,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
-	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, "MOCK_CLUSTER_UUID")
+	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
 	if err != nil {
 		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 
