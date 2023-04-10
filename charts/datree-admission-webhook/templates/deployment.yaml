@@ -58,6 +58,8 @@ spec:
               value: "{{.Values.datree.noRecord}}"
             - name: DATREE_ENFORCE
               value: "{{.Values.datree.enforce}}"
+            - name: DATREE_CONFIG_FROM_HELM
+              value: "{{.Values.datree.configFromHelm}}"
             - name: DATREE_NAMESPACE
               value: {{template "datree.namespace" .}}
             - name: POD_NAME
