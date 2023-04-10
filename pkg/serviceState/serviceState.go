@@ -67,16 +67,26 @@ func (s *ServiceState) GetK8sVersion() string {
 	return s.k8sVersion
 }
 
+func (s *ServiceState) GetConfigFromHelm() bool {
+	return s.configFromHelm
+}
+
 func (s *ServiceState) GetPolicyName() string {
 	return s.policyName
+}
+
+// SetPolicyName to override when we get cluster config in /prerun
+func (s *ServiceState) SetPolicyName(policyName string) {
+	s.policyName = policyName
 }
 
 func (s *ServiceState) GetIsEnforceMode() bool {
 	return s.isEnforceMode
 }
 
-func (s *ServiceState) GetConfigFromHelm() bool {
-	return s.configFromHelm
+// SetIsEnforceMode to override when we get cluster config in /prerun
+func (s *ServiceState) SetIsEnforceMode(isEnforceMode bool) {
+	s.isEnforceMode = isEnforceMode
 }
 
 func (s *ServiceState) GetServiceVersion() string {
@@ -93,14 +103,4 @@ func (s *ServiceState) GetOutput() string {
 
 func (s *ServiceState) GetVerbose() string {
 	return s.verbose
-}
-
-// SetIsEnforceMode to override when we get cluster config in /prerun
-func (s *ServiceState) SetIsEnforceMode(isEnforceMode bool) {
-	s.isEnforceMode = isEnforceMode
-}
-
-// SetPolicyName to override when we get cluster config in /prerun
-func (s *ServiceState) SetPolicyName(policyName string) {
-	s.policyName = policyName
 }
