@@ -19,9 +19,9 @@ type ServiceState struct {
 	isEnforceMode  bool
 	configFromHelm bool
 	serviceVersion string
-	NoRecord       string
-	Output         string
-	Verbose        string
+	noRecord       string
+	output         string
+	verbose        string
 }
 
 func New() *ServiceState {
@@ -34,9 +34,9 @@ func New() *ServiceState {
 		isEnforceMode:  os.Getenv(enums.Enforce) == "true",
 		configFromHelm: os.Getenv(enums.ConfigFromHelm) == "true",
 		serviceVersion: config.WebhookVersion,
-		NoRecord:       os.Getenv(enums.NoRecord),
-		Output:         os.Getenv(enums.Output),
-		Verbose:        os.Getenv(enums.Verbose),
+		noRecord:       os.Getenv(enums.NoRecord),
+		output:         os.Getenv(enums.Output),
+		verbose:        os.Getenv(enums.Verbose),
 	}
 }
 
@@ -85,13 +85,13 @@ func (s *ServiceState) GetServiceVersion() string {
 }
 
 func (s *ServiceState) GetNoRecord() string {
-	return s.NoRecord
+	return s.noRecord
 }
 
 func (s *ServiceState) GetOutput() string {
-	return s.Output
+	return s.output
 }
 
 func (s *ServiceState) GetVerbose() string {
-	return s.Verbose
+	return s.verbose
 }
