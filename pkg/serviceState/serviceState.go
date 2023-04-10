@@ -25,7 +25,6 @@ type ServiceState struct {
 }
 
 func New() *ServiceState {
-
 	return &ServiceState{
 		clientId:       shortuuid.New(),
 		token:          os.Getenv(enums.Token),
@@ -94,4 +93,14 @@ func (s *ServiceState) GetOutput() string {
 
 func (s *ServiceState) GetVerbose() string {
 	return s.verbose
+}
+
+// SetIsEnforceMode to override when we get cluster config in /prerun
+func (s *ServiceState) SetIsEnforceMode(isEnforceMode bool) {
+	s.isEnforceMode = isEnforceMode
+}
+
+// SetPolicyName to override when we get cluster config in /prerun
+func (s *ServiceState) SetPolicyName(policyName string) {
+	s.policyName = policyName
 }
