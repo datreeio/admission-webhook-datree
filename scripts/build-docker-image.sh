@@ -7,7 +7,7 @@ else
   buildEnv=$BUILD_ENVIRONMENT
 fi
 
-# In case $IMAGE_NAME env var is not set, will pass default - "webhook-server"
+# In case $IMAGE_NAME env var is not set, will pass default - "webhook-skipList"
 if [ "$IMAGE_NAME" = "" ]; then
   imageName="webhook-server"
 else

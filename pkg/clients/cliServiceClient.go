@@ -8,8 +8,8 @@ import (
 	"strconv"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
-	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
+	"github.com/datreeio/admission-webhook-datree/pkg/skipList"
 
 	"github.com/datreeio/datree/pkg/ciContext"
 	"github.com/datreeio/datree/pkg/evaluation"
@@ -112,18 +112,18 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 }
 
 type ClusterRequestMetadata struct {
-	CliEvaluationId          int                                 `json:"cliEvaluationId"`
-	Token                    string                              `json:"token"`
-	Skipped                  bool                                `json:"skipped"`
-	Allowed                  bool                                `json:"allowed"`
-	ResourceKind             string                              `json:"resourceKind"`
-	ResourceName             string                              `json:"resourceName"`
-	Managers                 []string                            `json:"managers"`
-	PolicyName               string                              `json:"policyName"`
-	K8sVersion               string                              `json:"k8sVersion"`
-	Namespace                string                              `json:"namespace,omitempty"`
-	ConfigMapScanningFilters server.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
-	Occurrences              int                                 `json:"occurrences"`
+	CliEvaluationId          int                                   `json:"cliEvaluationId"`
+	Token                    string                                `json:"token"`
+	Skipped                  bool                                  `json:"skipped"`
+	Allowed                  bool                                  `json:"allowed"`
+	ResourceKind             string                                `json:"resourceKind"`
+	ResourceName             string                                `json:"resourceName"`
+	Managers                 []string                              `json:"managers"`
+	PolicyName               string                                `json:"policyName"`
+	K8sVersion               string                                `json:"k8sVersion"`
+	Namespace                string                                `json:"namespace,omitempty"`
+	ConfigMapScanningFilters skipList.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
+	Occurrences              int                                   `json:"occurrences"`
 }
 
 type ClusterRequestMetadataBatchReqBody struct {

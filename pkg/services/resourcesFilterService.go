@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/datreeio/admission-webhook-datree/pkg/server"
+	"github.com/datreeio/admission-webhook-datree/pkg/skipList"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
 )
@@ -55,7 +55,7 @@ func shouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq *admis
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	resourceName := rootObject.Metadata.Name
 
-	for _, skipListItem := range server.ConfigMapScanningFilters.SkipList {
+	for _, skipListItem := range skipList.ConfigMapScanningFilters.SkipList {
 		skipRuleItem := strings.Split(skipListItem, ";")
 
 		if len(skipRuleItem) != 3 {

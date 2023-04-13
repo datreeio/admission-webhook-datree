@@ -16,7 +16,7 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
-	"github.com/datreeio/admission-webhook-datree/pkg/server"
+	"github.com/datreeio/admission-webhook-datree/pkg/skipList"
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
 
@@ -76,7 +76,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
-		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
+		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, skipList.ConfigMapScanningFilters)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
@@ -215,7 +215,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
+	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, skipList.ConfigMapScanningFilters)
 	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
@@ -398,7 +398,7 @@ func (vs ValidationService) getEvaluationRequestData(policyName string,
 }
 
 func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
-	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType) *cliClient.ClusterRequestMetadata {
+	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters skipList.ConfigMapScanningFiltersType) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
 		CliEvaluationId:          cliEvaluationId,

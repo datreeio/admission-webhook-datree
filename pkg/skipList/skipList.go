@@ -1,4 +1,4 @@
-package server
+package skipList
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ type ConfigMapScanningFiltersType struct {
 
 var ConfigMapScanningFilters = ConfigMapScanningFiltersType{}
 
-func InitServerVars() error {
+func InitSkipList() error {
 	skipList, err := readConfigScanningFilters()
 
 	if err != nil {

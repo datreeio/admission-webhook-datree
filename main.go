@@ -23,7 +23,7 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/controllers"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
-	"github.com/datreeio/admission-webhook-datree/pkg/server"
+	"github.com/datreeio/admission-webhook-datree/pkg/skipList"
 	"github.com/datreeio/datree/pkg/deploymentConfig"
 	"github.com/datreeio/datree/pkg/networkValidator"
 	"github.com/datreeio/datree/pkg/utils"
@@ -81,8 +81,8 @@ func start(port string) {
 	state.SetClusterUuid(clusterUuid)
 	state.SetK8sVersion(k8sVersion)
 
-	server.InitServerVars()
-	certPath, keyPath, err := server.ValidateCertificate()
+	skipList.InitSkipList()
+	certPath, keyPath, err := skipList.ValidateCertificate()
 	if err != nil {
 		panic(err)
 	}
