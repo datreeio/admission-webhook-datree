@@ -75,10 +75,15 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
-	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
+
+	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, skipList.ConfigMapScanningFilters)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
+	}
+
+	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
+		saveMetadataAndReturnAResponseForSkippedResource()
 	}
 
 	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
@@ -92,6 +97,11 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetPolicyName(prerunData.ActivePolicy)
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
+		skipList.OverrideSkipList(prerunData.IgnorePatterns)
+	}
+
+	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
+		saveMetadataAndReturnAResponseForSkippedResource()
 	}
 
 	// convert default rules string into DefaultRulesDefinitions structure

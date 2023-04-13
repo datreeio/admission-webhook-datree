@@ -27,6 +27,10 @@ func InitSkipList() error {
 	return nil
 }
 
+func OverrideSkipList(skipList []string) {
+	ConfigMapScanningFilters.SkipList = skipList
+}
+
 func validateFileExistence(filePath string) bool {
 	if _, err := os.Stat(filePath); errors.Is(err, os.ErrNotExist) {
 		return false

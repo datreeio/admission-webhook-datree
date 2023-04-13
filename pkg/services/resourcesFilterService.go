@@ -18,10 +18,6 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 		panic("admissionReviewReq is nil")
 	}
 
-	if shouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
-		return false
-	}
-
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	managedFields := rootObject.Metadata.ManagedFields
 
@@ -50,7 +46,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	return true
 }
 
-func shouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+func ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
 	namespace := admissionReviewReq.Request.Namespace
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	resourceName := rootObject.Metadata.Name

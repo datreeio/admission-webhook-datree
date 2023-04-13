@@ -25,7 +25,7 @@ func TestConfigMapScanningFiltersValidation(t *testing.T) {
 		admissionReviewReq.Request.Kind.Kind = "CronJob"
 		admissionReviewReq.Request.Namespace = "test-namespace"
 		rootObject.Metadata.Name = "test-name"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, true, ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because properties match the regexes in the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
@@ -34,7 +34,7 @@ func TestConfigMapScanningFiltersValidation(t *testing.T) {
 		admissionReviewReq.Request.Kind.Kind = "CronJobbb"
 		admissionReviewReq.Request.Namespace = "test-namespaceee"
 		rootObject.Metadata.Name = "test-nameee"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, true, ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be validated because kind non-skipped is not in the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
@@ -43,7 +43,7 @@ func TestConfigMapScanningFiltersValidation(t *testing.T) {
 		admissionReviewReq.Request.Kind.Kind = "non-skipped"
 		admissionReviewReq.Request.Namespace = "test-namespace"
 		rootObject.Metadata.Name = "test-name"
-		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, false, ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject))
 	})
 }
 
