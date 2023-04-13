@@ -8,18 +8,18 @@ replicaCount: 2
 customLabels: {}
 # Additional annotations to add to all resources.
 customAnnotations: {}
-# Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-skipList
+# Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
     # Create the ServiceAccount
     create: true
     # The ServiceAccount name
-    name: datree-webhook-skipList
+    name: datree-webhook-server
   clusterRole:
     # Create the ClusterRole
     create: true
     # The ClusterRole name
-    name: datree-webhook-skipList-cluster-role
+    name: datree-webhook-server-cluster-role
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
@@ -50,7 +50,7 @@ datree:
   customSkipList:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
-# The Datree webhook-skipList image to use.
+# The Datree webhook-server image to use.
 image:
   # Image repository
   repository: datree/admission-webhook
@@ -96,9 +96,9 @@ scanJob:
     #   memory: 256Mi
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
-# `datree-wait-skipList-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-skipList to be ready
+# `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-skipList to be ready
 hooks:
-  # The timeout time the hook will wait for the webhook-skipList is ready.
+  # The timeout time the hook will wait for the webhook-server is ready.
   timeoutTime:
   ttlSecondsAfterFinished:
   # The image for running kubectl commands
