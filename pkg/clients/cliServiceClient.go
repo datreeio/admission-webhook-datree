@@ -63,10 +63,10 @@ func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutCli
 }
 
 type ClusterEvaluationPrerunDataResponse struct {
-	cliClient.EvaluationPrerunDataResponse
-	ActivePolicy    string
-	ActionOnFailure enums.ActionOnFailure
-	IgnorePatterns  []string
+	cliClient.EvaluationPrerunDataResponse `json:",inline"`
+	ActivePolicy                           string                `json:"activePolicy"`
+	ActionOnFailure                        enums.ActionOnFailure `json:"actionOnFailure"`
+	IgnorePatterns                         []string              `json:"ignorePatterns"`
 }
 
 func (c *CliClient) RequestClusterEvaluationPrerunData(tokenId string, clusterUuid k8sTypes.UID) (*ClusterEvaluationPrerunDataResponse, error) {
