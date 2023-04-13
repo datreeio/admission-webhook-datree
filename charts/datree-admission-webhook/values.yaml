@@ -2,7 +2,7 @@
 
 # The name of the namespace all resources will be created in, if not specified in the release.
 namespace: ""
-# The number of Datree webhook-skipList replicas to deploy for the webhook.
+# The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
 # Additional labels to add to all resources.
 customLabels: {}
@@ -96,7 +96,7 @@ scanJob:
     #   memory: 256Mi
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
-# `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-skipList to be ready
+# `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
 hooks:
   # The timeout time the hook will wait for the webhook-server is ready.
   timeoutTime:
