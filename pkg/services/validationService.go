@@ -83,7 +83,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 
 	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
-		saveMetadataAndReturnAResponseForSkippedResource()
+		return saveMetadataAndReturnAResponseForSkippedResource()
 	}
 
 	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
@@ -101,7 +101,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 
 	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
-		saveMetadataAndReturnAResponseForSkippedResource()
+		return saveMetadataAndReturnAResponseForSkippedResource()
 	}
 
 	// convert default rules string into DefaultRulesDefinitions structure
