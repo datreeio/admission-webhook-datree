@@ -230,10 +230,40 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
 
-type ClusterRequestMetadataAggregator = map[string]*cliClient.ClusterRequestMetadata
+func (m *clusterRequestMetadataMap) Len() int {
+	return m.entriesCount
+}
+func (m *clusterRequestMetadataMap) ShouldSendBatchToServer() bool {
+	return m.entriesCount >= 500
+}
 
-var clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator)
-var clusterRequestMetadataMutex = sync.RWMutex{}
+func (m *clusterRequestMetadataMap) LoadOrStore(logJson string, clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	existingLog, loaded := m.clusterRequestMetadataAggregator.LoadOrStore(logJson, clusterRequestMetadata)
+	if loaded {
+		existingLog.(*cliClient.ClusterRequestMetadata).Occurrences++
+	} else {
+		m.entriesCount += 1
+	}
+}
+
+func (m *clusterRequestMetadataMap) Clear() {
+	m.clusterRequestMetadataAggregator = &sync.Map{}
+	m.entriesCount = 0
+}
+
+type clusterRequestMetadataMap struct {
+	entriesCount                     int
+	clusterRequestMetadataAggregator *sync.Map
+}
+
+func clusterRequestMetadataMapNew() *clusterRequestMetadataMap {
+	return &clusterRequestMetadataMap{
+		entriesCount:                     0,
+		clusterRequestMetadataAggregator: &sync.Map{},
+	}
+}
+
+var clusterRequestMetadataAggregatorMap = clusterRequestMetadataMapNew()
 
 func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
@@ -243,34 +273,23 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 		return
 	}
 	logJson := string(logJsonInBytes)
-	clusterRequestMetadataMutex.RLock()
-	currentValue := clusterRequestMetadataAggregator[logJson]
-	clusterRequestMetadataMutex.RUnlock()
-	if currentValue == nil {
-		clusterRequestMetadataMutex.Lock()
-		clusterRequestMetadataAggregator[logJson] = clusterRequestMetadata
-		clusterRequestMetadataMutex.Unlock()
-	} else {
-		currentValue.Occurrences++
-	}
+	clusterRequestMetadataAggregatorMap.LoadOrStore(logJson, clusterRequestMetadata)
 
-	if len(clusterRequestMetadataAggregator) >= 500 {
+	if clusterRequestMetadataAggregatorMap.ShouldSendBatchToServer() {
 		vs.SendMetadataInBatch()
 	}
 }
 
 func (vs *ValidationService) SendMetadataInBatch() {
-	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, len(clusterRequestMetadataAggregator))
-	clusterRequestMetadataMutex.RLock()
-	for _, value := range clusterRequestMetadataAggregator {
-		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value)
-	}
-	clusterRequestMetadataMutex.RUnlock()
+	clusterRequestMetadataArray := make([]*cliClient.ClusterRequestMetadata, 0, clusterRequestMetadataAggregatorMap.entriesCount)
+	clusterRequestMetadataAggregatorMap.clusterRequestMetadataAggregator.Range(func(key, value interface{}) bool {
+		clusterRequestMetadataArray = append(clusterRequestMetadataArray, value.(*cliClient.ClusterRequestMetadata))
+		return true
+	})
+
 	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
 
-	clusterRequestMetadataMutex.Lock()
-	clusterRequestMetadataAggregator = make(ClusterRequestMetadataAggregator) // clear the hash table
-	clusterRequestMetadataMutex.Unlock()
+	clusterRequestMetadataAggregatorMap.Clear()
 }
 
 func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
