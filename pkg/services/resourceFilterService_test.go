@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/datreeio/admission-webhook-datree/pkg/skipList"
+	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	"github.com/stretchr/testify/assert"
 	admission "k8s.io/api/admission/v1"
 )
@@ -16,7 +16,7 @@ import (
 var templateResource string
 
 func TestConfigMapScanningFiltersValidation(t *testing.T) {
-	skipList.ConfigMapScanningFilters.SkipList = []string{"test-namespace+;CronJob+;test-name+", "namespace;kind;name"}
+	server.ConfigMapScanningFilters.SkipList = []string{"test-namespace+;CronJob+;test-name+", "namespace;kind;name"}
 
 	t.Run("resource should be skipped because properties match the skip list", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
@@ -48,7 +48,7 @@ func TestConfigMapScanningFiltersValidation(t *testing.T) {
 }
 
 func TestPrerequisitesFilters(t *testing.T) {
-	skipList.ConfigMapScanningFilters.SkipList = []string{}
+	server.ConfigMapScanningFilters.SkipList = []string{}
 
 	t.Run("resource should be skipped because resource is deleted", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
@@ -77,7 +77,7 @@ func TestPrerequisitesFilters(t *testing.T) {
 }
 
 func TestWhiteListFilters(t *testing.T) {
-	skipList.ConfigMapScanningFilters.SkipList = []string{}
+	server.ConfigMapScanningFilters.SkipList = []string{}
 
 	t.Run("resource should be validated because it is managed by kubectl", func(t *testing.T) {
 		t.Run("kubectl-client-side-apply", func(t *testing.T) {
