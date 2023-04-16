@@ -96,6 +96,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetPolicyName(prerunData.ActivePolicy)
+		policyName = prerunData.ActivePolicy
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
 	}
