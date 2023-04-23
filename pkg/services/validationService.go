@@ -201,11 +201,16 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	if !vs.State.GetIsEnforceMode() {
 		allowed = true
+		baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
+		invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
 		if isFailedPolicyCheck {
-			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
-			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
 			*warningMessages = append([]string{
 				fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check", resourceName, resourceKind),
+				fmt.Sprintf("👉 Get the full report %s", invocationUrl),
+			}, *warningMessages...)
+		} else {
+			*warningMessages = append([]string{
+				fmt.Sprintf("✅ Object with name \"%s\" and kind \"%s\" passed Datree's policy check", resourceName, resourceKind),
 				fmt.Sprintf("👉 Get the full report %s", invocationUrl),
 			}, *warningMessages...)
 		}
