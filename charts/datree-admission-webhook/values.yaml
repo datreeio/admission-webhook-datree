@@ -28,20 +28,24 @@ datree:
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
     key: "" # Key within a given secret that contains the token (string)
-  # The name of the policy to check, e.g: staging. (string, optional)
-  policy:
   # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
   verbose:
   # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
   output:
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord:
-  # Block resources that fail the policy check. (boolean ,optional)
-  enforce:
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
   clusterName:
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
+  
+  # If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
+  # Affected configurations: policy, enforce, customSkipList.
+  configFromHelm: false
+  # The name of the policy to check, e.g: staging. (string, optional)
+  policy:
+  # Block resources that fail the policy check. (boolean ,optional)
+  enforce:
   # Excluded resources from policy checks. ("namespace;kind;name" ,optional)
   customSkipList:
     # Recommended resources to exclude from your policy checks.

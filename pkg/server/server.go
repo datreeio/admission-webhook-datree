@@ -16,7 +16,7 @@ type ConfigMapScanningFiltersType struct {
 
 var ConfigMapScanningFilters = ConfigMapScanningFiltersType{}
 
-func InitServerVars() error {
+func InitSkipList() error {
 	skipList, err := readConfigScanningFilters()
 
 	if err != nil {
@@ -25,6 +25,10 @@ func InitServerVars() error {
 
 	ConfigMapScanningFilters.SkipList = skipList
 	return nil
+}
+
+func OverrideSkipList(skipList []string) {
+	ConfigMapScanningFilters.SkipList = skipList
 }
 
 func validateFileExistence(filePath string) bool {

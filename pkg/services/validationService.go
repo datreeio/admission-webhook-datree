@@ -65,7 +65,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := vs.State.GetK8sVersion()
-	policyName := vs.State.GetPolicyName()
 	token := vs.State.GetToken()
 	if token == "" {
 		errorMessage := "no DATREE_TOKEN was found in env"
@@ -75,19 +74,33 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
-	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
+
+	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
-	prerunData, err := vs.CliServiceClient.RequestEvaluationPrerunData(token)
+	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
+		return saveMetadataAndReturnAResponseForSkippedResource()
+	}
+
+	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
 	if err != nil {
 		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 
 		prerunWarningMsg := "Datree failed to run policy check - an error occurred when pulling your policy"
 		*warningMessages = append(*warningMessages, prerunWarningMsg)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
+	}
+	if !vs.State.GetConfigFromHelm() {
+		vs.State.SetPolicyName(prerunData.ActivePolicy)
+		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
+		server.OverrideSkipList(prerunData.IgnorePatterns)
+	}
+
+	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
+		return saveMetadataAndReturnAResponseForSkippedResource()
 	}
 
 	// convert default rules string into DefaultRulesDefinitions structure
@@ -101,7 +114,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
+	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, vs.State.GetPolicyName(), prerunData.RegistrationURL, defaultRules, false)
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
 		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
@@ -110,11 +123,11 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 		for _, policy := range prerunData.PoliciesJson.Policies {
 			if policy.IsDefault {
-				policyName = policy.Name
+				vs.State.SetPolicyName(policy.Name)
 			}
 		}
 
-		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
+		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, vs.State.GetPolicyName(), prerunData.RegistrationURL, defaultRules, false)
 		if err != nil {
 			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
 			*warningMessages = append(*warningMessages, err.Error())

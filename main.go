@@ -81,7 +81,7 @@ func start(port string) {
 	state.SetClusterUuid(clusterUuid)
 	state.SetK8sVersion(k8sVersion)
 
-	server.InitServerVars()
+	server.InitSkipList()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
 		panic(err)

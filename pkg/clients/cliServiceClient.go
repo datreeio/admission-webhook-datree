@@ -62,30 +62,45 @@ func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutCli
 	}
 }
 
-func (c *CliClient) RequestEvaluationPrerunData(tokenId string) (*cliClient.EvaluationPrerunDataResponse, error) {
+type ClusterEvaluationPrerunDataResponse struct {
+	cliClient.EvaluationPrerunDataResponse `json:",inline"`
+	ActivePolicy                           string                `json:"activePolicy"`
+	ActionOnFailure                        enums.ActionOnFailure `json:"actionOnFailure"`
+	IgnorePatterns                         []string              `json:"ignorePatterns"`
+}
+
+func (c *CliClient) RequestClusterEvaluationPrerunData(tokenId string, clusterUuid k8sTypes.UID) (*ClusterEvaluationPrerunDataResponse, error) {
 	if c.networkValidator.IsLocalMode() {
-		return &cliClient.EvaluationPrerunDataResponse{IsPolicyAsCodeMode: true}, nil
+		return &ClusterEvaluationPrerunDataResponse{
+			EvaluationPrerunDataResponse: cliClient.EvaluationPrerunDataResponse{
+				IsPolicyAsCodeMode: true,
+			},
+		}, nil
 	}
 
-	res, err := c.httpClient.Request(http.MethodGet, "/cli/evaluation/policyCheck/tokens/"+tokenId+"/prerun?", nil, c.flagsHeaders)
+	res, err := c.httpClient.Request(http.MethodGet, "/cli/evaluation/policyCheck/tokens/"+tokenId+"/clusters/"+string(clusterUuid)+"/prerun?", nil, c.flagsHeaders)
 
 	if err != nil {
 		networkErr := c.networkValidator.IdentifyNetworkError(err)
 		if networkErr != nil {
-			return &cliClient.EvaluationPrerunDataResponse{}, networkErr
+			return &ClusterEvaluationPrerunDataResponse{}, networkErr
 		}
 
 		if c.networkValidator.IsLocalMode() {
-			return &cliClient.EvaluationPrerunDataResponse{IsPolicyAsCodeMode: true}, nil
+			return &ClusterEvaluationPrerunDataResponse{EvaluationPrerunDataResponse: cliClient.EvaluationPrerunDataResponse{
+				IsPolicyAsCodeMode: true,
+			}}, nil
 		}
 
-		return &cliClient.EvaluationPrerunDataResponse{}, err
+		return &ClusterEvaluationPrerunDataResponse{}, err
 	}
 
-	var evaluationPrerunDataResponse = &cliClient.EvaluationPrerunDataResponse{IsPolicyAsCodeMode: true}
+	var evaluationPrerunDataResponse = &ClusterEvaluationPrerunDataResponse{EvaluationPrerunDataResponse: cliClient.EvaluationPrerunDataResponse{
+		IsPolicyAsCodeMode: true,
+	}}
 	err = json.Unmarshal(res.Body, &evaluationPrerunDataResponse)
 	if err != nil {
-		return &cliClient.EvaluationPrerunDataResponse{}, err
+		return &ClusterEvaluationPrerunDataResponse{}, err
 	}
 
 	return evaluationPrerunDataResponse, nil
