@@ -93,6 +93,8 @@ clusterScanner:
       create: true
       # The ClusterRole name
       name: cluster-scanner-role
+    clusterRoleBinding:
+      name: cluster-scanner-role-binding
   image:
     # Image repository
     repository: datree/cluster-scanner

@@ -38,7 +38,7 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: {{.Values.clusterScanner.rbac.clusterRole.name}} 
+  name: {{.Values.clusterScanner.rbac.clusterRoleBinding.name}} #cluster-scanner-role-binding
   labels: {{include "datree.labels" . | nindent 4}}
   {{- with .Values.customAnnotations }}
   annotations: {{ toYaml . | nindent 4 }}
