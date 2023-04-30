@@ -1,0 +1,149 @@
+{{- if .Values.clusterScanner.rbac.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{.Values.clusterScanner.rbac.serviceAccount.name}}
+  labels: {{ include "datree.labels" . | nindent 4 }}
+  namespace: {{ template "datree.namespace" . }}
+  {{- with .Values.customAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+{{- end}}
+
+
+---
+{{- if .Values.clusterScanner.rbac.clusterRole.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{.Values.clusterScanner.rbac.clusterRole.name}}
+  labels: {{ include "datree.labels" . | nindent 4 }}
+  {{- with .Values.customAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+rules:
+  - apiGroups:
+      - "*"
+    resources:
+      - "*"
+    verbs:
+      - "get"
+      - "list"
+      - "watch"
+{{- end}}
+
+
+---
+{{- if .Values.clusterScanner.rbac.clusterRole.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{.Values.clusterScanner.rbac.clusterRole.name}} 
+  labels: {{include "datree.labels" . | nindent 4}}
+  {{- with .Values.customAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{.Values.clusterScanner.rbac.clusterRole.name}} #  cluster-scanner-role
+subjects:
+  - kind: ServiceAccount
+    name: {{.Values.clusterScanner.rbac.serviceAccount.name}} # cluster-scanner-service-account
+    namespace: {{template "datree.namespace" .}}
+{{- end}}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datree-cluster-scanner-server
+  namespace: {{ template "datree.namespace" . }}
+  labels: {{ include "datree.labels" . | nindent 4 }}
+    owner: datree
+    app: "datree-cluster-scanner-server"
+  {{- with .Values.customAnnotations }}
+  annotations: {{ toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+      app: "datree-cluster-scanner-server"
+  template:
+    metadata:
+      labels: {{ include "datree.labels" . | nindent 8 }}
+        app: "datree-cluster-scanner-server"
+      {{- with .Values.customAnnotations }}
+      annotations: {{ toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      {{- if .Values.nodeSelector }}
+      nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity: {{ toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.tolerations }}
+      tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{.Values.clusterScanner.rbac.serviceAccount.name}}
+      containers:
+        - name: cluster-scanner-server
+          env:
+            - name: CLUSTER_NAME
+              value: {{.Values.datree.clusterName}}
+            - name: DATREE_TOKEN
+            {{- if and .Values.datree.existingSecret (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.key "") }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.datree.existingSecret.name }}
+                  key: {{ .Values.datree.existingSecret.key }}
+            {{- else }}
+              value: "{{ .Values.datree.token }}"
+            {{- end }}
+            - name: DATREE_POLICY
+              value: {{.Values.datree.policy | default "Starter"}}
+            - name: DATREE_NAMESPACE
+              value: {{template "datree.namespace" .}}
+            - name: SCAN_INTERVAL_HOURS
+              value: "0 */{{ .Values.datree.scanIntervalHours | default 1 }} * * *"
+          securityContext:
+            {{- with .Values.securityContext }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8444
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8444
+              scheme: HTTPS
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "latest" }}"
+          imagePullPolicy: "{{.Values.clusterScanner.image.pullPolicy}}"
+          resources: {{- toYaml .Values.clusterScanner.resources | nindent 12 }}
+          ports:
+            - containerPort: 8444
+              name: scanner-api
+          volumeMounts:
+            - name: webhook-config
+              mountPath: /config
+              readOnly: true
+      volumes:
+        - name: webhook-config
+          projected:
+            sources:
+            - configMap:
+                name: custom-scanning-filters
+                optional: true
+            - configMap:
+                name: webhook-scanning-filters
+                optional: true
+
