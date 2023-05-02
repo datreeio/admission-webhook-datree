@@ -102,6 +102,8 @@ spec:
             {{- else }}
               value: "{{ .Values.datree.token }}"
             {{- end }}
+            - name: DATREE_ENFORCE
+              value: "{{.Values.datree.enforce}}"   
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
             - name: DATREE_NAMESPACE
