@@ -66,7 +66,7 @@ spec:
             {{- end }}
             seccompProfile:
               type: RuntimeDefault
-          image: "{{ .Values.scanJob.image.repository }}:{{ .Values.scanJob.image.tag | default "0.0.23" }}"
+          image: "{{ .Values.scanJob.image.repository }}:{{ .Values.scanJob.image.tag | default "0.0.24" }}"
           imagePullPolicy: "{{.Values.scanJob.image.pullPolicy}}"
           resources: {{- toYaml .Values.scanJob.resources | nindent 12 }}
           volumeMounts:
