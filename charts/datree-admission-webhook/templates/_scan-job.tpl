@@ -54,6 +54,8 @@ spec:
               value: {{.Values.datree.policy | default "Starter"}}
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName}}
+            - name: DATREE_ENFORCE
+              value: "{{.Values.datree.enforce}}"            
             - name: DATREE_CONFIG_FROM_HELM
               value: "{{.Values.datree.configFromHelm | default false }}"
             - name: DATREE_NAMESPACE
