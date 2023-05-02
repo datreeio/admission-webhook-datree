@@ -109,7 +109,7 @@ spec:
             - name: DATREE_NAMESPACE
               value: {{template "datree.namespace" .}}
             - name: SCAN_INTERVAL_HOURS
-              value: {{ .Values.datree.scanIntervalHours | default 1 }}
+              value: "{{ .Values.datree.scanIntervalHours | default 1 }}"
           securityContext:
             {{- with .Values.securityContext }}
             {{ toYaml . | nindent 12 }}
