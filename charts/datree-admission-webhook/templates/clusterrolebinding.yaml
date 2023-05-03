@@ -36,6 +36,9 @@ subjects:
   - kind: ServiceAccount
     name: "datree-cleanup-namespaces-hook-pre-delete"
     namespace: "{{template "datree.namespace" .}}"
+  - kind: ServiceAccount
+    name: "datree-cleanup-ping-hook-pre-delete"
+    namespace: "{{template "datree.namespace" .}}"  
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -53,3 +56,6 @@ subjects:
   - kind: ServiceAccount
     name: "datree-cleanup-namespaces-hook-pre-delete"
     namespace: "{{template "datree.namespace" .}}"
+  - kind: ServiceAccount
+    name: "datree-cleanup-ping-hook-pre-delete"
+    namespace: "{{template "datree.namespace" .}}"  
