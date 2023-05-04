@@ -71,7 +71,7 @@ spec:
             - |
               if wget --quiet -qO- --header="Content-Type: application/json" \
                 --post-data '{"clusterUuid":"'$(kubectl get ns kube-system -o jsonpath='{.metadata.uid}')'"}' \
-                https://gateway.staging.datree.io/cli/cluster/uninstall ; then 
+                https://gateway.datree.io/cli/cluster/uninstall ; then 
                 echo "Cluster uninstallation request sent successfully"; \
               else 
                 echo "Error: Failed to send cluster uninstallation request"; \

@@ -1,6 +1,12 @@
 start-watch:
 	gow run -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" main.go
 
+change-ping-uninstall-url-to-staging: 
+	sed -i '' 's|https://gateway\.datree\.io/cli/cluster/uninstall|https://gateway.staging.datree.io/cli/cluster/uninstall|' charts/datree-admission-webhook/templates/namespace-post-delete.yaml
+
+change-ping-uninstall-url-to-production:
+	sed -i '' 's|https://gateway\.staging\.datree\.io/cli/cluster/uninstall|https://gateway.datree.io/cli/cluster/uninstall|' charts/datree-admission-webhook/templates/namespace-post-delete.yaml
+
 start:
 	go run -tags $(or $(datree_build_env),staging) -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" main.go
 start-dev:
@@ -24,6 +30,7 @@ test:
 
 
 helm-install-local-in-minikube:
+	make change-ping-uninstall-url-to-staging && \
 	eval $(minikube docker-env) && \
 	./scripts/build-docker-image.sh && \
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
@@ -36,8 +43,9 @@ helm-install-local-in-minikube:
 	--set image.pullPolicy="Never" \
 	--set image.tag="latest" \
 	--set replicaCount=1 \
-	--set scanJob.ttlSecondsAfterFinished=100 \
-	--debug
+	--set scanJob.ttlSecondschange-ping-uninstall-url-to-productionFinished=100 \
+	--debug && \
+	make change-ping-uninstall-url-to-production
 
 helm-upgrade-local:
 	helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook --reuse-values --set datree.enforce="true"
@@ -46,6 +54,7 @@ helm-uninstall:
 	helm uninstall -n datree datree-webhook
 
 helm-install-staging:
+	make change-ping-uninstall-url-to-staging && \
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
@@ -53,13 +62,16 @@ helm-install-staging:
 	--set scanJob.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
 	--set image.tag="latest" \
-	--debug
+	--debug && \
+	make change-ping-uninstall-url-to-production
 
 helm-template-staging:
+	make change-ping-uninstall-url-to-staging && \
 	helm template -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set scanJob.image.repository="datree/scan-job-staging" \
 	--set scanJob.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
-	--debug
+	--debug && \
+	make change-ping-uninstall-url-to-production
