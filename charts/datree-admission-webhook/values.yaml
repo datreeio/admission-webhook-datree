@@ -24,7 +24,7 @@ datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
   token: <DATREE_TOKEN>
-  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored. 
+  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
     key: "" # Key within a given secret that contains the token (string)
@@ -38,7 +38,7 @@ datree:
   clusterName:
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
-  
+
   # If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
   # Affected configurations: policy, enforce, customSkipList.
   configFromHelm: false
@@ -55,7 +55,7 @@ image:
   # Image repository
   repository: datree/admission-webhook
   # Image tag
-  tag: 
+  tag:
   # Image pull policy
   pullPolicy: Always
 # Security context for the containers
@@ -78,13 +78,26 @@ resources: {}
 nodeSelector: {}
 affinity: {}
 tolerations: []
-scanJob:
-  ttlSecondsAfterFinished: 1
+clusterScanner:
   resources: {}
   annotations: {}
+  # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
+  rbac:
+    serviceAccount:
+      # Create the ServiceAccount
+      create: true
+      # The ServiceAccount name
+      name: cluster-scanner-service-account
+    clusterRole:
+      # Create the ClusterRole
+      create: true
+      # The ClusterRole name
+      name: cluster-scanner-role
+    clusterRoleBinding:
+      name: cluster-scanner-role-binding
   image:
     # Image repository
-    repository: datree/scan-job
+    repository: datree/cluster-scanner
     pullPolicy: Always
     # Image tag
     tag:
