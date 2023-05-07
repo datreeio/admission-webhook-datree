@@ -110,6 +110,8 @@ spec:
               value: {{template "datree.namespace" .}}
             - name: SCAN_INTERVAL_HOURS
               value: "{{ .Values.datree.scanIntervalHours | default 1 }}"
+            - name: DATREE_CONFIG_FROM_HELM
+              value: "{{.Values.datree.configFromHelm | default false }}"
           securityContext:
             {{- with .Values.securityContext }}
             {{ toYaml . | nindent 12 }}
