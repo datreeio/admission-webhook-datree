@@ -49,6 +49,11 @@
           "title": "The configFromHelm Schema",
           "type": "boolean",
           "default": false
+        },
+        "policy": {
+          "title": "The policy Schema",
+          "type": "string",
+          "default": ""
         }
       }
     },
@@ -74,6 +79,7 @@
         "pullPolicy": {
           "title": "The pullPolicy Schema",
           "type": "string",
+          "enum": ["Always", "Never", "IfNotPresent"],
           "default": ""
         }
       }
@@ -102,6 +108,7 @@
             "pullPolicy": {
               "title": "The pullPolicy Schema",
               "type": "string",
+              "enum": ["Always", "Never", "IfNotPresent"],
               "default": ""
             },
             "tag": {
@@ -123,6 +130,7 @@
         "failurePolicy": {
           "title": "The failurePolicy Schema",
           "type": "string",
+          "enum": ["Ignore", "Fail"],
           "default": ""
         }
       }
