@@ -58,6 +58,7 @@ helm-install-staging:
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
+	--set datree.clusterName="minikube" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
 	--set clusterScanner.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
@@ -70,8 +71,10 @@ helm-template-staging:
 	helm template -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
+	--set datree.clusterName="minikube" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
 	--set clusterScanner.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
+	--set image.tag="latest" \
 	--debug && \
 	make change-ping-uninstall-url-to-production
