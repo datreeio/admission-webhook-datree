@@ -38,7 +38,7 @@
         "clusterName": {
           "title": "The clusterName Schema",
           "type": "string",
-          "default": null
+          "default": ""
         },
         "scanIntervalHours": {
           "title": "The scanIntervalHours Schema",
@@ -69,7 +69,7 @@
         "tag": {
           "title": "The tag Schema",
           "type": "string",
-          "default": null
+          "default": ""
         },
         "pullPolicy": {
           "title": "The pullPolicy Schema",
@@ -107,7 +107,7 @@
             "tag": {
               "title": "The tag Schema",
               "type": "string",
-              "default": null
+              "default": ""
             }
           }
         }
