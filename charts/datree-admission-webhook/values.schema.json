@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "required": [
+    "namespace",
+    "replicaCount",
+    "datree",
+    "image",
+    "clusterScanner",
+    "validatingWebhookConfiguration"
+  ],
+  "properties": {
+    "namespace": {
+      "title": "The namespace Schema",
+      "type": "string",
+      "default": ""
+    },
+    "replicaCount": {
+      "title": "The replicaCount Schema",
+      "type": "integer",
+      "default": 2
+    },
+    "datree": {
+      "title": "The datree Schema",
+      "type": "object",
+      "required": [
+        "token",
+        "clusterName",
+        "scanIntervalHours",
+        "configFromHelm"
+      ],
+      "properties": {
+        "token": {
+          "title": "The token Schema",
+          "type": "string",
+          "default": ""
+        },
+        "clusterName": {
+          "title": "The clusterName Schema",
+          "type": "string",
+          "default": ""
+        },
+        "scanIntervalHours": {
+          "title": "The scanIntervalHours Schema",
+          "type": "integer",
+          "default": 1
+        },
+        "configFromHelm": {
+          "title": "The configFromHelm Schema",
+          "type": "boolean",
+          "default": false
+        },
+        "policy": {
+          "title": "The policy Schema",
+          "type": "string",
+          "default": ""
+        }
+      }
+    },
+    "image": {
+      "title": "The image Schema",
+      "type": "object",
+      "required": [
+        "repository",
+        "tag",
+        "pullPolicy"
+      ],
+      "properties": {
+        "repository": {
+          "title": "The repository Schema",
+          "type": "string",
+          "default": ""
+        },
+        "tag": {
+          "title": "The tag Schema",
+          "type": "string",
+          "default": ""
+        },
+        "pullPolicy": {
+          "title": "The pullPolicy Schema",
+          "type": "string",
+          "enum": ["Always", "Never", "IfNotPresent"],
+          "default": ""
+        }
+      }
+    },
+    "clusterScanner": {
+      "title": "The clusterScanner Schema",
+      "type": "object",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "image": {
+          "title": "The image Schema",
+          "type": "object",
+          "required": [
+            "repository",
+            "pullPolicy",
+            "tag"
+          ],
+          "properties": {
+            "repository": {
+              "title": "The repository Schema",
+              "type": "string",
+              "default": ""
+            },
+            "pullPolicy": {
+              "title": "The pullPolicy Schema",
+              "type": "string",
+              "enum": ["Always", "Never", "IfNotPresent"],
+              "default": ""
+            },
+            "tag": {
+              "title": "The tag Schema",
+              "type": "string",
+              "default": ""
+            }
+          }
+        }
+      }
+    },
+    "validatingWebhookConfiguration": {
+      "title": "The validatingWebhookConfiguration Schema",
+      "type": "object",
+      "required": [
+        "failurePolicy"
+      ],
+      "properties": {
+        "failurePolicy": {
+          "title": "The failurePolicy Schema",
+          "type": "string",
+          "enum": ["Ignore", "Fail"],
+          "default": ""
+        }
+      }
+    }
+  }
+}
