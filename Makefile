@@ -72,7 +72,7 @@ helm-template-staging:
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set datree.clusterName="minikube" \
-	--set datree.policy="minikube" \
+	--set datree.policy="Starter" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
 	--set clusterScanner.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
