@@ -1,6 +1,3 @@
-# for autocompletion in VS Code
-# yaml-language-server: $schema=https://github.com/datreeio/admission-webhook-datree/blob/main/charts/datree-admission-webhook/values.schema.json
-
 # Default values for datree-admission-webhook.
 
 # The name of the namespace all resources will be created in, if not specified in the release.
@@ -124,3 +121,6 @@ hooks:
     pullPolicy: IfNotPresent
 validatingWebhookConfiguration:
   failurePolicy: Ignore
+
+# for autocompletion in VS Code
+# yaml-language-server: $schema=https://github.com/datreeio/admission-webhook-datree/blob/main/charts/datree-admission-webhook/values.schema.json
