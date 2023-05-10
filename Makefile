@@ -37,6 +37,7 @@ helm-install-local-in-minikube:
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set datree.clusterName="minikube" \
+	--set datree.policy="Starter" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
 	--set clusterScanner.image.tag="latest" \
 	--set image.repository="webhook-server" \
@@ -59,6 +60,7 @@ helm-install-staging:
 	--create-namespace \
 	--set datree.token="${DATREE_TOKEN}" \
 	--set datree.clusterName="minikube" \
+	--set datree.policy="Starter" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
 	--set clusterScanner.image.tag="latest" \
 	--set image.repository="datree/webhook-staging" \
