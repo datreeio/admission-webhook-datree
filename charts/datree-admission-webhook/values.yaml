@@ -5,9 +5,9 @@ namespace: ""
 # The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
 # Additional labels to add to all resources.
-customLabels: {}
+customLabels: { }
 # Additional annotations to add to all resources.
-customAnnotations: {}
+customAnnotations: { }
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
@@ -23,7 +23,7 @@ rbac:
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
-  token: <DATREE_TOKEN>
+  token:
   # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
@@ -65,22 +65,22 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 25000
   capabilities:
-    drop: ["ALL"]
+    drop: [ "ALL" ]
   seccompProfile:
     type: RuntimeDefault
-resources: {}
+resources: { }
 # limits:
 #   cpu: 200m
 #   memory: 256Mi
 # requests:
 #   cpu: 200m
 #   memory: 48Mi
-nodeSelector: {}
-affinity: {}
-tolerations: []
+nodeSelector: { }
+affinity: { }
+tolerations: [ ]
 clusterScanner:
-  resources: {}
-  annotations: {}
+  resources: { }
+  annotations: { }
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
   rbac:
     serviceAccount:

@@ -32,12 +32,11 @@
       "properties": {
         "token": {
           "title": "The token Schema",
-          "type": "string",
-          "default": ""
+          "type": "string"
         },
         "clusterName": {
           "title": "The clusterName Schema",
-          "type": "string",
+          "type": ["string", "null"],
           "default": ""
         },
         "scanIntervalHours": {
@@ -52,7 +51,7 @@
         },
         "policy": {
           "title": "The policy Schema",
-          "type": "string",
+          "type": ["string", "null"],
           "default": ""
         }
       }
@@ -62,7 +61,6 @@
       "type": "object",
       "required": [
         "repository",
-        "tag",
         "pullPolicy"
       ],
       "properties": {
@@ -73,7 +71,7 @@
         },
         "tag": {
           "title": "The tag Schema",
-          "type": "string",
+          "type": ["string", "null"],
           "default": ""
         },
         "pullPolicy": {
@@ -96,8 +94,7 @@
           "type": "object",
           "required": [
             "repository",
-            "pullPolicy",
-            "tag"
+            "pullPolicy"
           ],
           "properties": {
             "repository": {
@@ -113,7 +110,7 @@
             },
             "tag": {
               "title": "The tag Schema",
-              "type": "string",
+              "type": ["string", "null"],
               "default": ""
             }
           }
