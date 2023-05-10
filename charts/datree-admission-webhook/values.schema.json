@@ -32,8 +32,7 @@
       "properties": {
         "token": {
           "title": "The token Schema",
-          "type": "string",
-          "default": ""
+          "type": "string"
         },
         "clusterName": {
           "title": "The clusterName Schema",
