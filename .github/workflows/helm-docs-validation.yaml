@@ -12,11 +12,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      
+      - name: Install helm-docs
+        run: |
+          curl -LO https://github.com/norwoodj/helm-docs/releases/download/v1.5.0/helm-docs_1.5.0_linux_amd64.tar.gz
+          tar -xvf helm-docs_1.5.0_linux_amd64.tar.gz
+          sudo mv helm-docs /usr/local/bin/
 
       - name: Generate Helm Docs
-        uses: docker://jnorwood/helm-docs:latest
-#        run: ls -la
-#        run: sh ci/helm-docs.sh
+        run: make generate-helm-docs
 
       - name: Check for file changes
         run: |
