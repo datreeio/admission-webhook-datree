@@ -4,7 +4,7 @@
 # Default values for datree-admission-webhook.
 
 # The name of the namespace all resources will be created in, if not specified in the release.
-namespace2345: ""
+namespace: ""
 # The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
 # Additional labels to add to all resources.
