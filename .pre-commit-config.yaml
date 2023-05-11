@@ -1,9 +1,0 @@
-repos:
-  - repo: https://github.com/norwoodj/helm-docs
-    rev: v1.2.0
-    hooks:
-      - id: helm-docs
-        args:
-          - --sort-values-order=file
-          - --output-file=./README.md
-          - --template-files=./charts/datree-admission-webhook/README.md.gotmpl
