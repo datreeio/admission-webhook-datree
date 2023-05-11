@@ -7,8 +7,6 @@ on:
 jobs:
   helm_docs_validation:
     runs-on: ubuntu-latest
-    container:
-      image: jnorwood/helm-docs:v1.11.0
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
