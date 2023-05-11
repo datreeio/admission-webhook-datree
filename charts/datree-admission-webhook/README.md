@@ -44,7 +44,7 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| namespace | string | `""` |  |
+| namespace234 | string | `""` |  |
 | replicaCount | int | `2` |  |
 | customLabels | object | `{}` |  |
 | customAnnotations | object | `{}` |  |
