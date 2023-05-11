@@ -3,7 +3,7 @@
 <p align="center">
 <img src="https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png" width="80%" />
 </p>
-  
+
 # Overview
 Datree offers cluster integration that allows you to validate your resources against your configured policy upon pushing them into a cluster, by using an admission webhook.
 
