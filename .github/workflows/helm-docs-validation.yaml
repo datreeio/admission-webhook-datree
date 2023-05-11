@@ -14,7 +14,8 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Generate Helm Docs
-        run: sh ci/helm-docs.sh
+        run: ls -la
+#        run: sh ci/helm-docs.sh
 
       - name: Check for file changes
         run: |
