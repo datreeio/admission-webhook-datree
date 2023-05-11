@@ -82,12 +82,11 @@ helm-template-staging:
 	--debug && \
 	make change-ping-uninstall-url-to-production
 
-g1enerate-helm-file:
+generate-helm-docs:
 	helm-docs --sort-values-order=file \
 	--output-file ./README.md \
-	--template-files=./charts/datree-admission-webhook/templates/README.md.gotmpl
-
-g2enerate-helm-file:
+	--template-files=./charts/datree-admission-webhook/templates/README.md.gotmpl \
+	&& \
 	helm-docs --sort-values-order=file \
 	--output-file ../../README.md \
 	--template-files=./README.md.gotmpl
