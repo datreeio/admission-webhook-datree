@@ -23,6 +23,6 @@ jobs:
       - name: Check for file changes
         run: |
           if [ -n "$(git diff)" ]; then
-            echo "::error::helm-docs-validation failed, did you forget to run 'make generate-helm-docs'?"
+            echo "::error::helm-docs-validation failed, did you forget to run \"make generate-helm-docs\"'?"
             exit 1
           fi
