@@ -86,7 +86,7 @@ generate-helm-docs:
 	helm-docs \
 	--sort-values-order=file \
 	--output-file ./README.md \
-	--template-files=./charts/datree-admission-webhook/templates/README.md.gotmpl \
+	--template-files=./charts/datree-admission-webhook/README.md.gotmpl \
 	&& \
 	helm-docs \
 	--sort-values-order=file \
