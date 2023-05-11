@@ -3,7 +3,7 @@
 <p align="center">
 <img src="https://github.com/datreeio/admission-webhook-datree/blob/main/internal/images/diagram.png" width="80%" />
 </p>
-  
+ 
 # Overview
 Datree offers cluster integration that allows you to validate your resources against your configured policy upon pushing them into a cluster, by using an admission webhook.
 
@@ -15,37 +15,56 @@ The webhook will catch **create**, **apply** and **edit** operations and initiat
 
 The following table lists the configurable parameters of the Datree chart and their default values.
 
-| Parameter                              | Description                                                                                                                                                                  | Default                                                                                                                                   |
-| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| namespace                              | The name of the namespace all resources will be created in.                                                                                                                  | datree                                                                                                                                    |
-| replicaCount                           | The number of Datree webhook-server replicas to deploy for the webhook.                                                                                                      | 2                                                                                                                                         |
-| customLabels                           | Additional labels for Datree webhook-server pods.                                                                                                                            | {}                                                                                                                                        |
-| customAnnotations                      | Additional annotations to add to all resources.                                                                                                                              | {}                                                                                                                                        |
-| rbac.serviceAccount.create             | Create a ServiceAccount                                                                                                                                                      | true                                                                                                                                      |
-| rbac.serviceAccount.name               | The ServiceAccount name                                                                                                                                                      | webhook-server-datree                                                                                                                     |
-| rbac.clusterRole.create                | Create a ClusterRole                                                                                                                                                         | true                                                                                                                                      |
-| rbac.clusterRole.name                  | The ClusterRole name                                                                                                                                                         | webhook-server-datree                                                                                                                     |
-| image.repository                       | Image repository.                                                                                                                                                            | datree/admission-webhook                                                                                                                  |
-| image.tag                              | The image release tag to use.                                                                                                                                                | Defaults to Chart appVersion                                                                                                              |
-| image.pullPolicy                       | Image pull policy                                                                                                                                                            | Always                                                                                                                                    |
-| securityContext                        | Security context applied on the container.                                                                                                                                   | {"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true, "runAsNonRoot":true, "runAsUser":25000}                                  |
-| resources                              | The resource request/limits for the container image.                                                                                                                         | limits :cpu: 1000m, memory: 512Mi requests: cpu:100m, memory:256Mi                                                                        |
-| datree.token                           | The token used to link the CLI to your dashboard. (required)                                                                                                                 | nil                                                                                                                                       |
-| datree.clusterName                     | The name of the cluster link for cluster name in your dashboard                                                                                                              | cluster uuid                                                                                                                              |
-| datree.verbose                         | Display 'How to Fix' link for failed rules in output. (optional)                                                                                                             | false                                                                                                                                     |
-| datree.output                          | The format output of the policy check results: yaml, json, xml, simple, JUnit. (optional)                                                                                    | "" (i.e beautiful😊)                                                                                                                      |
-| datree.noRecord                        | Don’t send policy checks metadata to the backend. (optional)                                                                                                                 | false                                                                                                                                     |
-| datree.configFromHelm                  | If false, the webhook will be configured from the dashboard, otherwise it will be configured from here. Affected configurations: policy, enforce, customSkipList. (optional) | true                                                                                                                                      |
-| datree.policy                          | The name of the policy to check, e.g: staging. (optional)                                                                                                                    | "" (i.e "Starter")                                                                                                                        |
-| datree.enforce                         | Block resources that fail the policy check. (optional)                                                                                                                       | false                                                                                                                                     |
-| datree.customSkipList                  | The Recommended resources to exclude from your policy checks. (optional)                                                                                                     | [ "(.\*);(.\*);(^aws-node.*)" ]                                                                                                           |
-| hooks.waitForServerRollout.sleepyTime  | The waiting time before the webhook-server is ready to receive requests.                                                                                                     | nil                                                                                                                                       |
-| hooks.waitForServerRollout.image       | An image for running sleep command                                                                                                                                           | {"repository": "alpine", "sha":"sha256:1304f174557314a7ed9eddb4eab12fed12cb0cd9809e4c28f29af86979a3c870", "pullPolicy":"Always"}          |
-| hooks.labelNamespace.image.            | An image for running kubectl label command                                                                                                                                   | {"repository": "bitnami/kubectl", "sha":"sha256:d3c17f1dc6e665dcc78e8c14a83ae630bc3d65b07ea11c5f1a012c2c6786d039", "pullPolicy":"Always"} |
-| nodeSelector                           | Used to select on which node a pod is scheduled to run                                                                                                                       | nil                                                                                                                                       |
-| affinity                               | Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes                                                                           | nil                                                                                                                                       |
-| hooks.timeoutTime                      | Automatic Clean-up for Finished Jobs                                                                                                                                         | 1                                                                                                                                         |
-| clusterScanner.rbac.serviceAccount     | Create service Account for the scanner                                                                                                                                       | cluster-scanner-service-account                                                                                                           |
-| clusterScanner.rbac.clusterRole        | Create service Role for the scanner                                                                                                                                          | cluster-scanner-role                                                                                                                      |
-| clusterScanner.rbac.clusterRoleBinding | Create service RoleBinding for the scanner                                                                                                                                   | cluster-scanner-role-binding                                                                                                              |
-| clusterScanner.image.repository        | Image repository for scanner                                                                                                                                                 | datree/cluster-scanner                                                                                                                    |
+## Values
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| namespace | string | `""` |  |
+| replicaCount | int | `2` |  |
+| customLabels | object | `{}` |  |
+| customAnnotations | object | `{}` |  |
+| rbac.serviceAccount.create | bool | `true` |  |
+| rbac.serviceAccount.name | string | `"datree-webhook-server"` |  |
+| rbac.clusterRole.create | bool | `true` |  |
+| rbac.clusterRole.name | string | `"datree-webhook-server-cluster-role"` |  |
+| datree.token | string | `nil` |  |
+| datree.existingSecret.name | string | `""` |  |
+| datree.existingSecret.key | string | `""` |  |
+| datree.verbose | string | `nil` |  |
+| datree.output | string | `nil` |  |
+| datree.noRecord | string | `nil` |  |
+| datree.clusterName | string | `nil` |  |
+| datree.scanIntervalHours | int | `1` |  |
+| datree.configFromHelm | bool | `false` |  |
+| datree.policy | string | `nil` |  |
+| datree.enforce | string | `nil` |  |
+| datree.customSkipList[0] | string | `"(.*);(.*);(^aws-node.*)"` |  |
+| image.repository | string | `"datree/admission-webhook"` |  |
+| image.tag | string | `nil` |  |
+| image.pullPolicy | string | `"Always"` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `25000` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| resources | object | `{}` |  |
+| nodeSelector | object | `{}` |  |
+| affinity | object | `{}` |  |
+| tolerations | list | `[]` |  |
+| clusterScanner.resources | object | `{}` |  |
+| clusterScanner.annotations | object | `{}` |  |
+| clusterScanner.rbac.serviceAccount.create | bool | `true` |  |
+| clusterScanner.rbac.serviceAccount.name | string | `"cluster-scanner-service-account"` |  |
+| clusterScanner.rbac.clusterRole.create | bool | `true` |  |
+| clusterScanner.rbac.clusterRole.name | string | `"cluster-scanner-role"` |  |
+| clusterScanner.rbac.clusterRoleBinding.name | string | `"cluster-scanner-role-binding"` |  |
+| clusterScanner.image.repository | string | `"datree/cluster-scanner"` |  |
+| clusterScanner.image.pullPolicy | string | `"Always"` |  |
+| clusterScanner.image.tag | string | `nil` |  |
+| hooks.timeoutTime | string | `nil` |  |
+| hooks.ttlSecondsAfterFinished | string | `nil` |  |
+| hooks.image.repository | string | `"clastix/kubectl"` |  |
+| hooks.image.tag | string | `"v1.25"` |  |
+| hooks.image.pullPolicy | string | `"IfNotPresent"` |  |
+| validatingWebhookConfiguration.failurePolicy | string | `"Ignore"` |  |

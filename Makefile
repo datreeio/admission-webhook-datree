@@ -84,10 +84,10 @@ helm-template-staging:
 
 g1enerate-helm-file:
 	helm-docs --sort-values-order=file \
-	--output-file ./README_AUTO.md \
+	--output-file ./README.md \
 	--template-files=./charts/datree-admission-webhook/templates/README.md.gotmpl
 
 g2enerate-helm-file:
 	helm-docs --sort-values-order=file \
-	--output-file ../../README_AUTO.md \
-	--template-files=../../README.md.gotmpl
+	--output-file ../../README.md \
+	--template-files=./README.md.gotmpl
