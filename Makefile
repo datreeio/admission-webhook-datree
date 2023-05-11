@@ -92,3 +92,14 @@ generate-helm-docs:
 	--sort-values-order=file \
 	--output-file ../../README.md \
 	--template-files=./README.md.gotmpl
+
+generate-helm-docs2:
+	sh ci/helm-docs.sh \
+	--sort-values-order=file \
+	--output-file ./README.md \
+	--template-files=./charts/datree-admission-webhook/README.md.gotmpl \
+	&& \
+	sh ci/helm-docs.sh \
+	--sort-values-order=file \
+	--output-file ../../README.md \
+	--template-files=./README.md.gotmpl
