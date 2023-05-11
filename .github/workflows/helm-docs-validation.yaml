@@ -1,0 +1,23 @@
+name: Helm Docs Validation
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  helm_docs_validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Generate Helm Docs
+        run: make generate-helm-docs
+
+      - name: Check for file changes
+        run: |
+          if [ -n "$(git diff)" ]; then
+            echo "::error::helm-docs-validation failed, did you forget to run 'make generate-helm-docs'?"
+            exit 1
+          fi

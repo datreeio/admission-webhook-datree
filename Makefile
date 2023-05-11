@@ -81,3 +81,14 @@ helm-template-staging:
 	--set image.tag="latest" \
 	--debug && \
 	make change-ping-uninstall-url-to-production
+
+generate-helm-docs:
+	helm-docs \
+	--sort-values-order=file \
+	--output-file ./README.md \
+	--template-files=./charts/datree-admission-webhook/README.md.gotmpl \
+	&& \
+	helm-docs \
+	--sort-values-order=file \
+	--output-file ../../README.md \
+	--template-files=./README.md.gotmpl

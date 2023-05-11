@@ -1,0 +1,43 @@
+# Datree Admission Webhook
+
+A Kubernetes validating webhook for policy enforcement within the cluster, on every CREATE, APPLY and UPDATE operation
+on a resource.
+
+## TL;DR
+
+```bash
+  # Install and create namespace with Helm
+  helm repo add datree-webhook https://datreeio.github.io/admission-webhook-datree/
+  helm repo update
+
+  # Already existing `datree` namespace
+  kubectl create ns datree
+  helm install -n datree datree-webhook datree-webhook/datree-admission-webhook --set datree.token=<DATREE_TOKEN>
+```
+
+### Prerequisites
+
+Helm v3.0.0+
+
+## Configuration Options
+
+Datree admission webhook can be configured via the helm values file under `datree` key:
+
+### Datree Configuration options
+
+```
+datree:
+  token: <DATREE_TOKEN>     # The token used to link the CLI to your dashboard.
+  policy: ""                # The name of the policy to check, e.g: staging. (string, optional)
+  verbose: ""               # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
+  output: ""                # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
+  noRecord: ""              # Don’t send policy checks metadata to the backend. (boolean ,optional)
+  enforce: ""               # Block resources that fail the policy check. (boolean ,optional)
+  clusterName: ""           # The name of the cluster link for cluster name in your dashboard. (string ,optional)
+```
+
+For further information about Datree flags see [CLI arguments](https://hub.datree.io/setup/cli-arguments).
+
+### Parameters
+
+{{ template "chart.valuesSection" . }}
