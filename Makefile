@@ -83,10 +83,12 @@ helm-template-staging:
 	make change-ping-uninstall-url-to-production
 
 generate-helm-docs:
-	helm-docs --sort-values-order=file \
+	helm-docs \
+	--sort-values-order=file \
 	--output-file ./README.md \
 	--template-files=./charts/datree-admission-webhook/templates/README.md.gotmpl \
 	&& \
-	helm-docs --sort-values-order=file \
+	helm-docs \
+	--sort-values-order=file \
 	--output-file ../../README.md \
 	--template-files=./README.md.gotmpl
