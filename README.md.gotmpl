@@ -15,4 +15,23 @@ The webhook will catch **create**, **apply** and **edit** operations and initiat
 
 The following table lists the configurable parameters of the Datree chart and their default values.
 
+{{ define "chart.valuesTableHtml" }}
+<table>
+	<thead>
+		<th>Parameter</th>
+		<th>Description</th>
+		<th>Default</th>
+	</thead>
+	<tbody>
+	{{- range .Values }}
+		<tr>
+			<td>{{ .Key }}</td>
+			<td>{{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }}</td>
+			<td>{{ template "chart.valueDefaultColumnRender" . }}</td>
+		</tr>
+	{{- end }}
+	</tbody>
+</table>
+{{ end }}
+
 {{ template "chart.valuesSectionHtml" . }}
