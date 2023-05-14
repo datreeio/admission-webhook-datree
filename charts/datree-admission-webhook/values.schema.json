@@ -12,7 +12,7 @@
   "properties": {
     "namespace": {
       "title": "The namespace Schema",
-      "type": ["string", "null"],
+      "type": "string",
       "default": ""
     },
     "replicaCount": {

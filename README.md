@@ -19,7 +19,7 @@ The following table lists the configurable parameters of the Datree chart and th
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| namespace | string | `nil` | The name of the namespace all resources will be created in, if not specified in the release. |
+| namespace | string | `""` | The name of the namespace all resources will be created in, if not specified in the release. |
 | replicaCount | int | `2` | The number of Datree webhook-server replicas to deploy for the webhook. |
 | customLabels | object | `{}` | Additional labels to add to all resources. |
 | customAnnotations | object | `{}` | Additional annotations to add to all resources. |
