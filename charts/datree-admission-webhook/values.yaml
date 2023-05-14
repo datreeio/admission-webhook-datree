@@ -55,11 +55,11 @@ datree:
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
 # The Datree webhook-server image to use.
 image:
-  # -- Image repository
+  # -- Image repository for the webhook
   repository: datree/admission-webhook
-  # -- The image release tag to use
+  # -- The image release tag to use for the webhook
   tag:
-  # -- Image pull policy
+  # -- Image pull policy for the webhook
   pullPolicy: Always
 # -- Security context applied on the containers
 securityContext:
@@ -79,7 +79,9 @@ resources: { }
 # requests:
 #   cpu: 200m
 #   memory: 48Mi
+# -- Used to select on which node a pod is scheduled to run
 nodeSelector: { }
+# -- Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes
 affinity: { }
 tolerations: [ ]
 clusterScanner:
@@ -87,23 +89,27 @@ clusterScanner:
   annotations: { }
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
   rbac:
+    # -- Create service Account for the scanner
     serviceAccount:
-      # -- Create the ServiceAccount
+      # Create the ServiceAccount
       create: true
-      # -- The ServiceAccount name
+      # The ServiceAccount name
       name: cluster-scanner-service-account
+    # -- Create service Role for the scanner
     clusterRole:
-      # -- Create the ClusterRole
+      # Create the ClusterRole
       create: true
-      # -- The ClusterRole name
+      # The ClusterRole name
       name: cluster-scanner-role
+    # -- Create service RoleBinding for the scanner
     clusterRoleBinding:
       name: cluster-scanner-role-binding
   image:
-    # Image repository
+    # -- Image repository for the scanner
     repository: datree/cluster-scanner
+    # -- Image pull policy for the scanner
     pullPolicy: Always
-    # Image tag
+    # -- The image release tag to use for the scanner
     tag:
     # limits:
     #   cpu: 1000m
@@ -115,7 +121,7 @@ clusterScanner:
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
 hooks:
-  # The timeout time the hook will wait for the webhook-server is ready.
+  # -- The timeout time the hook will wait for the webhook-server is ready.
   timeoutTime:
   ttlSecondsAfterFinished:
   # The image for running kubectl commands
