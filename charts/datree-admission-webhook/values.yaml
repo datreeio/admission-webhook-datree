@@ -13,15 +13,17 @@ customLabels: { }
 customAnnotations: { }
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
+  # -- Create service Account for the webhook
   serviceAccount:
-    # -- Create a ServiceAccount
+    # Create the ServiceAccount
     create: true
-    # -- The ServiceAccount name
+    # The ServiceAccount name
     name: datree-webhook-server
+  # -- Create service Account for the webhook
   clusterRole:
-    # -- Create a ClusterRole
+    # Create the ClusterRole
     create: true
-    # -- The ClusterRole name
+    # The ClusterRole name
     name: datree-webhook-server-cluster-role
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.

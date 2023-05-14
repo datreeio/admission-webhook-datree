@@ -48,10 +48,8 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 | replicaCount | int | `2` | The number of Datree webhook-server replicas to deploy for the webhook. |
 | customLabels | object | `{}` | Additional labels to add to all resources. |
 | customAnnotations | object | `{}` | Additional annotations to add to all resources. |
-| rbac.serviceAccount.create | bool | `true` | Create a ServiceAccount |
-| rbac.serviceAccount.name | string | `"datree-webhook-server"` | The ServiceAccount name |
-| rbac.clusterRole.create | bool | `true` | Create a ClusterRole |
-| rbac.clusterRole.name | string | `"datree-webhook-server-cluster-role"` | The ClusterRole name |
+| rbac.serviceAccount | object | `{"create":true,"name":"datree-webhook-server"}` | Create service Account for the webhook |
+| rbac.clusterRole | object | `{"create":true,"name":"datree-webhook-server-cluster-role"}` | Create service Account for the webhook |
 | datree.token | string | `nil` | The token used to link the CLI to your dashboard. (string, required) |
 | datree.existingSecret | object | `{"key":"","name":""}` | The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored. |
 | datree.verbose | string | `nil` | Display 'How to Fix' link for failed rules in output. (boolean, optional) |
