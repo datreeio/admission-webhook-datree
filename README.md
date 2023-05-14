@@ -29,34 +29,32 @@ The following table lists the configurable parameters of the Datree chart and th
 | rbac.clusterRole.name | string | `"datree-webhook-server-cluster-role"` | The ClusterRole name |
 | datree.token | string | `nil` | The token used to link the CLI to your dashboard. (string, required) |
 | datree.existingSecret | object | `{"key":"","name":""}` | The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored. |
-| datree.verbose | string | `nil` | Display 'How to Fix' link for failed rules in output. (boolean ,optional) |
-| datree.output | string | `nil` | The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional) |
-| datree.noRecord | string | `nil` | Don’t send policy checks metadata to the backend. (boolean ,optional) |
-| datree.clusterName | string | `nil` | The name of the cluster link for cluster name in your dashboard. (string ,optional) |
+| datree.verbose | string | `nil` | Display 'How to Fix' link for failed rules in output. (boolean, optional) |
+| datree.output | string | `nil` | The format output of the policy check results: yaml, json, xml, simple, JUnit. (string, optional) |
+| datree.noRecord | string | `nil` | Don’t send policy checks metadata to the backend. (boolean, optional) |
+| datree.clusterName | string | `nil` | The name of the cluster link for cluster name in your dashboard (string ,optional) |
 | datree.scanIntervalHours | int | `1` | How often should the scan run in hours. (int, optional, default: 1 ) |
 | datree.configFromHelm | bool | `false` | If false, the webhook will be configured from the dashboard, otherwise it will be configured from here. Affected configurations: policy, enforce, customSkipList. |
 | datree.policy | string | `nil` | The name of the policy to check, e.g: staging. (string, optional) |
 | datree.enforce | string | `nil` | Block resources that fail the policy check. (boolean ,optional) |
 | datree.customSkipList | list | `["(.*);(.*);(^aws-node.*)"]` | Excluded resources from policy checks. ("namespace;kind;name" ,optional) |
-| image.repository | string | `"datree/admission-webhook"` | Image repository |
-| image.tag | string | `nil` | The image release tag to use |
-| image.pullPolicy | string | `"Always"` | Image pull policy |
+| image.repository | string | `"datree/admission-webhook"` | Image repository for the webhook |
+| image.tag | string | `nil` | The image release tag to use for the webhook |
+| image.pullPolicy | string | `"Always"` | Image pull policy for the webhook |
 | securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":25000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context applied on the containers |
 | resources | object | `{}` | The resource request/limits for the container image |
-| nodeSelector | object | `{}` |  |
-| affinity | object | `{}` |  |
+| nodeSelector | object | `{}` | Used to select on which node a pod is scheduled to run |
+| affinity | object | `{}` | Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes |
 | tolerations | list | `[]` |  |
 | clusterScanner.resources | object | `{}` |  |
 | clusterScanner.annotations | object | `{}` |  |
-| clusterScanner.rbac.serviceAccount.create | bool | `true` | Create the ServiceAccount |
-| clusterScanner.rbac.serviceAccount.name | string | `"cluster-scanner-service-account"` | The ServiceAccount name |
-| clusterScanner.rbac.clusterRole.create | bool | `true` | Create the ClusterRole |
-| clusterScanner.rbac.clusterRole.name | string | `"cluster-scanner-role"` | The ClusterRole name |
-| clusterScanner.rbac.clusterRoleBinding.name | string | `"cluster-scanner-role-binding"` |  |
-| clusterScanner.image.repository | string | `"datree/cluster-scanner"` |  |
-| clusterScanner.image.pullPolicy | string | `"Always"` |  |
-| clusterScanner.image.tag | string | `nil` |  |
-| hooks.timeoutTime | string | `nil` |  |
+| clusterScanner.rbac.serviceAccount | object | `{"create":true,"name":"cluster-scanner-service-account"}` | Create service Account for the scanner |
+| clusterScanner.rbac.clusterRole | object | `{"create":true,"name":"cluster-scanner-role"}` | Create service Role for the scanner |
+| clusterScanner.rbac.clusterRoleBinding | object | `{"name":"cluster-scanner-role-binding"}` | Create service RoleBinding for the scanner |
+| clusterScanner.image.repository | string | `"datree/cluster-scanner"` | Image repository for the scanner |
+| clusterScanner.image.pullPolicy | string | `"Always"` | Image pull policy for the scanner |
+| clusterScanner.image.tag | string | `nil` | The image release tag to use for the scanner |
+| hooks.timeoutTime | string | `nil` | The timeout time the hook will wait for the webhook-server is ready. |
 | hooks.ttlSecondsAfterFinished | string | `nil` |  |
 | hooks.image.repository | string | `"clastix/kubectl"` |  |
 | hooks.image.tag | string | `"v1.25"` |  |
