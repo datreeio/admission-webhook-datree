@@ -69,7 +69,7 @@ The following table lists the configurable parameters of the Datree chart and th
 		</tr>
 		<tr>
 			<td>rbac.clusterRole</td>
-			<td>Create service Account for the webhook</td>
+			<td>Create service Role for the webhook</td>
 			<td><pre lang="json">
 {
   "create": true,

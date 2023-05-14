@@ -19,7 +19,7 @@ rbac:
     create: true
     # The ServiceAccount name
     name: datree-webhook-server
-  # -- Create service Account for the webhook
+  # -- Create service Role for the webhook
   clusterRole:
     # Create the ClusterRole
     create: true
