@@ -81,3 +81,16 @@ helm-template-staging:
 	--set image.tag="latest" \
 	--debug && \
 	make change-ping-uninstall-url-to-production
+
+# in order to run the command, first install helm-docs by running: "brew install norwoodj/tap/helm-docs"
+# https://github.com/norwoodj/helm-docs
+generate-helm-docs:
+	helm-docs \
+	--sort-values-order=file \
+	--output-file ./README.md \
+	--template-files=./charts/datree-admission-webhook/README.md.gotmpl \
+	&& \
+	helm-docs \
+	--sort-values-order=file \
+	--output-file ../../README.md \
+	--template-files=./README.md.gotmpl

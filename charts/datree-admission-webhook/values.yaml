@@ -3,21 +3,23 @@
 
 # Default values for datree-admission-webhook.
 
-# The name of the namespace all resources will be created in, if not specified in the release.
+# -- The name of the namespace all resources will be created in, if not specified in the release.
 namespace: ""
-# The number of Datree webhook-server replicas to deploy for the webhook.
+# -- The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 2
-# Additional labels to add to all resources.
+# -- Additional labels to add to all resources.
 customLabels: { }
-# Additional annotations to add to all resources.
+# -- Additional annotations to add to all resources.
 customAnnotations: { }
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
+  # -- Create service Account for the webhook
   serviceAccount:
     # Create the ServiceAccount
     create: true
     # The ServiceAccount name
     name: datree-webhook-server
+  # -- Create service Role for the webhook
   clusterRole:
     # Create the ClusterRole
     create: true
@@ -25,43 +27,43 @@ rbac:
     name: datree-webhook-server-cluster-role
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
-  # The token used to link the CLI to your dashboard. (string)
+  # -- The token used to link Datree to your dashboard. (string, required)
   token:
-  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
+  # -- The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
     key: "" # Key within a given secret that contains the token (string)
-  # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
+  # -- Display 'How to Fix' link for failed rules in output. (boolean, optional)
   verbose:
-  # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
+  # -- The format output of the policy check results: yaml, json, xml, simple, JUnit. (string, optional)
   output:
-  # Don’t send policy checks metadata to the backend. (boolean ,optional)
+  # -- Don’t send policy checks metadata to the backend. (boolean, optional)
   noRecord:
-  # The name of the cluster link for cluster name in your dashboard. (string ,optional)
+  # -- The name of the cluster link for cluster name in your dashboard (string ,optional)
   clusterName:
-  # How often should the scan run in hours. (int, optional, default: 1 )
+  # -- How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
 
-  # If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
+  # -- If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
   # Affected configurations: policy, enforce, customSkipList.
   configFromHelm: false
-  # The name of the policy to check, e.g: staging. (string, optional)
+  # -- The name of the policy to check, e.g: staging. (string, optional)
   policy:
-  # Block resources that fail the policy check. (boolean ,optional)
+  # -- Block resources that fail the policy check. (boolean ,optional)
   enforce:
-  # Excluded resources from policy checks. ("namespace;kind;name" ,optional)
+  # -- Excluded resources from policy checks. ("namespace;kind;name" ,optional)
   customSkipList:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
 # The Datree webhook-server image to use.
 image:
-  # Image repository
+  # -- Image repository for the webhook
   repository: datree/admission-webhook
-  # Image tag
+  # -- The image release tag to use for the webhook
   tag:
-  # Image pull policy
+  # -- Image pull policy for the webhook
   pullPolicy: Always
-# Security context for the containers
+# -- Security context applied on the containers
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
@@ -71,6 +73,7 @@ securityContext:
     drop: [ "ALL" ]
   seccompProfile:
     type: RuntimeDefault
+# -- The resource request/limits for the webhook container image
 resources: { }
 # limits:
 #   cpu: 200m
@@ -78,31 +81,37 @@ resources: { }
 # requests:
 #   cpu: 200m
 #   memory: 48Mi
+# -- Used to select on which node a pod is scheduled to run
 nodeSelector: { }
 affinity: { }
 tolerations: [ ]
 clusterScanner:
+  # -- The resource request/limits for the scanner container image
   resources: { }
   annotations: { }
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
   rbac:
+    # -- Create service Account for the scanner
     serviceAccount:
       # Create the ServiceAccount
       create: true
       # The ServiceAccount name
       name: cluster-scanner-service-account
+    # -- Create service Role for the scanner
     clusterRole:
       # Create the ClusterRole
       create: true
       # The ClusterRole name
       name: cluster-scanner-role
+    # -- Create service RoleBinding for the scanner
     clusterRoleBinding:
       name: cluster-scanner-role-binding
   image:
-    # Image repository
+    # -- Image repository for the scanner
     repository: datree/cluster-scanner
+    # -- Image pull policy for the scanner
     pullPolicy: Always
-    # Image tag
+    # -- The image release tag to use for the scanner
     tag:
     # limits:
     #   cpu: 1000m
@@ -114,7 +123,7 @@ clusterScanner:
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
 hooks:
-  # The timeout time the hook will wait for the webhook-server is ready.
+  # -- The timeout time the hook will wait for the webhook-server is ready.
   timeoutTime:
   ttlSecondsAfterFinished:
   # The image for running kubectl commands
