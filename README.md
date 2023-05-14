@@ -40,11 +40,11 @@ The following table lists the configurable parameters of the Datree chart and th
 | image.tag | string | `nil` | The image release tag to use for the webhook |
 | image.pullPolicy | string | `"Always"` | Image pull policy for the webhook |
 | securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":25000,"seccompProfile":{"type":"RuntimeDefault"}}` | Security context applied on the containers |
-| resources | object | `{}` | The resource request/limits for the container image |
+| resources | object | `{}` | The resource request/limits for the webhook container image |
 | nodeSelector | object | `{}` | Used to select on which node a pod is scheduled to run |
 | affinity | object | `{}` | Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes |
 | tolerations | list | `[]` |  |
-| clusterScanner.resources | object | `{}` |  |
+| clusterScanner.resources | object | `{}` | The resource request/limits for the scanner container image |
 | clusterScanner.annotations | object | `{}` |  |
 | clusterScanner.rbac.serviceAccount | object | `{"create":true,"name":"cluster-scanner-service-account"}` | Create service Account for the scanner |
 | clusterScanner.rbac.clusterRole | object | `{"create":true,"name":"cluster-scanner-role"}` | Create service Role for the scanner |

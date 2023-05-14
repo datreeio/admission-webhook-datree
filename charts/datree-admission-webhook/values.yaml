@@ -73,7 +73,7 @@ securityContext:
     drop: [ "ALL" ]
   seccompProfile:
     type: RuntimeDefault
-# -- The resource request/limits for the container image
+# -- The resource request/limits for the webhook container image
 resources: { }
 # limits:
 #   cpu: 200m
@@ -87,6 +87,7 @@ nodeSelector: { }
 affinity: { }
 tolerations: [ ]
 clusterScanner:
+  # -- The resource request/limits for the scanner container image
   resources: { }
   annotations: { }
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
