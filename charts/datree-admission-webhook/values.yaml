@@ -83,7 +83,6 @@ resources: { }
 #   memory: 48Mi
 # -- Used to select on which node a pod is scheduled to run
 nodeSelector: { }
-# -- Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes
 affinity: { }
 tolerations: [ ]
 clusterScanner:

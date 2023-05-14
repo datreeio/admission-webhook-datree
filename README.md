@@ -234,7 +234,7 @@ null
 		</tr>
 		<tr>
 			<td>affinity</td>
-			<td>Offers more expressive syntax for fine-grained control of how Pods are scheduled to specific nodes</td>
+			<td></td>
 			<td><pre lang="json">
 {}
 </pre>
