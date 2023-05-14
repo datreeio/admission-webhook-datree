@@ -82,7 +82,7 @@ helm-template-staging:
 	--debug && \
 	make change-ping-uninstall-url-to-production
 
-# in order to run the command, first install helm-docs buy running: "brew install norwoodj/tap/helm-docs"
+# in order to run the command, first install helm-docs by running: "brew install norwoodj/tap/helm-docs"
 # https://github.com/norwoodj/helm-docs
 generate-helm-docs:
 	helm-docs \
