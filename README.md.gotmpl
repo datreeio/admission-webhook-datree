@@ -27,7 +27,7 @@ The following table lists the configurable parameters of the Datree chart and th
 		<tr>
 			<td>{{ .Key }}</td>
 			<td>{{ if .Description }}{{ .Description }}{{ else }}{{ .AutoDescription }}{{ end }}</td>
-			<td>{{ .Default }}</td>
+			<td>{{ template "chart.valueDefaultColumnRender" . }}</td>
 		</tr>
 	{{- end }}
 	</tbody>
