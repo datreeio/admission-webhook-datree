@@ -27,7 +27,7 @@ rbac:
     name: datree-webhook-server-cluster-role
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
-  # -- The token used to link the CLI to your dashboard. (string, required)
+  # -- The token used to link Datree to your dashboard. (string, required)
   token:
   # -- The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:

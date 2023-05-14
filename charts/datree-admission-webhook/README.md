@@ -105,7 +105,7 @@ For further information about Datree flags see [CLI arguments](https://hub.datre
 		</tr>
 		<tr>
 			<td>datree.token</td>
-			<td>The token used to link the CLI to your dashboard. (string, required)</td>
+			<td>The token used to link Datree to your dashboard. (string, required)</td>
 			<td><pre lang="json">
 null
 </pre>

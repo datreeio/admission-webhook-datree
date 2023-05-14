@@ -80,7 +80,7 @@ The following table lists the configurable parameters of the Datree chart and th
 		</tr>
 		<tr>
 			<td>datree.token</td>
-			<td>The token used to link the CLI to your dashboard. (string, required)</td>
+			<td>The token used to link Datree to your dashboard. (string, required)</td>
 			<td><pre lang="json">
 null
 </pre>
