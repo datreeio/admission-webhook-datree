@@ -221,6 +221,46 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>imageCredentials.enabled</td>
+			<td>The Repository credentials (If it's private)</td>
+			<td><pre lang="json">
+"false"
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>imageCredentials.registry</td>
+			<td>The repository URL</td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>imageCredentials.username</td>
+			<td>The repository username</td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>imageCredentials.password</td>
+			<td>The repository password</td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>imageCredentials.email</td>
+			<td>The repository owner's email address</td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>securityContext</td>
 			<td>Security context applied on the containers</td>
 			<td><pre lang="json">

@@ -63,6 +63,16 @@ image:
   tag:
   # -- Image pull policy for the webhook
   pullPolicy: Always
+
+# -- Registry Credentials (If it's private)
+# -- If you have your private registry and already push all the images in it, here you should define that registry credentials, and we take care of it.
+imageCredentials:
+  enabled: false
+  registry:
+  username:
+  password:
+  email:
+  
 # -- Security context applied on the containers
 securityContext:
   allowPrivilegeEscalation: false

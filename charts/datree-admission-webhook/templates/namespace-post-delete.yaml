@@ -23,6 +23,10 @@ spec:
       serviceAccount: datree-cleanup-namespaces-hook-pre-delete
       nodeSelector:
         kubernetes.io/os: linux
+      {{- if .Values.imageCredentials.enabled }}
+      imagePullSecrets:
+      - name: datree-repo-credentials
+      {{- end }}
       containers:
         - name: kubectl-label
           image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
@@ -60,6 +64,10 @@ spec:
       serviceAccount: datree-cleanup-ping-hook-pre-delete
       nodeSelector:
         kubernetes.io/os: linux
+      {{- if .Values.imageCredentials.enabled }}
+      imagePullSecrets:
+      - name: datree-repo-credentials
+      {{- end }}
       containers:
         - name: datree-ping
           image: "kumahq/kubectl:v1.20.15"
