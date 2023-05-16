@@ -13,7 +13,7 @@ curl https://raw.githubusercontent.com/datreeio/admission-webhook-datree/main/sc
 
 ### Prerequisites
 
-- Go version 1.18
+- Go version 1.19
 - Git
 - **optional**: [gow](https://github.com/mitranim/gow#installation) (go file watcher)
 - **optional**: VS Code + Thunder Client
@@ -36,7 +36,7 @@ make start-watch
 
 ### Prerequisites
 
-- Go version 1.18
+- Go version 1.19
 - Git
 - [Docker](https://docs.docker.com/get-docker/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
