@@ -52,16 +52,8 @@ helm-upgrade-local:
 	make change-ping-uninstall-url-to-staging && \
 	eval $(minikube docker-env) && \
 	helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook \
+	-f ./internal/fixtures/values.dev.yaml \
 	--set datree.token="${DATREE_TOKEN}" \
-	--set datree.clusterName="minikube" \
-	--set datree.policy="Starter" \
-	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
-	--set clusterScanner.image.tag="latest" \
-	--set image.repository="webhook-server" \
-	--set image.pullPolicy="Never" \
-	--set image.tag="latest" \
-	--set replicaCount=1 \
-	--set datree.enforce="true" \
 	--set scanJob.ttlSecondschange-ping-uninstall-url-to-productionFinished=100 \
 	--debug && \
 	make change-ping-uninstall-url-to-production
