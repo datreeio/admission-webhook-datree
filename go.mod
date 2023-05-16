@@ -1,6 +1,6 @@
 module github.com/datreeio/admission-webhook-datree
 
-go 1.18
+go 1.19
 
 require (
 	github.com/datreeio/datree v1.8.42
