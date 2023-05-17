@@ -64,15 +64,15 @@ image:
   # -- Image pull policy for the webhook
   pullPolicy: Always
 # -- Security context applied on the containers
-securityContext:
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 25000
-  capabilities:
-    drop: [ "ALL" ]
-  seccompProfile:
-    type: RuntimeDefault
+#securityContext:
+#  allowPrivilegeEscalation: false
+#  readOnlyRootFilesystem: true
+#  runAsNonRoot: true
+#  runAsUser: 25000
+#  capabilities:
+#    drop: [ "ALL" ]
+#  seccompProfile:
+#    type: RuntimeDefault
 # -- The resource request/limits for the webhook container image
 resources: { }
 # limits:

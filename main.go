@@ -37,6 +37,7 @@ func main() {
 		port = "8443"
 	}
 
+	fmt.Println("THIS IS MY LOG@@@@")
 	start(port)
 }
 

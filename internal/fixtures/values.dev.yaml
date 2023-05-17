@@ -63,15 +63,15 @@ image:
   # Image pull policy
   pullPolicy: Never
 # Security context for the containers
-securityContext:
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 25000
-  capabilities:
-    drop: [ "ALL" ]
-  seccompProfile:
-    type: RuntimeDefault
+#securityContext:
+#  allowPrivilegeEscalation: false
+#  readOnlyRootFilesystem: true
+#  runAsNonRoot: true
+#  runAsUser: 25000
+#  capabilities:
+#    drop: [ "ALL" ]
+#  seccompProfile:
+#    type: RuntimeDefault
 resources: { }
 # limits:
 #   cpu: 200m
