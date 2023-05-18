@@ -102,7 +102,7 @@ clusterScanner:
   image:
     # Image repository
     repository: datree/cluster-scanner-staging
-    pullPolicy: Never
+    pullPolicy: Always
     # Image tag
     tag: latest
     # limits:
