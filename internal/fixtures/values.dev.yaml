@@ -63,6 +63,7 @@ image:
   # Image pull policy
   pullPolicy: Never
 # Security context for the containers
+<<<<<<< Updated upstream
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
@@ -72,6 +73,9 @@ securityContext:
     drop: [ "ALL" ]
   seccompProfile:
     type: RuntimeDefault
+=======
+securityContext: { }
+>>>>>>> Stashed changes
 resources: { }
 # limits:
 #   cpu: 200m
@@ -102,7 +106,7 @@ clusterScanner:
   image:
     # Image repository
     repository: datree/cluster-scanner-staging
-    pullPolicy: Never
+    pullPolicy: Always
     # Image tag
     tag: latest
     # limits:
