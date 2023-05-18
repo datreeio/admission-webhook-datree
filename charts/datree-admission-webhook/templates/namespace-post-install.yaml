@@ -33,8 +33,6 @@ spec:
             - label
             - ns
             - kube-system
-            - kube-public
-            - kube-node-lease
             - {{template "datree.namespace" .}}
             - admission.datree/validate=skip
             - --overwrite
