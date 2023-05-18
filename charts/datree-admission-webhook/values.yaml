@@ -55,6 +55,8 @@ datree:
   customSkipList:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+    - "(^kube-public$);(.*);(.*)" # skip all resources in the kube-public namespace
+    - "(^kube-node-lease$);(.*);(.*)" # skip all resources in the kube-node-lease namespace
 # The Datree webhook-server image to use.
 image:
   # -- Image repository for the webhook
