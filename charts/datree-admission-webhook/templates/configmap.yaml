@@ -5,6 +5,8 @@ metadata:
   namespace: {{ template "datree.namespace" . }}
 data:
   datreeSkipList: |- 
+    - (^kube-public$);(.*);(.*)
+    - (^kube-node-lease$);(.*);(.*)
 {{- range  .Values.datree.customSkipList }} 
     - {{ . }}
 {{- end }}
