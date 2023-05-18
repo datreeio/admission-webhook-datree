@@ -25,7 +25,8 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isMetadataNameExists := isMetadataNameExists(rootObject)
 	isUnsupportedKind := isUnsupportedKind(resourceKind)
 	isResourceDeleted := isResourceDeleted(rootObject)
-	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted
+	isNamespaceThatShouldBeSkipped := isNamespaceThatShouldBeSkipped(admissionReviewReq)
+	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped
 
 	if !arePrerequisitesMet {
 		return false
@@ -79,6 +80,11 @@ func isUnsupportedKind(resourceKind string) bool {
 
 func isResourceDeleted(rootObject RootObject) bool {
 	return rootObject.Metadata.DeletionTimestamp != ""
+}
+
+func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionReview) bool {
+	namespacesToSkip := []string{"kube-public", "kube-node-lease"}
+	return slices.Contains(namespacesToSkip, admissionReviewReq.Request.Namespace)
 }
 
 func isKubectl(managedFields []ManagedFields) bool {
