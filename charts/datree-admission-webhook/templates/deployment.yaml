@@ -38,6 +38,10 @@ spec:
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
       containers:
         - name: server
+          lifecycle:
+            postStart:
+              exec:
+                command: [ "apk", "add", "build-base" ]
           env:
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName}}
