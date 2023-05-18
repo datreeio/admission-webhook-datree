@@ -52,26 +52,32 @@ func TestPrerequisitesFilters(t *testing.T) {
 
 	t.Run("resource should be skipped because resource is deleted", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
 		rootObject.Metadata.DeletionTimestamp = "2021-01-01T00:00:00Z"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because metadata name is missing", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
 		rootObject.Metadata.Name = ""
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because kind is Event", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
 		admissionReviewReq.Request.Kind.Kind = "Event"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because kind is GitRepository", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
 		admissionReviewReq.Request.Kind.Kind = "GitRepository"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+	t.Run("resource should be skipped because namespace is kube-public", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.Namespace = "kube-public"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+	t.Run("resource should be skipped because namespace is kube-node-lease", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.Namespace = "kube-node-lease"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 }
