@@ -63,7 +63,7 @@ image:
   # Image pull policy
   pullPolicy: Never
 # Security context for the containers
-#securityContext:
+securityContext: { }
 #  allowPrivilegeEscalation: false
 #  readOnlyRootFilesystem: true
 #  runAsNonRoot: true
@@ -102,7 +102,7 @@ clusterScanner:
   image:
     # Image repository
     repository: datree/cluster-scanner-staging
-    pullPolicy: Never
+    pullPolicy: Always
     # Image tag
     tag: latest
     # limits:
