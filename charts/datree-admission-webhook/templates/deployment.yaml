@@ -20,9 +20,11 @@ spec:
     metadata:
       labels: {{ include "datree.labels" . | nindent 8 }}
         app: "datree-webhook-server"
-      {{- with .Values.customAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
-      {{- end }}
+      annotations:
+        roolout: {{ randAlphaNum 5 | quote }}
+        {{- with .Values.customAnnotations }}
+        {{ toYaml . }}
+        {{- end}}
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}

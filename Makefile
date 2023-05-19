@@ -35,21 +35,21 @@ helm-install-local-in-minikube:
 	./scripts/build-docker-image.sh && \
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
+	-f ./internal/fixtures/values.dev.yaml \
 	--set datree.token="${DATREE_TOKEN}" \
-	--set datree.clusterName="minikube" \
-	--set datree.policy="Starter" \
-	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
-	--set clusterScanner.image.tag="latest" \
-	--set image.repository="webhook-server" \
-	--set image.pullPolicy="Never" \
-	--set image.tag="latest" \
-	--set replicaCount=1 \
 	--set scanJob.ttlSecondschange-ping-uninstall-url-to-productionFinished=100 \
 	--debug && \
 	make change-ping-uninstall-url-to-production
 
 helm-upgrade-local:
-	helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook --reuse-values --set datree.enforce="true"
+	make change-ping-uninstall-url-to-staging && \
+	eval $(minikube docker-env) && \
+	helm upgrade -n datree datree-webhook ./charts/datree-admission-webhook \
+	-f ./internal/fixtures/values.dev.yaml \
+	--set datree.token="${DATREE_TOKEN}" \
+	--set scanJob.ttlSecondschange-ping-uninstall-url-to-productionFinished=100 \
+	--debug && \
+	make change-ping-uninstall-url-to-production
 
 helm-uninstall:
 	helm uninstall -n datree datree-webhook

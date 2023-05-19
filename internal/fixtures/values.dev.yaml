@@ -1,0 +1,127 @@
+# for autocompletion in VS Code
+# yaml-language-server: $schema=https://raw.githubusercontent.com/datreeio/admission-webhook-datree/main/charts/datree-admission-webhook/values.schema.json
+
+# Default values for datree-admission-webhook.
+
+# The name of the namespace all resources will be created in, if not specified in the release.
+namespace: ""
+# The number of Datree webhook-server replicas to deploy for the webhook.
+replicaCount: 1
+# Additional labels to add to all resources.
+customLabels: { }
+# Additional annotations to add to all resources.
+customAnnotations: { }
+# Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
+rbac:
+  serviceAccount:
+    # Create the ServiceAccount
+    create: true
+    # The ServiceAccount name
+    name: datree-webhook-server
+  clusterRole:
+    # Create the ClusterRole
+    create: true
+    # The ClusterRole name
+    name: datree-webhook-server-cluster-role
+datree:
+  # It is required to provide either the token or the existingSecret containing the token for correct functionality.
+  # The token used to link the CLI to your dashboard. (string)
+  token:
+  # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
+  existingSecret:
+    name: "" # Name of the secret containing the datree token (string)
+    key: "" # Key within a given secret that contains the token (string)
+  # Display 'How to Fix' link for failed rules in output. (boolean ,optional)
+  verbose:
+  # The format output of the policy check results: yaml, json, xml, simple, JUnit. (string ,optional)
+  output:
+  # Don’t send policy checks metadata to the backend. (boolean ,optional)
+  noRecord:
+  # The name of the cluster link for cluster name in your dashboard. (string ,optional)
+  clusterName: "minikube"
+  # How often should the scan run in hours. (int, optional, default: 1 )
+  scanIntervalHours: 1
+
+  # If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
+  # Affected configurations: policy, enforce, customSkipList.
+  configFromHelm: false
+  # The name of the policy to check, e.g: staging. (string, optional)
+  policy: "Starter"
+  # Block resources that fail the policy check. (boolean ,optional)
+  enforce:
+  # Excluded resources from policy checks. ("namespace;kind;name" ,optional)
+  customSkipList:
+    # Recommended resources to exclude from your policy checks.
+    - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+    - "(.*);(.*);(^aws-123.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+# The Datree webhook-server image to use.
+image:
+  # Image repository
+  repository: webhook-server
+  # Image tag
+  tag: latest
+  # Image pull policy
+  pullPolicy: Never
+# Security context for the containers
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 25000
+  capabilities:
+    drop: [ "ALL" ]
+  seccompProfile:
+    type: RuntimeDefault
+resources: { }
+# limits:
+#   cpu: 200m
+#   memory: 256Mi
+# requests:
+#   cpu: 200m
+#   memory: 48Mi
+nodeSelector: { }
+affinity: { }
+tolerations: [ ]
+clusterScanner:
+  resources: { }
+  annotations: { }
+  # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
+  rbac:
+    serviceAccount:
+      # Create the ServiceAccount
+      create: true
+      # The ServiceAccount name
+      name: cluster-scanner-service-account
+    clusterRole:
+      # Create the ClusterRole
+      create: true
+      # The ClusterRole name
+      name: cluster-scanner-role
+    clusterRoleBinding:
+      name: cluster-scanner-role-binding
+  image:
+    # Image repository
+    repository: datree/cluster-scanner-staging
+    pullPolicy: Always
+    # Image tag
+    tag: latest
+    # limits:
+    #   cpu: 1000m
+    #   memory: 1048Mi
+    # requests:
+    #   cpu: 200m
+    #   memory: 256Mi
+# During install Datree run two hooks: pre-install and pre-delete.
+# `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
+# `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
+hooks:
+  # The timeout time the hook will wait for the webhook-server is ready.
+  timeoutTime:
+  ttlSecondsAfterFinished:
+  # The image for running kubectl commands
+  image:
+    repository: clastix/kubectl
+    tag: v1.25
+    pullPolicy: IfNotPresent
+validatingWebhookConfiguration:
+  failurePolicy: Ignore

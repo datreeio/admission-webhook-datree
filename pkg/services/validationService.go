@@ -116,23 +116,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, vs.State.GetPolicyName(), prerunData.RegistrationURL, defaultRules, false)
 	if err != nil {
-		*warningMessages = append(*warningMessages, err.Error())
-		/*this flow runs when user enter none existing policy name (we wouldn't like to fail the validation for this reason)
-		so we are validating against default policy */
-		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Extracting policy out of policies yaml err1: %s", err.Error()))
-
-		for _, policy := range prerunData.PoliciesJson.Policies {
-			if policy.IsDefault {
-				vs.State.SetPolicyName(policy.Name)
-			}
-		}
-
-		policy, err = policyFactory.CreatePolicy(prerunData.PoliciesJson, vs.State.GetPolicyName(), prerunData.RegistrationURL, defaultRules, false)
-		if err != nil {
-			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Extracting policy out of policies yaml err2: %s", err.Error()))
-			*warningMessages = append(*warningMessages, err.Error())
-			panic(err.Error())
-		}
+		*warningMessages = append(*warningMessages, fmt.Sprintf("Unable to complete evaluation. Policy %s not found.", vs.State.GetPolicyName()))
+		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
 	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
