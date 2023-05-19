@@ -64,8 +64,8 @@ image:
   # -- Image pull policy for the webhook
   pullPolicy: Always
 
-# -- Registry Credentials (If it's private)
-# -- If you have your private registry and already push all the images in it, here you should define that registry credentials, and we take care of it.
+# -- Private Registry Credentials
+# -- For private registry which contains all the required images
 imageCredentials:
   enabled: false
   registry:
