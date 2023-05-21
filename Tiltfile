@@ -2,7 +2,7 @@
 
 # Importing required Tilt modules
 # from tilt.dev import helm_chart
-docker_build('datree/admission-webhook', '.', dockerfile='./Dockerfile')
+docker_build('datree/admission-webhook','.')
 
 k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='./values.yaml'))
 
