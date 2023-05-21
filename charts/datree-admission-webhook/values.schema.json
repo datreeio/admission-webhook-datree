@@ -86,7 +86,7 @@
         {
           "properties": {
             "configFromHelm": {
-              "const": false
+              "boolean": false
             }
           },
           "required": [
@@ -97,7 +97,7 @@
         {
           "properties": {
             "configFromHelm": {
-              "const": true
+              "boolean": true
             }
           },
           "required": [
