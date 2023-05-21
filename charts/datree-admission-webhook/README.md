@@ -221,42 +221,16 @@ null
 </td>
 		</tr>
 		<tr>
-			<td>imageCredentials.enabled</td>
-			<td>Private Registry Credentials</td>
+			<td>imageCredentials</td>
+			<td>For private registry which contains all the required images</td>
 			<td><pre lang="json">
-"false"
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>imageCredentials.registry</td>
-			<td>The repository URL</td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>imageCredentials.username</td>
-			<td>The repository username</td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>imageCredentials.password</td>
-			<td>The repository password</td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>imageCredentials.email</td>
-			<td>The repository owner's email address</td>
-			<td><pre lang="json">
-null
+{
+  "email": null,
+  "enabled": false,
+  "password": null,
+  "registry": null,
+  "username": null
+}
 </pre>
 </td>
 		</tr>
