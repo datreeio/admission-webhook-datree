@@ -24,7 +24,6 @@
       "title": "The datree Schema",
       "type": "object",
       "required": [
-        "token",
         "clusterName",
         "scanIntervalHours",
         "configFromHelm"
@@ -32,7 +31,22 @@
       "properties": {
         "token": {
           "title": "The token Schema",
-          "type": "string"
+          "type": ["string", "null"],
+          "default": ""
+        },
+        "existingSecret": {
+          "title": "The existingSecret Schema",
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": ["string", "null"],
+              "default": ""
+            },
+            "key": {
+              "type": ["string", "null"],
+              "default": ""
+            }
+          }
         },
         "clusterName": {
           "title": "The clusterName Schema",
@@ -53,8 +67,48 @@
           "title": "The policy Schema",
           "type": ["string", "null"],
           "default": ""
+        },
+        "enforce": {
+          "title": "The enforce Schema",
+          "type": ["boolean", "null"],
+          "default": null
+        },
+        "customSkipList": {
+          "title": "The customSkipList Schema",
+          "type": ["array", "null"],
+          "items": {
+            "type": "string"
+          },
+          "default": null
         }
-      }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "configFromHelm": {
+              "const": false
+            }
+          },
+          "required": [
+            "token",
+            "clusterName"
+          ]
+        },
+        {
+          "properties": {
+            "configFromHelm": {
+              "const": true
+            }
+          },
+          "required": [
+            "token",
+            "clusterName",
+            "policy",
+            "enforce",
+            "customSkipList"
+          ]
+        }
+      ]
     },
     "image": {
       "title": "The image Schema",
