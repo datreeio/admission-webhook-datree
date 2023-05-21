@@ -222,7 +222,7 @@ null
 		</tr>
 		<tr>
 			<td>imageCredentials.enabled</td>
-			<td>The Repository credentials (If it's private)</td>
+			<td>Private Registry Credentials</td>
 			<td><pre lang="json">
 "false"
 </pre>
