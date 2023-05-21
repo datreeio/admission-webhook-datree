@@ -46,6 +46,8 @@ rules:
     resourceNames:
       - kube-system
       - {{template "datree.namespace" .}}
+      - kube-public
+      - kube-node-lease
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
