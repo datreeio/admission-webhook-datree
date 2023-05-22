@@ -31,7 +31,7 @@ jobs:
             "WEBHOOK_VERSION=${{ steps.define_version.outputs.version }}"
           context: .
           file: ./Dockerfile
-          platforms: linux/amd64,linux/arm64,linux/arm/v8
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: |
             ${{ env.DOCKERHUB_ORGANIZATION }}/${{ env.DOCKERHUB_REPO }}:${{ steps.define_version.outputs.version }}
