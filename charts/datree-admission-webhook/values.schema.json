@@ -59,7 +59,21 @@
           "type": "array",
           "default": false
         }
-      }
+      },
+      "oneOf": [
+        {
+          "required": ["policy"],
+          "not": {
+            "required": ["multiplePolicies"]
+          }
+        },
+        {
+          "required": ["multiplePolicies"],
+          "not": {
+            "required": ["policy"]
+          }
+        }
+      ]
     },
     "image": {
       "title": "The image Schema",
