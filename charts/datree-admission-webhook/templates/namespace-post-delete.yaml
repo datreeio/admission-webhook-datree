@@ -4,9 +4,11 @@ metadata:
   name: datree-cleanup-namespaces-hook-pre-delete
   labels: {{include "datree.labels" . | nindent 4}}
   namespace: {{template "datree.namespace" .}}
-  annotations: 
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
     "helm.sh/hook": pre-delete, pre-upgrade
-    "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
+    "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded, hook-failed
+
     {{- with .Values.customAnnotations }}
     {{ toYaml . }}
     {{- end}}
@@ -45,7 +47,8 @@ metadata:
   name: datree-uninstall-ping
   labels: {{include "datree.labels" . | nindent 4}}
   namespace: {{template "datree.namespace" .}}
-  annotations: 
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}
