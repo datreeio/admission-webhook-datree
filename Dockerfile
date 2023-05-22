@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.19-alpine AS builder
+FROM --platform=$TARGETPLATFORM golang:1.19-alpine AS builder
 ARG BUILD_ENVIRONMENT
 ARG WEBHOOK_VERSION
 WORKDIR /go/src/app
