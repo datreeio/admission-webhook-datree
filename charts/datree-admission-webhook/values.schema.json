@@ -53,16 +53,18 @@
           "title": "The policy Schema",
           "type": ["string", "null"],
           "default": ""
+        },
+        "multiplePolicies": {
+          "title": "The multiplePolicies Schema",
+          "type": "array",
+          "default": false
         }
       }
     },
     "image": {
       "title": "The image Schema",
       "type": "object",
-      "required": [
-        "repository",
-        "pullPolicy"
-      ],
+      "required": ["repository", "pullPolicy"],
       "properties": {
         "repository": {
           "title": "The repository Schema",
@@ -85,17 +87,12 @@
     "clusterScanner": {
       "title": "The clusterScanner Schema",
       "type": "object",
-      "required": [
-        "image"
-      ],
+      "required": ["image"],
       "properties": {
         "image": {
           "title": "The image Schema",
           "type": "object",
-          "required": [
-            "repository",
-            "pullPolicy"
-          ],
+          "required": ["repository", "pullPolicy"],
           "properties": {
             "repository": {
               "title": "The repository Schema",
@@ -120,9 +117,7 @@
     "validatingWebhookConfiguration": {
       "title": "The validatingWebhookConfiguration Schema",
       "type": "object",
-      "required": [
-        "failurePolicy"
-      ],
+      "required": ["failurePolicy"],
       "properties": {
         "failurePolicy": {
           "title": "The failurePolicy Schema",
