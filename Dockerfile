@@ -1,19 +1,30 @@
-FROM golang:1.19-alpine AS builder
+# Stage 1: Builder
+FROM --platform=$BUILDPLATFORM golang:1.17-alpine AS builder
 
+ARG BUILDPLATFORM
 ARG BUILD_ENVIRONMENT
 ARG WEBHOOK_VERSION
 
 WORKDIR /go/src/app
 
-# download dependencies in a separate step to allow caching
-COPY go.* .
+# Copy and download dependencies (separately for caching)
+COPY go.* ./
 RUN go mod download
 
 COPY . .
-# cache the build
-RUN --mount=type=cache,target=/root/.cache/go-build go build -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
 
+# Build the application
+RUN CGO_ENABLED=0 GOOS=linux go build \
+    -tags "$BUILD_ENVIRONMENT" \
+    -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" \
+    -o /go/bin/webhook-datree
+
+# Stage 2: Final Image
 FROM --platform=$TARGETPLATFORM alpine:3.14
-COPY --from=builder /go/src/app/webhook-datree /
+
+# Copy the built binary from the previous stage
+COPY --from=builder /go/bin/webhook-datree /usr/local/bin/
+
 EXPOSE 8443
-ENTRYPOINT ["/webhook-datree"]
+
+ENTRYPOINT ["webhook-datree"]
