@@ -22,7 +22,6 @@ spec:
       {{- end }}
     spec:
       restartPolicy: OnFailure
-      serviceAccount: datree-cleanup-namespaces-hook-pre-delete
       nodeSelector:
         kubernetes.io/os: linux
       {{- if .Values.imageCredentials.enabled }}
