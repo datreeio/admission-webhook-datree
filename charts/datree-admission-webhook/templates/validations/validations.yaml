@@ -1,0 +1,6 @@
+{{- if and (.Values.datree.multiplePolicies) (not .Values.datree.configFromHelm)}}
+    {{- fail "To use multiplePolicies please change configFromHelm to true" }}
+{{- end }}
+{{- if and (.Values.datree.multiplePolicies) (.Values.datree.policy)}}
+    {{- fail "You can't use both policy and multiplePolicies at the same time" }}
+{{- end }}
