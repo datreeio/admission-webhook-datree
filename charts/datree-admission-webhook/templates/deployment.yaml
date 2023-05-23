@@ -44,7 +44,7 @@ spec:
         - name: server
           env:
             - name: CLUSTER_NAME
-              value: {{.Values.datree.clusterName | required "Cluster name is required"}}
+              value: {{.Values.datree.clusterName}}
             - name: DATREE_TOKEN
             {{- if and .Values.datree.existingSecret (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.key "") }}
               valueFrom:
@@ -52,7 +52,7 @@ spec:
                   name: {{ .Values.datree.existingSecret.name }}
                   key: {{ .Values.datree.existingSecret.key }}
             {{- else }}
-              value: "{{ .Values.datree.token | required "Token or existingSecret is required" }}"
+              value: "{{ .Values.datree.token }}"
             {{- end }}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
