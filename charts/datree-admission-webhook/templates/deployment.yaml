@@ -113,7 +113,7 @@ spec:
             preStop:
               exec:
                 command: ["/bin/sh","-c"]
-                args: ["kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n $(DATREE_NAMESPACE); kubectl label ns kube-system $(DATREE_NAMESPACE) admission.datree/validate-;"]
+              args: ["kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n $(DATREE_NAMESPACE); kubectl label ns kube-system $(DATREE_NAMESPACE) admission.datree/validate-;"]
 
       volumes:
         - name: webhook-tls-certs
