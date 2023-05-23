@@ -103,7 +103,6 @@ spec:
               mountPath: /config
               readOnly: true
         - name: datree-cleanup-namespaces-hook-pre-delete
-          namespace: {{ template "datree.namespace" . }}
           image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
           imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
           securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
