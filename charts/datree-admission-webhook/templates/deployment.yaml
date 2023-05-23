@@ -106,6 +106,7 @@ spec:
           image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
           imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
           securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
+          serviceAccount: datree-cleanup-namespaces-hook-pre-delete
           env:
             - name: DATREE_NAMESPACE
               value: {{template "datree.namespace" .}}
