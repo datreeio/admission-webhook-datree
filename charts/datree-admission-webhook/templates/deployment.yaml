@@ -102,18 +102,6 @@ spec:
             - name: webhook-config
               mountPath: /config
               readOnly: true
-        - name: datree-cleanup-namespaces-hook-pre-delete
-          image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
-          imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
-          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
-          env:
-            - name: DATREE_NAMESPACE
-              value: {{template "datree.namespace" .}}
-          lifecycle:
-            preStop:
-              exec:
-                command: ["/bin/sh", "-c", "echo Hello from"]
-
       volumes:
         - name: webhook-tls-certs
           secret:
