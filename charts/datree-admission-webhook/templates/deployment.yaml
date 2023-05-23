@@ -109,15 +109,13 @@ spec:
           env:
             - name: DATREE_NAMESPACE
               value: {{template "datree.namespace" .}}
+          command:
+            - sh
+            - "-c"
+            - >-
+              kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n {{template "datree.namespace" .}};
+              kubectl label ns kube-system {{template "datree.namespace" .}} admission.datree/validate-;
           lifecycle:
-            postStart:
-              exec:
-                command:
-                  - sh
-                  - "-c"
-                  - >-
-                    kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n {{template "datree.namespace" .}};
-                    kubectl label ns kube-system {{template "datree.namespace" .}} admission.datree/validate-;
             preStop:
               exec:
                 command:
