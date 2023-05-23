@@ -73,7 +73,19 @@
             "required": ["policy"]
           }
         }
-      ]
+      ],
+      "if": {
+        "properties": {
+          "configFromHelm": {
+            "const": false
+          }
+        }
+      },
+      "then": {
+        "not": {
+          "required": ["multiplePolicies"]
+        }
+      }
     },
     "image": {
       "title": "The image Schema",
