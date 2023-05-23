@@ -22,6 +22,7 @@ spec:
       {{- end }}
     spec:
       restartPolicy: OnFailure
+      serviceAccount: datree-cleanup-namespaces-hook-pre-delete
       nodeSelector:
         kubernetes.io/os: linux
       {{- if .Values.imageCredentials.enabled }}
@@ -37,5 +38,4 @@ spec:
             - sh
             - "-c"
             - >-
-              kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n {{template "datree.namespace" .}};
-              kubectl label ns kube-system {{template "datree.namespace" .}} admission.datree/validate-;
+              kubectl get ns;
