@@ -49,6 +49,7 @@ metadata:
   namespace: {{template "datree.namespace" .}}
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "1"
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}
