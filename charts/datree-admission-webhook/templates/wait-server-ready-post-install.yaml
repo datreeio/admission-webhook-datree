@@ -23,6 +23,10 @@ spec:
     spec:
       serviceAccountName: datree-wait-server-ready-hook-post-install
       restartPolicy: Never
+      {{- if .Values.imageCredentials.enabled }}
+      imagePullSecrets:
+      - name: datree-repo-credentials
+      {{- end }}
       containers:
       - name: kubectl-client
         image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"

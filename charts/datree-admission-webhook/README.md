@@ -221,6 +221,20 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>imageCredentials</td>
+			<td>For private registry which contains all the required images</td>
+			<td><pre lang="json">
+{
+  "email": null,
+  "enabled": false,
+  "password": null,
+  "registry": null,
+  "username": null
+}
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>securityContext</td>
 			<td>Security context applied on the containers</td>
 			<td><pre lang="json">
