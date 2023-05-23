@@ -93,30 +93,6 @@
             }
           }
         }
-      },
-      "oneOf": [
-        {
-          "required": ["policy"],
-          "not": {
-            "required": ["multiplePolicies"]
-          }
-        },
-        {
-          "required": ["multiplePolicies"],
-          "not": {
-            "required": ["policy"]
-          }
-        }
-      ],
-      "dependencies": {
-        "multiplePolicies": {
-          "properties": {
-            "configFromHelm": {
-              "const": true
-            }
-          },
-          "required": ["configFromHelm"]
-        }
       }
     }
   },
