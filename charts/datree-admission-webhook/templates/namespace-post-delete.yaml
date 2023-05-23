@@ -6,7 +6,7 @@ metadata:
   namespace: {{template "datree.namespace" .}}
   annotations:
     argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-8"
+    argocd.argoproj.io/sync-wave: "1"
     "helm.sh/hook": pre-delete, pre-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}
