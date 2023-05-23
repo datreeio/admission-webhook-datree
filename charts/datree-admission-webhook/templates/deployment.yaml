@@ -109,7 +109,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                ["/bin/sh", "-c", "kubectl label ns datree datree admission.datree/validate-"]
+                command: ["/bin/sh", "-c", "kubectl label ns datree datree admission.datree/validate-"]
 
       volumes:
         - name: webhook-tls-certs
