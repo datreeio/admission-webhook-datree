@@ -108,16 +108,14 @@
           }
         }
       ],
-      "if": {
-        "properties": {
-          "configFromHelm": {
-            "const": false
-          }
-        }
-      },
-      "then": {
-        "not": {
-          "required": ["multiplePolicies"]
+      "dependencies": {
+        "multiplePolicies": {
+          "properties": {
+            "configFromHelm": {
+              "const": true
+            }
+          },
+          "required": ["configFromHelm"]
         }
       }
     }
