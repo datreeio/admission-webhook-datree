@@ -112,7 +112,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-                command: ["/bin/sh", "-c", "echo hi"]
+                command: ["/bin/sh", "-c", "echo Hello from"]
 
       volumes:
         - name: webhook-tls-certs
