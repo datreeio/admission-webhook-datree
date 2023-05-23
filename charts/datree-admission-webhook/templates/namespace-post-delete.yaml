@@ -37,4 +37,4 @@ spec:
             - sh
             - "-c"
             - >-
-              kubectl get ns;
+              echo "hello world";
