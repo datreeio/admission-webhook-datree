@@ -7,7 +7,6 @@ metadata:
   annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "1"
-    "helm.sh/hook": pre-delete, pre-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation, hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}
     {{ toYaml . }}
@@ -22,6 +21,7 @@ spec:
       {{- end }}
     spec:
       restartPolicy: OnFailure
+      serviceAccount: datree-cleanup-namespaces-hook-pre-delete
       nodeSelector:
         kubernetes.io/os: linux
       {{- if .Values.imageCredentials.enabled }}
@@ -37,4 +37,6 @@ spec:
             - sh
             - "-c"
             - >-
-              echo "hello world";
+              kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook -n {{template "datree.namespace" .}};
+              kubectl label ns kube-system {{template "datree.namespace" .}} admission.datree/validate-;
+
