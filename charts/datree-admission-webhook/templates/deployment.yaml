@@ -44,15 +44,15 @@ spec:
         - name: server
           env:
             - name: CLUSTER_NAME
-              value: {{.Values.datree.clusterName}}
+              value: {{.Values.datree.clusterName | required "Cluster name is required"}}
             - name: DATREE_TOKEN
-            {{- if and .Values.datree.existingSecret (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.key "") }}
+              {{- if and .Values.datree.existingSecret (and (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.name nil)) (and (ne .Values.datree.existingSecret.key "") (ne .Values.datree.existingSecret.key nil)) }}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.datree.existingSecret.name }}
                   key: {{ .Values.datree.existingSecret.key }}
             {{- else }}
-              value: "{{ .Values.datree.token }}"
+              value: "{{ .Values.datree.token | required "Token or existingSecret is required" }}"
             {{- end }}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}
