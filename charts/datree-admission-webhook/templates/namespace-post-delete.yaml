@@ -8,6 +8,7 @@ metadata:
   {{- with .Values.customAnnotations }}
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
     {{ toYaml . | nindent 4 }}
     {{- end }}
 ---
@@ -20,6 +21,7 @@ metadata:
   {{- with .Values.customAnnotations }}
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
     {{ toYaml . | nindent 4 }}
     {{- end }}
 ---
@@ -31,6 +33,7 @@ metadata:
   {{- with .Values.customAnnotations }}
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
     {{ toYaml . | nindent 4 }}
     {{- end }}
 roleRef:
@@ -56,6 +59,7 @@ metadata:
   {{- with .Values.customAnnotations }}
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
     {{ toYaml . | nindent 4 }}
     {{- end }}
 roleRef:
