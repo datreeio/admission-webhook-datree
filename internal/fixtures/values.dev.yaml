@@ -38,7 +38,7 @@ datree:
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord:
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
-  clusterName: "minikube"
+  clusterName: "roy-cluster-2"
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
 

@@ -65,6 +65,7 @@ func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutCli
 type ClusterEvaluationPrerunDataResponse struct {
 	cliClient.EvaluationPrerunDataResponse `json:",inline"`
 	ActivePolicy                           string                `json:"activePolicy"`
+	ActivePolicies                         []string              `json:"activePolicies"`
 	ActionOnFailure                        enums.ActionOnFailure `json:"actionOnFailure"`
 	IgnorePatterns                         []string              `json:"ignorePatterns"`
 }

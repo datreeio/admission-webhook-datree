@@ -94,7 +94,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 	if !vs.State.GetConfigFromHelm() {
-		vs.State.SetPolicyName(prerunData.ActivePolicy)
+		vs.State.SetPolicyName(prerunData.ActivePolicies[0]) // TODO fix this
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
 	}
