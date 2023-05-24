@@ -24,6 +24,7 @@ metadata:
   labels: {{include "datree.labels" . | nindent 4}}
   {{- with .Values.customAnnotations }}
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "-10"
     {{ toYaml . | nindent 4 }}
     {{- end }}
@@ -49,6 +50,7 @@ metadata:
   labels: {{include "datree.labels" . | nindent 4}}
   {{- with .Values.customAnnotations }}
   annotations:
+    argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/sync-wave: "-10"
     {{ toYaml . | nindent 4 }}
     {{- end }}
