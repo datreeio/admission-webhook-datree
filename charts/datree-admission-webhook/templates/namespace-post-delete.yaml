@@ -6,5 +6,5 @@ metadata:
 data:
   datreeSkipList: |-
   {{- range  .Values.datree.customSkipList }}
-- {{ . }}
+      - {{ . }}
   {{- end }}
