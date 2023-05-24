@@ -9,7 +9,7 @@ metadata:
 data:
   datreeSkipList: |-
   {{- range  .Values.datree.customSkipList }}
-- {{ . }}
+      - {{ . }}
   {{- end }}
 ---
 apiVersion: batch/v1
