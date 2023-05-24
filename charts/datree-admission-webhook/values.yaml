@@ -46,11 +46,11 @@ datree:
 
   # -- If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
   # Affected configurations: policy, enforce, customSkipList.
-  configFromHelm: false
+  configFromHelm: true
   # -- The name of the policy to check, e.g: staging. (string, optional)
   policy:
   # -- Block resources that fail the policy check. (boolean ,optional)
-  enforce:
+  enforce: true
   # -- Excluded resources from policy checks. ("namespace;kind;name" ,optional)
   customSkipList:
     # Recommended resources to exclude from your policy checks.
