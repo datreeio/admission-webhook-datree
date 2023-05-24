@@ -5,8 +5,9 @@ metadata:
   name: datree-webhook-server-lease
   namespace: {{ template "datree.namespace" . }}
   annotations:
-    argocd.argoproj.io/sync-wave: '2'
-    {{- with .Values.customAnnotations }}
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": before-hook-creation
+  {{- with .Values.customAnnotations }}
   {{ toYaml . | nindent 4 }}
   {{- end }}
   labels: {{ include "datree.labels" . | nindent 4 }}
