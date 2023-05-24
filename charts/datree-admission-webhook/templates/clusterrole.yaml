@@ -31,8 +31,11 @@ kind: ClusterRole
 metadata:
   name: datree-namespaces-update
   labels: {{include "datree.labels" . | nindent 4}}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   {{- with .Values.customAnnotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{ toYaml . | nindent 4 }}
   {{- end }}
 rules:
   - apiGroups:
@@ -52,8 +55,11 @@ kind: ClusterRole
 metadata:
   name: datree-validationwebhook-delete
   labels: {{include "datree.labels" . | nindent 4}}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
   {{- with .Values.customAnnotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{ toYaml . | nindent 4 }}
   {{- end }}
 rules:
   - apiGroups:
