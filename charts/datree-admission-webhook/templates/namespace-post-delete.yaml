@@ -1,3 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-scanning-filters-2
+  namespace: {{ template "datree.namespace" . }}
+  annotations:
+    argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
+data:
+  datreeSkipList: |-
+  {{- range  .Values.datree.customSkipList }}
+- {{ . }}
+  {{- end }}
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -48,6 +62,7 @@ metadata:
   namespace: {{template "datree.namespace" .}}
   annotations:
     argocd.argoproj.io/hook: PreSync
+    argocd.argoproj.io/sync-wave: "-10"
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}
