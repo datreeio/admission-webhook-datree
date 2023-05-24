@@ -46,7 +46,7 @@ spec:
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName | required "Cluster name is required"}}
             - name: DATREE_TOKEN
-            {{- if and .Values.datree.existingSecret (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.key "") }}
+              {{- if and .Values.datree.existingSecret (and (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.name nil)) (and (ne .Values.datree.existingSecret.key "") (ne .Values.datree.existingSecret.key nil)) }}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.datree.existingSecret.name }}
