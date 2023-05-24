@@ -24,21 +24,10 @@
       "title": "The datree Schema",
       "type": "object",
       "required": [
-        "token",
-        "clusterName",
         "scanIntervalHours",
         "configFromHelm"
       ],
       "properties": {
-        "token": {
-          "title": "The token Schema",
-          "type": "string"
-        },
-        "clusterName": {
-          "title": "The clusterName Schema",
-          "type": ["string", "null"],
-          "default": ""
-        },
         "scanIntervalHours": {
           "title": "The scanIntervalHours Schema",
           "type": "integer",
