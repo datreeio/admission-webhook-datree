@@ -42,7 +42,7 @@ var applyAllowedRequestFluxCDJsonNoLabels string
 func setMockEnv(t *testing.T) {
 	t.Setenv(enums.Token, "test-token")
 	t.Setenv(enums.ClusterName, "test-cluster-name")
-	t.Setenv(enums.Policy, "test-policy-name")
+	t.Setenv(enums.Policy, "Default")
 	t.Setenv(enums.Enforce, "true")
 }
 
@@ -169,6 +169,28 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	assert.Contains(t, admissionResponse.Warnings[0], expectedWarningMessages[0])
 	assert.Contains(t, admissionResponse.Warnings[1], expectedWarningMessages[1])
 	assert.Contains(t, admissionResponse.Warnings[1], "webhook=true")
+}
+
+func TestValidateRequestBodyWithPolicyNotExists(t *testing.T) {
+	setMockEnv(t)
+	t.Setenv(enums.Enforce, "true")
+	t.Setenv(enums.Policy, "NotExistsPolicy")
+	expectedWarningMessages := "Unable to complete evaluation. Policy NotExistsPolicy not found."
+
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
+
+	validationController.Validate(responseRecorder, request)
+	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
+
+	assert.Equal(t, admissionResponse.Allowed, true)
+	assert.Contains(t, admissionResponse.Warnings[0], expectedWarningMessages)
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {

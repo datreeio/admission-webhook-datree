@@ -20,9 +20,11 @@ spec:
     metadata:
       labels: {{ include "datree.labels" . | nindent 8 }}
         app: "datree-webhook-server"
-      {{- with .Values.customAnnotations }}
-      annotations: {{ toYaml . | nindent 8 }}
-      {{- end }}
+      annotations:
+        roolout: {{ randAlphaNum 5 | quote }}
+        {{- with .Values.customAnnotations }}
+        {{ toYaml . }}
+        {{- end}}
     spec:
       {{- if .Values.nodeSelector }}
       nodeSelector: {{- toYaml .Values.nodeSelector | nindent 8 }}
@@ -34,19 +36,23 @@ spec:
       tolerations: {{- toYaml .Values.tolerations | nindent 8 }}
       {{- end }}
       serviceAccountName: {{.Values.rbac.serviceAccount.name}}
+      {{- if .Values.imageCredentials.enabled }}
+      imagePullSecrets:
+      - name: datree-repo-credentials
+      {{- end }}
       containers:
         - name: server
           env:
             - name: CLUSTER_NAME
-              value: {{.Values.datree.clusterName}}
+              value: {{.Values.datree.clusterName | required "Cluster name is required"}}
             - name: DATREE_TOKEN
-            {{- if and .Values.datree.existingSecret (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.key "") }}
+              {{- if and .Values.datree.existingSecret (and (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.name nil)) (and (ne .Values.datree.existingSecret.key "") (ne .Values.datree.existingSecret.key nil)) }}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.datree.existingSecret.name }}
                   key: {{ .Values.datree.existingSecret.key }}
             {{- else }}
-              value: "{{ .Values.datree.token }}"
+              value: "{{ .Values.datree.token | required "Token or existingSecret is required" }}"
             {{- end }}
             - name: DATREE_POLICY
               value: {{.Values.datree.policy | default "Starter"}}

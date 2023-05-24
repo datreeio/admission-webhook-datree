@@ -24,6 +24,10 @@ spec:
       restartPolicy: OnFailure
       nodeSelector:
         kubernetes.io/os: linux
+      {{- if .Values.imageCredentials.enabled }}
+      imagePullSecrets:
+      - name: datree-repo-credentials
+      {{- end }}
       containers:
         - name: kubectl-label
           image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
