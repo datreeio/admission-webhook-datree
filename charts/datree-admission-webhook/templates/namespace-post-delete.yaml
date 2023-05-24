@@ -39,7 +39,7 @@ spec:
             - "-c"
             - >-
               kubectl delete validatingwebhookconfigurations.admissionregistration.k8s.io datree-webhook --ignore-not-found=true -n {{template "datree.namespace" .}};
-              kubectl label ns kube-system {{template "datree.namespace" .}} admission.datree/validate- --ignore-not-found=true;
+              kubectl label ns kube-system {{template "datree.namespace" .}} admission.datree/validate-;
 ---
 apiVersion: batch/v1
 kind: Job
