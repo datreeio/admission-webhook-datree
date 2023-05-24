@@ -4,8 +4,10 @@ kind: Lease
 metadata:
   name: datree-webhook-server-lease
   namespace: {{ template "datree.namespace" . }}
-  {{- with .Values.customAnnotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+    {{- with .Values.customAnnotations }}
+  {{ toYaml . | nindent 4 }}
   {{- end }}
   labels: {{ include "datree.labels" . | nindent 4 }}
 spec:
