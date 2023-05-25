@@ -146,17 +146,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	evaluationRequestData := vs.getEvaluationRequestData(policy.Name, startTime,
 		policyCheckResults, namespace, resourceKind, resourceName)
 
-	verifyVersionResponse, err := vs.CliServiceClient.GetVersionRelatedMessages(evaluationRequestData.WebhookVersion)
-	if err != nil {
-		*warningMessages = append(*warningMessages, err.Error())
-	} else {
-		if verifyVersionResponse != nil {
-			for i := range verifyVersionResponse.MessageTextArray {
-				*warningMessages = append(*warningMessages, verifyVersionResponse.MessageTextArray[i])
-			}
-		}
-	}
-
 	noRecords := os.Getenv(enums.NoRecord)
 	if noRecords != "true" {
 		evaluationResultResp, err := vs.sendEvaluationResult(evaluationRequestData)
@@ -211,6 +200,17 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 				fmt.Sprintf("✅ Object with name \"%s\" and kind \"%s\" passed Datree's policy check", resourceName, resourceKind),
 				fmt.Sprintf("👉 Get the full report %s", invocationUrl),
 			}, *warningMessages...)
+		}
+	}
+
+	verifyVersionResponse, err := vs.CliServiceClient.GetVersionRelatedMessages(vs.State.GetServiceVersion())
+	if err != nil {
+		*warningMessages = append(*warningMessages, err.Error())
+	} else {
+		if verifyVersionResponse != nil {
+			for i := range verifyVersionResponse.MessageTextArray {
+				*warningMessages = append(*warningMessages, verifyVersionResponse.MessageTextArray[i])
+			}
 		}
 	}
 
