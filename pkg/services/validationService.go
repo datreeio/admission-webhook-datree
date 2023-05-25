@@ -114,13 +114,13 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
+	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
+
 	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, vs.State.GetPolicyName(), prerunData.RegistrationURL, defaultRules, false)
 	if err != nil {
 		*warningMessages = append(*warningMessages, fmt.Sprintf("Unable to complete evaluation. Policy %s not found.", vs.State.GetPolicyName()))
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
-
-	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
 
 	policyCheckData := evaluation.PolicyCheckData{
 		FilesConfigurations: filesConfigurations,
