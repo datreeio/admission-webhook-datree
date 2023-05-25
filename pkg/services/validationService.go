@@ -235,7 +235,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, "PLACEHOLDER_POLICY_NAME", namespace, server.ConfigMapScanningFilters) // TODO remove this line
+	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, "PLACEHOLDER_POLICY_NAME", namespace, server.ConfigMapScanningFilters) // TODO use the real policy name
 	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
