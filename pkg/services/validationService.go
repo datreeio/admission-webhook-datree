@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -126,6 +127,16 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	policyNames := []string{"EKS", "Starter"}
 
 	for _, policyName := range policyNames {
+		if !shouldPolicyRunForNamespace(policyWithNamespaces{
+			policy: policyName,
+			namespaces: namespacePatterns{
+				includePatterns: []string{".*"},
+				excludePatterns: []string{},
+			},
+		}, namespace) {
+			continue
+		}
+
 		// create policy
 		policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
 		if err != nil {
@@ -347,6 +358,29 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 			},
 		},
 	}
+}
+
+type namespacePatterns struct {
+	includePatterns []string
+	excludePatterns []string
+}
+type policyWithNamespaces struct {
+	policy     string
+	namespaces namespacePatterns
+}
+
+func shouldPolicyRunForNamespace(policy policyWithNamespaces, namespace string) bool {
+	for _, excludePattern := range policy.namespaces.excludePatterns {
+		if match, _ := regexp.MatchString(excludePattern, namespace); match {
+			return false
+		}
+	}
+	for _, includePattern := range policy.namespaces.includePatterns {
+		if match, _ := regexp.MatchString(includePattern, namespace); match {
+			return true
+		}
+	}
+	return false
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
