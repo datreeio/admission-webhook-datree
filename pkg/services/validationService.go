@@ -118,13 +118,13 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
 
 	policyNameFromState := vs.State.GetPolicyName()
-	fmt.Println("policyNameFromState: ", policyNameFromState)
+	fmt.Println("policyNameFromState: ", policyNameFromState) // TODO remove this line
 
 	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
 
 	didFailAtLeastOnePolicyCheck := false
 
-	policyNames := []string{"EKS", "Starter"}
+	policyNames := []string{"EKS", "Starter"} // TODO remove this line
 
 	for _, policyName := range policyNames {
 		if !shouldPolicyRunForNamespace(policyWithNamespaces{
