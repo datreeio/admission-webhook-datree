@@ -116,81 +116,91 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
 
-	policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, vs.State.GetPolicyName(), prerunData.RegistrationURL, defaultRules, false)
-	if err != nil {
-		*warningMessages = append(*warningMessages, fmt.Sprintf("Unable to complete evaluation. Policy %s not found.", vs.State.GetPolicyName()))
-		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
-	}
-
-	policyCheckData := evaluation.PolicyCheckData{
-		FilesConfigurations: filesConfigurations,
-		IsInteractiveMode:   false,
-		PolicyName:          policy.Name,
-		Policy:              policy,
-	}
+	policyNameFromState := vs.State.GetPolicyName()
+	fmt.Println("policyNameFromState: ", policyNameFromState)
 
 	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
-	policyCheckResults, err := evaluator.Evaluate(policyCheckData)
-	if err != nil {
-		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Evaluate err: %s", err.Error()))
-	}
 
-	results := policyCheckResults.FormattedResults
-	passedPolicyCheckCount := 0
-	if results.EvaluationResults != nil {
-		passedPolicyCheckCount = results.EvaluationResults.Summary.FilesPassedCount
-	}
+	didFailAtLeastOnePolicyCheck := false
 
-	evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
+	policyNames := []string{"EKS", "Starter"}
 
-	evaluationRequestData := vs.getEvaluationRequestData(policy.Name, startTime,
-		policyCheckResults, namespace, resourceKind, resourceName)
+	for _, policyName := range policyNames {
+		// create policy
+		policy, err := policyFactory.CreatePolicy(prerunData.PoliciesJson, policyName, prerunData.RegistrationURL, defaultRules, false)
+		if err != nil {
+			*warningMessages = append(*warningMessages, fmt.Sprintf("Policy %s not found, skipping evaluation", policyName))
+			continue
+		}
 
-	noRecords := os.Getenv(enums.NoRecord)
-	if noRecords != "true" {
-		evaluationResultResp, err := vs.sendEvaluationResult(evaluationRequestData)
-		if err == nil {
-			cliEvaluationId = evaluationResultResp.EvaluationId
-		} else {
-			cliEvaluationId = -2
-			internalLogger.LogAndReportUnexpectedError("saving evaluation results failed")
-			*warningMessages = append(*warningMessages, "saving evaluation results failed")
+		policyCheckData := evaluation.PolicyCheckData{
+			FilesConfigurations: filesConfigurations,
+			IsInteractiveMode:   false,
+			PolicyName:          policy.Name,
+			Policy:              policy,
+		}
+
+		// evaluate policy against configuration
+		policyCheckResults, err := evaluator.Evaluate(policyCheckData)
+		if err != nil {
+			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Evaluate err: %s", err.Error()))
+		}
+
+		results := policyCheckResults.FormattedResults
+		passedPolicyCheckCount := 0
+		if results.EvaluationResults != nil {
+			passedPolicyCheckCount = results.EvaluationResults.Summary.FilesPassedCount
+		}
+
+		evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
+
+		// send results to backend
+		noRecords := os.Getenv(enums.NoRecord)
+		if noRecords != "true" {
+			evaluationResultResp, err := vs.sendEvaluationResult(vs.getEvaluationRequestData(policy.Name, startTime,
+				policyCheckResults, namespace, resourceKind, resourceName))
+			if err == nil {
+				cliEvaluationId = evaluationResultResp.EvaluationId
+			} else {
+				cliEvaluationId = -2
+				internalLogger.LogAndReportUnexpectedError("saving evaluation results failed")
+				*warningMessages = append(*warningMessages, "saving evaluation results failed")
+			}
+		}
+
+		// get results text
+		resultStr, err := evaluation.GetResultsText(&evaluation.PrintResultsData{
+			Results:           results,
+			EvaluationSummary: evaluationSummary,
+			LoginURL:          prerunData.RegistrationURL,
+			Printer:           printer.CreateNewPrinter(),
+			K8sVersion:        clusterK8sVersion,
+			Verbose:           os.Getenv(enums.Verbose) == "true",
+			PolicyName:        policy.Name,
+			OutputFormat:      os.Getenv(enums.Output),
+		})
+		if err != nil {
+			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
+		}
+
+		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
+		if didFailCurrentPolicyCheck {
+			didFailAtLeastOnePolicyCheck = true
+
+			sb := strings.Builder{}
+			sb.WriteString("\n---\n")
+			sb.WriteString(resultStr)
+			msg = sb.String()
 		}
 	}
 
-	resultStr, err := evaluation.GetResultsText(&evaluation.PrintResultsData{
-		Results:           results,
-		EvaluationSummary: evaluationSummary,
-		LoginURL:          prerunData.RegistrationURL,
-		Printer:           printer.CreateNewPrinter(),
-		K8sVersion:        clusterK8sVersion,
-		Verbose:           os.Getenv(enums.Verbose) == "true",
-		PolicyName:        policy.Name,
-		OutputFormat:      os.Getenv(enums.Output),
-	})
-
-	if err != nil {
-		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
-	}
-
-	var allowed bool
-	var isFailedPolicyCheck = evaluationSummary.PassedPolicyCheckCount == 0
-	if isFailedPolicyCheck {
-		allowed = false
-
-		sb := strings.Builder{}
-		sb.WriteString("\n---\n")
-		sb.WriteString(resultStr)
-		msg = sb.String()
-	} else {
-		allowed = true
-	}
+	allowed := !didFailAtLeastOnePolicyCheck
 
 	if !vs.State.GetIsEnforceMode() {
 		allowed = true
 		baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
 		invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
-		if isFailedPolicyCheck {
+		if didFailAtLeastOnePolicyCheck {
 			*warningMessages = append([]string{
 				fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check", resourceName, resourceKind),
 				fmt.Sprintf("👉 Get the full report %s", invocationUrl),
@@ -214,7 +224,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, policy.Name, namespace, server.ConfigMapScanningFilters)
+	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, "PLACEHOLDER_POLICY_NAME", namespace, server.ConfigMapScanningFilters)
 	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
