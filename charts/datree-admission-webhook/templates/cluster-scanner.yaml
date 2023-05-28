@@ -122,24 +122,24 @@ spec:
               value: "{{ .Values.datree.scanIntervalHours | default 1 }}"
             - name: DATREE_CONFIG_FROM_HELM
               value: "{{.Values.datree.configFromHelm | default false }}"
-{{/*          securityContext:*/}}
-{{/*            {{- with .Values.securityContext }}*/}}
-{{/*            {{ toYaml . | nindent 12 }}*/}}
-{{/*            {{- end }}*/}}
-{{/*          livenessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /health*/}}
-{{/*              port: 8080*/}}
-{{/*              scheme: HTTP*/}}
-{{/*            initialDelaySeconds: 5*/}}
-{{/*            periodSeconds: 10*/}}
-{{/*          readinessProbe:*/}}
-{{/*            httpGet:*/}}
-{{/*              path: /ready*/}}
-{{/*              port: 8080*/}}
-{{/*              scheme: HTTP*/}}
-{{/*            initialDelaySeconds: 5*/}}
-{{/*            periodSeconds: 10*/}}
+          securityContext:
+            {{- with .Values.securityContext }}
+            {{ toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
           image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.7" }}"
           imagePullPolicy: "{{.Values.clusterScanner.image.pullPolicy}}"
           resources: {{- toYaml .Values.clusterScanner.resources | nindent 12 }}

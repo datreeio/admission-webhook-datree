@@ -1,0 +1,12 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-webhook-server",
+      "type": "shell",
+      "command": "cli sh datree-webhook-server -c builder -- go build -v -o /out/webhook-datree -gcflags='all=-N -l' main.go",
+      "group": "build",
+      "detail": "Build Datree webhook-server"
+    }
+  ]
+}
