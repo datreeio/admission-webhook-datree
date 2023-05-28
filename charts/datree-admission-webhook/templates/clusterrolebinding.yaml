@@ -23,6 +23,7 @@ metadata:
   name: datree-namespaces-update
   labels: {{include "datree.labels" . | nindent 4}}
   annotations:
+    argocd.argoproj.io/hook: Skip
     {{- with .Values.customAnnotations }}
     {{ toYaml . | nindent 4 }}
     {{- end }}
