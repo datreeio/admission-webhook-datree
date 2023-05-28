@@ -32,8 +32,7 @@ metadata:
   name: datree-namespaces-update
   labels: {{include "datree.labels" . | nindent 4}}
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-10"
+    argocd.argoproj.io/hook: Skip
   {{- with .Values.customAnnotations }}
   {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -56,8 +55,7 @@ metadata:
   name: datree-validationwebhook-delete
   labels: {{include "datree.labels" . | nindent 4}}
   annotations:
-    argocd.argoproj.io/hook: PreSync
-    argocd.argoproj.io/sync-wave: "-10"
+    argocd.argoproj.io/hook: Skip
   {{- with .Values.customAnnotations }}
   {{ toYaml . | nindent 4 }}
   {{- end }}
