@@ -42,10 +42,6 @@ spec:
       {{- end }}
       containers:
         - name: server
-          lifecycle:
-            postStart:
-              exec:
-                command: [ "apk", "add", "build-base" ]
           env:
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName | required "Cluster name is required"}}
@@ -76,6 +72,9 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+          {{- with .Values.securityContext }}
+          securityContext: {{ toYaml . | nindent 12 }}
+          {{- end }}
           livenessProbe:
             httpGet:
               path: /health

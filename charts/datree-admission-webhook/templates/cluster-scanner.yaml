@@ -96,10 +96,6 @@ spec:
       {{- end }}
       containers:
         - name: cluster-scanner-server
-          lifecycle:
-            postStart:
-              exec: 
-                command: ['sh', '-c', 'apk add --no-cache curl bash unzip openssl git build-base && curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/$(arch | sed s/aarch64/arm64/ | sed s/x86_64/amd64/)/kubectl" && install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl']
           env:
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName}}
