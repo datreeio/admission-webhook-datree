@@ -94,3 +94,6 @@ generate-helm-docs:
 	--sort-values-order=file \
 	--output-file ../../README.md \
 	--template-files=./README.md.gotmpl
+
+lint:
+	golangci-lint run ./...

@@ -136,7 +136,7 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 5
             periodSeconds: 10
-          image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.7" }}"
+          image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.9" }}"
           imagePullPolicy: "{{.Values.clusterScanner.image.pullPolicy}}"
           resources: {{- toYaml .Values.clusterScanner.resources | nindent 12 }}
           ports:

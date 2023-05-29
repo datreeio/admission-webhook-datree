@@ -135,6 +135,7 @@ func (c *CliClient) SendRequestMetadataBatch(clusterRequestMetadataAggregator Cl
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/clusterRequestMetadataBatch", clusterRequestMetadataAggregator, c.flagsHeaders)
 	if err != nil {
 		// using fmt.Println instead of logger to avoid circular dependency
+		//nolint:all
 		fmt.Println(fmt.Sprintf("SendRequestMetadataBatch status code: %d, err: %s", httpRes.StatusCode, err.Error()))
 	}
 }
@@ -251,6 +252,7 @@ type ReportK8sMetadataRequest struct {
 }
 
 func (c *CliClient) ReportK8sMetadata(request *ReportK8sMetadataRequest) {
+	//nolint:all
 	c.httpClient.Request(http.MethodPost, "/cli/clusterEvents", request, c.flagsHeaders)
 }
 
