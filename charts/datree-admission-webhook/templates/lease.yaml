@@ -6,6 +6,7 @@ metadata:
   namespace: {{ template "datree.namespace" . }}
   annotations:
     "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": before-hook-creation
   {{- with .Values.customAnnotations }}
   {{ toYaml . | nindent 4 }}
   {{- end }}
