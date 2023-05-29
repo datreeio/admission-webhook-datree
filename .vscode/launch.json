@@ -7,9 +7,6 @@
       "request": "launch",
       "mode": "exec",
       "program": "/out/webhook-datree",
-      "env": {
-        "DATREE_TOKEN": "c171b361-ba8f-4cfd-a803-6e278106a2c4"
-      },
       "raftt": {
         "workload": "datree-webhook-server"
       },
