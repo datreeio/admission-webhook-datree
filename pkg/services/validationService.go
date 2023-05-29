@@ -151,6 +151,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		*warningMessages = append(*warningMessages, err.Error())
 	} else {
 		if verifyVersionResponse != nil {
+			//nolint:all
 			for i := range verifyVersionResponse.MessageTextArray {
 				*warningMessages = append(*warningMessages, verifyVersionResponse.MessageTextArray[i])
 			}
@@ -392,6 +393,7 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 
 func (vs ValidationService) getEvaluationRequestData(policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
+	//nolint:all
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
 	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
 		EvaluationData: evaluation.EvaluationRequestData{

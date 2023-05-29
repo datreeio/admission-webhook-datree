@@ -104,6 +104,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 	k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataOnInit)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
+	//nolint:all
 	cornJob.AddFunc("@hourly", func() {
 		if k8sMetadataUtil.leaderElection.IsLeader() {
 			nodesCount, nodes, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)

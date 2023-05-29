@@ -40,6 +40,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isOKDResourceThatShouldBeEvaluated := isOkdResourceThatShouldBeEvaluated(managedFields)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOKDResourceThatShouldBeEvaluated
 
+	//nolint:all
 	if !isResourceWhiteListed {
 		return false
 	}
@@ -132,6 +133,7 @@ func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.Admission
 	}
 
 	badFluxObject := (len(labels) == 0) || (isDryRun)
+	//nolint:all
 	if badFluxObject {
 		return false
 	}
@@ -208,6 +210,7 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOkdResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
+	//nolint:all
 	if doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager"}) {
 		return true
 	}

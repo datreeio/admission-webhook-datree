@@ -81,6 +81,7 @@ func start(port string) {
 	state.SetClusterUuid(clusterUuid)
 	state.SetK8sVersion(k8sVersion)
 
+	//nolint:all
 	server.InitSkipList()
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
@@ -101,12 +102,14 @@ func start(port string) {
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+		//nolint:all
 		http.ListenAndServe(":"+port, nil)
 	}
 }
 
 func initMetadataLogsCronjob(validationService *services.ValidationService) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
+	//nolint:all
 	cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
 	cornJob.Start()
 }

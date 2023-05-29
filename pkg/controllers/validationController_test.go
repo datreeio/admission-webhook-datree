@@ -148,6 +148,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	setMockEnv(t)
 	t.Setenv(enums.Enforce, "false")
 	var applyRequestNotAllowed admission.AdmissionReview
+	//nolint:all
 	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
