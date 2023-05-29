@@ -4,8 +4,11 @@ kind: Lease
 metadata:
   name: datree-webhook-server-lease
   namespace: {{ template "datree.namespace" . }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-delete-policy": before-hook-creation
   {{- with .Values.customAnnotations }}
-  annotations: {{ toYaml . | nindent 4 }}
+  {{ toYaml . | nindent 4 }}
   {{- end }}
   labels: {{ include "datree.labels" . | nindent 4 }}
 spec:

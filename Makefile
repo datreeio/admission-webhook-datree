@@ -58,7 +58,7 @@ helm-install-staging:
 	make change-ping-uninstall-url-to-staging && \
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
-	--set datree.token="${DATREE_TOKEN}" \
+	--set datree.token="66b6aab2-5a5e-4680-9433-5e592665d314" \
 	--set datree.clusterName="minikube" \
 	--set datree.policy="Starter" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
