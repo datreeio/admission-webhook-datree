@@ -3,6 +3,7 @@ package server
 import (
 	"errors"
 	"fmt"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 	"os"
 	"path/filepath"
 
@@ -54,9 +55,8 @@ func getScanningFilterFromConfigMap(filePath string) ([]string, error) {
 }
 
 func readConfigScanningFilters() (skipList []string, err error) {
-	configDir := `/config`
-	configSkipListPath := filepath.Join(configDir, `skiplist`)
-	datreeSkipListPath := filepath.Join(configDir, `datreeSkipList`)
+	configSkipListPath := filepath.Join(servicestate.DATREE_CONFIG_FILE_DIR, `skiplist`)
+	datreeSkipListPath := filepath.Join(servicestate.DATREE_CONFIG_FILE_DIR, `datreeSkipList`)
 	skipListPaths := []string{datreeSkipListPath, configSkipListPath}
 	skipLists := []string{}
 
@@ -67,7 +67,6 @@ func readConfigScanningFilters() (skipList []string, err error) {
 				return nil, err
 			}
 			skipLists = append(skipLists, skipList...)
-
 		}
 	}
 	return skipLists, nil
