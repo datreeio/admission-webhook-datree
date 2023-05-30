@@ -782,6 +782,9 @@
       }
     ]
   },
+  "activePolicies": [
+    "Starter"
+  ],
   "registrationUrl": "https://app.staging.datree.io",
   "promptRegistrationURL": "https://app.staging.datree.io",
   "isPolicyAsCodeMode": false,
