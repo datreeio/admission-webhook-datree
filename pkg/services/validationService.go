@@ -120,6 +120,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	allowed := true
 
+	sb := strings.Builder{}
+
 	for _, policyName := range prerunData.ActivePolicies {
 		if !vs.shouldPolicyRunForNamespace(policyName, namespace) {
 			continue
@@ -186,10 +188,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() {
 			allowed = false
 
-			sb := strings.Builder{}
 			sb.WriteString("\n---\n")
 			sb.WriteString(resultStr)
-			msg = sb.String()
 		}
 
 		if !vs.State.GetIsEnforceMode() {
@@ -208,6 +208,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			}
 		}
 	}
+
+	msg = sb.String()
 
 	verifyVersionResponse, err := vs.CliServiceClient.GetVersionRelatedMessages(vs.State.GetServiceVersion())
 	if err != nil {
