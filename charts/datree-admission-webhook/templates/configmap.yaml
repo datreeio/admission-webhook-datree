@@ -5,7 +5,7 @@ metadata:
   namespace: {{ template "datree.namespace" . }}
 data:
 {{- if .Values.datree.multiplePolicies }}
-  multiplePolicies: | 
+  datreeMultiplePolicies: | 
     {{- toYaml .Values.datree.multiplePolicies | nindent 4 }}
 {{- end }}
   datreeSkipList: |- 
