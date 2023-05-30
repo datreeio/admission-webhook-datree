@@ -125,7 +125,7 @@ type PolicyWithNamespaces struct {
 type MultiplePolicies = []PolicyWithNamespaces
 
 func readMultiplePolicies() *MultiplePolicies {
-	datreeMultiplePoliciesPath := filepath.Join(DATREE_CONFIG_FILE_DIR, "multiplePolicies")
+	datreeMultiplePoliciesPath := filepath.Join(DATREE_CONFIG_FILE_DIR, "datreeMultiplePolicies")
 
 	if _, err := os.Stat(datreeMultiplePoliciesPath); errors.Is(err, os.ErrNotExist) {
 		fmt.Println(fmt.Errorf("error read multiplePolicies on path : %s", datreeMultiplePoliciesPath))
