@@ -118,7 +118,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
 
-	didFailAtLeastOnePolicyCheck := false
+	allowed := true
 
 	for _, policyName := range prerunData.ActivePolicies {
 		if !vs.shouldPolicyRunForNamespace(policyName, namespace) {
@@ -183,32 +183,29 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 
 		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
-		if didFailCurrentPolicyCheck {
-			didFailAtLeastOnePolicyCheck = true
+		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() {
+			allowed = false
 
 			sb := strings.Builder{}
 			sb.WriteString("\n---\n")
 			sb.WriteString(resultStr)
 			msg = sb.String()
 		}
-	}
 
-	allowed := !didFailAtLeastOnePolicyCheck
-
-	if !vs.State.GetIsEnforceMode() {
-		allowed = true
-		baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
-		invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
-		if didFailAtLeastOnePolicyCheck {
-			*warningMessages = append([]string{
-				fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check", resourceName, resourceKind),
-				fmt.Sprintf("👉 Get the full report %s", invocationUrl),
-			}, *warningMessages...)
-		} else {
-			*warningMessages = append([]string{
-				fmt.Sprintf("✅ Object with name \"%s\" and kind \"%s\" passed Datree's policy check", resourceName, resourceKind),
-				fmt.Sprintf("👉 Get the full report %s", invocationUrl),
-			}, *warningMessages...)
+		if !vs.State.GetIsEnforceMode() {
+			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
+			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
+			if didFailCurrentPolicyCheck {
+				*warningMessages = append([]string{
+					fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check with policy \"%s\"", resourceName, resourceKind, policyName),
+					fmt.Sprintf("👉 Get the full report %s", invocationUrl),
+				}, *warningMessages...)
+			} else {
+				*warningMessages = append([]string{
+					fmt.Sprintf("✅  Object with name \"%s\" and kind \"%s\" passed Datree's policy check with policy \"%s\"", resourceName, resourceKind, policyName),
+					fmt.Sprintf("👉 Get the full report %s", invocationUrl),
+				}, *warningMessages...)
+			}
 		}
 	}
 
