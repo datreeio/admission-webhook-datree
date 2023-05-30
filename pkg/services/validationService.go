@@ -197,12 +197,12 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
 			if didFailCurrentPolicyCheck {
 				*warningMessages = append([]string{
-					fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check with policy \"%s\"", resourceName, resourceKind, policyName),
+					fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check for policy \"%s\"", resourceName, resourceKind, policyName),
 					fmt.Sprintf("👉 Get the full report %s", invocationUrl),
 				}, *warningMessages...)
 			} else {
 				*warningMessages = append([]string{
-					fmt.Sprintf("✅  Object with name \"%s\" and kind \"%s\" passed Datree's policy check with policy \"%s\"", resourceName, resourceKind, policyName),
+					fmt.Sprintf("✅  Object with name \"%s\" and kind \"%s\" passed Datree's policy check for policy \"%s\"", resourceName, resourceKind, policyName),
 					fmt.Sprintf("👉 Get the full report %s", invocationUrl),
 				}, *warningMessages...)
 			}
