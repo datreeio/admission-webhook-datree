@@ -1,4 +1,0 @@
-host: direct
-envDefinition: env.raftt
-directOptions:
-  searchLocalDockerRegistry: true
