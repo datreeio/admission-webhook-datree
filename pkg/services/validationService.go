@@ -95,7 +95,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 	if !vs.State.GetConfigFromHelm() {
-		vs.State.SetPolicyName(prerunData.ActivePolicies[0]) // TODO fix this
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
 	}
@@ -117,23 +116,12 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
 
-	policyNameFromState := vs.State.GetPolicyName()
-	fmt.Println("policyNameFromState: ", policyNameFromState) // TODO remove this line
-
 	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
 
 	didFailAtLeastOnePolicyCheck := false
 
-	policyNames := []string{"EKS", "Starter"} // TODO remove this line
-
-	for _, policyName := range policyNames {
-		if !shouldPolicyRunForNamespace(policyWithNamespaces{
-			policy: policyName,
-			namespaces: namespacePatterns{
-				includePatterns: []string{".*"},
-				excludePatterns: []string{},
-			},
-		}, namespace) {
+	for _, policyName := range prerunData.ActivePolicies {
+		if !vs.shouldPolicyRunForNamespace(policyName, namespace) {
 			continue
 		}
 
@@ -361,27 +349,35 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 	}
 }
 
-type namespacePatterns struct {
-	includePatterns []string
-	excludePatterns []string
-}
-type policyWithNamespaces struct {
-	policy     string
-	namespaces namespacePatterns
-}
-
-func shouldPolicyRunForNamespace(policy policyWithNamespaces, namespace string) bool {
-	for _, excludePattern := range policy.namespaces.excludePatterns {
+func (vs *ValidationService) shouldPolicyRunForNamespace(policyName string, namespace string) bool {
+	namespaceRestrictions := vs.getNamespaceRestrictionsByPolicyName(policyName)
+	if namespaceRestrictions == nil {
+		return true
+	}
+	for _, excludePattern := range namespaceRestrictions.ExcludePatterns {
 		if match, _ := regexp.MatchString(excludePattern, namespace); match {
 			return false
 		}
 	}
-	for _, includePattern := range policy.namespaces.includePatterns {
+	for _, includePattern := range namespaceRestrictions.IncludePatterns {
 		if match, _ := regexp.MatchString(includePattern, namespace); match {
 			return true
 		}
 	}
 	return false
+}
+func (vs *ValidationService) getNamespaceRestrictionsByPolicyName(policyName string) *servicestate.Namespaces {
+	policies := vs.State.GetMultiplePolicies()
+	if policies == nil {
+		return nil
+	}
+
+	for _, policy := range *policies {
+		if policy.Policy == policyName {
+			return &policy.Namespaces
+		}
+	}
+	return nil
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
@@ -435,7 +431,7 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 	return namespace, resourceKind, resourceName, managers
 }
 
-func (vs ValidationService) getEvaluationRequestData(policyName string,
+func (vs *ValidationService) getEvaluationRequestData(policyName string,
 	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
 	//nolint:all
 	evaluationDurationSeconds := time.Now().Sub(startTime).Seconds()
