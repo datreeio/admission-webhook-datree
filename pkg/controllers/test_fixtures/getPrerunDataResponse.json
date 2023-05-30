@@ -783,7 +783,7 @@
     ]
   },
   "activePolicies": [
-    "Starter"
+    "Default"
   ],
   "registrationUrl": "https://app.staging.datree.io",
   "promptRegistrationURL": "https://app.staging.datree.io",
