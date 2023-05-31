@@ -40,12 +40,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isOKDResourceThatShouldBeEvaluated := isOkdResourceThatShouldBeEvaluated(managedFields)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOKDResourceThatShouldBeEvaluated
 
-	//nolint:all
-	if !isResourceWhiteListed {
-		return false
-	}
-
-	return true
+	return isResourceWhiteListed
 }
 
 func ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
@@ -133,12 +128,7 @@ func isFluxResourceThatShouldBeEvaluated(admissionReviewReq *admission.Admission
 	}
 
 	badFluxObject := (len(labels) == 0) || (isDryRun)
-	//nolint:all
-	if badFluxObject {
-		return false
-	}
-
-	return true
+	return !badFluxObject
 }
 
 func isArgoResourceThatShouldBeEvaluated(admissionReviewReq *admission.AdmissionReview, resourceKind string, managedFields []ManagedFields) bool {
@@ -210,10 +200,5 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOkdResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	//nolint:all
-	if doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager"}) {
-		return true
-	}
-
-	return false
+	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager"})
 }

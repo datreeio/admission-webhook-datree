@@ -2,6 +2,7 @@ package k8sMetadataUtil
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -104,8 +105,8 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 	k8sMetadataUtil.sendK8sMetadata(cliClient, k8sMetadataOnInit)
 
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-	//nolint:all
-	cornJob.AddFunc("@hourly", func() {
+
+	_, err = cornJob.AddFunc("@hourly", func() {
 		if k8sMetadataUtil.leaderElection.IsLeader() {
 			nodesCount, nodes, nodesCountErr := getNodesCount(k8sMetadataUtil.ClientSet)
 			k8sDistribution := getLocalK8sDistribution(k8sMetadataUtil.ClientSet, nodes)
@@ -120,6 +121,9 @@ func (k8sMetadataUtil *K8sMetadataUtil) InitK8sMetadataUtil(state *servicestate.
 		}
 
 	})
+	if err != nil {
+		fmt.Printf("Cronjon failed to be added, err: %s \n", err.Error())
+	}
 	cornJob.Start()
 }
 
