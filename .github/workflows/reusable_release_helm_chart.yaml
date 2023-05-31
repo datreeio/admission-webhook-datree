@@ -66,4 +66,4 @@ jobs:
           branch-suffix: "timestamp"
           delete-branch: true
           labels: "docs"
-          reviewers: "datreeio/product"
+          reviewers: "hadar-co"
