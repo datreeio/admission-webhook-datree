@@ -4,6 +4,8 @@
 {{- if and (.Values.datree.multiplePolicies) (.Values.datree.policy)}}
     {{- fail "You can't use both policy and multiplePolicies at the same time" }}
 {{- end }}
+  
+{{/* don't allow the same policy to be used more than once */}}
 {{- if .Values.datree.multiplePolicies}}
     {{- $policyCount := dict}}
     {{- range $index, $policy := .Values.datree.multiplePolicies}}
@@ -11,7 +13,7 @@
         {{- if get $policyCount $policyName}}
             {{- fail (printf "datree.multiplePolicies: Policy \"%s\" cannot be used more than once. Refer to docs for more info: https://hub.datree.io/configuration/behavior#multipe-policies" $policyName)}}
         {{- else}}
-            {{- set $policyCount $policyName true}}
+            {{- $_ := set $policyCount $policyName true}}
         {{- end}}
-  {{- end}}
+    {{- end}}
 {{- end }}
