@@ -8,6 +8,8 @@ jobs:
     permissions:
       contents: write
     runs-on: ubuntu-latest
+    outputs:
+      chart_version: ${{ steps.set_chart_version.outputs.chart_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -23,9 +25,11 @@ jobs:
         with:
           version: v3.10.0
       - name: Set Chart Version env
+        id: set_chart_version
         run: |
           NEW_CHART_VERSION=$(yq e '.version' ./charts/datree-admission-webhook/Chart.yaml | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
           echo "NEW_CHART_VERSION=$NEW_CHART_VERSION" >> $GITHUB_ENV
+          echo "chart_version=$NEW_CHART_VERSION" >> $GITHUB_OUTPUT
       - name: Custom bump versions
         uses: mikefarah/yq@master
         with:
@@ -39,3 +43,27 @@ jobs:
         uses: helm/chart-releaser-action@v1.4.1
         env:
           CR_TOKEN: "${{ secrets.DATREE_CI_GH_TOKEN }}"
+  update-docs:
+    runs-on: ubuntu-latest
+    name: update docs after the release
+    needs: release
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          token: ${{secrets.DATREE_CI_GH_TOKEN}}
+          repository: datreeio/docs
+      - name: Replace version in docs
+        run: |
+          sed -E 's/datree-admission-webhook --revision [0-9.]+/datree-admission-webhook --revision ${{ needs.release.outputs.chart_version }}/' ./docs/welcome/getting-started/index.mdx > ~/getting_started_index_temp.mdx && mv ~/getting_started_index_temp.mdx ./docs/welcome/getting-started/index.mdx
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{secrets.DATREE_CI_GH_TOKEN}}
+          commit-message: "docs: update webhook version to ${{ needs.release.outputs.chart_version }}"
+          title: "docs: update webhook version to ${{ needs.release.outputs.chart_version }}"
+          body: "docs: update webhook version to ${{ needs.release.outputs.chart_version }}"
+          branch: "docs/update-webhook-version-${{ needs.release.outputs.chart_version }}"
+          branch-suffix: "timestamp"
+          delete-branch: true
+          labels: "docs"
+          reviewers: "datreeio/product"
