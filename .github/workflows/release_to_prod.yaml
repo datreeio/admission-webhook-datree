@@ -67,9 +67,6 @@ jobs:
           AWS_MAX_ATTEMPTS=10 aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
   update-docs:
     runs-on: ubuntu-latest
-    env:
-      REPO_NAME: datree
-      IMAGE_NAME: admission-webhook
     name: update docs after the release
     needs: release-docker
     steps:
