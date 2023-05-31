@@ -78,7 +78,7 @@ spec:
           projected:
             sources:
             - configMap:
-                name: custom-scanning-filters
+                name: datree-config
                 optional: true
             - configMap:
                 name: webhook-scanning-filters

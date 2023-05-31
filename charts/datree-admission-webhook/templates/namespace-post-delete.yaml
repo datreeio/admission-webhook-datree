@@ -4,7 +4,8 @@ metadata:
   name: datree-cleanup-namespaces-hook-pre-delete
   labels: {{include "datree.labels" . | nindent 4}}
   namespace: {{template "datree.namespace" .}}
-  annotations: 
+  annotations:
+    argocd.argoproj.io/hook: Skip
     "helm.sh/hook": pre-delete, pre-upgrade
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}
@@ -45,7 +46,8 @@ metadata:
   name: datree-uninstall-ping
   labels: {{include "datree.labels" . | nindent 4}}
   namespace: {{template "datree.namespace" .}}
-  annotations: 
+  annotations:
+    argocd.argoproj.io/hook: Skip
     "helm.sh/hook": pre-delete
     "helm.sh/hook-delete-policy": hook-succeeded, hook-failed
     {{- with .Values.customAnnotations }}

@@ -42,83 +42,112 @@
           "title": "The policy Schema",
           "type": ["string", "null"],
           "default": ""
-        }
-      }
-    },
-    "image": {
-      "title": "The image Schema",
-      "type": "object",
-      "required": [
-        "repository",
-        "pullPolicy"
-      ],
-      "properties": {
-        "repository": {
-          "title": "The repository Schema",
-          "type": "string",
-          "default": ""
         },
-        "tag": {
-          "title": "The tag Schema",
-          "type": ["string", "null"],
-          "default": ""
-        },
-        "pullPolicy": {
-          "title": "The pullPolicy Schema",
-          "type": "string",
-          "enum": ["Always", "Never", "IfNotPresent"],
-          "default": ""
-        }
-      }
-    },
-    "clusterScanner": {
-      "title": "The clusterScanner Schema",
-      "type": "object",
-      "required": [
-        "image"
-      ],
-      "properties": {
-        "image": {
-          "title": "The image Schema",
-          "type": "object",
-          "required": [
-            "repository",
-            "pullPolicy"
-          ],
-          "properties": {
-            "repository": {
-              "title": "The repository Schema",
-              "type": "string",
-              "default": ""
-            },
-            "pullPolicy": {
-              "title": "The pullPolicy Schema",
-              "type": "string",
-              "enum": ["Always", "Never", "IfNotPresent"],
-              "default": ""
-            },
-            "tag": {
-              "title": "The tag Schema",
-              "type": ["string", "null"],
-              "default": ""
+        "multiplePolicies": {
+          "title": "The multiplePolicies Schema",
+          "type": "array",
+          "items": {
+            "title": "The items Schema",
+            "type": "object",
+            "required": ["policy", "namespaces"],
+            "properties": {
+              "policy": {
+                "title": "The policy Schema",
+                "type": "string"
+              },
+              "namespaces": {
+                "title": "The namespaces Schema",
+                "type": "object",
+                "properties": {
+                  "includePatterns": {
+                    "title": "The include Schema",
+                    "type": "array",
+                    "items": {
+                      "title": "The items Schema",
+                      "type": "string"
+                    }
+                  },
+                  "excludePatterns": {
+                    "title": "The exclude Schema",
+                    "type": "array",
+                    "items": {
+                      "title": "The items Schema",
+                      "type": "string"
+                    }
+                  }
+                },
+                "additionalProperties": false,
+                "required": ["includePatterns"]
+              }
             }
           }
         }
       }
-    },
-    "validatingWebhookConfiguration": {
-      "title": "The validatingWebhookConfiguration Schema",
-      "type": "object",
-      "required": [
-        "failurePolicy"
-      ],
-      "properties": {
-        "failurePolicy": {
-          "title": "The failurePolicy Schema",
-          "type": "string",
-          "enum": ["Ignore", "Fail"],
-          "default": ""
+    }
+  },
+  "image": {
+    "title": "The image Schema",
+    "type": "object",
+    "required": ["repository", "pullPolicy"],
+    "properties": {
+      "repository": {
+        "title": "The repository Schema",
+        "type": "string",
+        "default": ""
+      },
+      "tag": {
+        "title": "The tag Schema",
+        "type": ["string", "null"],
+        "default": ""
+      },
+      "pullPolicy": {
+        "title": "The pullPolicy Schema",
+        "type": "string",
+        "enum": ["Always", "Never", "IfNotPresent"],
+        "default": ""
+      }
+    }
+  },
+  "clusterScanner": {
+    "title": "The clusterScanner Schema",
+    "type": "object",
+    "required": ["image"],
+    "properties": {
+      "image": {
+        "title": "The image Schema",
+        "type": "object",
+        "required": ["repository", "pullPolicy"],
+        "properties": {
+          "repository": {
+            "title": "The repository Schema",
+            "type": "string",
+            "default": ""
+          },
+          "pullPolicy": {
+            "title": "The pullPolicy Schema",
+            "type": "string",
+            "enum": ["Always", "Never", "IfNotPresent"],
+            "default": ""
+          },
+          "tag": {
+            "title": "The tag Schema",
+            "type": ["string", "null"],
+            "default": ""
+          }
         }
+      }
+    }
+  },
+  "validatingWebhookConfiguration": {
+    "title": "The validatingWebhookConfiguration Schema",
+    "type": "object",
+    "required": ["failurePolicy"],
+    "properties": {
+      "failurePolicy": {
+        "title": "The failurePolicy Schema",
+        "type": "string",
+        "enum": ["Ignore", "Fail"],
+        "default": ""
       }
     }
   }
