@@ -38,7 +38,7 @@ COPY . .
 RUN chown -R myuser:myuser /app && \
     chmod -R 755 /app
 # RUN go build -gcflags "-N -l" -o /app/webhook-datree
-RUN --mount=type=cache,target=/root/.cache/go-build GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -gcflags "-N -l" -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
+RUN --mount=type=cache,target=/root/.cache/go-build go build -gcflags "-N -l" -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION" -o webhook-datree
 
 
 USER myuser

@@ -1,18 +1,11 @@
 # -*- mode: Python -*-
 
-# Importing required Tilt modules
-# from tilt.dev import helm_chart
 
-# Run this commands: 
-#           OUTPUT_VERSION=$(bash scripts/define_release_version.sh)
-        #   echo "detected version = $OUTPUT_VERSION"
-        #   echo "version=$OUTPUT_VERSION" >> $GITHUB_OUTPUT
 
 docker_build('datree/admission-webhook', './', dockerfile = './Dockerfile-tilt', build_args={
     "BUILD_ENVIRONMENT":"staging",
     "WEBHOOK_VERSION":"0.0.1",
-    }
-)
+})
 docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile-tilt', build_args={
     "BUILD_ENVIRONMENT":"staging",
     "WEBHOOK_VERSION":"0.0.1",
@@ -22,24 +15,28 @@ namespace_create('datree')
 
 k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='./values-tilt.yaml', namespace='datree'))
 
-local_resource(
-    name='wait for datree-webhook-server to be ready',
-    serve_cmd='kubectl rollout status -n datree deployment/datree-webhook-server && kubectl port-forward --namespace datree $(kubectl get pods --namespace datree --selector "app=datree-webhook-server" --output=name) 8443 5555',
-    resource_deps = ['datree-webhook-server'],
-
-    )
-# Add extention 'wait_for_it'
-
 
 local_resource(
-  name='webhook debugging',
-  serve_cmd='bash ./webhook-debugging.sh',
+    name='datree-webhook-server-debuging',
+    serve_cmd='bash ./webhook-debugging.sh',
+)
+
+local_resource(
+    name='webhook - restart port-forwarding',
+    serve_cmd='bash ./webhook-restart-port-forwarding.sh',
 )
 
 local_resource(
     name='cluster-scanner debugging',
     serve_cmd='bash ./cluster-scanner-debugging.sh',
 )
+
+local_resource(
+    name='cluster-scanner - restart port-forwarding',
+    serve_cmd='bash ./scanner-restart-port-forwarding.sh',
+)
+
+
 # local_resource(
 #     name='wait for datree-cluster-scanner-server to be ready',
 #     serve_cmd='kubectl port-forward --namespace datree $(kubectl get pods --namespace datree --selector "app=datree-cluster-scanner-server" --output=name) 8080 5556',

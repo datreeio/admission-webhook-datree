@@ -41,7 +41,7 @@ func main() {
 }
 
 func start(port string) {
-	fmt.Println("Starting Datree Webhook - niv 6")
+	fmt.Println("Starting Datree Webhook - niv 4")
 	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
