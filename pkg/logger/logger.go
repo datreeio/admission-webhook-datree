@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"go.uber.org/zap"
 	admission "k8s.io/api/admission/v1"
@@ -24,6 +25,7 @@ type Logger struct {
 
 func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
 	zapLogger, _ := zap.NewProduction()
+	//nolint:all
 	defer zapLogger.Sync() // flushes buffer, if any
 	sugar := zapLogger.Sugar()
 

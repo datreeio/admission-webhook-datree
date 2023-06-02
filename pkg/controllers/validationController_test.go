@@ -55,8 +55,8 @@ func TestHeaderValidation(t *testing.T) {
 	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
-	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
-	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "Content-Type header is not application/json")
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	assert.Equal(t, "Content-Type header is not application/json", strings.TrimSpace(responseRecorder.Body.String()))
 }
 
 func TestValidateHttpMethod(t *testing.T) {
@@ -68,8 +68,8 @@ func TestValidateHttpMethod(t *testing.T) {
 	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
-	assert.Equal(t, responseRecorder.Code, http.StatusMethodNotAllowed)
-	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "Method not allowed")
+	assert.Equal(t, http.StatusMethodNotAllowed, responseRecorder.Code)
+	assert.Equal(t, "Method not allowed", strings.TrimSpace(responseRecorder.Body.String()))
 }
 
 func TestValidateRequestBodyEmpty(t *testing.T) {
@@ -81,8 +81,8 @@ func TestValidateRequestBodyEmpty(t *testing.T) {
 	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
-	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
-	assert.Equal(t, strings.TrimSpace(responseRecorder.Body.String()), "EOF")
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	assert.Equal(t, "EOF", strings.TrimSpace(responseRecorder.Body.String()))
 }
 
 func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
@@ -94,7 +94,7 @@ func TestValidateRequestBodyMissingRequestProperty(t *testing.T) {
 	validationController := mockValidationController(httpClient.Response{})
 	validationController.Validate(responseRecorder, request)
 
-	assert.Equal(t, responseRecorder.Code, http.StatusBadRequest)
+	assert.Equal(t, http.StatusBadRequest, responseRecorder.Code)
 	assert.Contains(t, strings.TrimSpace(responseRecorder.Body.String()), "request is nil")
 }
 
@@ -124,8 +124,8 @@ func TestValidateRequestBody(t *testing.T) {
 	})
 	validationController.Validate(responseRecorder, request)
 
-	assert.Equal(t, responseRecorder.Code, http.StatusOK)
-	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Result.Message, "We're good!")
+	assert.Equal(t, http.StatusOK, responseRecorder.Code)
+	assert.Equal(t, "We're good!", responseToAdmissionResponse(responseRecorder.Body.String()).Result.Message)
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
@@ -141,13 +141,14 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	})
 
 	validationController.Validate(responseRecorder, request)
-	assert.Equal(t, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed, false)
+	assert.Equal(t, false, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed)
 }
 
 func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
 	setMockEnv(t)
 	t.Setenv(enums.Enforce, "false")
 	var applyRequestNotAllowed admission.AdmissionReview
+	//nolint:all
 	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
@@ -165,7 +166,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 		"🚩 Object with name \"my-deployment\" and kind \"Scale\" failed the policy check",
 		"👉 Get the full report https://app.staging.datree.io/cli/invocations/",
 	}
-	assert.Equal(t, admissionResponse.Allowed, true)
+	assert.Equal(t, true, admissionResponse.Allowed)
 	assert.Contains(t, admissionResponse.Warnings[0], expectedWarningMessages[0])
 	assert.Contains(t, admissionResponse.Warnings[1], expectedWarningMessages[1])
 	assert.Contains(t, admissionResponse.Warnings[1], "webhook=true")
@@ -174,8 +175,6 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 func TestValidateRequestBodyWithPolicyNotExists(t *testing.T) {
 	setMockEnv(t)
 	t.Setenv(enums.Enforce, "true")
-	t.Setenv(enums.Policy, "NotExistsPolicy")
-	expectedWarningMessages := "Unable to complete evaluation. Policy NotExistsPolicy not found."
 
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
@@ -183,14 +182,16 @@ func TestValidateRequestBodyWithPolicyNotExists(t *testing.T) {
 
 	validationController := mockValidationController(httpClient.Response{
 		StatusCode: http.StatusOK,
-		Body:       getPrerunDataResponse,
+		Body: getAndMutatePrerunResponse(func(prerunResponse *clients.ClusterEvaluationPrerunDataResponse) {
+			prerunResponse.ActivePolicies = []string{"NotExistsPolicy"}
+		}),
 	})
 
 	validationController.Validate(responseRecorder, request)
 	admissionResponse := responseToAdmissionResponse(responseRecorder.Body.String())
 
-	assert.Equal(t, admissionResponse.Allowed, true)
-	assert.Contains(t, admissionResponse.Warnings[0], expectedWarningMessages)
+	assert.Equal(t, true, admissionResponse.Allowed)
+	assert.Contains(t, admissionResponse.Warnings[0], "Policy NotExistsPolicy not found, skipping evaluation")
 }
 
 func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
@@ -208,7 +209,7 @@ func TestValidateRequestBodyWithAllowedK8sResource(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
+	assert.Equal(t, true, responseToAdmissionResponse(body).Allowed)
 }
 
 func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
@@ -225,7 +226,7 @@ func TestValidateRequestBodyWithFluxCDResource(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
+	assert.Equal(t, true, responseToAdmissionResponse(body).Allowed)
 }
 
 func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
@@ -242,7 +243,7 @@ func TestValidateRequestBodyWithFluxCDResourceWithoutLabels(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 
-	assert.Equal(t, responseToAdmissionResponse(body).Allowed, true)
+	assert.Equal(t, true, responseToAdmissionResponse(body).Allowed)
 }
 
 func responseToAdmissionResponse(response string) *admission.AdmissionResponse {
@@ -288,4 +289,27 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
 
 	return NewValidationController(mockedCliServiceClient, mockState, mockErrorReporter, mockK8sMetadataUtil)
+}
+
+func convertPrerunResponseJsonToStruct(prerunResponse []byte) *clients.ClusterEvaluationPrerunDataResponse {
+	var prerunResponseStruct clients.ClusterEvaluationPrerunDataResponse
+	err := json.Unmarshal(prerunResponse, &prerunResponseStruct)
+	if err != nil {
+		panic(err)
+	}
+	return &prerunResponseStruct
+}
+
+func convertPrerunResponseStructToBytes(prerunResponse *clients.ClusterEvaluationPrerunDataResponse) []byte {
+	prerunResponseJson, err := json.Marshal(prerunResponse)
+	if err != nil {
+		panic(err)
+	}
+	return prerunResponseJson
+}
+
+func getAndMutatePrerunResponse(mutate func(*clients.ClusterEvaluationPrerunDataResponse)) []byte {
+	prerunResponseStruct := convertPrerunResponseJsonToStruct(getPrerunDataResponse)
+	mutate(prerunResponseStruct)
+	return convertPrerunResponseStructToBytes(prerunResponseStruct)
 }

@@ -1,9 +1,13 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: custom-scanning-filters
+  name: datree-config
   namespace: {{ template "datree.namespace" . }}
 data:
+{{- if .Values.datree.multiplePolicies }}
+  datreeMultiplePolicies: | 
+    {{- toYaml .Values.datree.multiplePolicies | nindent 4 }}
+{{- end }}
   datreeSkipList: |- 
 {{- range  .Values.datree.customSkipList }} 
     - {{ . }}

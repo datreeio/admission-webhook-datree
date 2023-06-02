@@ -136,7 +136,7 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 5
             periodSeconds: 10
-          image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.8" }}"
+          image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.12" }}"
           imagePullPolicy: "{{.Values.clusterScanner.image.pullPolicy}}"
           resources: {{- toYaml .Values.clusterScanner.resources | nindent 12 }}
           ports:
@@ -153,7 +153,7 @@ spec:
           projected:
             sources:
             - configMap:
-                name: custom-scanning-filters
+                name: datree-config
                 optional: true
             - configMap:
                 name: webhook-scanning-filters
