@@ -1,6 +1,20 @@
 # -*- mode: Python -*-
 
 
+load('ext://uibutton', 'cmd_button')
+cmd_button(name='disable all',
+        argv=['tilt', 'disable', '--all'],
+        text='disable all',
+        location='nav',
+        icon_name='swipe_down',
+)
+
+cmd_button(name='enable all',
+        argv=['tilt', 'enable', '--all'],
+        text='enable all',
+        location='nav',
+        icon_name='swipe_up',
+)
 
 docker_build('datree/admission-webhook', './', dockerfile = './Dockerfile-tilt', build_args={
     "BUILD_ENVIRONMENT":"staging",
@@ -23,17 +37,17 @@ local_resource(
 
 local_resource(
     name='webhook - restart port-forwarding',
-    serve_cmd='bash ./webhook-restart-port-forwarding.sh',
+    serve_cmd='bash ./restart-port-forwarding.sh "datree-webhook-server" "datree-webhook-server-debuging"',
 )
 
 local_resource(
     name='cluster-scanner debugging',
-    serve_cmd='bash ./cluster-scanner-debugging.sh',
+    serve_cmd='bash ./cluster-scanner-debugging.sh ',
 )
 
 local_resource(
     name='cluster-scanner - restart port-forwarding',
-    serve_cmd='bash ./scanner-restart-port-forwarding.sh',
+    serve_cmd='bash ./restart-port-forwarding.sh "datree-cluster-scanner-server" "cluster-scanner debugging"',
 )
 
 
