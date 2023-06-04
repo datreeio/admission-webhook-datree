@@ -25,8 +25,12 @@ type Logger struct {
 
 func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
 	zapLogger, _ := zap.NewProduction()
-	//nolint:all
-	defer zapLogger.Sync() // flushes buffer, if any
+	defer func() {
+		err := zapLogger.Sync() // flushes buffer, if any
+		if err != nil {
+			fmt.Println("Error during zap logger sync:", err)
+		}
+	}()
 	sugar := zapLogger.Sugar()
 
 	return Logger{zapLogger: sugar, requestId: requestId, errorReporter: errorReporter}
