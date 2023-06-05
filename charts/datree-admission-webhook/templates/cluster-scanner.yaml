@@ -122,20 +122,24 @@ spec:
             {{- with .Values.securityContext }}
             {{ toYaml . | nindent 12 }}
             {{- end }}
-          # livenessProbe:
-          #   httpGet:
-          #     path: /health
-          #     port: 8080
-          #     scheme: HTTP
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
-          # readinessProbe:
-          #   httpGet:
-          #     path: /ready
-          #     port: 8080
-          #     scheme: HTTP
-          #   initialDelaySeconds: 5
-          #   periodSeconds: 10
+          {{- if .Values.clusterScanner.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.clusterScanner.livenessProbe.path | default "/health" | quote }}
+              port: {{ .Values.clusterScanner.livenessProbe.port | default 8080 }}
+              scheme: {{ .Values.clusterScanner.livenessProbe.scheme | default "HTTP" | quote }} 
+            initialDelaySeconds: {{.Values.clusterScanner.livenessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{.Values.clusterScanner.livenessProbe.periodSeconds | default 10 }}
+          {{- end }}
+          {{- if .Values.clusterScanner.readinessProbe.enabled }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.clusterScanner.readinessProbe.path | default "/ready" | quote }} 
+              port: {{ .Values.clusterScanner.readinessProbe.port | default 8080 }}
+              scheme: {{ .Values.clusterScanner.readinessProbe.scheme | default "HTTP" | quote }}
+            initialDelaySeconds: {{.Values.clusterScanner.readinessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{.Values.clusterScanner.readinessProbe.periodSeconds | default 10 }}
+          {{- end }}
           image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.12" }}"
           imagePullPolicy: "{{.Values.clusterScanner.image.pullPolicy}}"
           resources: {{- toYaml .Values.clusterScanner.resources | nindent 12 }}

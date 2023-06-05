@@ -129,6 +129,20 @@ clusterScanner:
     # requests:
     #   cpu: 200m
     #   memory: 256Mi
+  livenessProbe:
+    enabled: true
+    path:
+    scheme:
+    port:
+    initialDelaySeconds:
+    periodSeconds:
+  readinessProbe:
+    enabled: true
+    path:
+    scheme:
+    port:
+    initialDelaySeconds:
+    periodSeconds:
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
@@ -147,15 +161,15 @@ validatingWebhookConfiguration:
 
 livenessProbe:
   enabled: true
-  path: "/health"
-  scheme: "HTTPS"
-  port: 8443
-  initialDelaySeconds: 5
-  periodSeconds: 10
+  path:
+  scheme:
+  port:
+  initialDelaySeconds:
+  periodSeconds:
 readinessProbe:
   enabled: true
-  path: "/ready"
-  scheme: "HTTPS"
-  port: 8443
-  initialDelaySeconds: 5
-  periodSeconds: 10
+  path:
+  scheme:
+  port:
+  initialDelaySeconds:
+  periodSeconds:

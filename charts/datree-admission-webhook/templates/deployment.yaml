@@ -78,7 +78,6 @@ spec:
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              enabled: {{ .Values.livenessProbe.enabled }}
               path: {{ .Values.livenessProbe.path | default "/health" | quote }}
               port: {{ .Values.livenessProbe.port | default 8443 }}
               scheme: {{ .Values.livenessProbe.scheme | default "HTTPS" | quote }} 
