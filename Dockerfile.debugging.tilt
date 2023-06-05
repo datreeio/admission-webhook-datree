@@ -1,0 +1,16 @@
+FROM golang:1.19-alpine
+RUN addgroup -g 1000 myuser && \
+    adduser -D -u 1000 -G myuser myuser
+RUN apk add --no-cache git
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+WORKDIR /app
+COPY go.* .
+RUN go mod download
+RUN chown -R myuser:myuser /app && \
+    chmod -R 755 /app
+COPY . .
+RUN --mount=type=cache,target=/root/.cache/go-build go build -gcflags "-N -l" -tags $BUILD_ENVIRONMENT -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=$WEBHOOK_VERSION"  -o webhook-datree 
+
+USER myuser
+
+ENTRYPOINT [ "dlv", "exec", "--headless", "--listen=:5555", "--api-version=2", "--", "/app/webhook-datree" ]

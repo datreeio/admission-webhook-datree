@@ -121,3 +121,8 @@ hooks:
     pullPolicy: IfNotPresent
 validatingWebhookConfiguration:
   failurePolicy: Ignore
+livenessProbe:
+  enabled: false
+
+readinessProbe:
+  enabled: false

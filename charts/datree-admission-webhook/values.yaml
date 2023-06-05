@@ -143,3 +143,19 @@ hooks:
     pullPolicy: IfNotPresent
 validatingWebhookConfiguration:
   failurePolicy: Ignore
+
+
+livenessProbe:
+  enabled: true
+  path: "/health"
+  scheme: "HTTPS"
+  port: 8443
+  initialDelaySeconds: 5
+  periodSeconds: 10
+readinessProbe:
+  enabled: true
+  path: "/ready"
+  scheme: "HTTPS"
+  port: 8443
+  initialDelaySeconds: 5
+  periodSeconds: 10
