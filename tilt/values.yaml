@@ -23,7 +23,7 @@ rbac:
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
-  token: "d489a97c-34ab-4c4e-af8c-3208d2cee12a"
+  token:
   # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
@@ -35,7 +35,7 @@ datree:
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord:
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
-  clusterName: "nivnivtest"
+  clusterName: "tilt"
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
 
