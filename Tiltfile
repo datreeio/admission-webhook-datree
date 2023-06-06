@@ -26,7 +26,7 @@ cmd_button(name='debugging',
 
 namespace_create('datree')
 
-k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='./values-tilt.yaml', namespace='datree'))
+k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='./tilt/values.yaml', namespace='datree'))
 
 
 
