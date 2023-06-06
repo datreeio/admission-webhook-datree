@@ -3,6 +3,7 @@ package controllers
 import (
 	_ "embed"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -148,8 +149,11 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T
 	setMockEnv(t)
 	t.Setenv(enums.Enforce, "false")
 	var applyRequestNotAllowed admission.AdmissionReview
-	//nolint:all
-	json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
+
+	err := json.Unmarshal([]byte(applyRequestNotAllowedJson), &applyRequestNotAllowed)
+	if err != nil {
+		fmt.Printf("json unmarshal error: %s \n", err.Error())
+	}
 	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
 	request.Header.Set("Content-Type", "application/json")
 	responseRecorder := httptest.NewRecorder()

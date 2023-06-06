@@ -81,8 +81,10 @@ func start(port string) {
 	state.SetClusterUuid(clusterUuid)
 	state.SetK8sVersion(k8sVersion)
 
-	//nolint:all
-	server.InitSkipList()
+	err = server.InitSkipList()
+	if err != nil {
+		fmt.Printf("Failed init skip list: %s \n", err.Error())
+	}
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
 		panic(err)
@@ -102,14 +104,18 @@ func start(port string) {
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
-		//nolint:all
-		http.ListenAndServe(":"+port, nil)
+		err = http.ListenAndServe(":"+port, nil)
+		if err != nil {
+			fmt.Println("Failed to start http server", err.Error())
+		}
 	}
 }
 
 func initMetadataLogsCronjob(validationService *services.ValidationService) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
-	//nolint:all
-	cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
+	_, err := cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
+	if err != nil {
+		fmt.Printf("Metadata cronjon failed to be added, err: %s \n", err.Error())
+	}
 	cornJob.Start()
 }
