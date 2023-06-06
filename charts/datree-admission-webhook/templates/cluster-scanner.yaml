@@ -125,8 +125,8 @@ spec:
           {{- if .Values.clusterScanner.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.clusterScanner.livenessProbe.path | default "/health" | quote }}
-              port: {{ .Values.clusterScanner.livenessProbe.port | default 8080 }}
+              path: "/health"
+              port: 8080
               scheme: {{ .Values.clusterScanner.livenessProbe.scheme | default "HTTP" | quote }} 
             initialDelaySeconds: {{.Values.clusterScanner.livenessProbe.initialDelaySeconds | default 5 }}
             periodSeconds: {{.Values.clusterScanner.livenessProbe.periodSeconds | default 10 }}
@@ -134,8 +134,8 @@ spec:
           {{- if .Values.clusterScanner.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.clusterScanner.readinessProbe.path | default "/ready" | quote }} 
-              port: {{ .Values.clusterScanner.readinessProbe.port | default 8080 }}
+              path: "/ready"
+              port: 8080
               scheme: {{ .Values.clusterScanner.readinessProbe.scheme | default "HTTP" | quote }}
             initialDelaySeconds: {{.Values.clusterScanner.readinessProbe.initialDelaySeconds | default 5 }}
             periodSeconds: {{.Values.clusterScanner.readinessProbe.periodSeconds | default 10 }}

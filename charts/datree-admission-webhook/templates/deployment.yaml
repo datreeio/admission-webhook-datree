@@ -78,8 +78,8 @@ spec:
           {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: {{ .Values.livenessProbe.path | default "/health" | quote }}
-              port: {{ .Values.livenessProbe.port | default 8443 }}
+              path: "/health"
+              port: 8443
               scheme: {{ .Values.livenessProbe.scheme | default "HTTPS" | quote }} 
             initialDelaySeconds: {{.Values.livenessProbe.initialDelaySeconds | default 5  }}
             periodSeconds: {{.Values.livenessProbe.periodSeconds | default 10 }}
@@ -87,8 +87,8 @@ spec:
           {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
-              path: {{ .Values.readinessProbe.path | default "/ready" | quote }}
-              port: {{ .Values.readinessProbe.port | default 8443 }}
+              path: "/ready"
+              port: 8443
               scheme: {{ .Values.readinessProbe.scheme | default "HTTPS" | quote }}
             initialDelaySeconds: {{.Values.readinessProbe.initialDelaySeconds | default 5 }}
             periodSeconds: {{.Values.readinessProbe.periodSeconds | default 10 }}

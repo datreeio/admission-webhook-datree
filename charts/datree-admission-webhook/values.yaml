@@ -123,6 +123,7 @@ clusterScanner:
     pullPolicy: Always
     # -- The image release tag to use for the scanner
     tag:
+    resources: { }
     # limits:
     #   cpu: 1000m
     #   memory: 1048Mi
@@ -131,16 +132,12 @@ clusterScanner:
     #   memory: 256Mi
   livenessProbe:
     enabled: true
-    path:
     scheme:
-    port:
     initialDelaySeconds:
     periodSeconds:
   readinessProbe:
     enabled: true
-    path:
     scheme:
-    port:
     initialDelaySeconds:
     periodSeconds:
 # During install Datree run two hooks: pre-install and pre-delete.
@@ -161,15 +158,11 @@ validatingWebhookConfiguration:
 
 livenessProbe:
   enabled: true
-  path:
   scheme:
-  port:
   initialDelaySeconds:
   periodSeconds:
 readinessProbe:
   enabled: true
-  path:
   scheme:
-  port:
   initialDelaySeconds:
   periodSeconds:
