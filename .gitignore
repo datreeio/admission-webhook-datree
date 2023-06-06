@@ -1,6 +1,7 @@
 .idea/*
 .vscode/*
 !.vscode/launch.json
+!.vscode/settings.json
 !.vscode/thunder-tests/thunderCollection.json
 !.vscode/thunder-tests/thunderclient.json
 
