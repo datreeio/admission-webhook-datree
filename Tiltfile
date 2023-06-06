@@ -17,13 +17,6 @@ cmd_button(name='enable all',
         icon_name='swipe_up',
 )
 
-cmd_button(name='debugging',
-        argv=['debugging()'],
-        text='debugging',
-        location='nav',
-        icon_name='swipe_up',
-)
-
 namespace_create('datree')
 
 k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='./tilt/values.yaml', namespace='datree'))

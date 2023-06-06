@@ -97,7 +97,7 @@ clusterScanner:
       name: cluster-scanner-role-binding
   image:
     # Image repository
-    repository: datree/cluster-scanner
+    repository: datree/cluster-scanner-staging
     pullPolicy: Never
     # Image tag
     tag:
