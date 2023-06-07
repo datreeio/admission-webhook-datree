@@ -19,7 +19,7 @@ cmd_button(name='enable all',
 
 namespace_create('datree')
 
-k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='./tilt/values.yaml', namespace='datree'))
+k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='internal/fixtures/values.dev.yaml', namespace='datree'))
 
 
 
