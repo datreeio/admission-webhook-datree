@@ -57,7 +57,7 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: datree/admission-webhook
+  repository: webhook-server
   # Image tag
   tag: latest
   # Image pull policy
@@ -102,7 +102,7 @@ clusterScanner:
   image:
     # Image repository
     repository: datree/cluster-scanner-staging
-    pullPolicy: Never
+    pullPolicy: Always
     # Image tag
     tag: latest
     # limits:

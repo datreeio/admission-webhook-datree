@@ -19,12 +19,12 @@ cmd_button(name='enable all',
 
 namespace_create('datree')
 
-k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='internal/fixtures/values.dev.yaml', namespace='datree'))
+k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='internal/fixtures/values.dev.yaml', namespace='datree', set=['clusterScanner.image.pullPolicy=Never']))
 
 
 
 def debugging():
-    docker_build('datree/admission-webhook', './', dockerfile = './Dockerfile.debugging.tilt', build_args={
+    docker_build('webhook-server', './', dockerfile = './Dockerfile.debugging.tilt', build_args={
         "BUILD_ENVIRONMENT":"staging",
         "WEBHOOK_VERSION":"0.0.1",
     })
@@ -37,7 +37,7 @@ def debugging():
     local_resource(
     name='datree-webhook-server-debuging',
     serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-webhook-server" "8443 5555"',
-)
+    )
 
     local_resource(
         name='cluster-scanner debugging',
@@ -61,7 +61,7 @@ def hot_reload():
         cmd=compile_admission_webhook,
         deps=['./main.go'])
     
-    docker_build_with_restart('datree/admission-webhook', './', dockerfile = './Dockerfile.hotReload.tilt', entrypoint="/app/build/webhook-datree",
+    docker_build_with_restart('webhook-server', './', dockerfile = './Dockerfile.hotReload.tilt', entrypoint="/app/build/webhook-datree",
     live_update=[
         sync('./build/webhook-datree', '/app/build'),
     ],
