@@ -122,26 +122,32 @@ spec:
             {{- with .Values.securityContext }}
             {{ toYaml . | nindent 12 }}
             {{- end }}
+          {{- if .Values.clusterScanner.livenessProbe.enabled }}
           livenessProbe:
             httpGet:
-              path: /health
+              path: "/health"
               port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
+              scheme: {{ .Values.clusterScanner.livenessProbe.scheme | default "HTTP" | quote }} 
+            initialDelaySeconds: {{.Values.clusterScanner.livenessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{.Values.clusterScanner.livenessProbe.periodSeconds | default 10 }}
+          {{- end }}
+          {{- if .Values.clusterScanner.readinessProbe.enabled }}
           readinessProbe:
             httpGet:
-              path: /ready
+              path: "/ready"
               port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 5
-            periodSeconds: 10
+              scheme: {{ .Values.clusterScanner.readinessProbe.scheme | default "HTTP" | quote }}
+            initialDelaySeconds: {{.Values.clusterScanner.readinessProbe.initialDelaySeconds | default 5 }}
+            periodSeconds: {{.Values.clusterScanner.readinessProbe.periodSeconds | default 10 }}
+          {{- end }}
           image: "{{ .Values.clusterScanner.image.repository }}:{{ .Values.clusterScanner.image.tag | default "0.0.15" }}"
           imagePullPolicy: "{{.Values.clusterScanner.image.pullPolicy}}"
           resources: {{- toYaml .Values.clusterScanner.resources | nindent 12 }}
           ports:
             - containerPort: 8080
               name: scanner-api
+            - containerPort: 5556
+              name: debug
           volumeMounts:
             - name: webhook-config
               mountPath: /config

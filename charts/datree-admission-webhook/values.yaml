@@ -123,12 +123,23 @@ clusterScanner:
     pullPolicy: Always
     # -- The image release tag to use for the scanner
     tag:
+    resources: { }
     # limits:
     #   cpu: 1000m
     #   memory: 1048Mi
     # requests:
     #   cpu: 200m
     #   memory: 256Mi
+  livenessProbe:
+    enabled: true
+    scheme:
+    initialDelaySeconds:
+    periodSeconds:
+  readinessProbe:
+    enabled: true
+    scheme:
+    initialDelaySeconds:
+    periodSeconds:
 # During install Datree run two hooks: pre-install and pre-delete.
 # `datree-label-namespaces-hook-post-install` - Helm hook that run after the chart is installed and label namespaces with admission.datree/validate=skip
 # `datree-wait-server-ready-hook-post-install` - Helm hook that run after the chart is awaits for the webhook-server to be ready
@@ -143,3 +154,15 @@ hooks:
     pullPolicy: IfNotPresent
 validatingWebhookConfiguration:
   failurePolicy: Ignore
+
+
+livenessProbe:
+  enabled: true
+  scheme:
+  initialDelaySeconds:
+  periodSeconds:
+readinessProbe:
+  enabled: true
+  scheme:
+  initialDelaySeconds:
+  periodSeconds:

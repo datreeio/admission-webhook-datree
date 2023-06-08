@@ -4,7 +4,7 @@
 !.vscode/thunder-tests/thunderclient.json
 
 webhook-datree
-
+build
 .DS_STORE
 
 datree-webhook-logs

@@ -335,6 +335,78 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>clusterScanner.image.resources</td>
+			<td></td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.livenessProbe.enabled</td>
+			<td></td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.livenessProbe.scheme</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.livenessProbe.initialDelaySeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.livenessProbe.periodSeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.readinessProbe.enabled</td>
+			<td></td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.readinessProbe.scheme</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.readinessProbe.initialDelaySeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>clusterScanner.readinessProbe.periodSeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>hooks.timeoutTime</td>
 			<td>The timeout time the hook will wait for the webhook-server is ready.</td>
 			<td><pre lang="json">
@@ -379,6 +451,70 @@ null
 			<td></td>
 			<td><pre lang="json">
 "Ignore"
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>livenessProbe.enabled</td>
+			<td></td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>livenessProbe.scheme</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>livenessProbe.initialDelaySeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>livenessProbe.periodSeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>readinessProbe.enabled</td>
+			<td></td>
+			<td><pre lang="json">
+true
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>readinessProbe.scheme</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>readinessProbe.initialDelaySeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>readinessProbe.periodSeconds</td>
+			<td></td>
+			<td><pre lang="json">
+null
 </pre>
 </td>
 		</tr>
