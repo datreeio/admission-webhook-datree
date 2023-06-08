@@ -335,6 +335,14 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>clusterScanner.image.resources</td>
+			<td></td>
+			<td><pre lang="json">
+{}
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>clusterScanner.livenessProbe.enabled</td>
 			<td></td>
 			<td><pre lang="json">
@@ -343,23 +351,7 @@ true
 </td>
 		</tr>
 		<tr>
-			<td>clusterScanner.livenessProbe.path</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
 			<td>clusterScanner.livenessProbe.scheme</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>clusterScanner.livenessProbe.port</td>
 			<td></td>
 			<td><pre lang="json">
 null
@@ -391,23 +383,7 @@ true
 </td>
 		</tr>
 		<tr>
-			<td>clusterScanner.readinessProbe.path</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
 			<td>clusterScanner.readinessProbe.scheme</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>clusterScanner.readinessProbe.port</td>
 			<td></td>
 			<td><pre lang="json">
 null
@@ -487,23 +463,7 @@ true
 </td>
 		</tr>
 		<tr>
-			<td>livenessProbe.path</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
 			<td>livenessProbe.scheme</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>livenessProbe.port</td>
 			<td></td>
 			<td><pre lang="json">
 null
@@ -535,23 +495,7 @@ true
 </td>
 		</tr>
 		<tr>
-			<td>readinessProbe.path</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
 			<td>readinessProbe.scheme</td>
-			<td></td>
-			<td><pre lang="json">
-null
-</pre>
-</td>
-		</tr>
-		<tr>
-			<td>readinessProbe.port</td>
 			<td></td>
 			<td><pre lang="json">
 null
