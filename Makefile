@@ -99,7 +99,7 @@ lint:
 	golangci-lint run ./...
 	
 tilt-dev:
-	DATREE_TOKEN=$DATREE_TOKEN TILT_ENV="debugging" tilt up
+	DATREE_TOKEN=$DATREE_TOKEN tilt up
 
 tilt-debug:
-	DATREE_TOKEN=$DATREE_TOKEN tilt up
+	DATREE_TOKEN=$DATREE_TOKEN TILT_ENV="debugging" tilt up
