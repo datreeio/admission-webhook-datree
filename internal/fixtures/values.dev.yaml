@@ -8,9 +8,9 @@ namespace: ""
 # The number of Datree webhook-server replicas to deploy for the webhook.
 replicaCount: 1
 # Additional labels to add to all resources.
-customLabels: { }
+customLabels: {}
 # Additional annotations to add to all resources.
-customAnnotations: { }
+customAnnotations: {}
 # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
 rbac:
   serviceAccount:
@@ -69,26 +69,26 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 25000
   capabilities:
-    drop: [ "ALL" ]
+    drop: ["ALL"]
   seccompProfile:
     type: RuntimeDefault
-resources: { }
+resources: {}
 # limits:
 #   cpu: 200m
 #   memory: 256Mi
 # requests:
 #   cpu: 200m
 #   memory: 48Mi
-nodeSelector: { }
-affinity: { }
-tolerations: [ ]
+nodeSelector: {}
+affinity: {}
+tolerations: []
 clusterScanner:
   livenessProbe:
     enabled: false
   readinessProbe:
     enabled: false
-  resources: { }
-  annotations: { }
+  resources: {}
+  annotations: {}
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
   rbac:
     serviceAccount:

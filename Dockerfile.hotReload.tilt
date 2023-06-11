@@ -7,6 +7,7 @@ ARG BUILDPLATFORM
 ARG WEBHOOK_VERSION
 
 WORKDIR /app
+RUN apk add --no-cache tar
 ADD build build
 EXPOSE 8443
 ENTRYPOINT build/webhook-datree

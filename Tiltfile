@@ -57,35 +57,35 @@ def debugging():
 load('ext://restart_process', 'docker_build_with_restart')
 
 def hot_reload():
-    compile_admission_webhook = 'CGO_ENABLED=0 GOOS=linux go build -tags staging -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" -o build/webhook-datree ./'
     local_resource(
         name="build-admission-webhook",
-        cmd=compile_admission_webhook,
-        deps=['./main.go', './internal', './pkg'])
-    
+        cmd='CGO_ENABLED=0 GOOS=linux go build -tags staging -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" -o build/webhook-datree ./',
+        deps=['./main.go', './internal', './pkg']
+    )    
     docker_build_with_restart('webhook-server', './', dockerfile = './Dockerfile.hotReload.tilt', entrypoint="/app/build/webhook-datree",
-    live_update=[
-        sync('./build/webhook-datree', '/app/build'),
-    ],
-     build_args={
-            "BUILD_ENVIRONMENT":"staging",
-            "WEBHOOK_VERSION":"0.0.1",
-        })
+        live_update=[
+            sync('./build/webhook-datree', '/app/build'),
+        ],
+        build_args={
+                "BUILD_ENVIRONMENT":"staging",
+                "WEBHOOK_VERSION":"0.0.1",
+        }
+    )
 
-    compile_cluster_scanner = 'CGO_ENABLED=0 GOOS=linux go build -tags staging -ldflags="-X github.com/datreeio/cluster-scanner/pkg/config.ScannerVersion=0.0.1" -o build/cluster-scanner ../cluster-scanner'
     local_resource(
         name="build-cluster-scanner",
-        cmd=compile_cluster_scanner,
-        deps=['../cluster-scanner/main.go', '../cluster-scanner/internal', '../cluster-scanner/pkg'])
-    
-    docker_build_with_restart('cluster-scanner', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile.hotReload.tilt', entrypoint="/app/build/cluster-scanner",
-    live_update=[
-        sync('./build/cluster-scanner', '/app/build'),
-    ],
-     build_args={
-            "BUILD_ENVIRONMENT":"staging",
-            "WEBHOOK_VERSION":"0.0.1",
-        })
+        cmd='cd ../cluster-scanner && CGO_ENABLED=0 GOOS=linux go build -tags staging -ldflags="-X ../cluster-scanner/pkg/config.ScannerVersion=0.0.1" -o ../admission-webhook-datree/build/cluster-scanner ../cluster-scanner',
+        deps=['../cluster-scanner/main.go', '../cluster-scanner/internal', '../cluster-scanner/pkg']
+    )
+    docker_build_with_restart('datree/cluster-scanner-staging', './', dockerfile = '../cluster-scanner/Dockerfile.hotReload.tilt', entrypoint="/app/build/cluster-scanner",
+        live_update=[
+            sync('./build/cluster-scanner', '/app/build'),
+        ],
+        build_args={
+                "BUILD_ENVIRONMENT":"staging",
+                "SCANNER_VERSION":"0.0.1",
+        }
+    )
     
 
 if os.environ.get('TILT_ENV') == 'debugging':
