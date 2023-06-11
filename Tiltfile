@@ -53,13 +53,15 @@ def debugging():
         name='cluster-scanner - restart port-forwarding',
         serve_cmd='bash ./tilt/scripts/restart-port-forwarding.sh "datree-cluster-scanner-server" "cluster-scanner debugging"',
     )
+
 load('ext://restart_process', 'docker_build_with_restart')
+
 def hot_reload():
     compile_admission_webhook = 'CGO_ENABLED=0 GOOS=linux go build -tags staging -ldflags="-X github.com/datreeio/admission-webhook-datree/pkg/config.WebhookVersion=0.0.1" -o build/webhook-datree ./'
     local_resource(
         name="build-admission-webhook",
         cmd=compile_admission_webhook,
-        deps=['./main.go'])
+        deps=['./main.go', './internal', './pkg'])
     
     docker_build_with_restart('webhook-server', './', dockerfile = './Dockerfile.hotReload.tilt', entrypoint="/app/build/webhook-datree",
     live_update=[
@@ -69,6 +71,7 @@ def hot_reload():
             "BUILD_ENVIRONMENT":"staging",
             "WEBHOOK_VERSION":"0.0.1",
         })
+
 
 
     docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile',
