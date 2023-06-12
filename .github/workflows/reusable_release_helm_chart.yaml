@@ -55,6 +55,7 @@ jobs:
       - name: Replace version in docs
         run: |
           sed -E 's/datree-admission-webhook --revision [0-9.]+/datree-admission-webhook --revision ${{ needs.release.outputs.chart_version }}/' ./docs/welcome/getting-started/index.mdx > ~/getting_started_index_temp.mdx && mv ~/getting_started_index_temp.mdx ./docs/welcome/getting-started/index.mdx
+          sed -E 's/targetRevision: [0-9.]+/targetRevision: ${{ needs.release.outputs.chart_version }}/' ./docs/welcome/getting-started/index.mdx > ~/getting_started_index_temp_1.mdx && mv ~/getting_started_index_temp_1.mdx ./docs/welcome/getting-started/index.mdx
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
