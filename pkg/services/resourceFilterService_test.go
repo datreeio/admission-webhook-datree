@@ -132,6 +132,41 @@ func TestWhiteListFilters(t *testing.T) {
 		})
 	})
 
+	t.Run("resource should be validated because it is managed by openShift (OKD)", func(t *testing.T) {
+		t.Run("oc", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "oc"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("openshift-controller-manager-some-postfix", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "openshift-controller-manager-some-postfix"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("openshift-apiserver-some-postfix", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "openshift-apiserver-some-postfix"
+			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+	})
+	t.Run("resource should not be validated because it is not managed by openShift (OKD)", func(t *testing.T) {
+		t.Run("oc-postfix", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "oc-postfix"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("prefix-openshift-controller-manager-some-postfix", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "prefix-openshift-controller-manager-some-postfix"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+		t.Run("prefix-openshift-apiserver-some-postfix", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "prefix-openshift-apiserver-some-postfix"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
+	})
+
 	t.Run("special cases", func(t *testing.T) {
 		t.Run("resource should be validated because 1 fields manager is matching", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
