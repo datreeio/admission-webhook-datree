@@ -197,6 +197,30 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>datree.bypassPermissions.userAccounts</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>datree.bypassPermissions.serviceAccounts</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
+			<td>datree.bypassPermissions.groups</td>
+			<td></td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>image.repository</td>
 			<td>Image repository for the webhook</td>
 			<td><pre lang="json">
