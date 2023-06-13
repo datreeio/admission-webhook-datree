@@ -200,5 +200,5 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOkdResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager", "openshift-apiserver"}) || isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc"})
+	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager", "openshift-apiserver"}) || isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc", "Mozilla"})
 }
