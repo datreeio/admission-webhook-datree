@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	authenticationv1 "k8s.io/api/authentication/v1"
 	"net/http"
 	"os"
 	"regexp"
@@ -75,6 +76,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
+	resourceUserInfo := admissionReviewReq.Request.UserInfo
 
 	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
@@ -97,6 +99,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
+		// TODO override when we will introduce bypass permissions in prerun
+		vs.State.SetBypassPermissions(&servicestate.BypassPermissions{})
 	}
 
 	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
@@ -185,14 +189,22 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 
 		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
-		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() {
+		shouldBypassByPermissions := vs.shouldBypassByPermissions(resourceUserInfo)
+
+		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() && !shouldBypassByPermissions {
 			allowed = false
 
 			sb.WriteString("\n---\n")
 			sb.WriteString(resultStr)
 		}
 
-		if !vs.State.GetIsEnforceMode() {
+		if shouldBypassByPermissions {
+			if didFailCurrentPolicyCheck {
+				*warningMessages = append([]string{
+					"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
+				}, *warningMessages...)
+			}
+		} else if !vs.State.GetIsEnforceMode() {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
 			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
 			if didFailCurrentPolicyCheck {
@@ -374,6 +386,34 @@ func (vs *ValidationService) getNamespaceRestrictionsByPolicyName(policyName str
 		}
 	}
 	return nil
+}
+
+func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1.UserInfo) bool {
+	bypassPermissions := vs.State.GetBypassPermissions()
+	if bypassPermissions == nil {
+		return false
+	}
+
+	for _, userAccount := range bypassPermissions.UserAccounts {
+		if match, _ := regexp.MatchString(userAccount, userInfo.Username); match {
+			return true
+		}
+	}
+
+	for _, serviceAccount := range bypassPermissions.ServiceAccounts {
+		if match, _ := regexp.MatchString(serviceAccount, userInfo.Username); match {
+			return true
+		}
+	}
+
+	for _, bypassGroup := range bypassPermissions.Groups {
+		for _, userInfoGroup := range userInfo.Groups {
+			if match, _ := regexp.MatchString(bypassGroup, userInfoGroup); match {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {

@@ -16,34 +16,36 @@ import (
 var DATREE_CONFIG_FILE_DIR = `/config`
 
 type ServiceState struct {
-	clientId         string
-	token            string
-	clusterUuid      types.UID
-	clusterName      string
-	k8sVersion       string
-	configFromHelm   bool
-	policyName       string // strictly represents the policy name from the values.yaml file, we don't actually use it. We use the policies from prerunResponse.activePolicies for evaluation
-	multiplePolicies *MultiplePolicies
-	isEnforceMode    bool
-	serviceVersion   string
-	noRecord         string
-	output           string
-	verbose          string
+	clientId          string
+	token             string
+	clusterUuid       types.UID
+	clusterName       string
+	k8sVersion        string
+	configFromHelm    bool
+	policyName        string // strictly represents the policy name from the values.yaml file, we don't actually use it. We use the policies from prerunResponse.activePolicies for evaluation
+	multiplePolicies  *MultiplePolicies
+	isEnforceMode     bool
+	serviceVersion    string
+	noRecord          string
+	output            string
+	verbose           string
+	bypassPermissions *BypassPermissions
 }
 
 func New() *ServiceState {
 	return &ServiceState{
-		clientId:         shortuuid.New(),
-		token:            os.Getenv(enums.Token),
-		clusterName:      os.Getenv(enums.ClusterName),
-		configFromHelm:   os.Getenv(enums.ConfigFromHelm) != "false",
-		policyName:       os.Getenv(enums.Policy),
-		multiplePolicies: readMultiplePolicies(),
-		isEnforceMode:    os.Getenv(enums.Enforce) == "true",
-		serviceVersion:   config.WebhookVersion,
-		noRecord:         os.Getenv(enums.NoRecord),
-		output:           os.Getenv(enums.Output),
-		verbose:          os.Getenv(enums.Verbose),
+		clientId:          shortuuid.New(),
+		token:             os.Getenv(enums.Token),
+		clusterName:       os.Getenv(enums.ClusterName),
+		configFromHelm:    os.Getenv(enums.ConfigFromHelm) != "false",
+		policyName:        os.Getenv(enums.Policy),
+		multiplePolicies:  readMultiplePolicies(),
+		isEnforceMode:     os.Getenv(enums.Enforce) == "true",
+		serviceVersion:    config.WebhookVersion,
+		noRecord:          os.Getenv(enums.NoRecord),
+		output:            os.Getenv(enums.Output),
+		verbose:           os.Getenv(enums.Verbose),
+		bypassPermissions: readBypassPermissions(),
 	}
 }
 
@@ -112,6 +114,14 @@ func (s *ServiceState) GetMultiplePolicies() *MultiplePolicies {
 	return s.multiplePolicies
 }
 
+func (s *ServiceState) GetBypassPermissions() *BypassPermissions {
+	return s.bypassPermissions
+}
+
+func (s *ServiceState) SetBypassPermissions(bypassPermissions *BypassPermissions) {
+	s.bypassPermissions = bypassPermissions
+}
+
 type Namespaces struct {
 	IncludePatterns []string `yaml:"includePatterns" json:"includePatterns"`
 	ExcludePatterns []string `yaml:"excludePatterns" json:"excludePatterns"`
@@ -123,6 +133,12 @@ type PolicyWithNamespaces struct {
 }
 
 type MultiplePolicies = []PolicyWithNamespaces
+
+type BypassPermissions struct {
+	UserAccounts    []string `yaml:"userAccounts,omitempty" json:"userAccounts,omitempty"`
+	ServiceAccounts []string `yaml:"serviceAccounts,omitempty" json:"serviceAccounts,omitempty"`
+	Groups          []string `yaml:"groups,omitempty" json:"groups,omitempty"`
+}
 
 func readMultiplePolicies() *MultiplePolicies {
 	datreeMultiplePoliciesPath := filepath.Join(DATREE_CONFIG_FILE_DIR, "datreeMultiplePolicies")
@@ -139,6 +155,31 @@ func readMultiplePolicies() *MultiplePolicies {
 	}
 
 	result := &MultiplePolicies{}
+	fileUnmarshalError := yaml.Unmarshal(fileContent, &result)
+
+	if fileUnmarshalError != nil {
+		fmt.Println(fileUnmarshalError)
+		return nil
+	}
+
+	return result
+}
+
+func readBypassPermissions() *BypassPermissions {
+	datreeBypassPermissionsPath := filepath.Join(DATREE_CONFIG_FILE_DIR, "datreeBypassPermissions")
+
+	if _, err := os.Stat(datreeBypassPermissionsPath); errors.Is(err, os.ErrNotExist) {
+		fmt.Println(fmt.Errorf("bypassPermissions not found on path: %s", datreeBypassPermissionsPath))
+		return nil
+	}
+
+	fileContent, readFileError := os.ReadFile(datreeBypassPermissionsPath)
+	if readFileError != nil {
+		fmt.Println(readFileError)
+		return nil
+	}
+
+	result := &BypassPermissions{}
 	fileUnmarshalError := yaml.Unmarshal(fileContent, &result)
 
 	if fileUnmarshalError != nil {
