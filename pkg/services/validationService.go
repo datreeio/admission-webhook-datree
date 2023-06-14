@@ -99,8 +99,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
-		// TODO override when we will introduce bypass permissions in prerun
-		vs.State.SetBypassPermissions(&servicestate.BypassPermissions{})
+		vs.State.SetBypassPermissions(&prerunData.BypassPermissions)
 	}
 
 	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
