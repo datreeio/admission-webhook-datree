@@ -77,7 +77,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 
 	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
-		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
+		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
@@ -220,7 +220,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters)
+	clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters)
 	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
@@ -453,10 +453,12 @@ func (vs *ValidationService) getEvaluationRequestData(policyName string,
 	return evaluationRequestData
 }
 
-func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
+func getClusterRequestMetadata(clusterUuid k8sTypes.UID, webhookVersion string, cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
 	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
+		ClusterUuid:              clusterUuid,
+		WebhookVersion:           webhookVersion,
 		CliEvaluationId:          cliEvaluationId,
 		Token:                    token,
 		Skipped:                  skipped,
