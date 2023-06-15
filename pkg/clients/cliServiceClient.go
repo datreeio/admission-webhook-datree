@@ -112,6 +112,8 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 }
 
 type ClusterRequestMetadata struct {
+	ClusterUuid              k8sTypes.UID                        `json:"clusterUuid"`
+	WebhookVersion           string                              `json:"webhookVersion"`
 	CliEvaluationId          int                                 `json:"cliEvaluationId"`
 	Token                    string                              `json:"token"`
 	Skipped                  bool                                `json:"skipped"`
