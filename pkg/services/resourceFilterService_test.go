@@ -133,11 +133,6 @@ func TestWhiteListFilters(t *testing.T) {
 	})
 
 	t.Run("resource should be validated because it is managed by openShift", func(t *testing.T) {
-		t.Run("oc", func(t *testing.T) {
-			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-			rootObject.Metadata.ManagedFields[0].Manager = "oc"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
-		})
 		t.Run("openshift-controller-manager-some-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "openshift-controller-manager-some-postfix"
@@ -150,6 +145,11 @@ func TestWhiteListFilters(t *testing.T) {
 		})
 	})
 	t.Run("resource should not be validated because it is not managed by openShift", func(t *testing.T) {
+		t.Run("oc", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			rootObject.Metadata.ManagedFields[0].Manager = "oc"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
 		t.Run("oc-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "oc-postfix"
