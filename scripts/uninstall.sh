@@ -22,4 +22,6 @@ kubectl delete job/datree-wait-server-ready-hook-post-install -n $NAMESPACE
 kubectl label namespace kube-system admission.datree/validate-
 
 # namespace
+kubectl delete clusterrole/datree-validationwebhook-delete
+kubectl delete clusterrole/datree-namespaces-update
 kubectl delete namespace/datree
