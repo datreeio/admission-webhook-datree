@@ -23,5 +23,8 @@ kubectl label namespace kube-system admission.datree/validate-
 
 # namespace
 kubectl delete clusterrole/datree-validationwebhook-delete
+kubectl delete clusterrolebinding/datree-validationwebhook-delete
 kubectl delete clusterrole/datree-namespaces-update
+kubectl delete clusterrolebinding/datree-namespaces-update
+
 kubectl delete namespace/datree
