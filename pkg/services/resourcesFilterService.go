@@ -43,11 +43,6 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 		return false
 	}
 
-	// print owner reference
-	for _, ownerReference := range rootObject.Metadata.OwnerReferences {
-		fmt.Println(fmt.Printf("Kind: %s, Name: %s", ownerReference.Kind, ownerReference.Name))
-	}
-
 	if hasOwnerReference(rootObject) {
 		fmt.Println(fmt.Printf("Resource %s has owner reference, skipping validation", rootObject.Metadata.Name))
 		return false
