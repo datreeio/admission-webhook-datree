@@ -55,11 +55,6 @@ datree:
   customSkipList:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
-  # Permissions to bypass validation - allow applying anyway.
-  bypassPermissions:
-    userAccounts:
-    serviceAccounts:
-    groups:
 # The Datree webhook-server image to use.
 image:
   # -- Image repository for the webhook

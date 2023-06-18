@@ -197,12 +197,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			sb.WriteString(resultStr)
 		}
 
-		if shouldBypassByPermissions {
-			if didFailCurrentPolicyCheck {
-				*warningMessages = append([]string{
-					"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
-				}, *warningMessages...)
-			}
+		if shouldBypassByPermissions && didFailCurrentPolicyCheck {
+			*warningMessages = append([]string{
+				"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
+			}, *warningMessages...)
 		} else if !vs.State.GetIsEnforceMode() {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
 			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
