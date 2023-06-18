@@ -11,8 +11,12 @@ import (
 )
 
 type OwnerReference struct {
-	Kind string `json:"kind"`
-	Name string `json:"name"`
+	ApiVersion         string `json:"apiVersion"`
+	Kind               string `json:"kind"`
+	Name               string `json:"name"`
+	Uid                string `json:"uid"`
+	Controller         bool   `json:"controller"`
+	BlockOwnerDeletion bool   `json:"blockOwnerDeletion"`
 }
 
 type RootObject struct {
