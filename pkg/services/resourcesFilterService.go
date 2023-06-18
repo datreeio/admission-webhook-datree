@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 
@@ -9,11 +10,17 @@ import (
 	"k8s.io/utils/strings/slices"
 )
 
+type OwnerReference struct {
+	Kind string `json:"kind"`
+	Name string `json:"name"`
+}
+
 type RootObject struct {
 	Metadata Metadata `json:"metadata"`
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
 	}
@@ -29,6 +36,16 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped
 
 	if !arePrerequisitesMet {
+		return false
+	}
+
+	// print owner reference
+	for _, ownerReference := range rootObject.Metadata.OwnerReferences {
+		fmt.Println(fmt.Printf("Kind: %s, Name: %s", ownerReference.Kind, ownerReference.Name))
+	}
+
+	if hasOwnerReference(rootObject) {
+		fmt.Println(fmt.Printf("Resource %s has owner reference, skipping validation", rootObject.Metadata.Name))
 		return false
 	}
 
@@ -200,5 +217,19 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager", "openshift-apiserver"}) || isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc"})
+	openshiftManagedFields := []string{"openshift-controller-manager", "openshift-apiserver", "oc"}
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, openshiftManagedFields)
+}
+
+func hasOwnerReference(resource RootObject) bool {
+	if resource.Metadata.OwnerReferences == nil {
+		return false
+	}
+
+	for _, owner := range resource.Metadata.OwnerReferences {
+		if owner.Kind != "" && owner.Name != "" {
+			return true
+		}
+	}
+	return false
 }

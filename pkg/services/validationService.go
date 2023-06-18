@@ -49,6 +49,7 @@ type Metadata struct {
 	DeletionTimestamp string            `json:"deletionTimestamp"`
 	ManagedFields     []ManagedFields   `json:"managedFields"`
 	Labels            map[string]string `json:"labels"`
+	OwnerReferences   []OwnerReference  `json:"ownerReferences"`
 }
 
 type ValidationService struct {
