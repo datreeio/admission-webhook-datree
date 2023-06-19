@@ -112,6 +112,15 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 	return nil, nil
 }
 
+type OwnerReference struct {
+	ApiVersion         string `json:"apiVersion"`
+	Kind               string `json:"kind"`
+	Name               string `json:"name"`
+	Uid                string `json:"uid"`
+	Controller         bool   `json:"controller"`
+	BlockOwnerDeletion bool   `json:"blockOwnerDeletion"`
+}
+
 type ClusterRequestMetadata struct {
 	ClusterUuid              k8sTypes.UID                        `json:"clusterUuid"`
 	WebhookVersion           string                              `json:"webhookVersion"`
@@ -127,6 +136,7 @@ type ClusterRequestMetadata struct {
 	Namespace                string                              `json:"namespace,omitempty"`
 	ConfigMapScanningFilters server.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
 	Occurrences              int                                 `json:"occurrences"`
+	OwnerReferences          []OwnerReference                    `json:"ownerReferences"`
 }
 
 type ClusterRequestMetadataBatchReqBody struct {
