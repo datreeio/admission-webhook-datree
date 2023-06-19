@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	authenticationv1 "k8s.io/api/authentication/v1"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	authenticationv1 "k8s.io/api/authentication/v1"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
@@ -45,11 +46,11 @@ type ManagedFields struct {
 }
 
 type Metadata struct {
-	Name              string            `json:"name"`
-	DeletionTimestamp string            `json:"deletionTimestamp"`
-	ManagedFields     []ManagedFields   `json:"managedFields"`
-	Labels            map[string]string `json:"labels"`
-	OwnerReferences   []OwnerReference  `json:"ownerReferences"`
+	Name              string                     `json:"name"`
+	DeletionTimestamp string                     `json:"deletionTimestamp"`
+	ManagedFields     []ManagedFields            `json:"managedFields"`
+	Labels            map[string]string          `json:"labels"`
+	OwnerReferences   []cliClient.OwnerReference `json:"ownerReferences"`
 }
 
 type ValidationService struct {
@@ -80,7 +81,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	resourceUserInfo := admissionReviewReq.Request.UserInfo
 
 	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
-		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
+		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
@@ -230,7 +231,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters)
+	clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
@@ -492,7 +493,7 @@ func (vs *ValidationService) getEvaluationRequestData(policyName string,
 }
 
 func getClusterRequestMetadata(clusterUuid k8sTypes.UID, webhookVersion string, cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
-	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType) *cliClient.ClusterRequestMetadata {
+	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType, ownerReferences []cliClient.OwnerReference) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
 		ClusterUuid:              clusterUuid,
@@ -508,6 +509,7 @@ func getClusterRequestMetadata(clusterUuid k8sTypes.UID, webhookVersion string, 
 		K8sVersion:               clusterK8sVersion,
 		Namespace:                namespace,
 		ConfigMapScanningFilters: configMapScanningFilters,
+		OwnerReferences:          ownerReferences,
 		Occurrences:              1,
 	}
 
