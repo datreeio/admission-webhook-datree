@@ -37,9 +37,13 @@ run_command kubectl get validatingwebhookconfigurations
 
 run_command kubectl get mutatingwebhookconfigurations
 
-# get image version of datree scan-job
-run_command kubectl get job.batch/scan-job -n datree -o jsonpath='{.spec.template.spec.containers[0].image}'
+# get image version of cluster-scanner-server
+run_command kubectl get deployments/datree-cluster-scanner-server  -n datree -o jsonpath='{.spec.template.spec.containers[0].image}'
 
-run_command kubectl logs job.batch/scan-job -n datree
+# get latest 10 logs from the cluster-scanner-server
+run_command kubectl logs deployments/datree-cluster-scanner-server -n datree --tail=10
+
+#get lates 10 logs from the webhook-server
+run_command kubectl logs deployments/datree-webhook-server -n datree --tail=10
 
 
