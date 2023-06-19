@@ -41,9 +41,9 @@ run_command kubectl get mutatingwebhookconfigurations
 run_command kubectl get deployments/datree-cluster-scanner-server  -n datree -o jsonpath='{.spec.template.spec.containers[0].image}'
 
 # get latest 10 logs from the cluster-scanner-server
+run_command kubectl logs deployments/datree-cluster-scanner-server -n datree | head -n 10
 run_command kubectl logs deployments/datree-cluster-scanner-server -n datree --tail=10
 
 #get lates 10 logs from the webhook-server
+run_command kubectl logs deployments/datree-webhook-server -n datree | head -n 10
 run_command kubectl logs deployments/datree-webhook-server -n datree --tail=10
-
-
