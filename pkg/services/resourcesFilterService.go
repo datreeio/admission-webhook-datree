@@ -1,7 +1,6 @@
 package services
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -44,7 +43,6 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	}
 
 	if hasOwnerReference(rootObject) {
-		fmt.Println(fmt.Printf("Resource %s has owner reference, skipping validation", rootObject.Metadata.Name))
 		return false
 	}
 
