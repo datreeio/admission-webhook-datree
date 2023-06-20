@@ -53,7 +53,7 @@ helm-upgrade-local:
 
 helm-uninstall:
 	helm uninstall -n datree datree-webhook
-
+# I revoked the token
 helm-install-staging:
 	make change-ping-uninstall-url-to-staging && \
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
