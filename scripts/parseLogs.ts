@@ -46,11 +46,16 @@ function readFileAndParseToJsonArray(): void {
       if (item.requestDirection === "incoming") {
         logByRequestId[requestId] = item;
       } else if (item.requestDirection === "outgoing") {
-        logByRequestId[requestId].msg = { ...logByRequestId[requestId].msg, ...item.msg };
+        const current = logByRequestId[requestId];
+        if (current?.msg) {
+          logByRequestId[requestId].msg = { ...current.msg, ...item.msg };
+        }
       }
     });
 
-    const arrCombined = Object.values(logByRequestId);
+    const arrCombined = Object.values(logByRequestId).filter((item: any) => {
+      return item?.msg?.AdmissionReview;
+    });
 
     arrCombined.sort((a: any, b: any) => {
       return a.orderNumber - b.orderNumber;
@@ -190,8 +195,14 @@ function analyzeLogs(logs: JSONData[]): any[] {
     namespace: log.msg.request.namespace,
     userInfo: log.msg.request.userInfo,
     operation: log.msg.request.operation,
-    dryRun: log.msg.request.dryRun,
+    dryRun: log.msg.request.dryRun
   })).filter((log) => {
-    return log.kind !== 'Lease' 
-  })
+    return log.kind !== "Lease"
+      && log.kind !== "Event"
+      && log.kind !== "SubjectAccessReview"
+      && !log?.namespace?.startsWith("openshift")
+      && log.userInfo.username.startsWith("system:")
+      && !log.userInfo.username.startsWith("system:serviceaccount")
+      && !log.userInfo.username.startsWith("system:node");
+  });
 }
