@@ -30,13 +30,15 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	managedFields := rootObject.Metadata.ManagedFields
+	userInfo := admissionReviewReq.Request.UserInfo
 
 	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject)
 	isUnsupportedKind := isUnsupportedKind(resourceKind)
+	isUnsupportedOpenShiftServiceAccount := isUnsupportedOpenShiftServiceAccount(userInfo.Username)
 	isResourceDeleted := isResourceDeleted(rootObject)
 	isNamespaceThatShouldBeSkipped := isNamespaceThatShouldBeSkipped(admissionReviewReq)
-	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped
+	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped && !isUnsupportedOpenShiftServiceAccount
 
 	if !arePrerequisitesMet {
 		return false
@@ -84,8 +86,13 @@ func isMetadataNameExists(rootObject RootObject) bool {
 }
 
 func isUnsupportedKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Event", "GitRepository"}
+	unsupportedResourceKinds := []string{"Event", "GitRepository", "ProjectRequest", "SubjectAccessReview", "SelfSubjectAccessReview"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
+}
+
+func isUnsupportedOpenShiftServiceAccount(userName string) bool {
+	openShiftServiceAccountPrefix := "system:serviceaccount:openshift"
+	return strings.Contains(strings.ToLower(userName), strings.ToLower(openShiftServiceAccountPrefix))
 }
 
 func isResourceDeleted(rootObject RootObject) bool {
@@ -214,7 +221,8 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager", "openshift-apiserver"}) || isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc"})
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
+
 }
 
 func hasOwnerReference(resource RootObject) bool {

@@ -70,6 +70,21 @@ func TestPrerequisitesFilters(t *testing.T) {
 		admissionReviewReq.Request.Kind.Kind = "GitRepository"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
+	t.Run("resource should be skipped because kind is ProjectRequest", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.Kind.Kind = "ProjectRequest"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+	t.Run("resource should be skipped because kind is SubjectAccessReview", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.Kind.Kind = "SubjectAccessReview"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+	t.Run("resource should be skipped because kind is SelfSubjectAccessReview", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.Kind.Kind = "SelfSubjectAccessReview"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
 	t.Run("resource should be skipped because namespace is kube-public", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Namespace = "kube-public"
@@ -138,15 +153,18 @@ func TestWhiteListFilters(t *testing.T) {
 			rootObject.Metadata.ManagedFields[0].Manager = "oc"
 			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
-		t.Run("openshift-controller-manager-some-postfix", func(t *testing.T) {
+		t.Run("Mozilla", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-			rootObject.Metadata.ManagedFields[0].Manager = "openshift-controller-manager-some-postfix"
+			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
 			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
-		t.Run("openshift-apiserver-some-postfix", func(t *testing.T) {
+	})
+	t.Run("resource should not be validated because it is managed by openShift", func(t *testing.T) {
+		t.Run("openShift service account", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-			rootObject.Metadata.ManagedFields[0].Manager = "openshift-apiserver-some-postfix"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			admissionReviewReq.Request.UserInfo.Username = "system:serviceaccount:openshift-infra"
+			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
 	t.Run("resource should not be validated because it is not managed by openShift", func(t *testing.T) {
@@ -163,11 +181,6 @@ func TestWhiteListFilters(t *testing.T) {
 		t.Run("prefix-openshift-apiserver-some-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "prefix-openshift-apiserver-some-postfix"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
-		})
-		t.Run("Mozilla should be skipped because we removed it", func(t *testing.T) {
-			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
 			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("Mozilla-postfix", func(t *testing.T) {
