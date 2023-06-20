@@ -1,0 +1,28 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-labels
+  annotations:
+    policies.kyverno.io/title: Require Labels
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/minversion: 1.6.0
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Namespace, Label
+    policies.kyverno.io/description: >-
+      Fine-grained policy to require labels on namespaces.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    - name: check-for-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Namespace
+      validate:
+        message: "The label `app.kubernetes.io/name` is required."
+        pattern:
+          metadata:
+            labels:
+              app.kubernetes.io/name-test: "?*"

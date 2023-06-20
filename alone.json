@@ -1,0 +1,86 @@
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "9703f9d9-c641-4520-9358-e58d5a525eb6",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Namespace"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "namespaces"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Namespace"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "namespaces"
+    },
+    "name": "yishai-ui",
+    "namespace": "yishai-ui",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "kubeadmin",
+      "uid": "44544553-2f5a-471c-8631-a403339e3bf4",
+      "groups": [
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Namespace",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "yishai-ui",
+        "uid": "2c379274-ba51-49ef-94b6-77373c0bc135",
+        "creationTimestamp": "2023-06-18T14:28:15Z",
+        "labels": {
+          "kubernetes.io/metadata.name": "yishai-ui"
+        },
+        "managedFields": [
+          {
+            "manager": "Mozilla",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-18T14:28:15Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:labels": {
+                  ".": {},
+                  "f:kubernetes.io/metadata.name": {}
+                }
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "finalizers": [
+          "kubernetes"
+        ]
+      },
+      "status": {
+        "phase": "Active"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}

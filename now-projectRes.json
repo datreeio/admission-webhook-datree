@@ -1,0 +1,386 @@
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "2582c503-2fdb-4837-a5a3-c12afa5f7e8e",
+    "kind": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "kind": "ProjectRequest"
+    },
+    "resource": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "resource": "projectrequests"
+    },
+    "requestKind": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "kind": "ProjectRequest"
+    },
+    "requestResource": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "resource": "projectrequests"
+    },
+    "name": "tzlil-and-buddies-test",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "kubeadmin",
+      "groups": [
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "ProjectRequest",
+      "apiVersion": "project.openshift.io/v1",
+      "metadata": {
+        "name": "tzlil-and-buddies-test",
+        "uid": "c2d8cf49-5c9d-46f4-9136-f86c45680087",
+        "creationTimestamp": "2023-06-19T10:47:56Z"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "43db3067-bb07-44ef-ae81-a752e708e466",
+    "kind": {
+      "group": "authorization.k8s.io",
+      "version": "v1",
+      "kind": "SubjectAccessReview"
+    },
+    "resource": {
+      "group": "authorization.k8s.io",
+      "version": "v1",
+      "resource": "subjectaccessreviews"
+    },
+    "requestKind": {
+      "group": "authorization.k8s.io",
+      "version": "v1",
+      "kind": "SubjectAccessReview"
+    },
+    "requestResource": {
+      "group": "authorization.k8s.io",
+      "version": "v1",
+      "resource": "subjectaccessreviews"
+    },
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:serviceaccount:openshift-apiserver:openshift-apiserver-sa",
+      "uid": "fc5de3b3-e1f1-48e4-beee-4a12ba939e0c",
+      "groups": [
+        "system:serviceaccounts",
+        "system:serviceaccounts:openshift-apiserver",
+        "system:authenticated"
+      ],
+      "extra": {
+        "authentication.kubernetes.io/pod-name": [
+          "apiserver-5d8bc5f678-vb6h5"
+        ],
+        "authentication.kubernetes.io/pod-uid": [
+          "1fe1b6ff-6047-424c-9f30-7e62cde786cb"
+        ]
+      }
+    },
+    "object": {
+      "kind": "SubjectAccessReview",
+      "apiVersion": "authorization.k8s.io/v1",
+      "metadata": {
+        "creationTimestamp": null,
+        "managedFields": [
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "authorization.k8s.io/v1",
+            "time": "2023-06-19T10:47:56Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:spec": {
+                "f:extra": {
+                  ".": {},
+                  "f:authentication.kubernetes.io/pod-name": {},
+                  "f:authentication.kubernetes.io/pod-uid": {}
+                },
+                "f:groups": {},
+                "f:resourceAttributes": {
+                  ".": {},
+                  "f:group": {},
+                  "f:name": {},
+                  "f:namespace": {},
+                  "f:resource": {},
+                  "f:verb": {},
+                  "f:version": {}
+                },
+                "f:user": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "resourceAttributes": {
+          "namespace": "tzlil-and-buddies-test",
+          "verb": "get",
+          "group": "project.openshift.io",
+          "version": "v1",
+          "resource": "projects",
+          "name": "tzlil-and-buddies-test"
+        },
+        "user": "system:serviceaccount:openshift-apiserver:openshift-apiserver-sa",
+        "groups": [
+          "system:serviceaccounts",
+          "system:serviceaccounts:openshift-apiserver",
+          "system:authenticated"
+        ],
+        "extra": {
+          "authentication.kubernetes.io/pod-name": [
+            "apiserver-5d8bc5f678-vb6h5"
+          ],
+          "authentication.kubernetes.io/pod-uid": [
+            "1fe1b6ff-6047-424c-9f30-7e62cde786cb"
+          ]
+        }
+      },
+      "status": {
+        "allowed": false
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "0bb4a100-3a44-461a-8c8e-15d84519c6c3",
+    "kind": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "kind": "Project"
+    },
+    "resource": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "resource": "projects"
+    },
+    "requestKind": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "kind": "Project"
+    },
+    "requestResource": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "resource": "projects"
+    },
+    "name": "tzlil-and-buddies-test",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:serviceaccount:openshift-apiserver:openshift-apiserver-sa",
+      "groups": [
+        "system:serviceaccounts",
+        "system:serviceaccounts:openshift-apiserver",
+        "system:authenticated"
+      ],
+      "extra": {
+        "authentication.kubernetes.io/pod-name": [
+          "apiserver-5d8bc5f678-vb6h5"
+        ],
+        "authentication.kubernetes.io/pod-uid": [
+          "1fe1b6ff-6047-424c-9f30-7e62cde786cb"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Project",
+      "apiVersion": "project.openshift.io/v1",
+      "metadata": {
+        "name": "tzlil-and-buddies-test",
+        "uid": "e754eebe-bf65-48dc-88a7-b5568731bf23",
+        "creationTimestamp": "2023-06-19T10:47:56Z",
+        "annotations": {
+          "openshift.io/description": "",
+          "openshift.io/display-name": "",
+          "openshift.io/requester": "kubeadmin"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "project.openshift.io/v1",
+            "time": "2023-06-19T10:47:56Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/description": {},
+                  "f:openshift.io/display-name": {},
+                  "f:openshift.io/requester": {}
+                }
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "finalizers": [
+          "openshift.io/origin"
+        ]
+      },
+      "status": {}
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "0f0c0f76-68b7-4377-b2e5-20db4842e130",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Namespace"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "namespaces"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Namespace"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "namespaces"
+    },
+    "name": "tzlil-and-buddies-test",
+    "namespace": "tzlil-and-buddies-test",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:serviceaccount:openshift-apiserver:openshift-apiserver-sa",
+      "uid": "fc5de3b3-e1f1-48e4-beee-4a12ba939e0c",
+      "groups": [
+        "system:serviceaccounts",
+        "system:serviceaccounts:openshift-apiserver",
+        "system:authenticated"
+      ],
+      "extra": {
+        "authentication.kubernetes.io/pod-name": [
+          "apiserver-5d8bc5f678-vb6h5"
+        ],
+        "authentication.kubernetes.io/pod-uid": [
+          "1fe1b6ff-6047-424c-9f30-7e62cde786cb"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Namespace",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "tzlil-and-buddies-test",
+        "uid": "aa9d06ee-dd95-4497-9315-cbb454968975",
+        "creationTimestamp": "2023-06-19T10:47:57Z",
+        "labels": {
+          "kubernetes.io/metadata.name": "tzlil-and-buddies-test"
+        },
+        "annotations": {
+          "openshift.io/description": "",
+          "openshift.io/display-name": "",
+          "openshift.io/requester": "kubeadmin"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T10:47:57Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/description": {},
+                  "f:openshift.io/display-name": {},
+                  "f:openshift.io/requester": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:kubernetes.io/metadata.name": {}
+                }
+              },
+              "f:spec": {
+                "f:finalizers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "finalizers": [
+          "openshift.io/origin",
+          "kubernetes"
+        ]
+      },
+      "status": {
+        "phase": "Active"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "AdmissionReview": {
+    "kind": "AdmissionReview",
+    "apiVersion": "admission.k8s.io/v1",
+    "response": {
+      "uid": "0f0c0f76-68b7-4377-b2e5-20db4842e130",
+      "allowed": false,
+      "status": {
+        "metadata": {},
+        "message": "\n---\nwebhook-tzlil-and-buddies-test-Namespace.tmp.yaml\n\n[V] YAML validation\n[V] Kubernetes schema validation\n\n[X] Policy check\n\n❌  Ensure namespace dev prefix [CUSTOM RULE]  [1 occurrence]\n    - metadata.name: tzlil-and-buddies-test (kind: Namespace)\n      > key: metadata.name (line: 29:9)\n\n💡  namespace should have dev prefix\n\n\n(Summary)\n\n- Passing YAML validation: 1/1\n\n- Passing Kubernetes (v1.26.3+b404935) schema validation: 1/1\n\n- Passing policy check: 0/1\n\n+-----------------------------------------------------+-------------------------------+\n| Enabled rules in policy \"deployment_best_practices\" | 1                             |\n| Configs tested against policy                       | 1                             |\n| Total rules evaluated                               | 1                             |\n| \u001b[36mTotal rules skipped\u001b[0m                                 | \u001b[36m0\u001b[0m                             |\n| \u001b[91mTotal rules failed\u001b[0m                                  | \u001b[91m1\u001b[0m                             |\n| \u001b[32mTotal rules passed\u001b[0m                                  | \u001b[32m0\u001b[0m                             |\n| See all rules in policy                             | https://app.staging.datree.io |\n+-----------------------------------------------------+-------------------------------+\n",
+        "code": 500
+      }
+    }
+  },
+  "IsSkipped": false
+}
+----------------------

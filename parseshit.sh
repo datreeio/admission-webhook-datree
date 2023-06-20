@@ -5,7 +5,7 @@
 # Check if the file path is provided
 if [ $# -eq 0 ]; then
   echo "Please provide the path of the file."
-  exit 1
+  exit 1``
 fi
 
 # Read the file path from the command line argument

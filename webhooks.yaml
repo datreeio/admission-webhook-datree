@@ -1,0 +1,350 @@
+apiVersion: v1
+items:
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    annotations:
+      exclude.release.openshift.io/internal-openshift-hosted: "true"
+      include.release.openshift.io/self-managed-high-availability: "true"
+      service.beta.openshift.io/inject-cabundle: "true"
+    creationTimestamp: "2023-05-23T07:12:47Z"
+    generation: 2
+    name: controlplanemachineset.machine.openshift.io
+    ownerReferences:
+    - apiVersion: config.openshift.io/v1
+      controller: true
+      kind: ClusterVersion
+      name: version
+      uid: b031b1b8-2727-4557-beb5-5b1817107b42
+    resourceVersion: "6006"
+    uid: aeeffbcd-32a7-47c5-a39c-0d1d83730ada
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURVVENDQWptZ0F3SUJBZ0lJYWM4UUtObnJPc2t3RFFZSktvWklodmNOQVFFTEJRQXdOakUwTURJR0ExVUUKQXd3cmIzQmxibk5vYVdaMExYTmxjblpwWTJVdGMyVnlkbWx1WnkxemFXZHVaWEpBTVRZNE5EZ3lOVGt3T1RBZQpGdzB5TXpBMU1qTXdOekV4TkRsYUZ3MHlOVEEzTWpFd056RXhOVEJhTURZeE5EQXlCZ05WQkFNTUsyOXdaVzV6CmFHbG1kQzF6WlhKMmFXTmxMWE5sY25acGJtY3RjMmxuYm1WeVFERTJPRFE0TWpVNU1Ea3dnZ0VpTUEwR0NTcUcKU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRDJFV0E3cXo3NERMZ3RuNnplL2RNM3F4NTFCL3lNZjVWYwpRU2NWMHdZeFh3TUdrN0NtNEw3RjBRaTIvOThISld0ZC9qR2FRZmNyRExndGVzbFBWVE9GbHpoeTI4dHNiYUlWCk0vdDlYU2FtTk1XdVZNQ3c4RDQ0enUyb096RHZ3T1hEZDNTd014YU1acTZpdDJGSzBteFl1akRncGt5ajFmMDEKZTlkUjVyeUY5RzR0K09vZWwwMXorV0NxZzliZEpzQU9uZTJDKzhiYlNMVi9HRGluQ1lsNEMyTnBEdDl0NlV4VApqM2I5QXdkN0ZEVzFDbnhSdmF0U3BnUTdLMHV1TEQ2RG5KbWJOTWl3SUFYYzN1MC9GOC9QL3lrQmNjVFpUL2hyCkFhK2ViZWN5WXJNcEhianBGS0c0UXUxTjZTZEd3OFNFNytiL1JvbGNTcS9Ya3VWL0I1cTdBZ01CQUFHall6QmgKTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQjBHQTFVZERnUVdCQlJJZzFadApORzdOVEtHSGFJYUxvbkNERkV3TE16QWZCZ05WSFNNRUdEQVdnQlJJZzFadE5HN05US0dIYUlhTG9uQ0RGRXdMCk16QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFGNUU3dVNybmZ3bmh0aU9hOXlZRldSYzFkbDhPWHRLS3JRcisKUTdCTmFMUkd3MG5mWTFLZEppSlVJY3k0eTJXOHUrN2Q2L1pqQ0NkMFNtNjdqc1JQKy9vME41QTd6eHg4MVI1dApYUnVneU9EVXNOWFhTdU0rMEhaVDd4VGVzeXQzQm4vZXdyQUZjWE1Oemp5RTRRajhFanNwd3dCSVpxWGJMQWw1Cm8zOHE5SE02VWc1RmhlS2M5SHFvOVliT2pHMFRDUFB6Y2EzTUhOaS9keWZwM3VUMTIwUlhGRGFzNmZrbVhzNlQKc1R0V0poRERhYUNHZDZsOXRxNXhtREp4M01qN2NVRS85ZE1xdG1CYlBTN2d2bWxmdFV2bG51VGFrQTlFZ1YyYwplUk96TnVrSjUyL3pGNTNQQmY5aXMxRjhWSHBNaTFGUEM2NXVQV3ozR1BVOXBaL1JPdz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: control-plane-machine-set-operator
+        namespace: openshift-machine-api
+        path: /validate-machine-openshift-io-v1-controlplanemachineset
+        port: 9443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: controlplanemachineset.machine.openshift.io
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - machine.openshift.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - controlplanemachinesets
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 10
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    creationTimestamp: "2023-06-19T09:24:06Z"
+    generation: 1
+    labels:
+      webhook.kyverno.io/managed-by: kyverno
+    name: kyverno-cleanup-validating-webhook-cfg
+    resourceVersion: "88154"
+    uid: dfef93cf-2518-4573-9576-ad3922df2cf0
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM3VENDQWRXZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFZTVJZd0ZBWURWUVFEREEwcUxtdDUKZG1WeWJtOHVjM1pqTUI0WERUSXpNRFl4T1RBNE1qUXdOVm9YRFRJME1EWXhPREE1TWpRd05Wb3dHREVXTUJRRwpBMVVFQXd3TktpNXJlWFpsY201dkxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DCmdnRUJBTDlYcVhhcDUrU1lSRzQvMjg2aXVmL08zMEdONHBoOFJDK2h0Y0JyODNTZ1N6NldRdXBySkpDcndmR1MKY0tBZVZoRzFnbXpCeFM0SmlSWkRxWDRTT1hxSHhKYy9TQ3BRZXBoSlduYnZDbnRkcnFlOStweWVVNjJoM2llMwpqUldCQUhuY0prSHRkQWROQ3dMSjB6VU9CY2RrMmpheWhIMVdodnFmOTFxUWVkK3ZpUk9GRFVLd2p2RDlELzNKClRmcGV0N3R0YzNVbUVMUHlZSnNsZXF1dEJyMzVFVDA0NXhXZTJmdWFvYmlSYXI4M25ITTI4anArM2lOOEo1MTkKcDhFWHdvSXdsem9WbmF2a3lxTzVUelV2SXc5THp4QnN2ZzhrWEJBSjYzTXhRdE1iMjNiRlIwRGMvOUthckN2RgpHRnV2ZnFhQmJJUVA2aXBuUjNXTFZMMEdvd01DQXdFQUFhTkNNRUF3RGdZRFZSMFBBUUgvQkFRREFnS2tNQThHCkExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRklTYkxOSTB6N0JkajByYWpIYktSNDF0Y2JSbU1BMEcKQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUM2NGgxN1FJWUdxMU51NVJUTThVSUtmdmtzNXVyQlNSdmxlWDFHNTFwZAp0MW4vYkM0bzJlS3hGWitJWEdnR2Zsd0VSWmhkMkxQQXZ1QlpCRXJsOUNzU1UxOHpTVmxrall6OVNNdCs2M1RkCmZ0VUVhNVFZclZ1TjVwNWtXVlRSWU5kdW5aZTZNbVFSRWozQkd0MnQrajJsYnhzOTVUbWRtTUZhSktmeXNITG0Kb3YrTUZkZ1ZhRlhILytkdVh3M2lVb2d5bjhZNnM3ZmVZQnFxVGxHMnpTd2lDc1pmVmZBQkdNMFh1WFNIbzZEYwpZaFEwU002TVFESkVVNDc3czNxSUwxTytSeFZNQjBUREdwdnArQTBLbHhsdTV1cEhzL2YwVnEwdlYySmFPMWVyCkdSUndURnNPYzNjWUMxMFl1S1d6c2FpQzVVUldoaHROTDVRd0RMcXA0cnMxCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: kyverno-cleanup-controller
+        namespace: kyverno
+        path: /validate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: kyverno-cleanup-controller.kyverno.svc
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - kyverno.io
+      apiVersions:
+      - v2alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - cleanuppolicies/*
+      - clustercleanuppolicies/*
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 10
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    creationTimestamp: "2023-06-19T09:24:22Z"
+    generation: 1
+    labels:
+      webhook.kyverno.io/managed-by: kyverno
+    name: kyverno-exception-validating-webhook-cfg
+    resourceVersion: "88241"
+    uid: 7225a5d1-9b68-45cb-8185-94f37fe1fb96
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM3VENDQWRXZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFZTVJZd0ZBWURWUVFEREEwcUxtdDUKZG1WeWJtOHVjM1pqTUI0WERUSXpNRFl4T1RBNE1qUXlNVm9YRFRJME1EWXhPREE1TWpReU1Wb3dHREVXTUJRRwpBMVVFQXd3TktpNXJlWFpsY201dkxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DCmdnRUJBTlYxNXpaSVVHeGlKNTdMTnJ6TWdBY1luSG9rMW5CY2VqQzRnQVNvQmhPZkdvSlF0NXgrRUI2S2pZdFQKdmx0YXN1QzRnSVNSWlB1NTMwNjlzRWhYV0NrbldUT2FwYVNzbWlQeEMzSW5mcUZYa0xVUG1uZWllZjFqRW1Ndwp4a2VxNHRYQnBNbHpldTY1QytiU2tMWWs0RkJmdm1SZnhRc2ZqTzJqZzgyTnNRUXZLYXArVlUxS092N0d3Rm1XCjBwSUJWRWpDQkdlb1R6V01wSHl5YUlZUWFDQzhrblVhbS9zSUdQeExSSWNIeGcwRFEzcEZhWkoxdlJ2aUJweFIKUXNqZjE2dER5WFpOWmdVSk5GMmtMVkZMM2RoNVFCemxOS25SK0I4dFFBVmJ4ODFUR0t4MWhwYjNkeEF2aGZHSApMbHZnSDJ4SnZ3L2ZCUzU0Wm1IbnRLNWt2RjBDQXdFQUFhTkNNRUF3RGdZRFZSMFBBUUgvQkFRREFnS2tNQThHCkExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRlB4blN4dkpnL1FpZWZBUnR0UDlrOHFWWnIwTU1BMEcKQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUFOS21WNFU4R0lKeFZ4am5VRlNsNVFjbkpxbktNWndjcVl6MzI0VEV4Twp0ZnVTem9UdTZqY2Zqc3N3ZklML25GanUyd2hnRjNDdWJpMkZwN3gzamVxbEEyS0NNQzRQenZNOEJvT0hGRFg2CmxFemgwdjdjK0xsQlhOYm5vTTU2c1A1L1EzaFpQcmdEMytmSG5IRFphd0U0ejNMeEJPRFFZTk9lb2orY1Jza3EKSkJUanVtVlhSWEJhcTJDS0h6RVFQSUVnY3VSTno5aGxDTkdPMXUwUytBVDVDaTBnbDkycDBVUVdReTdyRkF0eQp5ekYzeDFBa0g5STlCYW0vREFrVjZlU09mR1lFSHRkNzA2UnRTdkFxNlJwaVNWTGVtMTRJY3lHWXh3aVVvNnREClZXTklQUU53SVdpWmtOY2FqMlQwVVg5b05tdTNtR29DUGROTDZxQ3NuMElMCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: kyverno-svc
+        namespace: kyverno
+        path: /exceptionvalidate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: kyverno-svc.kyverno.svc
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - kyverno.io
+      apiVersions:
+      - v2alpha1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - policyexceptions
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 10
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    creationTimestamp: "2023-06-19T09:24:22Z"
+    generation: 1
+    labels:
+      webhook.kyverno.io/managed-by: kyverno
+    name: kyverno-policy-validating-webhook-cfg
+    resourceVersion: "88239"
+    uid: fa0f1ee7-d43e-410c-8429-556fa6f626f4
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM3VENDQWRXZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFZTVJZd0ZBWURWUVFEREEwcUxtdDUKZG1WeWJtOHVjM1pqTUI0WERUSXpNRFl4T1RBNE1qUXlNVm9YRFRJME1EWXhPREE1TWpReU1Wb3dHREVXTUJRRwpBMVVFQXd3TktpNXJlWFpsY201dkxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DCmdnRUJBTlYxNXpaSVVHeGlKNTdMTnJ6TWdBY1luSG9rMW5CY2VqQzRnQVNvQmhPZkdvSlF0NXgrRUI2S2pZdFQKdmx0YXN1QzRnSVNSWlB1NTMwNjlzRWhYV0NrbldUT2FwYVNzbWlQeEMzSW5mcUZYa0xVUG1uZWllZjFqRW1Ndwp4a2VxNHRYQnBNbHpldTY1QytiU2tMWWs0RkJmdm1SZnhRc2ZqTzJqZzgyTnNRUXZLYXArVlUxS092N0d3Rm1XCjBwSUJWRWpDQkdlb1R6V01wSHl5YUlZUWFDQzhrblVhbS9zSUdQeExSSWNIeGcwRFEzcEZhWkoxdlJ2aUJweFIKUXNqZjE2dER5WFpOWmdVSk5GMmtMVkZMM2RoNVFCemxOS25SK0I4dFFBVmJ4ODFUR0t4MWhwYjNkeEF2aGZHSApMbHZnSDJ4SnZ3L2ZCUzU0Wm1IbnRLNWt2RjBDQXdFQUFhTkNNRUF3RGdZRFZSMFBBUUgvQkFRREFnS2tNQThHCkExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRlB4blN4dkpnL1FpZWZBUnR0UDlrOHFWWnIwTU1BMEcKQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUFOS21WNFU4R0lKeFZ4am5VRlNsNVFjbkpxbktNWndjcVl6MzI0VEV4Twp0ZnVTem9UdTZqY2Zqc3N3ZklML25GanUyd2hnRjNDdWJpMkZwN3gzamVxbEEyS0NNQzRQenZNOEJvT0hGRFg2CmxFemgwdjdjK0xsQlhOYm5vTTU2c1A1L1EzaFpQcmdEMytmSG5IRFphd0U0ejNMeEJPRFFZTk9lb2orY1Jza3EKSkJUanVtVlhSWEJhcTJDS0h6RVFQSUVnY3VSTno5aGxDTkdPMXUwUytBVDVDaTBnbDkycDBVUVdReTdyRkF0eQp5ekYzeDFBa0g5STlCYW0vREFrVjZlU09mR1lFSHRkNzA2UnRTdkFxNlJwaVNWTGVtMTRJY3lHWXh3aVVvNnREClZXTklQUU53SVdpWmtOY2FqMlQwVVg5b05tdTNtR29DUGROTDZxQ3NuMElMCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: kyverno-svc
+        namespace: kyverno
+        path: /policyvalidate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: validate-policy.kyverno.svc
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - kyverno.io
+      apiVersions:
+      - v1
+      - v2beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - clusterpolicies
+      - policies
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 10
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    creationTimestamp: "2023-06-19T09:24:24Z"
+    generation: 4
+    labels:
+      webhook.kyverno.io/managed-by: kyverno
+    name: kyverno-resource-validating-webhook-cfg
+    resourceVersion: "90263"
+    uid: b85dd51b-cf01-4b0e-9a03-5cc4bb3cbdd9
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM3VENDQWRXZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFZTVJZd0ZBWURWUVFEREEwcUxtdDUKZG1WeWJtOHVjM1pqTUI0WERUSXpNRFl4T1RBNE1qUXlNVm9YRFRJME1EWXhPREE1TWpReU1Wb3dHREVXTUJRRwpBMVVFQXd3TktpNXJlWFpsY201dkxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DCmdnRUJBTlYxNXpaSVVHeGlKNTdMTnJ6TWdBY1luSG9rMW5CY2VqQzRnQVNvQmhPZkdvSlF0NXgrRUI2S2pZdFQKdmx0YXN1QzRnSVNSWlB1NTMwNjlzRWhYV0NrbldUT2FwYVNzbWlQeEMzSW5mcUZYa0xVUG1uZWllZjFqRW1Ndwp4a2VxNHRYQnBNbHpldTY1QytiU2tMWWs0RkJmdm1SZnhRc2ZqTzJqZzgyTnNRUXZLYXArVlUxS092N0d3Rm1XCjBwSUJWRWpDQkdlb1R6V01wSHl5YUlZUWFDQzhrblVhbS9zSUdQeExSSWNIeGcwRFEzcEZhWkoxdlJ2aUJweFIKUXNqZjE2dER5WFpOWmdVSk5GMmtMVkZMM2RoNVFCemxOS25SK0I4dFFBVmJ4ODFUR0t4MWhwYjNkeEF2aGZHSApMbHZnSDJ4SnZ3L2ZCUzU0Wm1IbnRLNWt2RjBDQXdFQUFhTkNNRUF3RGdZRFZSMFBBUUgvQkFRREFnS2tNQThHCkExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRlB4blN4dkpnL1FpZWZBUnR0UDlrOHFWWnIwTU1BMEcKQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUFOS21WNFU4R0lKeFZ4am5VRlNsNVFjbkpxbktNWndjcVl6MzI0VEV4Twp0ZnVTem9UdTZqY2Zqc3N3ZklML25GanUyd2hnRjNDdWJpMkZwN3gzamVxbEEyS0NNQzRQenZNOEJvT0hGRFg2CmxFemgwdjdjK0xsQlhOYm5vTTU2c1A1L1EzaFpQcmdEMytmSG5IRFphd0U0ejNMeEJPRFFZTk9lb2orY1Jza3EKSkJUanVtVlhSWEJhcTJDS0h6RVFQSUVnY3VSTno5aGxDTkdPMXUwUytBVDVDaTBnbDkycDBVUVdReTdyRkF0eQp5ekYzeDFBa0g5STlCYW0vREFrVjZlU09mR1lFSHRkNzA2UnRTdkFxNlJwaVNWTGVtMTRJY3lHWXh3aVVvNnREClZXTklQUU53SVdpWmtOY2FqMlQwVVg5b05tdTNtR29DUGROTDZxQ3NuMElMCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: kyverno-svc
+        namespace: kyverno
+        path: /validate/fail
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: validate.kyverno.svc-fail
+    namespaceSelector:
+      matchExpressions:
+      - key: kubernetes.io/metadata.name
+        operator: NotIn
+        values:
+        - kyverno
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - ""
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      - DELETE
+      - CONNECT
+      resources:
+      - namespaces
+      - serviceaccounts
+      scope: '*'
+    - apiGroups:
+      - apps
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      - DELETE
+      - CONNECT
+      resources:
+      - deployments
+      scope: '*'
+    - apiGroups:
+      - coordination.k8s.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      - DELETE
+      - CONNECT
+      resources:
+      - leases
+      scope: '*'
+    sideEffects: NoneOnDryRun
+    timeoutSeconds: 10
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    annotations:
+      service.beta.openshift.io/inject-cabundle: "true"
+    creationTimestamp: "2023-05-23T07:12:11Z"
+    generation: 2
+    name: machine-api
+    resourceVersion: "4706"
+    uid: 5baf27c4-1722-4b8d-a19f-12405574378f
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURVVENDQWptZ0F3SUJBZ0lJYWM4UUtObnJPc2t3RFFZSktvWklodmNOQVFFTEJRQXdOakUwTURJR0ExVUUKQXd3cmIzQmxibk5vYVdaMExYTmxjblpwWTJVdGMyVnlkbWx1WnkxemFXZHVaWEpBTVRZNE5EZ3lOVGt3T1RBZQpGdzB5TXpBMU1qTXdOekV4TkRsYUZ3MHlOVEEzTWpFd056RXhOVEJhTURZeE5EQXlCZ05WQkFNTUsyOXdaVzV6CmFHbG1kQzF6WlhKMmFXTmxMWE5sY25acGJtY3RjMmxuYm1WeVFERTJPRFE0TWpVNU1Ea3dnZ0VpTUEwR0NTcUcKU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRDJFV0E3cXo3NERMZ3RuNnplL2RNM3F4NTFCL3lNZjVWYwpRU2NWMHdZeFh3TUdrN0NtNEw3RjBRaTIvOThISld0ZC9qR2FRZmNyRExndGVzbFBWVE9GbHpoeTI4dHNiYUlWCk0vdDlYU2FtTk1XdVZNQ3c4RDQ0enUyb096RHZ3T1hEZDNTd014YU1acTZpdDJGSzBteFl1akRncGt5ajFmMDEKZTlkUjVyeUY5RzR0K09vZWwwMXorV0NxZzliZEpzQU9uZTJDKzhiYlNMVi9HRGluQ1lsNEMyTnBEdDl0NlV4VApqM2I5QXdkN0ZEVzFDbnhSdmF0U3BnUTdLMHV1TEQ2RG5KbWJOTWl3SUFYYzN1MC9GOC9QL3lrQmNjVFpUL2hyCkFhK2ViZWN5WXJNcEhianBGS0c0UXUxTjZTZEd3OFNFNytiL1JvbGNTcS9Ya3VWL0I1cTdBZ01CQUFHall6QmgKTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQjBHQTFVZERnUVdCQlJJZzFadApORzdOVEtHSGFJYUxvbkNERkV3TE16QWZCZ05WSFNNRUdEQVdnQlJJZzFadE5HN05US0dIYUlhTG9uQ0RGRXdMCk16QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFGNUU3dVNybmZ3bmh0aU9hOXlZRldSYzFkbDhPWHRLS3JRcisKUTdCTmFMUkd3MG5mWTFLZEppSlVJY3k0eTJXOHUrN2Q2L1pqQ0NkMFNtNjdqc1JQKy9vME41QTd6eHg4MVI1dApYUnVneU9EVXNOWFhTdU0rMEhaVDd4VGVzeXQzQm4vZXdyQUZjWE1Oemp5RTRRajhFanNwd3dCSVpxWGJMQWw1Cm8zOHE5SE02VWc1RmhlS2M5SHFvOVliT2pHMFRDUFB6Y2EzTUhOaS9keWZwM3VUMTIwUlhGRGFzNmZrbVhzNlQKc1R0V0poRERhYUNHZDZsOXRxNXhtREp4M01qN2NVRS85ZE1xdG1CYlBTN2d2bWxmdFV2bG51VGFrQTlFZ1YyYwplUk96TnVrSjUyL3pGNTNQQmY5aXMxRjhWSHBNaTFGUEM2NXVQV3ozR1BVOXBaL1JPdz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: machine-api-operator-webhook
+        namespace: openshift-machine-api
+        path: /validate-machine-openshift-io-v1beta1-machine
+        port: 443
+    failurePolicy: Ignore
+    matchPolicy: Equivalent
+    name: validation.machine.machine.openshift.io
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - machine.openshift.io
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - machines
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 10
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURVVENDQWptZ0F3SUJBZ0lJYWM4UUtObnJPc2t3RFFZSktvWklodmNOQVFFTEJRQXdOakUwTURJR0ExVUUKQXd3cmIzQmxibk5vYVdaMExYTmxjblpwWTJVdGMyVnlkbWx1WnkxemFXZHVaWEpBTVRZNE5EZ3lOVGt3T1RBZQpGdzB5TXpBMU1qTXdOekV4TkRsYUZ3MHlOVEEzTWpFd056RXhOVEJhTURZeE5EQXlCZ05WQkFNTUsyOXdaVzV6CmFHbG1kQzF6WlhKMmFXTmxMWE5sY25acGJtY3RjMmxuYm1WeVFERTJPRFE0TWpVNU1Ea3dnZ0VpTUEwR0NTcUcKU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRDJFV0E3cXo3NERMZ3RuNnplL2RNM3F4NTFCL3lNZjVWYwpRU2NWMHdZeFh3TUdrN0NtNEw3RjBRaTIvOThISld0ZC9qR2FRZmNyRExndGVzbFBWVE9GbHpoeTI4dHNiYUlWCk0vdDlYU2FtTk1XdVZNQ3c4RDQ0enUyb096RHZ3T1hEZDNTd014YU1acTZpdDJGSzBteFl1akRncGt5ajFmMDEKZTlkUjVyeUY5RzR0K09vZWwwMXorV0NxZzliZEpzQU9uZTJDKzhiYlNMVi9HRGluQ1lsNEMyTnBEdDl0NlV4VApqM2I5QXdkN0ZEVzFDbnhSdmF0U3BnUTdLMHV1TEQ2RG5KbWJOTWl3SUFYYzN1MC9GOC9QL3lrQmNjVFpUL2hyCkFhK2ViZWN5WXJNcEhianBGS0c0UXUxTjZTZEd3OFNFNytiL1JvbGNTcS9Ya3VWL0I1cTdBZ01CQUFHall6QmgKTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQjBHQTFVZERnUVdCQlJJZzFadApORzdOVEtHSGFJYUxvbkNERkV3TE16QWZCZ05WSFNNRUdEQVdnQlJJZzFadE5HN05US0dIYUlhTG9uQ0RGRXdMCk16QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFGNUU3dVNybmZ3bmh0aU9hOXlZRldSYzFkbDhPWHRLS3JRcisKUTdCTmFMUkd3MG5mWTFLZEppSlVJY3k0eTJXOHUrN2Q2L1pqQ0NkMFNtNjdqc1JQKy9vME41QTd6eHg4MVI1dApYUnVneU9EVXNOWFhTdU0rMEhaVDd4VGVzeXQzQm4vZXdyQUZjWE1Oemp5RTRRajhFanNwd3dCSVpxWGJMQWw1Cm8zOHE5SE02VWc1RmhlS2M5SHFvOVliT2pHMFRDUFB6Y2EzTUhOaS9keWZwM3VUMTIwUlhGRGFzNmZrbVhzNlQKc1R0V0poRERhYUNHZDZsOXRxNXhtREp4M01qN2NVRS85ZE1xdG1CYlBTN2d2bWxmdFV2bG51VGFrQTlFZ1YyYwplUk96TnVrSjUyL3pGNTNQQmY5aXMxRjhWSHBNaTFGUEM2NXVQV3ozR1BVOXBaL1JPdz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: machine-api-operator-webhook
+        namespace: openshift-machine-api
+        path: /validate-machine-openshift-io-v1beta1-machineset
+        port: 443
+    failurePolicy: Ignore
+    matchPolicy: Equivalent
+    name: validation.machineset.machine.openshift.io
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - machine.openshift.io
+      apiVersions:
+      - v1beta1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - machinesets
+      scope: '*'
+    sideEffects: None
+    timeoutSeconds: 10
+- apiVersion: admissionregistration.k8s.io/v1
+  kind: ValidatingWebhookConfiguration
+  metadata:
+    annotations:
+      service.beta.openshift.io/inject-cabundle: "true"
+    creationTimestamp: "2023-05-23T07:11:18Z"
+    generation: 2
+    labels:
+      app: multus-admission-controller
+    name: multus.openshift.io
+    ownerReferences:
+    - apiVersion: operator.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: Network
+      name: cluster
+      uid: 01bae054-b4ba-47f7-91bb-bfceba7d5b4a
+    resourceVersion: "3722"
+    uid: 72312ee2-48b6-47a5-b763-b2472bd0e194
+  webhooks:
+  - admissionReviewVersions:
+    - v1
+    clientConfig:
+      caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURVVENDQWptZ0F3SUJBZ0lJYWM4UUtObnJPc2t3RFFZSktvWklodmNOQVFFTEJRQXdOakUwTURJR0ExVUUKQXd3cmIzQmxibk5vYVdaMExYTmxjblpwWTJVdGMyVnlkbWx1WnkxemFXZHVaWEpBTVRZNE5EZ3lOVGt3T1RBZQpGdzB5TXpBMU1qTXdOekV4TkRsYUZ3MHlOVEEzTWpFd056RXhOVEJhTURZeE5EQXlCZ05WQkFNTUsyOXdaVzV6CmFHbG1kQzF6WlhKMmFXTmxMWE5sY25acGJtY3RjMmxuYm1WeVFERTJPRFE0TWpVNU1Ea3dnZ0VpTUEwR0NTcUcKU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLQW9JQkFRRDJFV0E3cXo3NERMZ3RuNnplL2RNM3F4NTFCL3lNZjVWYwpRU2NWMHdZeFh3TUdrN0NtNEw3RjBRaTIvOThISld0ZC9qR2FRZmNyRExndGVzbFBWVE9GbHpoeTI4dHNiYUlWCk0vdDlYU2FtTk1XdVZNQ3c4RDQ0enUyb096RHZ3T1hEZDNTd014YU1acTZpdDJGSzBteFl1akRncGt5ajFmMDEKZTlkUjVyeUY5RzR0K09vZWwwMXorV0NxZzliZEpzQU9uZTJDKzhiYlNMVi9HRGluQ1lsNEMyTnBEdDl0NlV4VApqM2I5QXdkN0ZEVzFDbnhSdmF0U3BnUTdLMHV1TEQ2RG5KbWJOTWl3SUFYYzN1MC9GOC9QL3lrQmNjVFpUL2hyCkFhK2ViZWN5WXJNcEhianBGS0c0UXUxTjZTZEd3OFNFNytiL1JvbGNTcS9Ya3VWL0I1cTdBZ01CQUFHall6QmgKTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQQmdOVkhSTUJBZjhFQlRBREFRSC9NQjBHQTFVZERnUVdCQlJJZzFadApORzdOVEtHSGFJYUxvbkNERkV3TE16QWZCZ05WSFNNRUdEQVdnQlJJZzFadE5HN05US0dIYUlhTG9uQ0RGRXdMCk16QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFGNUU3dVNybmZ3bmh0aU9hOXlZRldSYzFkbDhPWHRLS3JRcisKUTdCTmFMUkd3MG5mWTFLZEppSlVJY3k0eTJXOHUrN2Q2L1pqQ0NkMFNtNjdqc1JQKy9vME41QTd6eHg4MVI1dApYUnVneU9EVXNOWFhTdU0rMEhaVDd4VGVzeXQzQm4vZXdyQUZjWE1Oemp5RTRRajhFanNwd3dCSVpxWGJMQWw1Cm8zOHE5SE02VWc1RmhlS2M5SHFvOVliT2pHMFRDUFB6Y2EzTUhOaS9keWZwM3VUMTIwUlhGRGFzNmZrbVhzNlQKc1R0V0poRERhYUNHZDZsOXRxNXhtREp4M01qN2NVRS85ZE1xdG1CYlBTN2d2bWxmdFV2bG51VGFrQTlFZ1YyYwplUk96TnVrSjUyL3pGNTNQQmY5aXMxRjhWSHBNaTFGUEM2NXVQV3ozR1BVOXBaL1JPdz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+      service:
+        name: multus-admission-controller
+        namespace: openshift-multus
+        path: /validate
+        port: 443
+    failurePolicy: Fail
+    matchPolicy: Equivalent
+    name: multus-validating-config.k8s.io
+    namespaceSelector: {}
+    objectSelector: {}
+    rules:
+    - apiGroups:
+      - k8s.cni.cncf.io
+      apiVersions:
+      - v1
+      operations:
+      - CREATE
+      - UPDATE
+      resources:
+      - network-attachment-definitions
+      scope: '*'
+    sideEffects: NoneOnDryRun
+    timeoutSeconds: 30
+kind: List
+metadata:
+  resourceVersion: ""

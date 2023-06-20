@@ -1,12 +1,11 @@
 package services
 
 import (
-	"regexp"
-	"strings"
-
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
+	"regexp"
+	"strings"
 )
 
 type RootObject struct {
@@ -70,7 +69,7 @@ func isMetadataNameExists(rootObject RootObject) bool {
 }
 
 func isUnsupportedKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Event", "GitRepository"}
+	unsupportedResourceKinds := []string{"Event", "GitRepository", "SelfSubjectAccessReview", "ProjectRequest"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 

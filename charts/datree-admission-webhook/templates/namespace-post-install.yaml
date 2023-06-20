@@ -33,11 +33,6 @@ spec:
         - name: kubectl-label
           image: "{{ .Values.hooks.image.repository }}:{{ .Values.hooks.image.tag }}"
           imagePullPolicy: {{.Values.hooks.image.pullPolicy}}
-          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}          
+          securityContext: {{- toYaml .Values.securityContext | nindent 12 }}
           args:
-            - label
-            - ns
-            - kube-system
-            - {{template "datree.namespace" .}}
-            - admission.datree/validate=skip
-            - --overwrite
+            - version

@@ -1,0 +1,69 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  creationTimestamp: "2023-06-19T09:24:24Z"
+  generation: 5
+  labels:
+    webhook.kyverno.io/managed-by: kyverno
+  name: kyverno-resource-validating-webhook-cfg
+  resourceVersion: "92263"
+  uid: b85dd51b-cf01-4b0e-9a03-5cc4bb3cbdd9
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    caBundle: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM3VENDQWRXZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFZTVJZd0ZBWURWUVFEREEwcUxtdDUKZG1WeWJtOHVjM1pqTUI0WERUSXpNRFl4T1RBNE1qUXlNVm9YRFRJME1EWXhPREE1TWpReU1Wb3dHREVXTUJRRwpBMVVFQXd3TktpNXJlWFpsY201dkxuTjJZekNDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0NBUW9DCmdnRUJBTlYxNXpaSVVHeGlKNTdMTnJ6TWdBY1luSG9rMW5CY2VqQzRnQVNvQmhPZkdvSlF0NXgrRUI2S2pZdFQKdmx0YXN1QzRnSVNSWlB1NTMwNjlzRWhYV0NrbldUT2FwYVNzbWlQeEMzSW5mcUZYa0xVUG1uZWllZjFqRW1Ndwp4a2VxNHRYQnBNbHpldTY1QytiU2tMWWs0RkJmdm1SZnhRc2ZqTzJqZzgyTnNRUXZLYXArVlUxS092N0d3Rm1XCjBwSUJWRWpDQkdlb1R6V01wSHl5YUlZUWFDQzhrblVhbS9zSUdQeExSSWNIeGcwRFEzcEZhWkoxdlJ2aUJweFIKUXNqZjE2dER5WFpOWmdVSk5GMmtMVkZMM2RoNVFCemxOS25SK0I4dFFBVmJ4ODFUR0t4MWhwYjNkeEF2aGZHSApMbHZnSDJ4SnZ3L2ZCUzU0Wm1IbnRLNWt2RjBDQXdFQUFhTkNNRUF3RGdZRFZSMFBBUUgvQkFRREFnS2tNQThHCkExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRlB4blN4dkpnL1FpZWZBUnR0UDlrOHFWWnIwTU1BMEcKQ1NxR1NJYjNEUUVCQ3dVQUE0SUJBUUFOS21WNFU4R0lKeFZ4am5VRlNsNVFjbkpxbktNWndjcVl6MzI0VEV4Twp0ZnVTem9UdTZqY2Zqc3N3ZklML25GanUyd2hnRjNDdWJpMkZwN3gzamVxbEEyS0NNQzRQenZNOEJvT0hGRFg2CmxFemgwdjdjK0xsQlhOYm5vTTU2c1A1L1EzaFpQcmdEMytmSG5IRFphd0U0ejNMeEJPRFFZTk9lb2orY1Jza3EKSkJUanVtVlhSWEJhcTJDS0h6RVFQSUVnY3VSTno5aGxDTkdPMXUwUytBVDVDaTBnbDkycDBVUVdReTdyRkF0eQp5ekYzeDFBa0g5STlCYW0vREFrVjZlU09mR1lFSHRkNzA2UnRTdkFxNlJwaVNWTGVtMTRJY3lHWXh3aVVvNnREClZXTklQUU53SVdpWmtOY2FqMlQwVVg5b05tdTNtR29DUGROTDZxQ3NuMElMCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+    service:
+      name: kyverno-svc
+      namespace: kyverno
+      path: /validate/fail
+      port: 443
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: validate.kyverno.svc-fail
+  namespaceSelector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: NotIn
+      values:
+      - kyverno
+  objectSelector: {}
+  rules:
+  - apiGroups:
+    - ""
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    - CONNECT
+    resources:
+    - serviceaccounts
+    scope: '*'
+  - apiGroups:
+    - apps
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    - CONNECT
+    resources:
+    - deployments
+    scope: '*'
+  - apiGroups:
+    - coordination.k8s.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    - DELETE
+    - CONNECT
+    resources:
+    - leases
+    scope: '*'
+  sideEffects: NoneOnDryRun
+  timeoutSeconds: 10

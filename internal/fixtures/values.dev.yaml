@@ -48,8 +48,14 @@ datree:
   # The name of the policy to check, e.g: staging. (string, optional)
   policy: "Starter"
   # Block resources that fail the policy check. (boolean ,optional)
-  enforce:
+  enforce: false
   # Excluded resources from policy checks. ("namespace;kind;name" ,optional)
+  # Permissions to bypass validation - allow applying anyway.
+  bypassPermissions:
+    userAccounts:
+      - minikube
+    serviceAccounts:
+    groups:
   customSkipList:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
@@ -57,17 +63,16 @@ datree:
 # The Datree webhook-server image to use.
 image:
   # Image repository
-  repository: webhook-server
+  repository: datree/webhook-staging
   # Image tag
   tag: latest
   # Image pull policy
-  pullPolicy: Never
+  pullPolicy: Always
 # Security context for the containers
 securityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
   runAsNonRoot: true
-  runAsUser: 25000
   capabilities:
     drop: [ "ALL" ]
   seccompProfile:

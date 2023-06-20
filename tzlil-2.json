@@ -1,0 +1,2827 @@
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "b0e5eab3-82d6-4177-a889-5eb52bb8ee37",
+    "kind": {
+      "group": "apiserver.openshift.io",
+      "version": "v1",
+      "kind": "APIRequestCount"
+    },
+    "resource": {
+      "group": "apiserver.openshift.io",
+      "version": "v1",
+      "resource": "apirequestcounts"
+    },
+    "requestKind": {
+      "group": "apiserver.openshift.io",
+      "version": "v1",
+      "kind": "APIRequestCount"
+    },
+    "requestResource": {
+      "group": "apiserver.openshift.io",
+      "version": "v1",
+      "resource": "apirequestcounts"
+    },
+    "name": "appliedclusterresourcequotas.v1.quota.openshift.io",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "3e960773-c5fc-4900-91a8-67d7ad791146",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "apiVersion": "apiserver.openshift.io/v1",
+      "kind": "APIRequestCount",
+      "metadata": {
+        "creationTimestamp": "2023-06-19T14:11:22Z",
+        "generation": 1,
+        "managedFields": [
+          {
+            "apiVersion": "apiserver.openshift.io/v1",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:spec": {
+                ".": {},
+                "f:numberOfUsersToReport": {}
+              }
+            },
+            "manager": "kube-apiserver",
+            "operation": "Update",
+            "time": "2023-06-19T14:11:22Z"
+          }
+        ],
+        "name": "appliedclusterresourcequotas.v1.quota.openshift.io",
+        "uid": "f3983890-3f73-454a-a55f-684029284e34"
+      },
+      "spec": {
+        "numberOfUsersToReport": 10
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "cbeeb292-a0c0-423b-849c-5e1096822a16",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "sre-build-test",
+    "namespace": "openshift-build-test-28119731-7bwhs",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "0ffd5adb-a82f-49e8-adf9-f6d5d7bfde78",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "sre-build-test",
+        "namespace": "openshift-build-test-28119731-7bwhs",
+        "uid": "781abc5d-b9f8-4995-b4e4-a2063590bf7a",
+        "resourceVersion": "134064",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T14:11:11Z",
+        "labels": {
+          "build": "sre-build-test"
+        },
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewBuild"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:11:11Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/generated-by": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:build": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:binary": {},
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:11:29Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:lastVersion": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "U0SnyHVK-Gpw_DA3Q0Ej"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "pnCaneX1kx6GR-hSukmA"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Binary",
+          "binary": {}
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "name": "go-toolset:1.17.7-13"
+            }
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "sre-build-test:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "sre-build-test",
+        "namespace": "openshift-build-test-28119731-7bwhs",
+        "uid": "781abc5d-b9f8-4995-b4e4-a2063590bf7a",
+        "resourceVersion": "134064",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T14:11:11Z",
+        "labels": {
+          "build": "sre-build-test"
+        },
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewBuild"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:11:11Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/generated-by": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:build": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:binary": {},
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "U0SnyHVK-Gpw_DA3Q0Ej"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "pnCaneX1kx6GR-hSukmA"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Binary",
+          "binary": {}
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "name": "go-toolset:1.17.7-13"
+            }
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "sre-build-test:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "1e1af9ba-bb9e-4e78-9c1c-7070289d9fcc",
+    "kind": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "kind": "ProjectRequest"
+    },
+    "resource": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "resource": "projectrequests"
+    },
+    "requestKind": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "kind": "ProjectRequest"
+    },
+    "requestResource": {
+      "group": "project.openshift.io",
+      "version": "v1",
+      "resource": "projectrequests"
+    },
+    "name": "tzlil-2",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "ProjectRequest",
+      "apiVersion": "project.openshift.io/v1",
+      "metadata": {
+        "name": "tzlil-2",
+        "uid": "e72b4058-8792-4d78-a0e6-a1ed0551d826",
+        "creationTimestamp": "2023-06-19T14:12:46Z"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "73db1207-8e1e-4d75-a386-6e8d9ce34929",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Secret"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "secrets"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Secret"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "secrets"
+    },
+    "name": "rails-pgsql-persistent-parameters-wxpxx",
+    "namespace": "tzlil-2",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "uid": "0616d343-dd8e-4929-8317-8b69258f5231",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Secret",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-pgsql-persistent-parameters-wxpxx",
+        "generateName": "rails-pgsql-persistent-parameters-",
+        "namespace": "tzlil-2",
+        "uid": "11b8d62f-1387-49ae-adfd-3048ed54bfc2",
+        "creationTimestamp": "2023-06-19T14:13:46Z",
+        "managedFields": [
+          {
+            "manager": "Mozilla",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T14:13:46Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:data": {
+                ".": {},
+                "f:APPLICATION_PASSWORD": {},
+                "f:APPLICATION_USER": {},
+                "f:DATABASE_NAME": {},
+                "f:DATABASE_SERVICE_NAME": {},
+                "f:MEMORY_LIMIT": {},
+                "f:MEMORY_POSTGRESQL_LIMIT": {},
+                "f:NAME": {},
+                "f:NAMESPACE": {},
+                "f:POSTGRESQL_MAX_CONNECTIONS": {},
+                "f:POSTGRESQL_SHARED_BUFFERS": {},
+                "f:RAILS_ENV": {},
+                "f:SOURCE_REPOSITORY_URL": {},
+                "f:VOLUME_CAPACITY": {}
+              },
+              "f:metadata": {
+                "f:generateName": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "data": {
+        "APPLICATION_PASSWORD": "c2VjcmV0",
+        "APPLICATION_USER": "b3BlbnNoaWZ0",
+        "DATABASE_NAME": "cm9vdA==",
+        "DATABASE_SERVICE_NAME": "cG9zdGdyZXNxbA==",
+        "MEMORY_LIMIT": "NTEyTWk=",
+        "MEMORY_POSTGRESQL_LIMIT": "NTEyTWk=",
+        "NAME": "cmFpbHMtcGdzcWwtcGVyc2lzdGVudA==",
+        "NAMESPACE": "b3BlbnNoaWZ0",
+        "POSTGRESQL_MAX_CONNECTIONS": "MTAw",
+        "POSTGRESQL_SHARED_BUFFERS": "MTJNQg==",
+        "RAILS_ENV": "cHJvZHVjdGlvbg==",
+        "SOURCE_REPOSITORY_URL": "aHR0cHM6Ly9naXRodWIuY29tL3NjbG9yZy9yYWlscy1leC5naXQ=",
+        "VOLUME_CAPACITY": "MUdp"
+      },
+      "type": "Opaque"
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "5334d087-f0ff-4238-a9dc-f58bd5409143",
+    "kind": {
+      "group": "template.openshift.io",
+      "version": "v1",
+      "kind": "TemplateInstance"
+    },
+    "resource": {
+      "group": "template.openshift.io",
+      "version": "v1",
+      "resource": "templateinstances"
+    },
+    "requestKind": {
+      "group": "template.openshift.io",
+      "version": "v1",
+      "kind": "TemplateInstance"
+    },
+    "requestResource": {
+      "group": "template.openshift.io",
+      "version": "v1",
+      "resource": "templateinstances"
+    },
+    "name": "rails-pgsql-persistent-jfx7d",
+    "namespace": "tzlil-2",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "TemplateInstance",
+      "apiVersion": "template.openshift.io/v1",
+      "metadata": {
+        "name": "rails-pgsql-persistent-jfx7d",
+        "generateName": "rails-pgsql-persistent-",
+        "namespace": "tzlil-2",
+        "uid": "008532cb-93dc-4a9a-aa85-5d6227168993",
+        "creationTimestamp": "2023-06-19T14:13:46Z",
+        "managedFields": [
+          {
+            "manager": "Mozilla",
+            "operation": "Update",
+            "apiVersion": "template.openshift.io/v1",
+            "time": "2023-06-19T14:13:46Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:generateName": {}
+              },
+              "f:spec": {
+                "f:secret": {},
+                "f:template": {
+                  "f:labels": {
+                    ".": {},
+                    "f:app": {},
+                    "f:template": {}
+                  },
+                  "f:message": {},
+                  "f:metadata": {
+                    "f:annotations": {
+                      ".": {},
+                      "f:description": {},
+                      "f:iconClass": {},
+                      "f:openshift.io/display-name": {},
+                      "f:openshift.io/documentation-url": {},
+                      "f:openshift.io/long-description": {},
+                      "f:openshift.io/provider-display-name": {},
+                      "f:openshift.io/support-url": {},
+                      "f:samples.operator.openshift.io/version": {},
+                      "f:tags": {},
+                      "f:template.openshift.io/bindable": {}
+                    },
+                    "f:creationTimestamp": {},
+                    "f:labels": {
+                      ".": {},
+                      "f:samples.operator.openshift.io/managed": {}
+                    },
+                    "f:managedFields": {},
+                    "f:name": {},
+                    "f:namespace": {},
+                    "f:resourceVersion": {},
+                    "f:uid": {}
+                  },
+                  "f:objects": {},
+                  "f:parameters": {}
+                }
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "template": {
+          "metadata": {
+            "name": "rails-pgsql-persistent",
+            "namespace": "openshift",
+            "uid": "e74df431-071c-4f23-ab3c-11164fdcaff2",
+            "resourceVersion": "20422",
+            "creationTimestamp": "2023-06-19T11:54:54Z",
+            "labels": {
+              "samples.operator.openshift.io/managed": "true"
+            },
+            "annotations": {
+              "description": "An example Rails application with a PostgreSQL database. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/rails-ex/blob/master/README.md.",
+              "iconClass": "icon-ruby",
+              "openshift.io/display-name": "Rails + PostgreSQL",
+              "openshift.io/documentation-url": "https://github.com/sclorg/rails-ex",
+              "openshift.io/long-description": "This template defines resources needed to develop a Rails application, including a build configuration, application deployment configuration, and database deployment configuration.",
+              "openshift.io/provider-display-name": "Red Hat, Inc.",
+              "openshift.io/support-url": "https://access.redhat.com",
+              "samples.operator.openshift.io/version": "4.13.2",
+              "tags": "quickstart,ruby,rails",
+              "template.openshift.io/bindable": "false"
+            },
+            "managedFields": [
+              {
+                "manager": "cluster-samples-operator",
+                "operation": "Update",
+                "apiVersion": "template.openshift.io/v1",
+                "time": "2023-06-19T11:54:54Z",
+                "fieldsType": "FieldsV1",
+                "fieldsV1": {
+                  "f:labels": {
+                    ".": {},
+                    "f:app": {},
+                    "f:template": {}
+                  },
+                  "f:message": {},
+                  "f:metadata": {
+                    "f:annotations": {
+                      "f:description": {},
+                      "f:template.openshift.io/bindable": {},
+                      "f:openshift.io/long-description": {},
+                      "f:iconClass": {},
+                      "f:tags": {},
+                      ".": {},
+                      "f:openshift.io/support-url": {},
+                      "f:openshift.io/provider-display-name": {},
+                      "f:openshift.io/display-name": {},
+                      "f:samples.operator.openshift.io/version": {},
+                      "f:openshift.io/documentation-url": {}
+                    },
+                    "f:labels": {
+                      ".": {},
+                      "f:samples.operator.openshift.io/managed": {}
+                    }
+                  },
+                  "f:objects": {},
+                  "f:parameters": {}
+                }
+              }
+            ]
+          },
+          "message": "The following service(s) have been created in your project: ${NAME}, ${DATABASE_SERVICE_NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/sclorg/rails-ex/blob/master/README.md.",
+          "objects": [
+            {
+              "apiVersion": "v1",
+              "kind": "Secret",
+              "metadata": {
+                "name": "${NAME}"
+              },
+              "stringData": {
+                "application-password": "${APPLICATION_PASSWORD}",
+                "application-user": "${APPLICATION_USER}",
+                "database-password": "${DATABASE_PASSWORD}",
+                "database-user": "${DATABASE_USER}",
+                "keybase": "${SECRET_KEY_BASE}"
+              }
+            },
+            {
+              "apiVersion": "v1",
+              "kind": "Service",
+              "metadata": {
+                "annotations": {
+                  "description": "Exposes and load balances the application pods",
+                  "service.alpha.openshift.io/dependencies": "[{\"name\": \"${DATABASE_SERVICE_NAME}\", \"kind\": \"Service\"}]"
+                },
+                "name": "${NAME}"
+              },
+              "spec": {
+                "ports": [
+                  {
+                    "name": "web",
+                    "port": 8080,
+                    "targetPort": 8080
+                  }
+                ],
+                "selector": {
+                  "name": "${NAME}"
+                }
+              }
+            },
+            {
+              "apiVersion": "route.openshift.io/v1",
+              "kind": "Route",
+              "metadata": {
+                "name": "${NAME}"
+              },
+              "spec": {
+                "host": "${APPLICATION_DOMAIN}",
+                "to": {
+                  "kind": "Service",
+                  "name": "${NAME}"
+                }
+              }
+            },
+            {
+              "apiVersion": "image.openshift.io/v1",
+              "kind": "ImageStream",
+              "metadata": {
+                "annotations": {
+                  "description": "Keeps track of changes in the application image"
+                },
+                "name": "${NAME}"
+              }
+            },
+            {
+              "apiVersion": "build.openshift.io/v1",
+              "kind": "BuildConfig",
+              "metadata": {
+                "annotations": {
+                  "description": "Defines how to build the application",
+                  "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "${NAME}"
+              },
+              "spec": {
+                "output": {
+                  "to": {
+                    "kind": "ImageStreamTag",
+                    "name": "${NAME}:latest"
+                  }
+                },
+                "postCommit": {
+                  "script": "bundle exec rake test"
+                },
+                "source": {
+                  "contextDir": "${CONTEXT_DIR}",
+                  "git": {
+                    "ref": "${SOURCE_REPOSITORY_REF}",
+                    "uri": "${SOURCE_REPOSITORY_URL}"
+                  },
+                  "type": "Git"
+                },
+                "strategy": {
+                  "sourceStrategy": {
+                    "env": [
+                      {
+                        "name": "RUBYGEM_MIRROR",
+                        "value": "${RUBYGEM_MIRROR}"
+                      }
+                    ],
+                    "from": {
+                      "kind": "ImageStreamTag",
+                      "name": "ruby:2.7-ubi8",
+                      "namespace": "${NAMESPACE}"
+                    }
+                  },
+                  "type": "Source"
+                },
+                "triggers": [
+                  {
+                    "type": "ImageChange"
+                  },
+                  {
+                    "type": "ConfigChange"
+                  },
+                  {
+                    "github": {
+                      "secret": "${GITHUB_WEBHOOK_SECRET}"
+                    },
+                    "type": "GitHub"
+                  }
+                ]
+              }
+            },
+            {
+              "apiVersion": "apps.openshift.io/v1",
+              "kind": "DeploymentConfig",
+              "metadata": {
+                "annotations": {
+                  "description": "Defines how to deploy the application server",
+                  "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "${NAME}"
+              },
+              "spec": {
+                "replicas": 1,
+                "selector": {
+                  "name": "${NAME}"
+                },
+                "strategy": {
+                  "recreateParams": {
+                    "pre": {
+                      "execNewPod": {
+                        "command": [
+                          "./migrate-database.sh"
+                        ],
+                        "containerName": "${NAME}"
+                      },
+                      "failurePolicy": "Abort"
+                    }
+                  },
+                  "type": "Recreate"
+                },
+                "template": {
+                  "metadata": {
+                    "labels": {
+                      "name": "${NAME}"
+                    },
+                    "name": "${NAME}"
+                  },
+                  "spec": {
+                    "containers": [
+                      {
+                        "env": [
+                          {
+                            "name": "DATABASE_SERVICE_NAME",
+                            "value": "${DATABASE_SERVICE_NAME}"
+                          },
+                          {
+                            "name": "POSTGRESQL_USER",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "database-user",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "POSTGRESQL_PASSWORD",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "database-password",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "SECRET_KEY_BASE",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "keybase",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "POSTGRESQL_DATABASE",
+                            "value": "${DATABASE_NAME}"
+                          },
+                          {
+                            "name": "POSTGRESQL_MAX_CONNECTIONS",
+                            "value": "${POSTGRESQL_MAX_CONNECTIONS}"
+                          },
+                          {
+                            "name": "POSTGRESQL_SHARED_BUFFERS",
+                            "value": "${POSTGRESQL_SHARED_BUFFERS}"
+                          },
+                          {
+                            "name": "APPLICATION_DOMAIN",
+                            "value": "${APPLICATION_DOMAIN}"
+                          },
+                          {
+                            "name": "APPLICATION_USER",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "application-user",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "APPLICATION_PASSWORD",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "application-password",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "RAILS_ENV",
+                            "value": "${RAILS_ENV}"
+                          }
+                        ],
+                        "image": " ",
+                        "livenessProbe": {
+                          "httpGet": {
+                            "path": "/articles",
+                            "port": 8080
+                          },
+                          "initialDelaySeconds": 10,
+                          "timeoutSeconds": 3
+                        },
+                        "name": "${NAME}",
+                        "ports": [
+                          {
+                            "containerPort": 8080
+                          }
+                        ],
+                        "readinessProbe": {
+                          "httpGet": {
+                            "path": "/articles",
+                            "port": 8080
+                          },
+                          "initialDelaySeconds": 5,
+                          "timeoutSeconds": 3
+                        },
+                        "resources": {
+                          "limits": {
+                            "memory": "${MEMORY_LIMIT}"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                },
+                "triggers": [
+                  {
+                    "imageChangeParams": {
+                      "automatic": true,
+                      "containerNames": [
+                        "${NAME}"
+                      ],
+                      "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "${NAME}:latest"
+                      }
+                    },
+                    "type": "ImageChange"
+                  },
+                  {
+                    "type": "ConfigChange"
+                  }
+                ]
+              }
+            },
+            {
+              "apiVersion": "v1",
+              "kind": "PersistentVolumeClaim",
+              "metadata": {
+                "name": "${DATABASE_SERVICE_NAME}"
+              },
+              "spec": {
+                "accessModes": [
+                  "ReadWriteOnce"
+                ],
+                "resources": {
+                  "requests": {
+                    "storage": "${VOLUME_CAPACITY}"
+                  }
+                }
+              }
+            },
+            {
+              "apiVersion": "v1",
+              "kind": "Service",
+              "metadata": {
+                "annotations": {
+                  "description": "Exposes the database server"
+                },
+                "name": "${DATABASE_SERVICE_NAME}"
+              },
+              "spec": {
+                "ports": [
+                  {
+                    "name": "postgresql",
+                    "port": 5432,
+                    "targetPort": 5432
+                  }
+                ],
+                "selector": {
+                  "name": "${DATABASE_SERVICE_NAME}"
+                }
+              }
+            },
+            {
+              "apiVersion": "apps.openshift.io/v1",
+              "kind": "DeploymentConfig",
+              "metadata": {
+                "annotations": {
+                  "description": "Defines how to deploy the database",
+                  "template.alpha.openshift.io/wait-for-ready": "true"
+                },
+                "name": "${DATABASE_SERVICE_NAME}"
+              },
+              "spec": {
+                "replicas": 1,
+                "selector": {
+                  "name": "${DATABASE_SERVICE_NAME}"
+                },
+                "strategy": {
+                  "type": "Recreate"
+                },
+                "template": {
+                  "metadata": {
+                    "labels": {
+                      "name": "${DATABASE_SERVICE_NAME}"
+                    },
+                    "name": "${DATABASE_SERVICE_NAME}"
+                  },
+                  "spec": {
+                    "containers": [
+                      {
+                        "env": [
+                          {
+                            "name": "POSTGRESQL_USER",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "database-user",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "POSTGRESQL_PASSWORD",
+                            "valueFrom": {
+                              "secretKeyRef": {
+                                "key": "database-password",
+                                "name": "${NAME}"
+                              }
+                            }
+                          },
+                          {
+                            "name": "POSTGRESQL_DATABASE",
+                            "value": "${DATABASE_NAME}"
+                          },
+                          {
+                            "name": "POSTGRESQL_MAX_CONNECTIONS",
+                            "value": "${POSTGRESQL_MAX_CONNECTIONS}"
+                          },
+                          {
+                            "name": "POSTGRESQL_SHARED_BUFFERS",
+                            "value": "${POSTGRESQL_SHARED_BUFFERS}"
+                          }
+                        ],
+                        "image": " ",
+                        "livenessProbe": {
+                          "exec": {
+                            "command": [
+                              "/usr/libexec/check-container",
+                              "--live"
+                            ]
+                          },
+                          "initialDelaySeconds": 120,
+                          "timeoutSeconds": 10
+                        },
+                        "name": "postgresql",
+                        "ports": [
+                          {
+                            "containerPort": 5432
+                          }
+                        ],
+                        "readinessProbe": {
+                          "exec": {
+                            "command": [
+                              "/usr/libexec/check-container"
+                            ]
+                          },
+                          "initialDelaySeconds": 5,
+                          "timeoutSeconds": 1
+                        },
+                        "resources": {
+                          "limits": {
+                            "memory": "${MEMORY_POSTGRESQL_LIMIT}"
+                          }
+                        },
+                        "volumeMounts": [
+                          {
+                            "mountPath": "/var/lib/pgsql/data",
+                            "name": "${DATABASE_SERVICE_NAME}-data"
+                          }
+                        ]
+                      }
+                    ],
+                    "volumes": [
+                      {
+                        "name": "${DATABASE_SERVICE_NAME}-data",
+                        "persistentVolumeClaim": {
+                          "claimName": "${DATABASE_SERVICE_NAME}"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "triggers": [
+                  {
+                    "imageChangeParams": {
+                      "automatic": true,
+                      "containerNames": [
+                        "postgresql"
+                      ],
+                      "from": {
+                        "kind": "ImageStreamTag",
+                        "name": "postgresql:12-el8",
+                        "namespace": "${NAMESPACE}"
+                      }
+                    },
+                    "type": "ImageChange"
+                  },
+                  {
+                    "type": "ConfigChange"
+                  }
+                ]
+              }
+            }
+          ],
+          "parameters": [
+            {
+              "name": "NAME",
+              "displayName": "Name",
+              "description": "The name assigned to all of the frontend objects defined in this template.",
+              "value": "rails-pgsql-persistent",
+              "required": true
+            },
+            {
+              "name": "NAMESPACE",
+              "displayName": "Namespace",
+              "description": "The OpenShift Namespace where the ImageStream resides.",
+              "value": "openshift",
+              "required": true
+            },
+            {
+              "name": "MEMORY_LIMIT",
+              "displayName": "Memory Limit",
+              "description": "Maximum amount of memory the Rails container can use.",
+              "value": "512Mi",
+              "required": true
+            },
+            {
+              "name": "MEMORY_POSTGRESQL_LIMIT",
+              "displayName": "Memory Limit (PostgreSQL)",
+              "description": "Maximum amount of memory the PostgreSQL container can use.",
+              "value": "512Mi",
+              "required": true
+            },
+            {
+              "name": "VOLUME_CAPACITY",
+              "displayName": "Volume Capacity",
+              "description": "Volume space available for data, e.g. 512Mi, 2Gi",
+              "value": "1Gi",
+              "required": true
+            },
+            {
+              "name": "SOURCE_REPOSITORY_URL",
+              "displayName": "Git Repository URL",
+              "description": "The URL of the repository with your application source code.",
+              "value": "https://github.com/sclorg/rails-ex.git",
+              "required": true
+            },
+            {
+              "name": "SOURCE_REPOSITORY_REF",
+              "displayName": "Git Reference",
+              "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch."
+            },
+            {
+              "name": "CONTEXT_DIR",
+              "displayName": "Context Directory",
+              "description": "Set this to the relative path to your project if it is not in the root of your repository."
+            },
+            {
+              "name": "APPLICATION_DOMAIN",
+              "displayName": "Application Hostname",
+              "description": "The exposed hostname that will route to the Rails service, if left blank a value will be defaulted."
+            },
+            {
+              "name": "GITHUB_WEBHOOK_SECRET",
+              "displayName": "GitHub Webhook Secret",
+              "description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
+              "generate": "expression",
+              "from": "[a-zA-Z0-9]{40}"
+            },
+            {
+              "name": "SECRET_KEY_BASE",
+              "displayName": "Secret Key",
+              "description": "Your secret key for verifying the integrity of signed cookies.",
+              "generate": "expression",
+              "from": "[a-z0-9]{127}"
+            },
+            {
+              "name": "APPLICATION_USER",
+              "displayName": "Application Username",
+              "description": "The application user that is used within the sample application to authorize access on pages.",
+              "value": "openshift",
+              "required": true
+            },
+            {
+              "name": "APPLICATION_PASSWORD",
+              "displayName": "Application Password",
+              "description": "The application password that is used within the sample application to authorize access on pages.",
+              "value": "secret",
+              "required": true
+            },
+            {
+              "name": "RAILS_ENV",
+              "displayName": "Rails Environment",
+              "description": "Environment under which the sample application will run. Could be set to production, development or test.",
+              "value": "production",
+              "required": true
+            },
+            {
+              "name": "DATABASE_SERVICE_NAME",
+              "displayName": "Database Service Name",
+              "value": "postgresql",
+              "required": true
+            },
+            {
+              "name": "DATABASE_USER",
+              "displayName": "Database Username",
+              "generate": "expression",
+              "from": "user[A-Z0-9]{3}"
+            },
+            {
+              "name": "DATABASE_PASSWORD",
+              "displayName": "Database Password",
+              "generate": "expression",
+              "from": "[a-zA-Z0-9]{8}"
+            },
+            {
+              "name": "DATABASE_NAME",
+              "displayName": "Database Name",
+              "value": "root",
+              "required": true
+            },
+            {
+              "name": "POSTGRESQL_MAX_CONNECTIONS",
+              "displayName": "Maximum Database Connections",
+              "value": "100"
+            },
+            {
+              "name": "POSTGRESQL_SHARED_BUFFERS",
+              "displayName": "Shared Buffer Amount",
+              "value": "12MB"
+            },
+            {
+              "name": "RUBYGEM_MIRROR",
+              "displayName": "Custom RubyGems Mirror URL",
+              "description": "The custom RubyGems mirror URL"
+            }
+          ],
+          "labels": {
+            "app": "rails-pgsql-persistent",
+            "template": "rails-pgsql-persistent"
+          }
+        },
+        "secret": {
+          "name": "rails-pgsql-persistent-parameters-wxpxx"
+        },
+        "requester": {
+          "username": "admin-zc4NzA",
+          "groups": [
+            "cluster-admins",
+            "system:authenticated:oauth",
+            "system:authenticated"
+          ],
+          "extra": {
+            "scopes.authorization.openshift.io": [
+              "user:full"
+            ]
+          }
+        }
+      },
+      "status": {}
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "c89a0a3b-c2c4-42d6-a170-9fed042a32a7",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "rails-pgsql-persistent",
+    "namespace": "tzlil-2",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "0ffd5adb-a82f-49e8-adf9-f6d5d7bfde78",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-pgsql-persistent",
+        "namespace": "tzlil-2",
+        "uid": "63cddc93-9ae6-40ab-b93d-90f2027ebebc",
+        "resourceVersion": "135715",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T14:13:48Z",
+        "labels": {
+          "app": "rails-pgsql-persistent",
+          "template": "rails-pgsql-persistent",
+          "template.openshift.io/template-instance-owner": "008532cb-93dc-4a9a-aa85-5d6227168993"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:13:48Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:13:49Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:imageChangeTriggers": {},
+                "f:lastVersion": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "wsw8jD3A8vdUx2Lo64dgrEfkvStREtdANChC1vNL"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-pgsql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1,
+        "imageChangeTriggers": [
+          {
+            "lastTriggeredImageID": "image-registry.openshift-image-registry.svc:5000/openshift/ruby@sha256:c30bbbd6d4b97853d99bc44f9f66f093023f9db693ae79ddfcaaaa6f58c125a6",
+            "from": {
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "lastTriggerTime": null
+          }
+        ]
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-pgsql-persistent",
+        "namespace": "tzlil-2",
+        "uid": "63cddc93-9ae6-40ab-b93d-90f2027ebebc",
+        "resourceVersion": "135715",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T14:13:48Z",
+        "labels": {
+          "app": "rails-pgsql-persistent",
+          "template": "rails-pgsql-persistent",
+          "template.openshift.io/template-instance-owner": "008532cb-93dc-4a9a-aa85-5d6227168993"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:13:48Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "wsw8jD3A8vdUx2Lo64dgrEfkvStREtdANChC1vNL"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-pgsql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "a00c025e-6965-4914-8bce-5512e334e37d",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "rails-pgsql-persistent",
+    "namespace": "tzlil-2",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "0ffd5adb-a82f-49e8-adf9-f6d5d7bfde78",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-pgsql-persistent",
+        "namespace": "tzlil-2",
+        "uid": "63cddc93-9ae6-40ab-b93d-90f2027ebebc",
+        "resourceVersion": "135715",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T14:13:48Z",
+        "labels": {
+          "app": "rails-pgsql-persistent",
+          "template": "rails-pgsql-persistent",
+          "template.openshift.io/template-instance-owner": "008532cb-93dc-4a9a-aa85-5d6227168993"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:13:48Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:13:49Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:imageChangeTriggers": {},
+                "f:lastVersion": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "wsw8jD3A8vdUx2Lo64dgrEfkvStREtdANChC1vNL"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-pgsql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1,
+        "imageChangeTriggers": [
+          {
+            "lastTriggeredImageID": "image-registry.openshift-image-registry.svc:5000/openshift/ruby@sha256:c30bbbd6d4b97853d99bc44f9f66f093023f9db693ae79ddfcaaaa6f58c125a6",
+            "from": {
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "lastTriggerTime": "2023-06-19T14:13:49Z"
+          }
+        ]
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-pgsql-persistent",
+        "namespace": "tzlil-2",
+        "uid": "63cddc93-9ae6-40ab-b93d-90f2027ebebc",
+        "resourceVersion": "135715",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T14:13:48Z",
+        "labels": {
+          "app": "rails-pgsql-persistent",
+          "template": "rails-pgsql-persistent",
+          "template.openshift.io/template-instance-owner": "008532cb-93dc-4a9a-aa85-5d6227168993"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T14:13:48Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "wsw8jD3A8vdUx2Lo64dgrEfkvStREtdANChC1vNL"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-pgsql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "2b16ef79-11b5-4604-92e7-6d1c3854e0b7",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Pod"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "pods"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Pod"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "pods"
+    },
+    "name": "rails-postgresql-example-1-hook-pre",
+    "namespace": "tzlil-and-buddies-test-12",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:serviceaccount:tzlil-and-buddies-test-12:deployer",
+      "uid": "331f7ac3-19c0-48de-93be-da77b1046833",
+      "groups": [
+        "system:serviceaccounts",
+        "system:serviceaccounts:tzlil-and-buddies-test-12",
+        "system:authenticated"
+      ],
+      "extra": {
+        "authentication.kubernetes.io/pod-name": [
+          "rails-postgresql-example-1-deploy"
+        ],
+        "authentication.kubernetes.io/pod-uid": [
+          "4101ac0b-9f8c-498c-91e2-73fae8c5a19e"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Pod",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-hook-pre",
+        "namespace": "tzlil-and-buddies-test-12",
+        "uid": "6cad3715-9f4c-4020-be31-11971bfec263",
+        "creationTimestamp": "2023-06-19T14:14:04Z",
+        "labels": {
+          "openshift.io/deployer-pod-for.name": "rails-postgresql-example-1",
+          "openshift.io/deployer-pod.type": "hook-pre"
+        },
+        "annotations": {
+          "openshift.io/deployment.name": "rails-postgresql-example-1",
+          "openshift.io/scc": "restricted-v2",
+          "seccomp.security.alpha.kubernetes.io/pod": "runtime/default"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-deploy",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T14:14:04Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/deployment.name": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:openshift.io/deployer-pod-for.name": {},
+                  "f:openshift.io/deployer-pod.type": {}
+                }
+              },
+              "f:spec": {
+                "f:activeDeadlineSeconds": {},
+                "f:containers": {
+                  "k:{\"name\":\"lifecycle\"}": {
+                    ".": {},
+                    "f:command": {},
+                    "f:env": {
+                      ".": {},
+                      "k:{\"name\":\"APPLICATION_DOMAIN\"}": {
+                        ".": {},
+                        "f:name": {}
+                      },
+                      "k:{\"name\":\"APPLICATION_PASSWORD\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"APPLICATION_USER\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"DATABASE_SERVICE_NAME\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"OPENSHIFT_DEPLOYMENT_NAME\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"OPENSHIFT_DEPLOYMENT_NAMESPACE\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_DATABASE\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_MAX_CONNECTIONS\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_PASSWORD\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"POSTGRESQL_SHARED_BUFFERS\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_USER\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"RAILS_ENV\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"SECRET_KEY_BASE\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      }
+                    },
+                    "f:image": {},
+                    "f:imagePullPolicy": {},
+                    "f:name": {},
+                    "f:resources": {
+                      ".": {},
+                      "f:limits": {
+                        ".": {},
+                        "f:memory": {}
+                      },
+                      "f:requests": {
+                        ".": {},
+                        "f:memory": {}
+                      }
+                    },
+                    "f:terminationMessagePath": {},
+                    "f:terminationMessagePolicy": {}
+                  }
+                },
+                "f:dnsPolicy": {},
+                "f:enableServiceLinks": {},
+                "f:restartPolicy": {},
+                "f:schedulerName": {},
+                "f:securityContext": {},
+                "f:terminationGracePeriodSeconds": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "kube-api-access-l9zzv",
+            "projected": {
+              "sources": [
+                {
+                  "serviceAccountToken": {
+                    "expirationSeconds": 3607,
+                    "path": "token"
+                  }
+                },
+                {
+                  "configMap": {
+                    "name": "kube-root-ca.crt",
+                    "items": [
+                      {
+                        "key": "ca.crt",
+                        "path": "ca.crt"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "downwardAPI": {
+                    "items": [
+                      {
+                        "path": "namespace",
+                        "fieldRef": {
+                          "apiVersion": "v1",
+                          "fieldPath": "metadata.namespace"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "configMap": {
+                    "name": "openshift-service-ca.crt",
+                    "items": [
+                      {
+                        "key": "service-ca.crt",
+                        "path": "service-ca.crt"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "defaultMode": 420
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "lifecycle",
+            "image": "image-registry.openshift-image-registry.svc:5000/tzlil-and-buddies-test-12/rails-postgresql-example@sha256:a5d452bade9c1c0c1b2bd866b28b9d5736792886de10527187e2534eb2cbe3bc",
+            "command": [
+              "./migrate-database.sh"
+            ],
+            "env": [
+              {
+                "name": "POSTGRESQL_PASSWORD",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "database-password"
+                  }
+                }
+              },
+              {
+                "name": "POSTGRESQL_MAX_CONNECTIONS",
+                "value": "100"
+              },
+              {
+                "name": "POSTGRESQL_SHARED_BUFFERS",
+                "value": "12MB"
+              },
+              {
+                "name": "APPLICATION_DOMAIN"
+              },
+              {
+                "name": "DATABASE_SERVICE_NAME",
+                "value": "postgresql"
+              },
+              {
+                "name": "POSTGRESQL_USER",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "database-user"
+                  }
+                }
+              },
+              {
+                "name": "POSTGRESQL_DATABASE",
+                "value": "root"
+              },
+              {
+                "name": "SECRET_KEY_BASE",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "keybase"
+                  }
+                }
+              },
+              {
+                "name": "APPLICATION_USER",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "application-user"
+                  }
+                }
+              },
+              {
+                "name": "APPLICATION_PASSWORD",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "application-password"
+                  }
+                }
+              },
+              {
+                "name": "RAILS_ENV",
+                "value": "production"
+              },
+              {
+                "name": "OPENSHIFT_DEPLOYMENT_NAME",
+                "value": "rails-postgresql-example-1"
+              },
+              {
+                "name": "OPENSHIFT_DEPLOYMENT_NAMESPACE",
+                "value": "tzlil-and-buddies-test-12"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "memory": "512Mi"
+              },
+              "requests": {
+                "memory": "512Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "kube-api-access-l9zzv",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              },
+              "runAsUser": 1001060000,
+              "runAsNonRoot": true,
+              "allowPrivilegeEscalation": false
+            }
+          }
+        ],
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 10,
+        "activeDeadlineSeconds": 21596,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "securityContext": {
+          "seLinuxOptions": {
+            "level": "s0:c33,c2"
+          },
+          "fsGroup": 1001060000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "imagePullSecrets": [
+          {
+            "name": "default-dockercfg-d2xrv"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/memory-pressure",
+            "operator": "Exists",
+            "effect": "NoSchedule"
+          }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true,
+        "preemptionPolicy": "PreemptLowerPriority"
+      },
+      "status": {
+        "phase": "Pending",
+        "qosClass": "Burstable"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "45811648-74c5-4f3c-8a31-f107b08d4f96",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Pod"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "pods"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Pod"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "pods"
+    },
+    "name": "rails-postgresql-example-1-hook-pre",
+    "namespace": "tzlil-and-buddies-test-14",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:serviceaccount:tzlil-and-buddies-test-14:deployer",
+      "uid": "b7277cfe-34b5-4cf1-90f1-a33f465013aa",
+      "groups": [
+        "system:serviceaccounts",
+        "system:serviceaccounts:tzlil-and-buddies-test-14",
+        "system:authenticated"
+      ],
+      "extra": {
+        "authentication.kubernetes.io/pod-name": [
+          "rails-postgresql-example-1-deploy"
+        ],
+        "authentication.kubernetes.io/pod-uid": [
+          "672bb40d-4760-4f74-909b-9055761367a8"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Pod",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-hook-pre",
+        "namespace": "tzlil-and-buddies-test-14",
+        "uid": "14b23c55-4b5c-4e65-9803-d0268dd45b02",
+        "creationTimestamp": "2023-06-19T14:16:10Z",
+        "labels": {
+          "openshift.io/deployer-pod-for.name": "rails-postgresql-example-1",
+          "openshift.io/deployer-pod.type": "hook-pre"
+        },
+        "annotations": {
+          "openshift.io/deployment.name": "rails-postgresql-example-1",
+          "openshift.io/scc": "restricted-v2",
+          "seccomp.security.alpha.kubernetes.io/pod": "runtime/default"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-deploy",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T14:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/deployment.name": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:openshift.io/deployer-pod-for.name": {},
+                  "f:openshift.io/deployer-pod.type": {}
+                }
+              },
+              "f:spec": {
+                "f:activeDeadlineSeconds": {},
+                "f:containers": {
+                  "k:{\"name\":\"lifecycle\"}": {
+                    ".": {},
+                    "f:command": {},
+                    "f:env": {
+                      ".": {},
+                      "k:{\"name\":\"APPLICATION_DOMAIN\"}": {
+                        ".": {},
+                        "f:name": {}
+                      },
+                      "k:{\"name\":\"APPLICATION_PASSWORD\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"APPLICATION_USER\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"DATABASE_SERVICE_NAME\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"OPENSHIFT_DEPLOYMENT_NAME\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"OPENSHIFT_DEPLOYMENT_NAMESPACE\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_DATABASE\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_MAX_CONNECTIONS\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_PASSWORD\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"POSTGRESQL_SHARED_BUFFERS\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"POSTGRESQL_USER\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      },
+                      "k:{\"name\":\"RAILS_ENV\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:value": {}
+                      },
+                      "k:{\"name\":\"SECRET_KEY_BASE\"}": {
+                        ".": {},
+                        "f:name": {},
+                        "f:valueFrom": {
+                          ".": {},
+                          "f:secretKeyRef": {}
+                        }
+                      }
+                    },
+                    "f:image": {},
+                    "f:imagePullPolicy": {},
+                    "f:name": {},
+                    "f:resources": {
+                      ".": {},
+                      "f:limits": {
+                        ".": {},
+                        "f:memory": {}
+                      },
+                      "f:requests": {
+                        ".": {},
+                        "f:memory": {}
+                      }
+                    },
+                    "f:terminationMessagePath": {},
+                    "f:terminationMessagePolicy": {}
+                  }
+                },
+                "f:dnsPolicy": {},
+                "f:enableServiceLinks": {},
+                "f:restartPolicy": {},
+                "f:schedulerName": {},
+                "f:securityContext": {},
+                "f:terminationGracePeriodSeconds": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "volumes": [
+          {
+            "name": "kube-api-access-mf5kh",
+            "projected": {
+              "sources": [
+                {
+                  "serviceAccountToken": {
+                    "expirationSeconds": 3607,
+                    "path": "token"
+                  }
+                },
+                {
+                  "configMap": {
+                    "name": "kube-root-ca.crt",
+                    "items": [
+                      {
+                        "key": "ca.crt",
+                        "path": "ca.crt"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "downwardAPI": {
+                    "items": [
+                      {
+                        "path": "namespace",
+                        "fieldRef": {
+                          "apiVersion": "v1",
+                          "fieldPath": "metadata.namespace"
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "configMap": {
+                    "name": "openshift-service-ca.crt",
+                    "items": [
+                      {
+                        "key": "service-ca.crt",
+                        "path": "service-ca.crt"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "defaultMode": 420
+            }
+          }
+        ],
+        "containers": [
+          {
+            "name": "lifecycle",
+            "image": "image-registry.openshift-image-registry.svc:5000/tzlil-and-buddies-test-14/rails-postgresql-example@sha256:4318c314d692b37a7b88938fbf0be2b2b363c6a459d18141f15b068de63be94e",
+            "command": [
+              "./migrate-database.sh"
+            ],
+            "env": [
+              {
+                "name": "DATABASE_SERVICE_NAME",
+                "value": "postgresql"
+              },
+              {
+                "name": "APPLICATION_DOMAIN"
+              },
+              {
+                "name": "APPLICATION_USER",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "application-user"
+                  }
+                }
+              },
+              {
+                "name": "APPLICATION_PASSWORD",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "application-password"
+                  }
+                }
+              },
+              {
+                "name": "POSTGRESQL_USER",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "database-user"
+                  }
+                }
+              },
+              {
+                "name": "POSTGRESQL_PASSWORD",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "database-password"
+                  }
+                }
+              },
+              {
+                "name": "POSTGRESQL_DATABASE",
+                "value": "root"
+              },
+              {
+                "name": "SECRET_KEY_BASE",
+                "valueFrom": {
+                  "secretKeyRef": {
+                    "name": "rails-postgresql-example",
+                    "key": "keybase"
+                  }
+                }
+              },
+              {
+                "name": "POSTGRESQL_MAX_CONNECTIONS",
+                "value": "100"
+              },
+              {
+                "name": "POSTGRESQL_SHARED_BUFFERS",
+                "value": "12MB"
+              },
+              {
+                "name": "RAILS_ENV",
+                "value": "production"
+              },
+              {
+                "name": "OPENSHIFT_DEPLOYMENT_NAME",
+                "value": "rails-postgresql-example-1"
+              },
+              {
+                "name": "OPENSHIFT_DEPLOYMENT_NAMESPACE",
+                "value": "tzlil-and-buddies-test-14"
+              }
+            ],
+            "resources": {
+              "limits": {
+                "memory": "512Mi"
+              },
+              "requests": {
+                "memory": "512Mi"
+              }
+            },
+            "volumeMounts": [
+              {
+                "name": "kube-api-access-mf5kh",
+                "readOnly": true,
+                "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount"
+              }
+            ],
+            "terminationMessagePath": "/dev/termination-log",
+            "terminationMessagePolicy": "File",
+            "imagePullPolicy": "IfNotPresent",
+            "securityContext": {
+              "capabilities": {
+                "drop": [
+                  "ALL"
+                ]
+              },
+              "runAsUser": 1001080000,
+              "runAsNonRoot": true,
+              "allowPrivilegeEscalation": false
+            }
+          }
+        ],
+        "restartPolicy": "Never",
+        "terminationGracePeriodSeconds": 10,
+        "activeDeadlineSeconds": 21598,
+        "dnsPolicy": "ClusterFirst",
+        "serviceAccountName": "default",
+        "serviceAccount": "default",
+        "securityContext": {
+          "seLinuxOptions": {
+            "level": "s0:c33,c12"
+          },
+          "fsGroup": 1001080000,
+          "seccompProfile": {
+            "type": "RuntimeDefault"
+          }
+        },
+        "imagePullSecrets": [
+          {
+            "name": "default-dockercfg-7gf4j"
+          }
+        ],
+        "schedulerName": "default-scheduler",
+        "tolerations": [
+          {
+            "key": "node.kubernetes.io/not-ready",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/unreachable",
+            "operator": "Exists",
+            "effect": "NoExecute",
+            "tolerationSeconds": 300
+          },
+          {
+            "key": "node.kubernetes.io/memory-pressure",
+            "operator": "Exists",
+            "effect": "NoSchedule"
+          }
+        ],
+        "priority": 0,
+        "enableServiceLinks": true,
+        "preemptionPolicy": "PreemptLowerPriority"
+      },
+      "status": {
+        "phase": "Pending",
+        "qosClass": "Burstable"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------

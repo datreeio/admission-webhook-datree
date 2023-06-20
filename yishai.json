@@ -1,0 +1,4994 @@
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "21d2ef64-6596-49c8-81c0-73ee8b795e57",
+    "kind": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "kind": "ImageStreamImport"
+    },
+    "resource": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "resource": "imagestreamimports"
+    },
+    "requestKind": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "kind": "ImageStreamImport"
+    },
+    "requestResource": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "resource": "imagestreamimports"
+    },
+    "name": "newapp",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "ImageStreamImport",
+      "apiVersion": "image.openshift.io/v1",
+      "metadata": {
+        "name": "newapp",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "4a19a2ff-58c8-447e-9b4d-8a4ddb79b080",
+        "creationTimestamp": "2023-06-19T13:41:20Z",
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "image.openshift.io/v1",
+            "time": "2023-06-19T13:41:20Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:spec": {
+                "f:images": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "import": false,
+        "images": [
+          {
+            "from": {
+              "kind": "DockerImage",
+              "name": "rails-postgresql-exampl"
+            },
+            "importPolicy": {
+              "importMode": "Legacy"
+            },
+            "referencePolicy": {
+              "type": "Source"
+            }
+          }
+        ]
+      },
+      "status": {}
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "a4b8ce86-2d77-4414-8dc2-ffb29e08930d",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Secret"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "secrets"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Secret"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "secrets"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "uid": "0616d343-dd8e-4929-8317-8b69258f5231",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Secret",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "d5b1128d-93f8-4d23-8e66-01990692b1a4",
+        "creationTimestamp": "2023-06-19T13:42:51Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:51Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:data": {
+                ".": {},
+                "f:application-password": {},
+                "f:application-user": {},
+                "f:database-password": {},
+                "f:database-user": {},
+                "f:keybase": {}
+              },
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/generated-by": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "data": {
+        "application-password": "c2VjcmV0",
+        "application-user": "b3BlbnNoaWZ0",
+        "database-password": "b2twMEtPOHQ=",
+        "database-user": "dXNlcklBTw==",
+        "keybase": "ZWJkNTM0Z3FsOHgzdGIzMHdpMW1yeDVyZWlkaTRkbWp0ZzRnMmYzZ3J3b24wZjBuM3VrcHZxcGc0MTR4bjVxeDM2d3FtbndmaWlqanlyMWc4ZndrZ2xncnJ2ZG5hbGV1c2x4dWt4cW5tOGk1NmtmNHk4c2huZjhiZXBwbWd2eA=="
+      },
+      "type": "Opaque"
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "cdbd96b7-1fd3-4b08-88ff-4fbd4ec166c4",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Service"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "services"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Service"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "services"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "uid": "0616d343-dd8e-4929-8317-8b69258f5231",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "4f6e2849-8dea-4dd7-8013-764dce57b636",
+        "creationTimestamp": "2023-06-19T13:42:52Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Exposes and load balances the application pods",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "service.alpha.openshift.io/dependencies": "[{\"name\": \"postgresql\", \"kind\": \"Service\"}]"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:52Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:service.alpha.openshift.io/dependencies": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:internalTrafficPolicy": {},
+                "f:ports": {
+                  ".": {},
+                  "k:{\"port\":8080,\"protocol\":\"TCP\"}": {
+                    ".": {},
+                    "f:name": {},
+                    "f:port": {},
+                    "f:protocol": {},
+                    "f:targetPort": {}
+                  }
+                },
+                "f:selector": {},
+                "f:sessionAffinity": {},
+                "f:type": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "protocol": "TCP",
+            "port": 8080,
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "name": "rails-postgresql-example"
+        },
+        "clusterIP": "172.30.210.235",
+        "clusterIPs": [
+          "172.30.210.235"
+        ],
+        "type": "ClusterIP",
+        "sessionAffinity": "None",
+        "ipFamilies": [
+          "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "internalTrafficPolicy": "Cluster"
+      },
+      "status": {
+        "loadBalancer": {}
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "31b4fd15-f723-472e-a975-f6136a3a19bc",
+    "kind": {
+      "group": "route.openshift.io",
+      "version": "v1",
+      "kind": "Route"
+    },
+    "resource": {
+      "group": "route.openshift.io",
+      "version": "v1",
+      "resource": "routes"
+    },
+    "requestKind": {
+      "group": "route.openshift.io",
+      "version": "v1",
+      "kind": "Route"
+    },
+    "requestResource": {
+      "group": "route.openshift.io",
+      "version": "v1",
+      "resource": "routes"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Route",
+      "apiVersion": "route.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "b40d43af-7380-4300-b5d0-f99d86484acf",
+        "creationTimestamp": "2023-06-19T13:42:52Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "openshift.io/host.generated": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "route.openshift.io/v1",
+            "time": "2023-06-19T13:42:52Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:openshift.io/generated-by": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:to": {
+                  "f:kind": {},
+                  "f:name": {},
+                  "f:weight": {}
+                },
+                "f:wildcardPolicy": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "host": "rails-postgresql-example-tzlil-and-buddies-test-11.apps.yishay-oc-0619.gp7n.p1.openshiftapps.com",
+        "to": {
+          "kind": "Service",
+          "name": "rails-postgresql-example",
+          "weight": 100
+        },
+        "wildcardPolicy": "None"
+      },
+      "status": {}
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "4ca1d374-a2f7-44eb-8211-ce44501d5b4f",
+    "kind": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "kind": "ImageStream"
+    },
+    "resource": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "resource": "imagestreams"
+    },
+    "requestKind": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "kind": "ImageStream"
+    },
+    "requestResource": {
+      "group": "image.openshift.io",
+      "version": "v1",
+      "resource": "imagestreams"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "ImageStream",
+      "apiVersion": "image.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "98e18331-7372-4757-a2a8-34d8bc8567c8",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T13:42:53Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Keeps track of changes in the application image",
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "image.openshift.io/v1",
+            "time": "2023-06-19T13:42:53Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "lookupPolicy": {
+          "local": false
+        }
+      },
+      "status": {
+        "dockerImageRepository": "image-registry.openshift-image-registry.svc:5000/tzlil-and-buddies-test-11/rails-postgresql-example",
+        "publicDockerImageRepository": "default-route-openshift-image-registry.apps.yishay-oc-0619.gp7n.p1.openshiftapps.com/tzlil-and-buddies-test-11/rails-postgresql-example"
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "a804dd3c-be75-45ba-b4c7-09033d28f6bd",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "14b86746-ddbf-49f6-ad68-74136ea929b5",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T13:42:53Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:53Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "6QXMDm0JGjH7TYFsGOTWYJsxbKgOqrXeN8Y2Af64"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-postgresql-example:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "22ce3f91-fb15-41d7-9d85-44817bf97e10",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "7f90d920-0d2b-4472-aa68-f5358ba8f9f6",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "14b86746-ddbf-49f6-ad68-74136ea929b5",
+        "resourceVersion": "117339",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T13:42:53Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:53Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:54Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:imageChangeTriggers": {},
+                "f:lastVersion": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "6QXMDm0JGjH7TYFsGOTWYJsxbKgOqrXeN8Y2Af64"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-postgresql-example:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1,
+        "imageChangeTriggers": [
+          {
+            "lastTriggeredImageID": "image-registry.openshift-image-registry.svc:5000/openshift/ruby@sha256:c30bbbd6d4b97853d99bc44f9f66f093023f9db693ae79ddfcaaaa6f58c125a6",
+            "from": {
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "lastTriggerTime": "2023-06-19T13:42:54Z"
+          }
+        ]
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "14b86746-ddbf-49f6-ad68-74136ea929b5",
+        "resourceVersion": "117339",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T13:42:53Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:53Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "6QXMDm0JGjH7TYFsGOTWYJsxbKgOqrXeN8Y2Af64"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-postgresql-example:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "bd917775-d861-4be0-871b-4055cf65db95",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "0ffd5adb-a82f-49e8-adf9-f6d5d7bfde78",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "14b86746-ddbf-49f6-ad68-74136ea929b5",
+        "resourceVersion": "117339",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T13:42:53Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:53Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:54Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:imageChangeTriggers": {},
+                "f:lastVersion": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "6QXMDm0JGjH7TYFsGOTWYJsxbKgOqrXeN8Y2Af64"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-postgresql-example:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1,
+        "imageChangeTriggers": [
+          {
+            "lastTriggeredImageID": "image-registry.openshift-image-registry.svc:5000/openshift/ruby@sha256:c30bbbd6d4b97853d99bc44f9f66f093023f9db693ae79ddfcaaaa6f58c125a6",
+            "from": {
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "lastTriggerTime": null
+          }
+        ]
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "14b86746-ddbf-49f6-ad68-74136ea929b5",
+        "resourceVersion": "117339",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T13:42:53Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T13:42:53Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:postCommit": {
+                  "f:script": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "6QXMDm0JGjH7TYFsGOTWYJsxbKgOqrXeN8Y2Af64"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/sclorg/rails-ex.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "ruby:2.7-ubi8"
+            },
+            "env": [
+              {
+                "name": "RUBYGEM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "rails-postgresql-example:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {
+          "script": "bundle exec rake test"
+        },
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "533ac6ce-63a7-427b-b746-07057bbfb840",
+    "kind": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "kind": "DeploymentConfig"
+    },
+    "resource": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "resource": "deploymentconfigs"
+    },
+    "requestKind": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "kind": "DeploymentConfig"
+    },
+    "requestResource": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "resource": "deploymentconfigs"
+    },
+    "name": "rails-postgresql-example",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "DeploymentConfig",
+      "apiVersion": "apps.openshift.io/v1",
+      "metadata": {
+        "name": "rails-postgresql-example",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "dfeae4a7-c99c-4af5-a5c5-1d5955d5bd77",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T13:42:54Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to deploy the application server",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "apps.openshift.io/v1",
+            "time": "2023-06-19T13:42:54Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:replicas": {},
+                "f:selector": {
+                  ".": {},
+                  "f:name": {}
+                },
+                "f:strategy": {
+                  "f:activeDeadlineSeconds": {},
+                  "f:recreateParams": {
+                    ".": {},
+                    "f:pre": {
+                      ".": {},
+                      "f:execNewPod": {
+                        ".": {},
+                        "f:command": {},
+                        "f:containerName": {}
+                      },
+                      "f:failurePolicy": {}
+                    },
+                    "f:timeoutSeconds": {}
+                  },
+                  "f:type": {}
+                },
+                "f:template": {
+                  ".": {},
+                  "f:metadata": {
+                    ".": {},
+                    "f:annotations": {
+                      ".": {},
+                      "f:openshift.io/generated-by": {}
+                    },
+                    "f:creationTimestamp": {},
+                    "f:labels": {
+                      ".": {},
+                      "f:name": {}
+                    },
+                    "f:name": {}
+                  },
+                  "f:spec": {
+                    ".": {},
+                    "f:containers": {
+                      ".": {},
+                      "k:{\"name\":\"rails-postgresql-example\"}": {
+                        ".": {},
+                        "f:env": {
+                          ".": {},
+                          "k:{\"name\":\"APPLICATION_DOMAIN\"}": {
+                            ".": {},
+                            "f:name": {}
+                          },
+                          "k:{\"name\":\"APPLICATION_PASSWORD\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          },
+                          "k:{\"name\":\"APPLICATION_USER\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          },
+                          "k:{\"name\":\"DATABASE_SERVICE_NAME\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_DATABASE\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_MAX_CONNECTIONS\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_PASSWORD\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          },
+                          "k:{\"name\":\"POSTGRESQL_SHARED_BUFFERS\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_USER\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          },
+                          "k:{\"name\":\"RAILS_ENV\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"SECRET_KEY_BASE\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          }
+                        },
+                        "f:image": {},
+                        "f:imagePullPolicy": {},
+                        "f:livenessProbe": {
+                          ".": {},
+                          "f:failureThreshold": {},
+                          "f:httpGet": {
+                            ".": {},
+                            "f:path": {},
+                            "f:port": {},
+                            "f:scheme": {}
+                          },
+                          "f:initialDelaySeconds": {},
+                          "f:periodSeconds": {},
+                          "f:successThreshold": {},
+                          "f:timeoutSeconds": {}
+                        },
+                        "f:name": {},
+                        "f:ports": {
+                          ".": {},
+                          "k:{\"containerPort\":8080,\"protocol\":\"TCP\"}": {
+                            ".": {},
+                            "f:containerPort": {},
+                            "f:protocol": {}
+                          }
+                        },
+                        "f:readinessProbe": {
+                          ".": {},
+                          "f:failureThreshold": {},
+                          "f:httpGet": {
+                            ".": {},
+                            "f:path": {},
+                            "f:port": {},
+                            "f:scheme": {}
+                          },
+                          "f:initialDelaySeconds": {},
+                          "f:periodSeconds": {},
+                          "f:successThreshold": {},
+                          "f:timeoutSeconds": {}
+                        },
+                        "f:resources": {
+                          ".": {},
+                          "f:limits": {
+                            ".": {},
+                            "f:memory": {}
+                          }
+                        },
+                        "f:terminationMessagePath": {},
+                        "f:terminationMessagePolicy": {}
+                      }
+                    },
+                    "f:dnsPolicy": {},
+                    "f:restartPolicy": {},
+                    "f:schedulerName": {},
+                    "f:securityContext": {},
+                    "f:terminationGracePeriodSeconds": {}
+                  }
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "strategy": {
+          "type": "Recreate",
+          "recreateParams": {
+            "timeoutSeconds": 600,
+            "pre": {
+              "failurePolicy": "Abort",
+              "execNewPod": {
+                "command": [
+                  "./migrate-database.sh"
+                ],
+                "containerName": "rails-postgresql-example"
+              }
+            }
+          },
+          "resources": {},
+          "activeDeadlineSeconds": 21600
+        },
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "rails-postgresql-example"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "rails-postgresql-example:latest"
+              }
+            }
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ],
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "test": false,
+        "selector": {
+          "name": "rails-postgresql-example"
+        },
+        "template": {
+          "metadata": {
+            "name": "rails-postgresql-example",
+            "creationTimestamp": null,
+            "labels": {
+              "name": "rails-postgresql-example"
+            },
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftNewApp"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "rails-postgresql-example",
+                "image": " ",
+                "ports": [
+                  {
+                    "containerPort": 8080,
+                    "protocol": "TCP"
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "DATABASE_SERVICE_NAME",
+                    "value": "postgresql"
+                  },
+                  {
+                    "name": "POSTGRESQL_USER",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "database-user"
+                      }
+                    }
+                  },
+                  {
+                    "name": "POSTGRESQL_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "database-password"
+                      }
+                    }
+                  },
+                  {
+                    "name": "POSTGRESQL_DATABASE",
+                    "value": "root"
+                  },
+                  {
+                    "name": "SECRET_KEY_BASE",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "keybase"
+                      }
+                    }
+                  },
+                  {
+                    "name": "POSTGRESQL_MAX_CONNECTIONS",
+                    "value": "100"
+                  },
+                  {
+                    "name": "POSTGRESQL_SHARED_BUFFERS",
+                    "value": "12MB"
+                  },
+                  {
+                    "name": "APPLICATION_DOMAIN"
+                  },
+                  {
+                    "name": "APPLICATION_USER",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "application-user"
+                      }
+                    }
+                  },
+                  {
+                    "name": "APPLICATION_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "application-password"
+                      }
+                    }
+                  },
+                  {
+                    "name": "RAILS_ENV",
+                    "value": "production"
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "memory": "512Mi"
+                  }
+                },
+                "livenessProbe": {
+                  "httpGet": {
+                    "path": "/articles",
+                    "port": 8080,
+                    "scheme": "HTTP"
+                  },
+                  "initialDelaySeconds": 10,
+                  "timeoutSeconds": 3,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "failureThreshold": 3
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/articles",
+                    "port": 8080,
+                    "scheme": "HTTP"
+                  },
+                  "initialDelaySeconds": 5,
+                  "timeoutSeconds": 3,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+              }
+            ],
+            "restartPolicy": "Always",
+            "terminationGracePeriodSeconds": 30,
+            "dnsPolicy": "ClusterFirst",
+            "securityContext": {},
+            "schedulerName": "default-scheduler"
+          }
+        }
+      },
+      "status": {
+        "latestVersion": 0,
+        "observedGeneration": 0,
+        "replicas": 0,
+        "updatedReplicas": 0,
+        "availableReplicas": 0,
+        "unavailableReplicas": 0
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "f0f17be4-5376-4337-bf34-d9155f1e2217",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Service"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "services"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Service"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "services"
+    },
+    "name": "postgresql",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "uid": "0616d343-dd8e-4929-8317-8b69258f5231",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "11752fde-8a11-4b09-877f-75a703b4a640",
+        "creationTimestamp": "2023-06-19T13:42:55Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Exposes the database server",
+          "openshift.io/generated-by": "OpenShiftNewApp"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:55Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:internalTrafficPolicy": {},
+                "f:ports": {
+                  ".": {},
+                  "k:{\"port\":5432,\"protocol\":\"TCP\"}": {
+                    ".": {},
+                    "f:name": {},
+                    "f:port": {},
+                    "f:protocol": {},
+                    "f:targetPort": {}
+                  }
+                },
+                "f:selector": {},
+                "f:sessionAffinity": {},
+                "f:type": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "postgresql",
+            "protocol": "TCP",
+            "port": 5432,
+            "targetPort": 5432
+          }
+        ],
+        "selector": {
+          "name": "postgresql"
+        },
+        "clusterIP": "172.30.207.74",
+        "clusterIPs": [
+          "172.30.207.74"
+        ],
+        "type": "ClusterIP",
+        "sessionAffinity": "None",
+        "ipFamilies": [
+          "IPv4"
+        ],
+        "ipFamilyPolicy": "SingleStack",
+        "internalTrafficPolicy": "Cluster"
+      },
+      "status": {
+        "loadBalancer": {}
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "56bea77f-2b14-404b-b1aa-e6597f35334a",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a133fe60d706a",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a133fe60d706a",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "583c913b-e4a0-43b4-a9a9-ef83b6bb8200",
+        "creationTimestamp": "2023-06-19T13:42:55Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:55Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.initContainers{git-clone}"
+      },
+      "reason": "Pulled",
+      "message": "Container image \"quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e4279df9b672308472c4b96d984e6d802a78b50e43988b826788ebdc480b93c8\" already present on machine",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:55Z",
+      "lastTimestamp": "2023-06-19T13:42:55Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "2618a412-21dd-4eb3-99b0-1c1bdecfae73",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a133ff32630f5",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a133ff32630f5",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "8b945c75-dd7c-4454-b95f-8a8b597706d6",
+        "creationTimestamp": "2023-06-19T13:42:55Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:55Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.initContainers{git-clone}"
+      },
+      "reason": "Created",
+      "message": "Created container git-clone",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:55Z",
+      "lastTimestamp": "2023-06-19T13:42:55Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "ecee4f31-7b10-42d3-8270-17a562ea2632",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a133ff4fc3138",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a133ff4fc3138",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "68493c99-1263-4fe1-bef4-aea8e6ea26ee",
+        "creationTimestamp": "2023-06-19T13:42:55Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:55Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.initContainers{git-clone}"
+      },
+      "reason": "Started",
+      "message": "Started container git-clone",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:55Z",
+      "lastTimestamp": "2023-06-19T13:42:55Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "246f0183-e4ce-49b4-b5a7-d6ac7c0dc40d",
+    "kind": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "kind": "DeploymentConfig"
+    },
+    "resource": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "resource": "deploymentconfigs"
+    },
+    "requestKind": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "kind": "DeploymentConfig"
+    },
+    "requestResource": {
+      "group": "apps.openshift.io",
+      "version": "v1",
+      "resource": "deploymentconfigs"
+    },
+    "name": "postgresql",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "admin-zc4NzA",
+      "groups": [
+        "cluster-admins",
+        "system:authenticated:oauth",
+        "system:authenticated"
+      ],
+      "extra": {
+        "scopes.authorization.openshift.io": [
+          "user:full"
+        ]
+      }
+    },
+    "object": {
+      "kind": "DeploymentConfig",
+      "apiVersion": "apps.openshift.io/v1",
+      "metadata": {
+        "name": "postgresql",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "662077f9-173c-471d-b434-1361b17ef459",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T13:42:55Z",
+        "labels": {
+          "app": "rails-postgresql-example",
+          "template": "rails-postgresql-example"
+        },
+        "annotations": {
+          "description": "Defines how to deploy the database",
+          "openshift.io/generated-by": "OpenShiftNewApp",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "oc",
+            "operation": "Update",
+            "apiVersion": "apps.openshift.io/v1",
+            "time": "2023-06-19T13:42:55Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:openshift.io/generated-by": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {}
+                }
+              },
+              "f:spec": {
+                "f:replicas": {},
+                "f:selector": {
+                  ".": {},
+                  "f:name": {}
+                },
+                "f:strategy": {
+                  "f:activeDeadlineSeconds": {},
+                  "f:recreateParams": {
+                    ".": {},
+                    "f:timeoutSeconds": {}
+                  },
+                  "f:type": {}
+                },
+                "f:template": {
+                  ".": {},
+                  "f:metadata": {
+                    ".": {},
+                    "f:annotations": {
+                      ".": {},
+                      "f:openshift.io/generated-by": {}
+                    },
+                    "f:creationTimestamp": {},
+                    "f:labels": {
+                      ".": {},
+                      "f:name": {}
+                    },
+                    "f:name": {}
+                  },
+                  "f:spec": {
+                    ".": {},
+                    "f:containers": {
+                      ".": {},
+                      "k:{\"name\":\"postgresql\"}": {
+                        ".": {},
+                        "f:env": {
+                          ".": {},
+                          "k:{\"name\":\"POSTGRESQL_DATABASE\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_MAX_CONNECTIONS\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_PASSWORD\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          },
+                          "k:{\"name\":\"POSTGRESQL_SHARED_BUFFERS\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:value": {}
+                          },
+                          "k:{\"name\":\"POSTGRESQL_USER\"}": {
+                            ".": {},
+                            "f:name": {},
+                            "f:valueFrom": {
+                              ".": {},
+                              "f:secretKeyRef": {}
+                            }
+                          }
+                        },
+                        "f:image": {},
+                        "f:imagePullPolicy": {},
+                        "f:livenessProbe": {
+                          ".": {},
+                          "f:exec": {
+                            ".": {},
+                            "f:command": {}
+                          },
+                          "f:failureThreshold": {},
+                          "f:initialDelaySeconds": {},
+                          "f:periodSeconds": {},
+                          "f:successThreshold": {},
+                          "f:timeoutSeconds": {}
+                        },
+                        "f:name": {},
+                        "f:ports": {
+                          ".": {},
+                          "k:{\"containerPort\":5432,\"protocol\":\"TCP\"}": {
+                            ".": {},
+                            "f:containerPort": {},
+                            "f:protocol": {}
+                          }
+                        },
+                        "f:readinessProbe": {
+                          ".": {},
+                          "f:exec": {
+                            ".": {},
+                            "f:command": {}
+                          },
+                          "f:failureThreshold": {},
+                          "f:initialDelaySeconds": {},
+                          "f:periodSeconds": {},
+                          "f:successThreshold": {},
+                          "f:timeoutSeconds": {}
+                        },
+                        "f:resources": {
+                          ".": {},
+                          "f:limits": {
+                            ".": {},
+                            "f:memory": {}
+                          }
+                        },
+                        "f:terminationMessagePath": {},
+                        "f:terminationMessagePolicy": {},
+                        "f:volumeMounts": {
+                          ".": {},
+                          "k:{\"mountPath\":\"/var/lib/pgsql/data\"}": {
+                            ".": {},
+                            "f:mountPath": {},
+                            "f:name": {}
+                          }
+                        }
+                      }
+                    },
+                    "f:dnsPolicy": {},
+                    "f:restartPolicy": {},
+                    "f:schedulerName": {},
+                    "f:securityContext": {},
+                    "f:terminationGracePeriodSeconds": {},
+                    "f:volumes": {
+                      ".": {},
+                      "k:{\"name\":\"data\"}": {
+                        ".": {},
+                        "f:emptyDir": {},
+                        "f:name": {}
+                      }
+                    }
+                  }
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "strategy": {
+          "type": "Recreate",
+          "recreateParams": {
+            "timeoutSeconds": 600
+          },
+          "resources": {},
+          "activeDeadlineSeconds": 21600
+        },
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "postgresql"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "namespace": "openshift",
+                "name": "postgresql:12-el8"
+              }
+            }
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ],
+        "replicas": 1,
+        "revisionHistoryLimit": 10,
+        "test": false,
+        "selector": {
+          "name": "postgresql"
+        },
+        "template": {
+          "metadata": {
+            "name": "postgresql",
+            "creationTimestamp": null,
+            "labels": {
+              "name": "postgresql"
+            },
+            "annotations": {
+              "openshift.io/generated-by": "OpenShiftNewApp"
+            }
+          },
+          "spec": {
+            "volumes": [
+              {
+                "name": "data",
+                "emptyDir": {}
+              }
+            ],
+            "containers": [
+              {
+                "name": "postgresql",
+                "image": " ",
+                "ports": [
+                  {
+                    "containerPort": 5432,
+                    "protocol": "TCP"
+                  }
+                ],
+                "env": [
+                  {
+                    "name": "POSTGRESQL_USER",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "database-user"
+                      }
+                    }
+                  },
+                  {
+                    "name": "POSTGRESQL_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "rails-postgresql-example",
+                        "key": "database-password"
+                      }
+                    }
+                  },
+                  {
+                    "name": "POSTGRESQL_DATABASE",
+                    "value": "root"
+                  },
+                  {
+                    "name": "POSTGRESQL_MAX_CONNECTIONS",
+                    "value": "100"
+                  },
+                  {
+                    "name": "POSTGRESQL_SHARED_BUFFERS",
+                    "value": "12MB"
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "memory": "512Mi"
+                  }
+                },
+                "volumeMounts": [
+                  {
+                    "name": "data",
+                    "mountPath": "/var/lib/pgsql/data"
+                  }
+                ],
+                "livenessProbe": {
+                  "exec": {
+                    "command": [
+                      "/usr/libexec/check-container",
+                      "--live"
+                    ]
+                  },
+                  "initialDelaySeconds": 120,
+                  "timeoutSeconds": 10,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "failureThreshold": 3
+                },
+                "readinessProbe": {
+                  "exec": {
+                    "command": [
+                      "/usr/libexec/check-container"
+                    ]
+                  },
+                  "initialDelaySeconds": 5,
+                  "timeoutSeconds": 1,
+                  "periodSeconds": 10,
+                  "successThreshold": 1,
+                  "failureThreshold": 3
+                },
+                "terminationMessagePath": "/dev/termination-log",
+                "terminationMessagePolicy": "File",
+                "imagePullPolicy": "IfNotPresent"
+              }
+            ],
+            "restartPolicy": "Always",
+            "terminationGracePeriodSeconds": 30,
+            "dnsPolicy": "ClusterFirst",
+            "securityContext": {},
+            "schedulerName": "default-scheduler"
+          }
+        }
+      },
+      "status": {
+        "latestVersion": 0,
+        "observedGeneration": 0,
+        "replicas": 0,
+        "updatedReplicas": 0,
+        "availableReplicas": 0,
+        "unavailableReplicas": 0
+      }
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "f2e2fc4a-df2e-4926-862e-a75fad495ce4",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a134045e6162a",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a134045e6162a",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "506848b9-85ce-48dd-984e-02b6285875ce",
+        "creationTimestamp": "2023-06-19T13:42:57Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:57Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.initContainers{manage-dockerfile}"
+      },
+      "reason": "Pulled",
+      "message": "Container image \"quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e4279df9b672308472c4b96d984e6d802a78b50e43988b826788ebdc480b93c8\" already present on machine",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:57Z",
+      "lastTimestamp": "2023-06-19T13:42:57Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "70cb4bc0-8285-4cfc-b617-5c808a2a497d",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a1340535bc2ba",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a1340535bc2ba",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "4389f1da-e75e-4e1d-95da-28fb1c4d7884",
+        "creationTimestamp": "2023-06-19T13:42:57Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:57Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.initContainers{manage-dockerfile}"
+      },
+      "reason": "Created",
+      "message": "Created container manage-dockerfile",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:57Z",
+      "lastTimestamp": "2023-06-19T13:42:57Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "42181031-7b7b-4ff5-a38c-51d89ed99243",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a134055d45a4b",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a134055d45a4b",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "90e8414b-58e2-4740-b913-c74011f801a3",
+        "creationTimestamp": "2023-06-19T13:42:57Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:57Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.initContainers{manage-dockerfile}"
+      },
+      "reason": "Started",
+      "message": "Started container manage-dockerfile",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:57Z",
+      "lastTimestamp": "2023-06-19T13:42:57Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "aa39f6de-253d-46c0-a444-51c2176f2c65",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a134081d13c9c",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a134081d13c9c",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "2da644e0-ef99-4aef-9fbe-55bf60637cb9",
+        "creationTimestamp": "2023-06-19T13:42:58Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:58Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.containers{sti-build}"
+      },
+      "reason": "Pulled",
+      "message": "Container image \"quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:e4279df9b672308472c4b96d984e6d802a78b50e43988b826788ebdc480b93c8\" already present on machine",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:58Z",
+      "lastTimestamp": "2023-06-19T13:42:58Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "6ce3bad7-d27f-48a0-a08d-64cb18d1996a",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a134095efd52c",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a134095efd52c",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "0b992d82-3e04-4b49-928d-44df23af8a3a",
+        "creationTimestamp": "2023-06-19T13:42:58Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:58Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.containers{sti-build}"
+      },
+      "reason": "Created",
+      "message": "Created container sti-build",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:58Z",
+      "lastTimestamp": "2023-06-19T13:42:58Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "2eedd9e1-9bf9-42e2-be21-7011e236288d",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "rails-postgresql-example-1-build.176a134098671894",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "rails-postgresql-example-1-build.176a134098671894",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "aabadc34-1fb7-4ba6-9c33-b7657ea82c88",
+        "creationTimestamp": "2023-06-19T13:42:58Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:58Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "rails-postgresql-example-1-build",
+        "uid": "57ce4dbd-9157-4469-9c3c-9c3701e5ac9a",
+        "apiVersion": "v1",
+        "resourceVersion": "117346",
+        "fieldPath": "spec.containers{sti-build}"
+      },
+      "reason": "Started",
+      "message": "Started container sti-build",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:58Z",
+      "lastTimestamp": "2023-06-19T13:42:58Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "0ff03b05-9890-4bb9-8ff3-534f145d4356",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-deploy.176a1340d7f42d49",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-deploy.176a1340d7f42d49",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "36742546-9406-4c49-b68d-7d2f07c30f6f",
+        "creationTimestamp": "2023-06-19T13:42:59Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:59Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-deploy",
+        "uid": "2c3711e9-d0a6-4ee4-a69c-aa020be2cda8",
+        "apiVersion": "v1",
+        "resourceVersion": "117424",
+        "fieldPath": "spec.containers{deployment}"
+      },
+      "reason": "Pulled",
+      "message": "Container image \"quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:1c631ffefccbd177c6912dbb829da534472d41bad49859a825a63043a2419e94\" already present on machine",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:59Z",
+      "lastTimestamp": "2023-06-19T13:42:59Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "b0223c8e-2675-49d1-afe3-2d7fc771a94d",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-deploy.176a1340e0334a6c",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-deploy.176a1340e0334a6c",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "039fafe1-00ab-4ade-bddf-5e28b5b15424",
+        "creationTimestamp": "2023-06-19T13:42:59Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:59Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-deploy",
+        "uid": "2c3711e9-d0a6-4ee4-a69c-aa020be2cda8",
+        "apiVersion": "v1",
+        "resourceVersion": "117424",
+        "fieldPath": "spec.containers{deployment}"
+      },
+      "reason": "Created",
+      "message": "Created container deployment",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:59Z",
+      "lastTimestamp": "2023-06-19T13:42:59Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "82c28318-106b-48e8-a6b5-49f77faa91fa",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-deploy.176a1340e23e2fd2",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-deploy.176a1340e23e2fd2",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "d120f9d5-3025-4a48-a3b1-0cdd25c3b6f7",
+        "creationTimestamp": "2023-06-19T13:42:59Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:42:59Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-deploy",
+        "uid": "2c3711e9-d0a6-4ee4-a69c-aa020be2cda8",
+        "apiVersion": "v1",
+        "resourceVersion": "117424",
+        "fieldPath": "spec.containers{deployment}"
+      },
+      "reason": "Started",
+      "message": "Started container deployment",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:42:59Z",
+      "lastTimestamp": "2023-06-19T13:42:59Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "d14d2112-4e59-40d3-b7e1-f4548e57cd84",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-dpfql.176a13411fe4b288",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-dpfql.176a13411fe4b288",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "36858484-1948-48bd-9d13-dd339b4643d9",
+        "creationTimestamp": "2023-06-19T13:43:00Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:43:00Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-dpfql",
+        "uid": "8e6ecb95-10ed-441a-8ef4-05107a1f4f9e",
+        "apiVersion": "v1",
+        "resourceVersion": "117451",
+        "fieldPath": "spec.containers{postgresql}"
+      },
+      "reason": "Pulling",
+      "message": "Pulling image \"image-registry.openshift-image-registry.svc:5000/openshift/postgresql@sha256:76c51abd07c2dace7c403d6621abf9cd4ad57361780270c284360ce47391c995\"",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:43:00Z",
+      "lastTimestamp": "2023-06-19T13:43:00Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "27b52d48-8e79-442a-9b90-507937abe2aa",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-dpfql.176a13462a5bca66",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-dpfql.176a13462a5bca66",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "5fea5b5f-47da-47a9-bfae-3c760a6cb4af",
+        "creationTimestamp": "2023-06-19T13:43:22Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:43:22Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-dpfql",
+        "uid": "8e6ecb95-10ed-441a-8ef4-05107a1f4f9e",
+        "apiVersion": "v1",
+        "resourceVersion": "117451",
+        "fieldPath": "spec.containers{postgresql}"
+      },
+      "reason": "Pulled",
+      "message": "Successfully pulled image \"image-registry.openshift-image-registry.svc:5000/openshift/postgresql@sha256:76c51abd07c2dace7c403d6621abf9cd4ad57361780270c284360ce47391c995\" in 21.650386564s (21.650394784s including waiting)",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:43:22Z",
+      "lastTimestamp": "2023-06-19T13:43:22Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "441b9ea9-5c85-4891-9751-833e4b337432",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-dpfql.176a134637ee5e17",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-dpfql.176a134637ee5e17",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "53eee8ab-a91c-4bc2-87be-c95ed0bde8ce",
+        "creationTimestamp": "2023-06-19T13:43:22Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:43:22Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-dpfql",
+        "uid": "8e6ecb95-10ed-441a-8ef4-05107a1f4f9e",
+        "apiVersion": "v1",
+        "resourceVersion": "117451",
+        "fieldPath": "spec.containers{postgresql}"
+      },
+      "reason": "Created",
+      "message": "Created container postgresql",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:43:22Z",
+      "lastTimestamp": "2023-06-19T13:43:22Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "e3022063-c131-4738-8bbc-7ea5674abc69",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "postgresql-1-dpfql.176a13463c4ad71b",
+    "namespace": "tzlil-and-buddies-test-11",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "postgresql-1-dpfql.176a13463c4ad71b",
+        "namespace": "tzlil-and-buddies-test-11",
+        "uid": "fece948e-4a3a-4b4b-8b78-c41f6ca45e40",
+        "creationTimestamp": "2023-06-19T13:43:22Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:43:22Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "tzlil-and-buddies-test-11",
+        "name": "postgresql-1-dpfql",
+        "uid": "8e6ecb95-10ed-441a-8ef4-05107a1f4f9e",
+        "apiVersion": "v1",
+        "resourceVersion": "117451",
+        "fieldPath": "spec.containers{postgresql}"
+      },
+      "reason": "Started",
+      "message": "Started container postgresql",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:43:22Z",
+      "lastTimestamp": "2023-06-19T13:43:22Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "6d665592-b78c-477d-a6f2-60df6faa9168",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d0eb7acb8",
+    "namespace": "openshift-monitoring",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d0eb7acb8",
+        "namespace": "openshift-monitoring",
+        "uid": "0e5b3743-19d5-43c6-b05e-aa78c895bfb2",
+        "creationTimestamp": "2023-06-19T13:45:00Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:00Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-monitoring",
+        "name": "osd-rebalance-infra-nodes-28119705-269s4",
+        "uid": "17006ad5-de57-4737-bae2-0e31e7ef7b0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118526",
+        "fieldPath": "spec.containers{osd-rebalance-infra-nodes}"
+      },
+      "reason": "Pulling",
+      "message": "Pulling image \"image-registry.openshift-image-registry.svc:5000/openshift/cli:latest\"",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:00Z",
+      "lastTimestamp": "2023-06-19T13:45:00Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "041987bd-c4cb-4ade-8ee3-e585468090f9",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-disable-cpms-28119705-cf8rs.176a135d187e790e",
+    "namespace": "openshift-machine-api",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-disable-cpms-28119705-cf8rs.176a135d187e790e",
+        "namespace": "openshift-machine-api",
+        "uid": "76b76b8c-9043-4823-ac35-db92bd396d26",
+        "creationTimestamp": "2023-06-19T13:45:00Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:00Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-machine-api",
+        "name": "osd-disable-cpms-28119705-cf8rs",
+        "uid": "d6c09802-13d0-48ce-9b71-8b1513750f0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118528",
+        "fieldPath": "spec.containers{osd-disable-cpms}"
+      },
+      "reason": "Pulling",
+      "message": "Pulling image \"image-registry.openshift-image-registry.svc:5000/openshift/cli:latest\"",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:00Z",
+      "lastTimestamp": "2023-06-19T13:45:00Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "c782d2e6-d127-4464-9f97-8f7452c92358",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d1eb093d9",
+    "namespace": "openshift-monitoring",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d1eb093d9",
+        "namespace": "openshift-monitoring",
+        "uid": "44678e34-5566-4831-b209-69385ef3da19",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-monitoring",
+        "name": "osd-rebalance-infra-nodes-28119705-269s4",
+        "uid": "17006ad5-de57-4737-bae2-0e31e7ef7b0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118526",
+        "fieldPath": "spec.containers{osd-rebalance-infra-nodes}"
+      },
+      "reason": "Pulled",
+      "message": "Successfully pulled image \"image-registry.openshift-image-registry.svc:5000/openshift/cli:latest\" in 267.928116ms (267.941514ms including waiting)",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "4372574b-3cb5-40ca-8bd0-98cc1cd34a07",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-disable-cpms-28119705-cf8rs.176a135d2488a41e",
+    "namespace": "openshift-machine-api",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-disable-cpms-28119705-cf8rs.176a135d2488a41e",
+        "namespace": "openshift-machine-api",
+        "uid": "ae9a1cce-41e0-4312-bbb2-fb4d503101cc",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-machine-api",
+        "name": "osd-disable-cpms-28119705-cf8rs",
+        "uid": "d6c09802-13d0-48ce-9b71-8b1513750f0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118528",
+        "fieldPath": "spec.containers{osd-disable-cpms}"
+      },
+      "reason": "Pulled",
+      "message": "Successfully pulled image \"image-registry.openshift-image-registry.svc:5000/openshift/cli:latest\" in 201.961291ms (201.976255ms including waiting)",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "d3a4db31-05a1-4b38-9bfb-30235f56807a",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d276ebe79",
+    "namespace": "openshift-monitoring",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d276ebe79",
+        "namespace": "openshift-monitoring",
+        "uid": "df000b77-e1bf-4382-90f9-21db7f490b31",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-monitoring",
+        "name": "osd-rebalance-infra-nodes-28119705-269s4",
+        "uid": "17006ad5-de57-4737-bae2-0e31e7ef7b0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118526",
+        "fieldPath": "spec.containers{osd-rebalance-infra-nodes}"
+      },
+      "reason": "Created",
+      "message": "Created container osd-rebalance-infra-nodes",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "496d9059-249f-4c21-863c-859b45ae01e4",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d298381ae",
+    "namespace": "openshift-monitoring",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-rebalance-infra-nodes-28119705-269s4.176a135d298381ae",
+        "namespace": "openshift-monitoring",
+        "uid": "bbb58160-1b19-462a-ad10-c27f7d93e657",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-monitoring",
+        "name": "osd-rebalance-infra-nodes-28119705-269s4",
+        "uid": "17006ad5-de57-4737-bae2-0e31e7ef7b0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118526",
+        "fieldPath": "spec.containers{osd-rebalance-infra-nodes}"
+      },
+      "reason": "Started",
+      "message": "Started container osd-rebalance-infra-nodes",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "1b5b2f8b-1db1-4ad6-b2ee-578ec11cc865",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-disable-cpms-28119705-cf8rs.176a135d2d46057c",
+    "namespace": "openshift-machine-api",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-disable-cpms-28119705-cf8rs.176a135d2d46057c",
+        "namespace": "openshift-machine-api",
+        "uid": "d073e3b7-e923-414c-9e65-81fba59cd6ee",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-machine-api",
+        "name": "osd-disable-cpms-28119705-cf8rs",
+        "uid": "d6c09802-13d0-48ce-9b71-8b1513750f0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118528",
+        "fieldPath": "spec.containers{osd-disable-cpms}"
+      },
+      "reason": "Created",
+      "message": "Created container osd-disable-cpms",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "dd2a4673-bedb-4f99-a73d-2716359963d5",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "osd-disable-cpms-28119705-cf8rs.176a135d2f48681f",
+    "namespace": "openshift-machine-api",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-133-47.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "osd-disable-cpms-28119705-cf8rs.176a135d2f48681f",
+        "namespace": "openshift-machine-api",
+        "uid": "62265f45-5852-45b0-97eb-883064edff7c",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-machine-api",
+        "name": "osd-disable-cpms-28119705-cf8rs",
+        "uid": "d6c09802-13d0-48ce-9b71-8b1513750f0c",
+        "apiVersion": "v1",
+        "resourceVersion": "118528",
+        "fieldPath": "spec.containers{osd-disable-cpms}"
+      },
+      "reason": "Started",
+      "message": "Started container osd-disable-cpms",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-133-47.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "bf99e08a-c9f6-4e28-b7cb-deb9bdbf03dc",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "collect-profiles-28119705-m9zj5.176a135d32c4005f",
+    "namespace": "openshift-operator-lifecycle-manager",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "collect-profiles-28119705-m9zj5.176a135d32c4005f",
+        "namespace": "openshift-operator-lifecycle-manager",
+        "uid": "f639ce28-4b75-4717-867f-804b94e5f1b3",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-operator-lifecycle-manager",
+        "name": "collect-profiles-28119705-m9zj5",
+        "uid": "174a5ad5-2ffe-4455-bbf8-0571ea0facc1",
+        "apiVersion": "v1",
+        "resourceVersion": "118527",
+        "fieldPath": "spec.containers{collect-profiles}"
+      },
+      "reason": "Pulled",
+      "message": "Container image \"quay.io/openshift-release-dev/ocp-v4.0-art-dev@sha256:52637c6f0a56bb7e83527a9c9e2d695afea0eeba8c2fc30078214036eb393525\" already present on machine",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "beea05e2-7253-4461-9b99-74495fe32dc0",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "collect-profiles-28119705-m9zj5.176a135d4e448c88",
+    "namespace": "openshift-operator-lifecycle-manager",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "collect-profiles-28119705-m9zj5.176a135d4e448c88",
+        "namespace": "openshift-operator-lifecycle-manager",
+        "uid": "506c5d74-ab01-47fb-a5a9-ea1ddbdf82a6",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-operator-lifecycle-manager",
+        "name": "collect-profiles-28119705-m9zj5",
+        "uid": "174a5ad5-2ffe-4455-bbf8-0571ea0facc1",
+        "apiVersion": "v1",
+        "resourceVersion": "118527",
+        "fieldPath": "spec.containers{collect-profiles}"
+      },
+      "reason": "Created",
+      "message": "Created container collect-profiles",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "1c0d9f51-fa46-43b8-a92e-87cff81115f5",
+    "kind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "resource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "requestKind": {
+      "group": "",
+      "version": "v1",
+      "kind": "Event"
+    },
+    "requestResource": {
+      "group": "",
+      "version": "v1",
+      "resource": "events"
+    },
+    "name": "collect-profiles-28119705-m9zj5.176a135d5321746f",
+    "namespace": "openshift-operator-lifecycle-manager",
+    "operation": "CREATE",
+    "userInfo": {
+      "username": "system:node:ip-10-0-138-137.ec2.internal",
+      "groups": [
+        "system:nodes",
+        "system:authenticated"
+      ]
+    },
+    "object": {
+      "kind": "Event",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "collect-profiles-28119705-m9zj5.176a135d5321746f",
+        "namespace": "openshift-operator-lifecycle-manager",
+        "uid": "3e7fa077-629d-4992-a435-bcdc744d1ff1",
+        "creationTimestamp": "2023-06-19T13:45:01Z",
+        "managedFields": [
+          {
+            "manager": "kubelet",
+            "operation": "Update",
+            "apiVersion": "v1",
+            "time": "2023-06-19T13:45:01Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:count": {},
+              "f:firstTimestamp": {},
+              "f:involvedObject": {},
+              "f:lastTimestamp": {},
+              "f:message": {},
+              "f:reason": {},
+              "f:source": {
+                "f:component": {},
+                "f:host": {}
+              },
+              "f:type": {}
+            }
+          }
+        ]
+      },
+      "involvedObject": {
+        "kind": "Pod",
+        "namespace": "openshift-operator-lifecycle-manager",
+        "name": "collect-profiles-28119705-m9zj5",
+        "uid": "174a5ad5-2ffe-4455-bbf8-0571ea0facc1",
+        "apiVersion": "v1",
+        "resourceVersion": "118527",
+        "fieldPath": "spec.containers{collect-profiles}"
+      },
+      "reason": "Started",
+      "message": "Started container collect-profiles",
+      "source": {
+        "component": "kubelet",
+        "host": "ip-10-0-138-137.ec2.internal"
+      },
+      "firstTimestamp": "2023-06-19T13:45:01Z",
+      "lastTimestamp": "2023-06-19T13:45:01Z",
+      "count": 1,
+      "type": "Normal",
+      "eventTime": null,
+      "reportingComponent": "",
+      "reportingInstance": ""
+    },
+    "oldObject": null,
+    "dryRun": false,
+    "options": {
+      "kind": "CreateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
