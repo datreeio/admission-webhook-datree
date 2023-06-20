@@ -215,7 +215,11 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string) bool {
-	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"}) && !strings.HasPrefix(username, "system:")
+	if strings.HasPrefix(username, "system:") {
+		// resources with a "system:" prefix are created by openshift, we don't want to evaluate them, specifically for openshift.
+		return false
+	}
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
 }
 
 func hasOwnerReference(resource RootObject) bool {
