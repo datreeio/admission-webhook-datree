@@ -53,7 +53,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields)
+	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, userInfo.Username)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
 
 	return isResourceWhiteListed
@@ -220,9 +220,11 @@ func doesRegexMatchString(regex string, str string) bool {
 	return r.MatchString(str)
 }
 
-func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
+func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string) bool {
+	if strings.HasPrefix(username, "system:") {
+		return false
+	}
 	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
-
 }
 
 func hasOwnerReference(resource RootObject) bool {
