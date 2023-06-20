@@ -35,10 +35,9 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject)
 	isUnsupportedKind := isUnsupportedKind(resourceKind)
-	isUnsupportedOpenShiftServiceAccount := isUnsupportedOpenShiftServiceAccount(userInfo.Username)
 	isResourceDeleted := isResourceDeleted(rootObject)
 	isNamespaceThatShouldBeSkipped := isNamespaceThatShouldBeSkipped(admissionReviewReq)
-	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped && !isUnsupportedOpenShiftServiceAccount
+	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped
 
 	if !arePrerequisitesMet {
 		return false
@@ -88,11 +87,6 @@ func isMetadataNameExists(rootObject RootObject) bool {
 func isUnsupportedKind(resourceKind string) bool {
 	unsupportedResourceKinds := []string{"Event", "GitRepository", "SubjectAccessReview", "SelfSubjectAccessReview"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
-}
-
-func isUnsupportedOpenShiftServiceAccount(userName string) bool {
-	openShiftServiceAccountPrefix := "system:serviceaccount:openshift"
-	return strings.Contains(strings.ToLower(userName), strings.ToLower(openShiftServiceAccountPrefix))
 }
 
 func isResourceDeleted(rootObject RootObject) bool {
@@ -221,10 +215,7 @@ func doesRegexMatchString(regex string, str string) bool {
 }
 
 func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string) bool {
-	if strings.HasPrefix(username, "system:") {
-		return false
-	}
-	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"}) && !strings.HasPrefix(username, "system:")
 }
 
 func hasOwnerReference(resource RootObject) bool {
