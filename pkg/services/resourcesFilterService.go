@@ -86,7 +86,7 @@ func isMetadataNameExists(rootObject RootObject) bool {
 }
 
 func isUnsupportedKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Event", "GitRepository", "ProjectRequest", "SubjectAccessReview", "SelfSubjectAccessReview"}
+	unsupportedResourceKinds := []string{"Event", "GitRepository", "SubjectAccessReview", "SelfSubjectAccessReview"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 

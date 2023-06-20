@@ -70,11 +70,6 @@ func TestPrerequisitesFilters(t *testing.T) {
 		admissionReviewReq.Request.Kind.Kind = "GitRepository"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
-	t.Run("resource should be skipped because kind is ProjectRequest", func(t *testing.T) {
-		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-		admissionReviewReq.Request.Kind.Kind = "ProjectRequest"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
-	})
 	t.Run("resource should be skipped because kind is SubjectAccessReview", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Kind.Kind = "SubjectAccessReview"
