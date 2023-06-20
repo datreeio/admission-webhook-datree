@@ -161,6 +161,12 @@ func TestWhiteListFilters(t *testing.T) {
 			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
 			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
+		t.Run("system service account with an openshift manager", func(t *testing.T) {
+			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+			admissionReviewReq.Request.UserInfo.Username = "system:test-test"
+			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
+			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		})
 	})
 	t.Run("resource should not be validated because it is not managed by openShift", func(t *testing.T) {
 		t.Run("oc-postfix", func(t *testing.T) {
@@ -188,6 +194,13 @@ func TestWhiteListFilters(t *testing.T) {
 			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla-postfix"
 			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
+	})
+
+	t.Run("resource should be validated because it has a system: username but not managed by openshift", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
+		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
+		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("special cases", func(t *testing.T) {
