@@ -103,3 +103,6 @@ tilt-dev:
 
 tilt-debug:
 	DATREE_TOKEN=$DATREE_TOKEN TILT_ENV="debugging" tilt up
+
+parse-logs:
+	sh ./scripts/parse-logs.sh
