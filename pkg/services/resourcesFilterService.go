@@ -30,6 +30,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	managedFields := rootObject.Metadata.ManagedFields
+	userInfo := admissionReviewReq.Request.UserInfo
 
 	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject)
@@ -51,7 +52,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields)
+	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, userInfo.Username)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
 
 	return isResourceWhiteListed
@@ -84,7 +85,7 @@ func isMetadataNameExists(rootObject RootObject) bool {
 }
 
 func isUnsupportedKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Event", "GitRepository"}
+	unsupportedResourceKinds := []string{"Event", "GitRepository", "SubjectAccessReview", "SelfSubjectAccessReview"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 
@@ -213,8 +214,12 @@ func doesRegexMatchString(regex string, str string) bool {
 	return r.MatchString(str)
 }
 
-func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager", "openshift-apiserver"}) || isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc"})
+func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string) bool {
+	if strings.HasPrefix(username, "system:") {
+		// resources with a "system:" prefix are created by openshift, we don't want to evaluate them, specifically for openshift.
+		return false
+	}
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
 }
 
 func hasOwnerReference(resource RootObject) bool {
