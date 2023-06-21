@@ -23,10 +23,7 @@
     "datree": {
       "title": "The datree Schema",
       "type": "object",
-      "required": [
-        "scanIntervalHours",
-        "configFromHelm"
-      ],
+      "required": ["scanIntervalHours", "configFromHelm"],
       "properties": {
         "scanIntervalHours": {
           "title": "The scanIntervalHours Schema",
@@ -78,6 +75,33 @@
                 },
                 "additionalProperties": false,
                 "required": ["includePatterns"]
+              }
+            }
+          }
+        },
+        "bypassPermissions": {
+          "title": "The bypassPermissions Schema",
+          "type": "object",
+          "properties": {
+            "userAccounts": {
+              "title": "The userAccounts Schema",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "serviceAccounts": {
+              "title": "The serviceAccounts Schema",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "groups": {
+              "title": "The groups Schema",
+              "type": "array",
+              "items": {
+                "type": "string"
               }
             }
           }
