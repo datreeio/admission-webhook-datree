@@ -1,0 +1,636 @@
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "7c91f3a4-34f1-412a-ad16-d14383f8eb36",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "nodejs-postgresql-persistent",
+    "namespace": "node-postgres",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "0ffd5adb-a82f-49e8-adf9-f6d5d7bfde78",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "nodejs-postgresql-persistent",
+        "namespace": "node-postgres",
+        "uid": "b31169da-c0c4-42fd-aab5-0349af8ab2aa",
+        "resourceVersion": "173420",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T15:16:10Z",
+        "labels": {
+          "app": "nodejs-postgresql-persistent",
+          "template": "nodejs-postgresql-persistent",
+          "template.openshift.io/template-instance-owner": "667fd104-a0b6-406f-9d24-210948900095"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T15:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:imageChangeTriggers": {},
+                "f:lastVersion": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T15:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "a633RqWoS5fXveDqTsPkgIBQOtfIeC1mIFLCf43h"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "OXNORlqo5RHVUvsjp4D0RO61RVN6FnM0TrueCWQT"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/nodeshift-starters/nodejs-rest-http-crud.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "nodejs:16-ubi8"
+            },
+            "env": [
+              {
+                "name": "NPM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "nodejs-postgresql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1,
+        "imageChangeTriggers": [
+          {
+            "lastTriggeredImageID": "image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:7c21ea223a550c3d3aec0cf0dc70737c5f0dff75124974a6245d37a38b2c3541",
+            "from": {
+              "namespace": "openshift",
+              "name": "nodejs:16-ubi8"
+            },
+            "lastTriggerTime": null
+          }
+        ]
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "nodejs-postgresql-persistent",
+        "namespace": "node-postgres",
+        "uid": "b31169da-c0c4-42fd-aab5-0349af8ab2aa",
+        "resourceVersion": "173420",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T15:16:10Z",
+        "labels": {
+          "app": "nodejs-postgresql-persistent",
+          "template": "nodejs-postgresql-persistent",
+          "template.openshift.io/template-instance-owner": "667fd104-a0b6-406f-9d24-210948900095"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T15:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "a633RqWoS5fXveDqTsPkgIBQOtfIeC1mIFLCf43h"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "OXNORlqo5RHVUvsjp4D0RO61RVN6FnM0TrueCWQT"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/nodeshift-starters/nodejs-rest-http-crud.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "nodejs:16-ubi8"
+            },
+            "env": [
+              {
+                "name": "NPM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "nodejs-postgresql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+----------------------
+{
+  "kind": "AdmissionReview",
+  "apiVersion": "admission.k8s.io/v1",
+  "request": {
+    "uid": "2e094b65-268e-405e-914a-9774f84c9cdb",
+    "kind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "resource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "requestKind": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "kind": "BuildConfig"
+    },
+    "requestResource": {
+      "group": "build.openshift.io",
+      "version": "v1",
+      "resource": "buildconfigs"
+    },
+    "name": "nodejs-postgresql-persistent",
+    "namespace": "node-postgres",
+    "operation": "UPDATE",
+    "userInfo": {
+      "username": "system:apiserver",
+      "uid": "7f90d920-0d2b-4472-aa68-f5358ba8f9f6",
+      "groups": [
+        "system:masters"
+      ]
+    },
+    "object": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "nodejs-postgresql-persistent",
+        "namespace": "node-postgres",
+        "uid": "b31169da-c0c4-42fd-aab5-0349af8ab2aa",
+        "resourceVersion": "173420",
+        "generation": 2,
+        "creationTimestamp": "2023-06-19T15:16:10Z",
+        "labels": {
+          "app": "nodejs-postgresql-persistent",
+          "template": "nodejs-postgresql-persistent",
+          "template.openshift.io/template-instance-owner": "667fd104-a0b6-406f-9d24-210948900095"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-apiserver",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T15:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:status": {
+                "f:imageChangeTriggers": {},
+                "f:lastVersion": {}
+              }
+            }
+          },
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T15:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "a633RqWoS5fXveDqTsPkgIBQOtfIeC1mIFLCf43h"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "OXNORlqo5RHVUvsjp4D0RO61RVN6FnM0TrueCWQT"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/nodeshift-starters/nodejs-rest-http-crud.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "nodejs:16-ubi8"
+            },
+            "env": [
+              {
+                "name": "NPM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "nodejs-postgresql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 1,
+        "imageChangeTriggers": [
+          {
+            "lastTriggeredImageID": "image-registry.openshift-image-registry.svc:5000/openshift/nodejs@sha256:7c21ea223a550c3d3aec0cf0dc70737c5f0dff75124974a6245d37a38b2c3541",
+            "from": {
+              "namespace": "openshift",
+              "name": "nodejs:16-ubi8"
+            },
+            "lastTriggerTime": "2023-06-19T15:16:10Z"
+          }
+        ]
+      }
+    },
+    "oldObject": {
+      "kind": "BuildConfig",
+      "apiVersion": "build.openshift.io/v1",
+      "metadata": {
+        "name": "nodejs-postgresql-persistent",
+        "namespace": "node-postgres",
+        "uid": "b31169da-c0c4-42fd-aab5-0349af8ab2aa",
+        "resourceVersion": "173420",
+        "generation": 1,
+        "creationTimestamp": "2023-06-19T15:16:10Z",
+        "labels": {
+          "app": "nodejs-postgresql-persistent",
+          "template": "nodejs-postgresql-persistent",
+          "template.openshift.io/template-instance-owner": "667fd104-a0b6-406f-9d24-210948900095"
+        },
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        },
+        "managedFields": [
+          {
+            "manager": "openshift-controller-manager",
+            "operation": "Update",
+            "apiVersion": "build.openshift.io/v1",
+            "time": "2023-06-19T15:16:10Z",
+            "fieldsType": "FieldsV1",
+            "fieldsV1": {
+              "f:metadata": {
+                "f:annotations": {
+                  ".": {},
+                  "f:description": {},
+                  "f:template.alpha.openshift.io/wait-for-ready": {}
+                },
+                "f:labels": {
+                  ".": {},
+                  "f:app": {},
+                  "f:template": {},
+                  "f:template.openshift.io/template-instance-owner": {}
+                }
+              },
+              "f:spec": {
+                "f:output": {
+                  "f:to": {}
+                },
+                "f:runPolicy": {},
+                "f:source": {
+                  "f:git": {
+                    ".": {},
+                    "f:uri": {}
+                  },
+                  "f:type": {}
+                },
+                "f:strategy": {
+                  "f:sourceStrategy": {
+                    ".": {},
+                    "f:env": {},
+                    "f:from": {}
+                  },
+                  "f:type": {}
+                },
+                "f:triggers": {}
+              }
+            }
+          }
+        ]
+      },
+      "spec": {
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChange": {}
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "a633RqWoS5fXveDqTsPkgIBQOtfIeC1mIFLCf43h"
+            }
+          },
+          {
+            "type": "Generic",
+            "generic": {
+              "secret": "OXNORlqo5RHVUvsjp4D0RO61RVN6FnM0TrueCWQT"
+            }
+          }
+        ],
+        "runPolicy": "Serial",
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "https://github.com/nodeshift-starters/nodejs-rest-http-crud.git"
+          }
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "openshift",
+              "name": "nodejs:16-ubi8"
+            },
+            "env": [
+              {
+                "name": "NPM_MIRROR"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "nodejs-postgresql-persistent:latest"
+          }
+        },
+        "resources": {},
+        "postCommit": {},
+        "nodeSelector": null,
+        "successfulBuildsHistoryLimit": 5,
+        "failedBuildsHistoryLimit": 5
+      },
+      "status": {
+        "lastVersion": 0
+      }
+    },
+    "dryRun": false,
+    "options": {
+      "kind": "UpdateOptions",
+      "apiVersion": "meta.k8s.io/v1"
+    }
+  }
+}
+

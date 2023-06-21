@@ -59,7 +59,7 @@ helm-install-staging:
 	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
 	--create-namespace \
 	-f ./internal/fixtures/values.dev.yaml \
-	--set datree.token="da2d9097-bf51-4852-898f-b06c1819dbbe" \
+	--set datree.token="" \
 	--set datree.clusterName="minikube" \
 	--set datree.policy="Starter" \
 	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
