@@ -37,7 +37,9 @@ spec:
           args:
             - label
             - ns
+            {{- if ne .Values.datree.labelSkipKubeSystem false }}
             - kube-system
+            {{- end }}
             - {{template "datree.namespace" .}}
             - admission.datree/validate=skip
             - --overwrite

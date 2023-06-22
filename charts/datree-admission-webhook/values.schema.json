@@ -40,6 +40,11 @@
           "type": ["string", "null"],
           "default": ""
         },
+        "labelSkipKubeSystem": {
+          "title": "The skipKubeSystem Schema",
+          "type": "boolean",
+          "default": true
+        },
         "multiplePolicies": {
           "title": "The multiplePolicies Schema",
           "type": "array",
