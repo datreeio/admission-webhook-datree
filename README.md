@@ -172,6 +172,14 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>datree.labelSkipKubeSystem</td>
+			<td>set admission.datree/validate=skip label on kube-system resources. (openshift/okd users should set it to false)</td>
+			<td><pre lang="json">
+null
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>image.repository</td>
 			<td>Image repository for the webhook</td>
 			<td><pre lang="json">

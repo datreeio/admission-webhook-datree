@@ -23,10 +23,7 @@
     "datree": {
       "title": "The datree Schema",
       "type": "object",
-      "required": [
-        "scanIntervalHours",
-        "configFromHelm"
-      ],
+      "required": ["scanIntervalHours", "configFromHelm"],
       "properties": {
         "scanIntervalHours": {
           "title": "The scanIntervalHours Schema",
@@ -42,6 +39,11 @@
           "title": "The policy Schema",
           "type": ["string", "null"],
           "default": ""
+        },
+        "labelSkipKubeSystem": {
+          "title": "The skipKubeSystem Schema",
+          "type": "boolean",
+          "default": true
         },
         "multiplePolicies": {
           "title": "The multiplePolicies Schema",
