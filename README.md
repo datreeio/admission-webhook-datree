@@ -172,10 +172,10 @@ null
 </td>
 		</tr>
 		<tr>
-			<td>datree.labelSkipKubeSystem</td>
+			<td>datree.labelKubeSystem</td>
 			<td>set admission.datree/validate=skip label on kube-system resources. (openshift/okd users should set it to false)</td>
 			<td><pre lang="json">
-null
+true
 </pre>
 </td>
 		</tr>
