@@ -40,8 +40,8 @@
           "type": ["string", "null"],
           "default": ""
         },
-        "labelSkipKubeSystem": {
-          "title": "The skipKubeSystem Schema",
+        "labelKubeSystem": {
+          "title": "The labelKubeSystem Schema",
           "type": "boolean",
           "default": true
         },
