@@ -83,6 +83,10 @@ nodeSelector: { }
 affinity: { }
 tolerations: [ ]
 clusterScanner:
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
   resources: { }
   annotations: { }
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
@@ -127,6 +131,5 @@ validatingWebhookConfiguration:
   failurePolicy: Ignore
 livenessProbe:
   enabled: false
-
 readinessProbe:
   enabled: false
