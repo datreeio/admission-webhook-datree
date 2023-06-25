@@ -83,6 +83,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+		*warningMessages = append([]string{
+			fmt.Sprintf("⏩ Object with name \"%s\" was skipped by Datree's policy check.", resourceName),
+			"👉 To avoid skipping this resource, contact support using the live chat: https://app.datree.io/",
+		}, *warningMessages...)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
