@@ -47,3 +47,6 @@ run_command kubectl logs deployments/datree-cluster-scanner-server -n datree --t
 #get lates 10 logs from the webhook-server
 run_command kubectl logs deployments/datree-webhook-server -n datree | head -n 10
 run_command kubectl logs deployments/datree-webhook-server -n datree --tail=10
+
+run_command kubectl describe -n datree deployment/datree-cluster-scanner-server
+run_command kubectl describe -n datree deployment/datree-webhook-server
