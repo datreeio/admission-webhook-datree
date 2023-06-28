@@ -167,3 +167,6 @@ readinessProbe:
   scheme:
   initialDelaySeconds:
   periodSeconds:
+
+devMode:
+  enabled: false
