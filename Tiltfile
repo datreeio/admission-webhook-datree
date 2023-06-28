@@ -36,12 +36,12 @@ def debugging():
 
     local_resource(
     name='datree-webhook-server-debuging',
-    serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-webhook-server" "8443 5555"',
+    serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-webhook-server" "5555"',
     )
 
     local_resource(
         name='cluster-scanner debugging',
-        serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-cluster-scanner-server" "8080 5556"',
+        serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-cluster-scanner-server" "5556"',
     )
 
     local_resource(
