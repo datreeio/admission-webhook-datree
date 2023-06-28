@@ -203,6 +203,29 @@ func TestWhiteListFilters(t *testing.T) {
 		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
+	t.Run("resource should be validated because it has a system: username and annotations openshift.io/requester and the value is not prefix system:serviceaccount", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
+		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
+		rootObject.Metadata.Annotations["openshift.io/requester"] = "test@datree.io"
+		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+
+	t.Run("resource should be not validated because it has a system: username and annotations openshift.io/requester value start with prefix system:serviceaccount", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
+		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
+		rootObject.Metadata.Annotations["openshift.io/requester"] = "system:serviceaccount"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+
+	t.Run("resource should be not validated because it has a system: username and there is no annotations openshift.io/requester key", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
+		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
+		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+
 	t.Run("special cases", func(t *testing.T) {
 		t.Run("resource should be validated because 1 fields manager is matching", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
