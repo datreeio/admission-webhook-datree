@@ -211,7 +211,7 @@ func TestWhiteListFilters(t *testing.T) {
 		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
-	t.Run("resource should be not validated because it has a system: username and annotations openshift.io/requester  value is system:serviceaccount", func(t *testing.T) {
+	t.Run("resource should be not validated because it has a system: username and annotations openshift.io/requester value start with prefix system:serviceaccount", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
 		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
