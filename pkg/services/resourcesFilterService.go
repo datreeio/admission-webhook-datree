@@ -31,6 +31,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	managedFields := rootObject.Metadata.ManagedFields
 	userInfo := admissionReviewReq.Request.UserInfo
+	resourceAnnotations := rootObject.Metadata.Annotations
 
 	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject)
@@ -52,7 +53,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, userInfo.Username)
+	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, userInfo.Username, resourceAnnotations)
 	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
 
 	return isResourceWhiteListed
@@ -214,11 +215,21 @@ func doesRegexMatchString(regex string, str string) bool {
 	return r.MatchString(str)
 }
 
-func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string) bool {
+func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string, annotations map[string]string) bool {
 	if strings.HasPrefix(username, "system:") {
-		// resources with a "system:" prefix are created by openshift, we don't want to evaluate them, specifically for openshift.
+		if val, ok := annotations["openshift.io/requester"]; ok {
+			if !strings.HasPrefix(val, "system:serviceaccount") {
+				// If the value of "openshift.io/requester" does not start with "system:serviceaccount",
+				// it indicates that the resource is created by a human and should be evaluated.
+				return true
+			}
+		}
+
+		// For other cases where the username starts with "system:" but the "openshift.io/requester" key is not present
+		// or its value starts with "system:serviceaccount", we return false to indicate that the resource should not be evaluated.
 		return false
 	}
+
 	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
 }
 

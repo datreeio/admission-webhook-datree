@@ -51,6 +51,7 @@ type Metadata struct {
 	ManagedFields     []ManagedFields            `json:"managedFields"`
 	Labels            map[string]string          `json:"labels"`
 	OwnerReferences   []cliClient.OwnerReference `json:"ownerReferences"`
+	Annotations       map[string]string          `json:"annotations"`
 }
 
 type ValidationService struct {
