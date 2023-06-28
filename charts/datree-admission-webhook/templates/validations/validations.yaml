@@ -4,6 +4,9 @@
 {{- if and (.Values.datree.multiplePolicies) (.Values.datree.policy)}}
     {{- fail "You can't use both policy and multiplePolicies at the same time" }}
 {{- end }}
+{{- if and (semverCompare "<1.19.x" .Capabilities.KubeVersion.Version) (.Values.securityContext.seccompProfile)}}
+    {{- fail "it seems you are running Kubernetes version < 1.19.x. To run Datree in version < v1.19.x, please set securityContext.seccompProfile=null" }}
+{{- end }}
   
 {{/* don't allow the same policy to be used more than once */}}
 {{- if .Values.datree.multiplePolicies}}
