@@ -79,6 +79,8 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 	internalLogger.LogIncoming(admissionReviewReq)
 	admissionReview, isSkipped := c.ValidationService.Validate(admissionReviewReq, &warningMessages, internalLogger)
 	writer.WriteBody(admissionReview)
+
+	admissionReview.Request = admissionReviewReq.Request
 	internalLogger.LogOutgoing(admissionReview, isSkipped)
 }
 

@@ -55,6 +55,8 @@ datree:
   customSkipList:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+  # -- set admission.datree/validate=skip label on kube-system resources. (openshift/okd users should set it to false)
+  labelKubeSystem: true
 # The Datree webhook-server image to use.
 image:
   # -- Image repository for the webhook
@@ -155,7 +157,6 @@ hooks:
 validatingWebhookConfiguration:
   failurePolicy: Ignore
 
-
 livenessProbe:
   enabled: true
   scheme:
@@ -166,3 +167,6 @@ readinessProbe:
   scheme:
   initialDelaySeconds:
   periodSeconds:
+
+devMode:
+  enabled: false

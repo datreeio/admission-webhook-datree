@@ -64,9 +64,10 @@ func NewCustomCliServiceClient(baseUrl string, httpClient HTTPClient, timeoutCli
 
 type ClusterEvaluationPrerunDataResponse struct {
 	cliClient.EvaluationPrerunDataResponse `json:",inline"`
-	ActivePolicies                         []string              `json:"activePolicies"`
-	ActionOnFailure                        enums.ActionOnFailure `json:"actionOnFailure"`
-	IgnorePatterns                         []string              `json:"ignorePatterns"`
+	ActivePolicies                         []string                       `json:"activePolicies"`
+	ActionOnFailure                        enums.ActionOnFailure          `json:"actionOnFailure"`
+	IgnorePatterns                         []string                       `json:"ignorePatterns"`
+	BypassPermissions                      servicestate.BypassPermissions `json:"bypassPermissions"`
 }
 
 func (c *CliClient) RequestClusterEvaluationPrerunData(tokenId string, clusterUuid k8sTypes.UID) (*ClusterEvaluationPrerunDataResponse, error) {
@@ -111,7 +112,18 @@ func (c *CliClient) SendEvaluationResult(request *cliClient.EvaluationResultRequ
 	return nil, nil
 }
 
+type OwnerReference struct {
+	ApiVersion         string `json:"apiVersion"`
+	Kind               string `json:"kind"`
+	Name               string `json:"name"`
+	Uid                string `json:"uid"`
+	Controller         bool   `json:"controller"`
+	BlockOwnerDeletion bool   `json:"blockOwnerDeletion"`
+}
+
 type ClusterRequestMetadata struct {
+	ClusterUuid              k8sTypes.UID                        `json:"clusterUuid"`
+	WebhookVersion           string                              `json:"webhookVersion"`
 	CliEvaluationId          int                                 `json:"cliEvaluationId"`
 	Token                    string                              `json:"token"`
 	Skipped                  bool                                `json:"skipped"`
@@ -124,6 +136,7 @@ type ClusterRequestMetadata struct {
 	Namespace                string                              `json:"namespace,omitempty"`
 	ConfigMapScanningFilters server.ConfigMapScanningFiltersType `json:"configMapScanningFilters,omitempty"`
 	Occurrences              int                                 `json:"occurrences"`
+	OwnerReferences          []OwnerReference                    `json:"ownerReferences"`
 }
 
 type ClusterRequestMetadataBatchReqBody struct {

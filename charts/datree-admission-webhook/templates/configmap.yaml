@@ -4,6 +4,10 @@ metadata:
   name: datree-config
   namespace: {{ template "datree.namespace" . }}
 data:
+{{- if .Values.datree.bypassPermissions }}
+  datreeBypassPermissions: |
+    {{- toYaml .Values.datree.bypassPermissions | nindent 4 }}
+{{- end }}
 {{- if .Values.datree.multiplePolicies }}
   datreeMultiplePolicies: | 
     {{- toYaml .Values.datree.multiplePolicies | nindent 4 }}

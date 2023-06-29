@@ -11,6 +11,8 @@ import (
 	"sync"
 	"time"
 
+	authenticationv1 "k8s.io/api/authentication/v1"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 
@@ -44,10 +46,12 @@ type ManagedFields struct {
 }
 
 type Metadata struct {
-	Name              string            `json:"name"`
-	DeletionTimestamp string            `json:"deletionTimestamp"`
-	ManagedFields     []ManagedFields   `json:"managedFields"`
-	Labels            map[string]string `json:"labels"`
+	Name              string                     `json:"name"`
+	DeletionTimestamp string                     `json:"deletionTimestamp"`
+	ManagedFields     []ManagedFields            `json:"managedFields"`
+	Labels            map[string]string          `json:"labels"`
+	OwnerReferences   []cliClient.OwnerReference `json:"ownerReferences"`
+	Annotations       map[string]string          `json:"annotations"`
 }
 
 type ValidationService struct {
@@ -75,10 +79,15 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
+	resourceUserInfo := admissionReviewReq.Request.UserInfo
 
 	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
-		clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters)
+		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
+		*warningMessages = append([]string{
+			fmt.Sprintf("⏩ Object with name \"%s\" was skipped by Datree's policy check.", resourceName),
+			"👉 To avoid skipping this resource, contact support using the live chat: https://app.datree.io/",
+		}, *warningMessages...)
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
@@ -97,6 +106,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
+		vs.State.SetBypassPermissions(&prerunData.BypassPermissions)
 	}
 
 	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
@@ -185,14 +195,20 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 
 		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
-		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() {
+		shouldBypassByPermissions := vs.shouldBypassByPermissions(resourceUserInfo)
+
+		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() && !shouldBypassByPermissions {
 			allowed = false
 
 			sb.WriteString("\n---\n")
 			sb.WriteString(resultStr)
 		}
 
-		if !vs.State.GetIsEnforceMode() {
+		if shouldBypassByPermissions && didFailCurrentPolicyCheck {
+			*warningMessages = append([]string{
+				"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
+			}, *warningMessages...)
+		} else if !vs.State.GetIsEnforceMode() {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
 			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
 			if didFailCurrentPolicyCheck {
@@ -220,7 +236,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters)
+	clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
 }
@@ -376,6 +392,34 @@ func (vs *ValidationService) getNamespaceRestrictionsByPolicyName(policyName str
 	return nil
 }
 
+func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1.UserInfo) bool {
+	bypassPermissions := vs.State.GetBypassPermissions()
+	if bypassPermissions == nil {
+		return false
+	}
+
+	for _, userAccount := range bypassPermissions.UserAccounts {
+		if match, _ := regexp.MatchString(userAccount, userInfo.Username); match {
+			return true
+		}
+	}
+
+	for _, serviceAccount := range bypassPermissions.ServiceAccounts {
+		if match, _ := regexp.MatchString(serviceAccount, userInfo.Username); match {
+			return true
+		}
+	}
+
+	for _, bypassGroup := range bypassPermissions.Groups {
+		for _, userInfoGroup := range userInfo.Groups {
+			if match, _ := regexp.MatchString(bypassGroup, userInfoGroup); match {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
 	yamlSchema, _ := yaml.JSONToYAML(admissionReviewReq.Object.Raw)
 	configs, _ := extractor.ParseYaml(string(yamlSchema))
@@ -453,10 +497,12 @@ func (vs *ValidationService) getEvaluationRequestData(policyName string,
 	return evaluationRequestData
 }
 
-func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
-	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType) *cliClient.ClusterRequestMetadata {
+func getClusterRequestMetadata(clusterUuid k8sTypes.UID, webhookVersion string, cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
+	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType, ownerReferences []cliClient.OwnerReference) *cliClient.ClusterRequestMetadata {
 
 	clusterRequestMetadata := &cliClient.ClusterRequestMetadata{
+		ClusterUuid:              clusterUuid,
+		WebhookVersion:           webhookVersion,
 		CliEvaluationId:          cliEvaluationId,
 		Token:                    token,
 		Skipped:                  skipped,
@@ -468,6 +514,7 @@ func getClusterRequestMetadata(cliEvaluationId int, token string, skipped bool, 
 		K8sVersion:               clusterK8sVersion,
 		Namespace:                namespace,
 		ConfigMapScanningFilters: configMapScanningFilters,
+		OwnerReferences:          ownerReferences,
 		Occurrences:              1,
 	}
 

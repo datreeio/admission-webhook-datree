@@ -26,7 +26,7 @@ rbac:
 datree:
   # It is required to provide either the token or the existingSecret containing the token for correct functionality.
   # The token used to link the CLI to your dashboard. (string)
-  token:
+  token: 81ac2326-d407-4ffa-a997-5745ed71ad5f
   # The token may also be provided via secret, note if the existingSecret is provided the token field above is ignored.
   existingSecret:
     name: "" # Name of the secret containing the datree token (string)
@@ -38,13 +38,13 @@ datree:
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord:
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
-  clusterName: "minikube"
+  clusterName: "change-this-name"
   # How often should the scan run in hours. (int, optional, default: 1 )
   scanIntervalHours: 1
 
   # If false, the webhook will be configured from the dashboard, otherwise it will be configured from here.
   # Affected configurations: policy, enforce, customSkipList.
-  configFromHelm: false
+  configFromHelm: true
   # The name of the policy to check, e.g: staging. (string, optional)
   policy: "Starter"
   # Block resources that fail the policy check. (boolean ,optional)
@@ -54,6 +54,7 @@ datree:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
     - "(.*);(.*);(^aws-123.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+
 # The Datree webhook-server image to use.
 image:
   # Image repository
@@ -83,12 +84,8 @@ nodeSelector: {}
 affinity: {}
 tolerations: []
 clusterScanner:
-  livenessProbe:
-    enabled: false
-  readinessProbe:
-    enabled: false
-  resources: { }
-  annotations: { }
+  resources: {}
+  annotations: {}
   # Create ClusterRoles, ClusterRoleBindings, and ServiceAccount for datree-webhook-server
   rbac:
     serviceAccount:
@@ -105,8 +102,8 @@ clusterScanner:
       name: cluster-scanner-role-binding
   image:
     # Image repository
-    repository: datree/cluster-scanner-staging
-    pullPolicy: Always
+    repository: cluster-scanner
+    pullPolicy: Never
     # Image tag
     tag: latest
     # limits:
@@ -129,7 +126,3 @@ hooks:
     pullPolicy: IfNotPresent
 validatingWebhookConfiguration:
   failurePolicy: Ignore
-livenessProbe:
-  enabled: false
-readinessProbe:
-  enabled: false

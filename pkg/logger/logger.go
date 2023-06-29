@@ -1,12 +1,12 @@
 package logger
 
 import (
-	"encoding/json"
 	"errors"
-	"fmt"
+	"os"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	admission "k8s.io/api/admission/v1"
 )
 
@@ -18,29 +18,31 @@ import (
 
 // Logger - instructions to get the logs are under /guides/developer-guide.md
 type Logger struct {
-	zapLogger     *zap.SugaredLogger
+	zapLogger     *zap.Logger
 	requestId     string
 	errorReporter *errorReporter.ErrorReporter
 }
 
 func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
-	zapLogger, _ := zap.NewProduction()
-	defer func() {
-		err := zapLogger.Sync() // flushes buffer, if any
-		if err != nil {
-			fmt.Println("Error during zap logger sync:", err)
-		}
-	}()
-	sugar := zapLogger.Sugar()
+	config := zap.NewProductionEncoderConfig()
+	config.EncodeTime = zapcore.ISO8601TimeEncoder
+	jsonEncoder := zapcore.NewJSONEncoder(config)
 
-	return Logger{zapLogger: sugar, requestId: requestId, errorReporter: errorReporter}
+	defaultLogLevel := zapcore.DebugLevel
+
+	core := zapcore.NewTee(zapcore.NewCore(jsonEncoder, zapcore.AddSync(os.Stdout), defaultLogLevel))
+
+	zapLogger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+
+	return Logger{
+		zapLogger:     zapLogger,
+		requestId:     requestId,
+		errorReporter: errorReporter,
+	}
 }
 
 func (l *Logger) LogError(message string) {
-	l.zapLogger.Errorw(message,
-		// Structured context as loosely typed key-value pairs.
-		"requestId", l.requestId,
-	)
+	l.zapLogger.Error(message, zap.String("requestId", l.requestId))
 }
 
 func (l *Logger) LogAndReportUnexpectedError(message string) {
@@ -75,16 +77,10 @@ func LogUtil(msg string) {
 }
 
 func (l *Logger) logInfo(objectToLog any, requestDirection string) {
-	l.zapLogger.Infow(l.objectToJson(objectToLog),
-		// Structured context as loosely typed key-value pairs.
-		"requestId", l.requestId,
-		"requestDirection", requestDirection)
-}
-func (l *Logger) objectToJson(object any) string {
-	result, err := json.Marshal(object)
-	if err != nil {
-		l.LogError(fmt.Sprintf("failed to convert object to JSON, error: %s", err))
-		return ""
-	}
-	return string(result)
+	logFields := make(map[string]interface{})
+	logFields["requestId"] = l.requestId
+	logFields["requestDirection"] = requestDirection
+	logFields["msg"] = objectToLog
+
+	l.zapLogger.Info("Logging information", zap.Any("logFields", logFields))
 }

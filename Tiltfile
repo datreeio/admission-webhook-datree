@@ -20,6 +20,7 @@ cmd_button(name='enable all',
 namespace_create('datree')
 DATREE_TOKEN=os.environ.get('DATREE_TOKEN')
 k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='internal/fixtures/values.dev.yaml', namespace='datree', set=[
+        'devMode.enabled=true',
         'clusterScanner.image.pullPolicy=Never', 
         'datree.token={}'.format(DATREE_TOKEN),
         'securityContext.readOnlyRootFilesystem=false',
@@ -37,17 +38,17 @@ def debugging():
 
     docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile.debugging.tilt', build_args={
         "BUILD_ENVIRONMENT":"staging",
-        "WEBHOOK_VERSION":"0.0.1",
+        "SCANNER_VERSION":"0.0.1",
     })
 
     local_resource(
     name='datree-webhook-server-debuging',
-    serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-webhook-server" "8443 5555"',
+    serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-webhook-server" "5555"',
     )
 
     local_resource(
         name='cluster-scanner debugging',
-        serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-cluster-scanner-server" "8080 5556"',
+        serve_cmd='bash ./tilt/scripts/port-forwarding-for-debugging.sh "datree-cluster-scanner-server" "5556"',
     )
 
     local_resource(

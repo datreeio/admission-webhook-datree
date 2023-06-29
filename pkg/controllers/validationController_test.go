@@ -145,6 +145,24 @@ func TestValidateRequestBodyWithNotAllowedK8sResource(t *testing.T) {
 	assert.Equal(t, false, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed)
 }
 
+func TestValidateRequestBodyWithNotAllowedK8sResourceBypassed(t *testing.T) {
+	setMockEnv(t)
+	t.Setenv("DATREE_ENFORCE", "true")
+	request := httptest.NewRequest(http.MethodPost, "/validate", strings.NewReader(applyRequestNotAllowedJson))
+	request.Header.Set("Content-Type", "application/json")
+	responseRecorder := httptest.NewRecorder()
+
+	validationController := mockValidationController(httpClient.Response{
+		StatusCode: http.StatusOK,
+		Body:       getPrerunDataResponse,
+	})
+
+	validationController.ValidationService.State.SetBypassPermissions(&servicestate.BypassPermissions{UserAccounts: []string{"admin"}})
+
+	validationController.Validate(responseRecorder, request)
+	assert.Equal(t, true, responseToAdmissionResponse(responseRecorder.Body.String()).Allowed)
+}
+
 func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
 	setMockEnv(t)
 	t.Setenv(enums.Enforce, "false")

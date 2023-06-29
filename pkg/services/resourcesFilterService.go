@@ -9,17 +9,29 @@ import (
 	"k8s.io/utils/strings/slices"
 )
 
+type OwnerReference struct {
+	ApiVersion         string `json:"apiVersion"`
+	Kind               string `json:"kind"`
+	Name               string `json:"name"`
+	Uid                string `json:"uid"`
+	Controller         bool   `json:"controller"`
+	BlockOwnerDeletion bool   `json:"blockOwnerDeletion"`
+}
+
 type RootObject struct {
 	Metadata Metadata `json:"metadata"`
 }
 
 func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
 	}
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
 	managedFields := rootObject.Metadata.ManagedFields
+	userInfo := admissionReviewReq.Request.UserInfo
+	resourceAnnotations := rootObject.Metadata.Annotations
 
 	// assigning to variables for easier debugging
 	isMetadataNameExists := isMetadataNameExists(rootObject)
@@ -32,13 +44,17 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 		return false
 	}
 
+	if hasOwnerReference(rootObject) {
+		return false
+	}
+
 	isKubectl := isKubectl(managedFields)
 	isHelm := isHelm(managedFields)
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isOKDResourceThatShouldBeEvaluated := isOkdResourceThatShouldBeEvaluated(managedFields)
-	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOKDResourceThatShouldBeEvaluated
+	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, userInfo.Username, resourceAnnotations)
+	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
 
 	return isResourceWhiteListed
 }
@@ -70,7 +86,7 @@ func isMetadataNameExists(rootObject RootObject) bool {
 }
 
 func isUnsupportedKind(resourceKind string) bool {
-	unsupportedResourceKinds := []string{"Event", "GitRepository"}
+	unsupportedResourceKinds := []string{"Event", "GitRepository", "SubjectAccessReview", "SelfSubjectAccessReview"}
 	return slices.Contains(unsupportedResourceKinds, resourceKind)
 }
 
@@ -199,6 +215,33 @@ func doesRegexMatchString(regex string, str string) bool {
 	return r.MatchString(str)
 }
 
-func isOkdResourceThatShouldBeEvaluated(managedFields []ManagedFields) bool {
-	return doesAtLeastOneFieldManagerStartWithOneOfThePrefixes(managedFields, []string{"openshift-controller-manager", "openshift-apiserver"})
+func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, username string, annotations map[string]string) bool {
+	if strings.HasPrefix(username, "system:") {
+		if val, ok := annotations["openshift.io/requester"]; ok {
+			if !strings.HasPrefix(val, "system:serviceaccount") {
+				// If the value of "openshift.io/requester" does not start with "system:serviceaccount",
+				// it indicates that the resource is created by a human and should be evaluated.
+				return true
+			}
+		}
+
+		// For other cases where the username starts with "system:" but the "openshift.io/requester" key is not present
+		// or its value starts with "system:serviceaccount", we return false to indicate that the resource should not be evaluated.
+		return false
+	}
+
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"openshift-controller-manager", "openshift-apiserver", "oc", "Mozilla"})
+}
+
+func hasOwnerReference(resource RootObject) bool {
+	if resource.Metadata.OwnerReferences == nil {
+		return false
+	}
+
+	for _, owner := range resource.Metadata.OwnerReferences {
+		if owner.Kind != "" && owner.Name != "" {
+			return true
+		}
+	}
+	return false
 }
