@@ -551,6 +551,14 @@ null
 </pre>
 </td>
 		</tr>
+		<tr>
+			<td>devMode.enabled</td>
+			<td></td>
+			<td><pre lang="json">
+false
+</pre>
+</td>
+		</tr>
 	</tbody>
 </table>
 
