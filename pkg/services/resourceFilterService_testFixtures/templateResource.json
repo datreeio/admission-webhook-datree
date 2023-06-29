@@ -27,11 +27,8 @@
     "namespace": "tzlil-tets",
     "operation": "CREATE",
     "userInfo": {
-      "username": "minikube-user",
-      "groups": [
-        "system:masters",
-        "system:authenticated"
-      ]
+      "username": "system:minikube-user",
+      "groups": ["system:masters", "system:authenticated"]
     },
     "object": {
       "kind": "Deployment",
