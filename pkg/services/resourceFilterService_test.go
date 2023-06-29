@@ -154,20 +154,6 @@ func TestWhiteListFilters(t *testing.T) {
 			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
-	t.Run("resource should not be validated because it is managed by openShift", func(t *testing.T) {
-		t.Run("openShift service account", func(t *testing.T) {
-			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-			admissionReviewReq.Request.UserInfo.Username = "system:serviceaccount:openshift-infra"
-			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
-		})
-		t.Run("system service account with an openshift manager", func(t *testing.T) {
-			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
-			admissionReviewReq.Request.UserInfo.Username = "system:test-test"
-			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
-		})
-	})
 	t.Run("resource should not be validated because it is not managed by openShift", func(t *testing.T) {
 		t.Run("oc-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
@@ -224,6 +210,12 @@ func TestWhiteListFilters(t *testing.T) {
 		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
 		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
 		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+	})
+
+	t.Run("resource should be validated because username prefix is not system: ", func(t *testing.T) {
+		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
+		admissionReviewReq.Request.UserInfo.Username = "kube-admin"
+		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("special cases", func(t *testing.T) {
