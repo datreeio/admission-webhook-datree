@@ -31,7 +31,7 @@ def debugging():
 
     docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile.debugging.tilt', build_args={
         "BUILD_ENVIRONMENT":"staging",
-        "WEBHOOK_VERSION":"0.0.1",
+        "SCANNER_VERSION":"0.0.1",
     })
 
     local_resource(
@@ -74,7 +74,7 @@ def hot_reload():
     docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile',
     build_args={
         "BUILD_ENVIRONMENT":"staging",
-        "WEBHOOK_VERSION":"0.0.1",
+        "SCANNER_VERSION":"0.0.1",
     })
     
 
