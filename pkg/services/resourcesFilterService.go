@@ -1,10 +1,13 @@
 package services
 
 import (
+	"encoding/json"
+	"fmt"
 	"regexp"
 	"strings"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
+	"github.com/google/go-cmp/cmp"
 	admission "k8s.io/api/admission/v1"
 	"k8s.io/utils/strings/slices"
 )
@@ -52,13 +55,22 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 		return true
 	}
 
+	if !isDiffBetweenObjectAndOldObject(admissionReviewReq) {
+		return false
+	}
+
 	isKubectl := isKubectl(managedFields)
 	isHelm := isHelm(managedFields)
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
 	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, resourceAnnotations)
-	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
+	isResourceWhiteListed := isKubectl ||
+		isHelm ||
+		isTerraform ||
+		isFluxResourceThatShouldBeEvaluated ||
+		isArgoResourceThatShouldBeEvaluated ||
+		isOpenshiftResourceThatShouldBeEvaluated
 
 	return isResourceWhiteListed
 }
@@ -101,6 +113,41 @@ func isResourceDeleted(rootObject RootObject) bool {
 func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionReview) bool {
 	namespacesToSkip := []string{"kube-public", "kube-node-lease"}
 	return slices.Contains(namespacesToSkip, admissionReviewReq.Request.Namespace)
+}
+
+func isDiffBetweenObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bool {
+	fmt.Println("@@admissionReviewReq", admissionReviewReq)
+	if admissionReviewReq.Request.OldObject.Raw == nil {
+		return false
+	}
+	if admissionReviewReq.Request.Operation != admission.Update {
+		return false
+	}
+	clonedObject := admissionReviewReq.Request.Object.DeepCopy()
+	clonedOldObject := admissionReviewReq.Request.OldObject.DeepCopy()
+
+	var objectMap map[string]interface{}
+	var oldObjectMap map[string]interface{}
+	json.Unmarshal(clonedObject.Raw, &objectMap)
+	json.Unmarshal(clonedOldObject.Raw, &oldObjectMap)
+	if objectMetadata, ok := objectMap["metadata"]; ok {
+		delete(objectMetadata.(map[string]interface{}), "managedFields")
+		delete(objectMetadata.(map[string]interface{}), "selfLink")
+	}
+
+	if oldObjectMetadata, ok := oldObjectMap["metadata"]; ok {
+		delete(oldObjectMetadata.(map[string]interface{}), "managedFields")
+		delete(oldObjectMetadata.(map[string]interface{}), "selfLink")
+	}
+
+	fmt.Println("@@clonedObject", string(clonedObject.Raw))
+	fmt.Println("@@clonedOldObject", string(clonedOldObject.Raw))
+
+	isEqual := cmp.Equal(objectMap, oldObjectMap)
+	diff := cmp.Diff(objectMap, oldObjectMap)
+	fmt.Println("@@isEqual", isEqual)
+	fmt.Println("@@diff", diff)
+	return isEqual
 }
 
 func isKubectl(managedFields []ManagedFields) bool {

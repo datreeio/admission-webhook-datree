@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/datreeio/datree v1.8.42
 	github.com/ghodss/yaml v1.0.0
+	github.com/google/go-cmp v0.5.9
 	github.com/lithammer/shortuuid v3.0.0+incompatible
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.10.0
@@ -25,7 +26,6 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/goccy/go-yaml v1.9.5 // indirect
-	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/itchyny/gojq v0.12.10 // indirect
 	github.com/itchyny/timefmt-go v0.1.5 // indirect
 	github.com/jinzhu/copier v0.3.5 // indirect
