@@ -118,10 +118,10 @@ func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionRevie
 func isDiffBetweenObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bool {
 	fmt.Println("@@admissionReviewReq", admissionReviewReq)
 	if admissionReviewReq.Request.OldObject.Raw == nil {
-		return false
+		return true
 	}
 	if admissionReviewReq.Request.Operation != admission.Update {
-		return false
+		return true
 	}
 	clonedObject := admissionReviewReq.Request.Object.DeepCopy()
 	clonedOldObject := admissionReviewReq.Request.OldObject.DeepCopy()
@@ -147,7 +147,7 @@ func isDiffBetweenObjectAndOldObject(admissionReviewReq *admission.AdmissionRevi
 	diff := cmp.Diff(objectMap, oldObjectMap)
 	fmt.Println("@@isEqual", isEqual)
 	fmt.Println("@@diff", diff)
-	return isEqual
+	return !isEqual
 }
 
 func isKubectl(managedFields []ManagedFields) bool {
