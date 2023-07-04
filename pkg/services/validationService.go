@@ -91,7 +91,9 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
-	if !ShouldResourceBeValidated(admissionReviewReq, rootObject) {
+	shouldValidatedResourceData := ShouldResourceBeValidated(admissionReviewReq, rootObject)
+
+	if !shouldValidatedResourceData.ShouldValidate {
 		return saveMetadataAndReturnAResponseForSkippedResource()
 	}
 
@@ -195,7 +197,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 
 		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
-		shouldBypassByPermissions := vs.shouldBypassByPermissions(resourceUserInfo)
+		shouldBypassByPermissions := vs.shouldBypassByPermissions(resourceUserInfo, shouldValidatedResourceData.OpenShiftRequester)
 
 		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() && !shouldBypassByPermissions {
 			allowed = false
@@ -392,20 +394,26 @@ func (vs *ValidationService) getNamespaceRestrictionsByPolicyName(policyName str
 	return nil
 }
 
-func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1.UserInfo) bool {
+func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1.UserInfo, openShiftRequester string) bool {
 	bypassPermissions := vs.State.GetBypassPermissions()
+
 	if bypassPermissions == nil {
 		return false
 	}
 
+	userName := userInfo.Username
+	if openShiftRequester != "" {
+		userName = openShiftRequester
+	}
+
 	for _, userAccount := range bypassPermissions.UserAccounts {
-		if match, _ := regexp.MatchString(userAccount, userInfo.Username); match {
+		if match, _ := regexp.MatchString(userAccount, userName); match {
 			return true
 		}
 	}
 
 	for _, serviceAccount := range bypassPermissions.ServiceAccounts {
-		if match, _ := regexp.MatchString(serviceAccount, userInfo.Username); match {
+		if match, _ := regexp.MatchString(serviceAccount, userName); match {
 			return true
 		}
 	}

@@ -53,42 +53,58 @@ func TestPrerequisitesFilters(t *testing.T) {
 	t.Run("resource should be skipped because resource is deleted", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		rootObject.Metadata.DeletionTimestamp = "2021-01-01T00:00:00Z"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because metadata name is missing", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		rootObject.Metadata.Name = ""
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because kind is Event", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Kind.Kind = "Event"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because kind is GitRepository", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Kind.Kind = "GitRepository"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because kind is SubjectAccessReview", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Kind.Kind = "SubjectAccessReview"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because kind is SelfSubjectAccessReview", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Kind.Kind = "SelfSubjectAccessReview"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because namespace is kube-public", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Namespace = "kube-public"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 	t.Run("resource should be skipped because namespace is kube-node-lease", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Namespace = "kube-node-lease"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 }
 
@@ -99,46 +115,62 @@ func TestWhiteListFilters(t *testing.T) {
 		t.Run("kubectl-client-side-apply", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("kubectl-create", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-create"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("kubectl-edit", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-edit"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("kubectl-patch", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "kubectl-patch"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
 
 	t.Run("resource should be validated because it is managed by helm", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		rootObject.Metadata.ManagedFields[0].Manager = "helm"
-		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: true,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("resource should be validated because it is managed by terraform", func(t *testing.T) {
 		t.Run("Terraform", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "Terraform"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("HashiCorp", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "HashiCorp"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("some-prefix-terraform-provider-kubernetes", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "some-prefix-terraform-provider-kubernetes"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
 
@@ -146,39 +178,53 @@ func TestWhiteListFilters(t *testing.T) {
 		t.Run("oc", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "oc"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("Mozilla", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla"
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
 	t.Run("resource should not be validated because it is not managed by openShift", func(t *testing.T) {
 		t.Run("oc-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "oc-postfix"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("prefix-openshift-controller-manager-some-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "prefix-openshift-controller-manager-some-postfix"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("prefix-openshift-apiserver-some-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "prefix-openshift-apiserver-some-postfix"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("Mozilla-postfix", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla-postfix"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 		t.Run("mozilla", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "Mozilla-postfix"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
 
@@ -186,7 +232,9 @@ func TestWhiteListFilters(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
 		rootObject.Metadata.ManagedFields[0].Manager = "kubectl-client-side-apply"
-		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: true,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("resource should be validated because it has a system: username and annotations openshift.io/requester and the value is not prefix system:serviceaccount", func(t *testing.T) {
@@ -194,7 +242,10 @@ func TestWhiteListFilters(t *testing.T) {
 		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
 		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
 		rootObject.Metadata.Annotations["openshift.io/requester"] = "test@datree.io"
-		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate:     true,
+			OpenShiftRequester: "test@datree.io",
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("resource should be not validated because it has a system: username and annotations openshift.io/requester value start with prefix system:serviceaccount", func(t *testing.T) {
@@ -202,20 +253,26 @@ func TestWhiteListFilters(t *testing.T) {
 		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
 		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
 		rootObject.Metadata.Annotations["openshift.io/requester"] = "system:serviceaccount"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("resource should be not validated because it has a system: username and there is no annotations openshift.io/requester key", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.UserInfo.Username = "system:test-test"
 		rootObject.Metadata.ManagedFields[0].Manager = "openshift"
-		assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("resource should be validated because username prefix is not system: ", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.UserInfo.Username = "kube-admin"
-		assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+		assert.Equal(t, ShouldValidatedResourceData{
+			ShouldValidate: true,
+		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
 
 	t.Run("special cases", func(t *testing.T) {
@@ -223,13 +280,17 @@ func TestWhiteListFilters(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "non-matching-manager"
 			rootObject.Metadata.ManagedFields = append(rootObject.Metadata.ManagedFields, ManagedFields{Manager: "kubectl-client-side-apply"})
-			assert.Equal(t, true, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: true,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 
 		t.Run("resource should be skipped because it is managed by non-allowed manager", func(t *testing.T) {
 			admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 			rootObject.Metadata.ManagedFields[0].Manager = "non-matching-manager"
-			assert.Equal(t, false, ShouldResourceBeValidated(admissionReviewReq, rootObject))
+			assert.Equal(t, ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 		})
 	})
 
