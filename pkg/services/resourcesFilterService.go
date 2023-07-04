@@ -288,7 +288,7 @@ func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, ann
 		}
 	}
 
-	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc", "Mozilla"}), ""
+	return false, ""
 }
 
 func hasOwnerReference(resource RootObject) bool {
