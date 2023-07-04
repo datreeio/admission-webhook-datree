@@ -25,7 +25,12 @@ type RootObject struct {
 	Metadata Metadata `json:"metadata"`
 }
 
-func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
+type ShouldValidatedResourceData struct {
+	ShouldValidate     bool
+	OpenShiftRequester string
+}
+
+func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) ShouldValidatedResourceData {
 
 	if admissionReviewReq == nil {
 		panic("admissionReviewReq is nil")
@@ -44,19 +49,27 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped
 
 	if !arePrerequisitesMet {
-		return false
+		return ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}
 	}
 
 	if hasOwnerReference(rootObject) {
-		return false
+		return ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}
 	}
 
 	if !isUsernamePrefixSystem(userInfo.Username) {
-		return true
+		return ShouldValidatedResourceData{
+			ShouldValidate: true,
+		}
 	}
 
 	if isEqualObjectAndOldObject(admissionReviewReq) {
-		return false
+		return ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}
 	}
 
 	isKubectl := isKubectl(managedFields)
@@ -64,15 +77,14 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isOpenshiftResourceThatShouldBeEvaluated := isOpenshiftResourceThatShouldBeEvaluated(managedFields, resourceAnnotations)
-	isResourceWhiteListed := isKubectl ||
-		isHelm ||
-		isTerraform ||
-		isFluxResourceThatShouldBeEvaluated ||
-		isArgoResourceThatShouldBeEvaluated ||
-		isOpenshiftResourceThatShouldBeEvaluated
+	isOpenshiftResourceThatShouldBeEvaluated, openShiftRequester := isOpenshiftResourceThatShouldBeEvaluated(managedFields, resourceAnnotations)
+	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
 
-	return isResourceWhiteListed
+	return ShouldValidatedResourceData{
+		ShouldValidate:     isResourceWhiteListed,
+		OpenShiftRequester: openShiftRequester,
+	}
+
 }
 
 func ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq *admission.AdmissionReview, rootObject RootObject) bool {
@@ -267,16 +279,16 @@ func doesRegexMatchString(regex string, str string) bool {
 	return r.MatchString(str)
 }
 
-func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, annotations map[string]string) bool {
+func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, annotations map[string]string) (bool, string) {
 	if val, ok := annotations["openshift.io/requester"]; ok {
 		if !strings.HasPrefix(val, "system:serviceaccount") {
 			// If the value of "openshift.io/requester" does not start with "system:serviceaccount",
 			// it indicates that the resource is created by a human and should be evaluated.
-			return true
+			return true, val
 		}
 	}
 
-	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc", "Mozilla"})
+	return isAtLeastOneFieldManagerEqualToOneOfTheExpectedFieldManagers(managedFields, []string{"oc", "Mozilla"}), ""
 }
 
 func hasOwnerReference(resource RootObject) bool {
