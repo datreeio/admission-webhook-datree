@@ -55,7 +55,7 @@ def debugging():
     )
 
 def hot_reload():
-    docker_build('webhook-server', '.', dockerfile = './Dockerfile.hotReload.tilt',
+    docker_build('webhook-server', './', dockerfile = './Dockerfile.hotReload.tilt',
         build_args={
             "BUILD_ENVIRONMENT":"staging",
             "WEBHOOK_VERSION":"0.0.1",
