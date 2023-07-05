@@ -55,7 +55,7 @@ def debugging():
     )
 
 def hot_reload():
-    docker_build('webhook-server', './', dockerfile = './Dockerfile.hotReload.tilt',
+    docker_build('webhook-server', './', dockerfile = './Dockerfile',
         build_args={
             "BUILD_ENVIRONMENT":"staging",
             "WEBHOOK_VERSION":"0.0.1",
@@ -63,7 +63,7 @@ def hot_reload():
     )
 
 
-    docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile.hotReload.tilt',
+    docker_build('datree/cluster-scanner-staging', '../cluster-scanner', dockerfile = '../cluster-scanner/Dockerfile',
         build_args={
             "BUILD_ENVIRONMENT":"staging",
             "SCANNER_VERSION":"0.0.1",
