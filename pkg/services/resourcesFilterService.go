@@ -2,7 +2,6 @@ package services
 
 import (
 	"encoding/json"
-	"fmt"
 	"regexp"
 	"strings"
 
@@ -72,17 +71,28 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 		}
 	}
 
+	if strings.HasPrefix(userInfo.Username, "system:serviceaccount:openshift") {
+		if isRequesterExist, openShiftRequester := isOpenshiftRequesterExists(resourceAnnotations); isRequesterExist {
+			return ShouldValidatedResourceData{
+				ShouldValidate:     true,
+				OpenShiftRequester: openShiftRequester,
+			}
+		} else {
+			return ShouldValidatedResourceData{
+				ShouldValidate: false,
+			}
+		}
+	}
+
 	isKubectl := isKubectl(managedFields)
 	isHelm := isHelm(managedFields)
 	isTerraform := isTerraform(managedFields)
 	isFluxResourceThatShouldBeEvaluated := isFluxResourceThatShouldBeEvaluated(admissionReviewReq, rootObject, managedFields)
 	isArgoResourceThatShouldBeEvaluated := isArgoResourceThatShouldBeEvaluated(admissionReviewReq, resourceKind, managedFields)
-	isOpenshiftResourceThatShouldBeEvaluated, openShiftRequester := isOpenshiftResourceThatShouldBeEvaluated(managedFields, resourceAnnotations)
-	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated || isOpenshiftResourceThatShouldBeEvaluated
+	isResourceWhiteListed := isKubectl || isHelm || isTerraform || isFluxResourceThatShouldBeEvaluated || isArgoResourceThatShouldBeEvaluated
 
 	return ShouldValidatedResourceData{
-		ShouldValidate:     isResourceWhiteListed,
-		OpenShiftRequester: openShiftRequester,
+		ShouldValidate: isResourceWhiteListed,
 	}
 
 }
@@ -128,7 +138,7 @@ func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionRevie
 }
 
 func isEqualObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bool {
-	fmt.Println("@@admissionReviewReq", admissionReviewReq)
+	// fmt.Println("@@admissionReviewReq", admissionReviewReq)
 	if admissionReviewReq.Request.OldObject.Raw == nil {
 		return false
 	}
@@ -153,13 +163,13 @@ func isEqualObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bo
 		delete(oldObjectMetadata.(map[string]interface{}), "selfLink")
 	}
 
-	fmt.Println("@@clonedObject", string(clonedObject.Raw))
-	fmt.Println("@@clonedOldObject", string(clonedOldObject.Raw))
+	// fmt.Println("@@clonedObject", string(clonedObject.Raw))
+	// fmt.Println("@@clonedOldObject", string(clonedOldObject.Raw))
 
 	isEqual := cmp.Equal(objectMap, oldObjectMap)
-	diff := cmp.Diff(objectMap, oldObjectMap)
-	fmt.Println("@@isEqual", isEqual)
-	fmt.Println("@@diff", diff)
+	// diff := cmp.Diff(objectMap, oldObjectMap)
+	// fmt.Println("@@isEqual", isEqual)
+	// fmt.Println("@@diff", diff)
 	return isEqual
 }
 
@@ -279,13 +289,9 @@ func doesRegexMatchString(regex string, str string) bool {
 	return r.MatchString(str)
 }
 
-func isOpenshiftResourceThatShouldBeEvaluated(managedFields []ManagedFields, annotations map[string]string) (bool, string) {
+func isOpenshiftRequesterExists(annotations map[string]string) (bool, string) {
 	if val, ok := annotations["openshift.io/requester"]; ok {
-		if !strings.HasPrefix(val, "system:serviceaccount") {
-			// If the value of "openshift.io/requester" does not start with "system:serviceaccount",
-			// it indicates that the resource is created by a human and should be evaluated.
-			return true, val
-		}
+		return true, val
 	}
 
 	return false, ""
