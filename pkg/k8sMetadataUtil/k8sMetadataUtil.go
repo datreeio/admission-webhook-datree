@@ -168,8 +168,8 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 		return "", k8sMetadataUtil.CreateClientSetError
 	} else {
 		// test
-		resource, err := k8sMetadataUtil.ClientSet.CoreV1().RESTClient().Get().Resource("groups").DoRaw(context.Background())
-		fmt.Println(string(resource), err)
+		result := k8sMetadataUtil.ClientSet.CoreV1().RESTClient().Get().Resource("groups").Do(context.Background())
+		fmt.Println(result.Get())
 		// test
 
 		clusterMetadata, err := k8sMetadataUtil.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
@@ -177,6 +177,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 			return "", err
 		}
 		ClusterUuid = clusterMetadata.UID
+		fmt.Println("cluster uuid: ", ClusterUuid)
 	}
 
 	return ClusterUuid, nil
