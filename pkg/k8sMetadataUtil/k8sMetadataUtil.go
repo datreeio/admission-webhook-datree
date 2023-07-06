@@ -3,7 +3,6 @@ package k8sMetadataUtil
 import (
 	"context"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"os"
 	"strings"
 	"time"
@@ -30,7 +29,6 @@ type K8sMetadataUtil struct {
 	CreateClientSetError error
 	leaderElection       *leaderElection.LeaderElection
 	internalLogger       logger.Logger
-	errorReporter        *errorReporter.ErrorReporter
 }
 
 type K8sMetadata struct {
