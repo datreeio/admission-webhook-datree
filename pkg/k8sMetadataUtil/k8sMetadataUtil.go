@@ -3,6 +3,8 @@ package k8sMetadataUtil
 import (
 	"context"
 	"fmt"
+	K8sClient "github.com/datreeio/admission-webhook-datree/pkg/K8sClient2"
+	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"os"
 	"strings"
 	"time"
@@ -29,6 +31,7 @@ type K8sMetadataUtil struct {
 	CreateClientSetError error
 	leaderElection       *leaderElection.LeaderElection
 	internalLogger       logger.Logger
+	errorReporter        *errorReporter.ErrorReporter
 }
 
 type K8sMetadata struct {
@@ -167,10 +170,12 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 	if k8sMetadataUtil.CreateClientSetError != nil {
 		return "", k8sMetadataUtil.CreateClientSetError
 	} else {
-		// test
-		result := k8sMetadataUtil.ClientSet.Discovery().RESTClient().Get().Resource("groups").Do(context.Background())
-		fmt.Println(result.Get())
-		// test
+		// get the equivalent of "kubectl get groups" command, for openshift crd
+		client2, err := K8sClient.NewK8sClient(k8sMetadataUtil.errorReporter)
+
+		res, err := client2.GetAllGroups([]string{}, k8sMetadataUtil.errorReporter)
+
+		fmt.Println(res, err)
 
 		clusterMetadata, err := k8sMetadataUtil.ClientSet.CoreV1().Namespaces().Get(context.TODO(), "kube-system", metav1.GetOptions{})
 		if err != nil {
