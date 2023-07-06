@@ -173,7 +173,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 		// get the equivalent of "kubectl get groups" command, for openshift crd
 		client2, err := K8sClient.NewK8sClient(k8sMetadataUtil.errorReporter)
 
-		res, err := client2.GetAllGroups([]string{}, k8sMetadataUtil.errorReporter)
+		res, err := client2.GetAllGroupsTheUserIsIn("roy@datree.io")
 
 		fmt.Println(res, err)
 
