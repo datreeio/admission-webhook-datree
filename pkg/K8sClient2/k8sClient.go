@@ -109,7 +109,13 @@ func (kc *K8sClient) GetAllGroupsTheUserIsIn(username string) ([]string, error) 
 		return nil, err
 	}
 
-	var allTheGroupsTheUserIsIn []string
+	allTheGroupsTheUserIsIn := extractAllTheGroupsTheUserIsIn(username, getAllGroupsResp)
+
+	return allTheGroupsTheUserIsIn, nil
+}
+
+func extractAllTheGroupsTheUserIsIn(username string, getAllGroupsResp *kubectlGetAllGroupsResp) []string {
+	allTheGroupsTheUserIsIn := make([]string, 0)
 	for _, group := range getAllGroupsResp.Items {
 		for _, user := range group.Users {
 			if user == username {
@@ -117,8 +123,7 @@ func (kc *K8sClient) GetAllGroupsTheUserIsIn(username string) ([]string, error) 
 			}
 		}
 	}
-
-	return allTheGroupsTheUserIsIn, nil
+	return allTheGroupsTheUserIsIn
 }
 
 func (kc *K8sClient) kubectlExec(args []string) (bytes.Buffer, bytes.Buffer, error) {

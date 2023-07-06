@@ -7,10 +7,12 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/go-cmp v0.5.9
 	github.com/lithammer/shortuuid v3.0.0+incompatible
+	github.com/openshift/api v0.0.0-20230705144233-e28cd4dd28a8
+	github.com/openshift/client-go v0.0.0-20230705133330-7f808ad59404
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.10.0
-	k8s.io/api v0.27.1
-	k8s.io/apimachinery v0.27.1
+	k8s.io/api v0.27.2
+	k8s.io/apimachinery v0.27.2
 	k8s.io/client-go v0.27.1
 	k8s.io/utils v0.0.0-20230505201702-9f6742963106
 )
@@ -26,6 +28,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.9.11 // indirect
 	github.com/goccy/go-yaml v1.9.5 // indirect
+	github.com/imdario/mergo v0.3.6 // indirect
 	github.com/itchyny/gojq v0.12.10 // indirect
 	github.com/itchyny/timefmt-go v0.1.5 // indirect
 	github.com/jinzhu/copier v0.3.5 // indirect
@@ -33,6 +36,7 @@ require (
 	github.com/open-policy-agent/opa v0.49.2 // indirect
 	github.com/owenrumney/go-sarif/v2 v2.1.2 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/yashtewari/glob-intersection v0.1.0 // indirect
