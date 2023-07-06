@@ -7,12 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
-	"os/exec"
-	"strings"
-
 	"k8s.io/client-go/discovery"
+	"os/exec"
 
-	"github.com/datreeio/datree/pkg/utils"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 )
@@ -48,17 +45,14 @@ func NewK8sClient(errorReporter *errorReporter.ErrorReporter) (*K8sClient, error
 	}, nil
 }
 
-func (kc *K8sClient) GetAllGroups(namespacesToSkip []string, errorReporter *errorReporter.ErrorReporter) (*RawK8sResources, error) {
-	resources, err := kc.getResources(namespacesToSkip, errorReporter, []string{"groups"})
-	if err != nil {
-		return nil, err
+type GroupResources = []GroupResource
+
+type GroupResource = struct {
+	Users    []string `json:"users"`
+	Metadata struct {
+		Name string `json:"name"`
 	}
-	return &resources, nil
 }
-
-type RawK8sResources = []RawK8sResource
-
-type RawK8sResource = map[string]interface{}
 
 type K8sResource struct {
 	ApiVersion string              `json:"apiVersion"`
@@ -76,22 +70,14 @@ type K8sResourceMetadata struct {
 	OwnerReferences []OwnerReference `json:"ownerReferences"`
 }
 
-type kubectlGetAllResourcesResp struct {
-	ApiVersion string          `json:"apiVersion"`
-	Kind       string          `json:"kind"`
-	Items      RawK8sResources `json:"items"`
+type kubectlGetAllGroupsResp struct {
+	ApiVersion string         `json:"apiVersion"`
+	Kind       string         `json:"kind"`
+	Items      GroupResources `json:"items"`
 }
 
-func (kc *K8sClient) getResources(namespacesToSkip []string, errorReporter *errorReporter.ErrorReporter, resourcesKindsToGet []string) (RawK8sResources, error) {
-	commandArgs := []string{"get", strings.Join(resourcesKindsToGet, ","), "--all-namespaces", "-o", "json", "--selector", "kubernetes.io/bootstrapping!=rbac-defaults,app.kubernetes.io/part-of!=datree"}
-
-	if len(namespacesToSkip) > 0 {
-		// command should look like this: kubectl get all --all-namespaces -o json --field-selector metadata.namespace!=<SKIPPED-NAMESPACE-NAME>,metadata.namespace!=kube-system,metadata.namespace!=<DATREE_NAMESPACE>
-		fieldSelectorParams := "metadata.namespace!="
-		fieldSelectorParams += strings.Join(namespacesToSkip, fmt.Sprintf(",%s", fieldSelectorParams))
-
-		commandArgs = append(commandArgs, "--field-selector", fieldSelectorParams)
-	}
+func (kc *K8sClient) GetAllGroupsTheUserIsIn(username string) ([]string, error) {
+	commandArgs := []string{"get", "groups", "-o", "json"}
 
 	stdOutBuffer, stdErrBuffer, err := kc.kubectlExec(commandArgs)
 
@@ -108,11 +94,11 @@ func (kc *K8sClient) getResources(namespacesToSkip []string, errorReporter *erro
 		// this is a minor error that should be reported but not fail the scan
 		errStr := "error in getResources: " + stdErrBuffer.String()
 		fmt.Println(errStr)
-		errorReporter.ReportUnexpectedError(errors.New(errStr))
+		kc.errorReporter.ReportUnexpectedError(errors.New(errStr))
 	}
 
-	getAllResourcesResp := &kubectlGetAllResourcesResp{}
-	err = json.Unmarshal(stdOutBuffer.Bytes(), &getAllResourcesResp)
+	getAllGroupsResp := &kubectlGetAllGroupsResp{}
+	err = json.Unmarshal(stdOutBuffer.Bytes(), &getAllGroupsResp)
 	if err != nil {
 		fmt.Printf("couldn't get the resources in cluster %s \n", err.Error())
 
@@ -123,45 +109,16 @@ func (kc *K8sClient) getResources(namespacesToSkip []string, errorReporter *erro
 		return nil, err
 	}
 
-	return getAllResourcesResp.Items, nil
-}
-
-func (kc *K8sClient) getApiResourcesKinds(errorReporter *errorReporter.ErrorReporter) ([]string, error) {
-	stdOutBuffer, stdErrBuffer, err := kc.kubectlExec([]string{"api-resources", "-o", "name"})
-
-	if stdOutBuffer.Len() == 0 {
-		// this is a real error that causes the scan to fail
-		if err != nil {
-			return nil, errors.New(fmt.Sprint(err) + ": " + stdErrBuffer.String())
-		} else {
-			return nil, errors.New("stdOut is empty: " + stdErrBuffer.String())
+	allTheGroupsTheUserIsIn := []string{}
+	for _, group := range getAllGroupsResp.Items {
+		for aaa, user := range group.Users {
+			if user == username {
+				allTheGroupsTheUserIsIn = append(allTheGroupsTheUserIsIn, group.Metadata.Name)
+			}
 		}
 	}
 
-	if err != nil {
-		// this is a minor error that should be reported but not fail the scan
-		errStr := "error in fetch api-resources: " + stdErrBuffer.String()
-		fmt.Println(errStr)
-		errorReporter.ReportUnexpectedError(errors.New(errStr))
-	}
-
-	apiResourcesKinds := rawApiResourcesToApiResourcesKinds(stdOutBuffer.String())
-	return apiResourcesKinds, nil
-}
-
-func rawApiResourcesToApiResourcesKinds(rawApiResources string) []string {
-	apiResourcesKinds := utils.MapSlice(strings.Split(rawApiResources, "\n"), func(resource string) string {
-		return strings.Split(resource, ".")[0]
-	})
-
-	var apiResourcesKindsNotEmpty []string
-	for _, resourceKind := range apiResourcesKinds {
-		if resourceKind != "" {
-			apiResourcesKindsNotEmpty = append(apiResourcesKindsNotEmpty, resourceKind)
-		}
-	}
-
-	return apiResourcesKindsNotEmpty
+	return allTheGroupsTheUserIsIn, nil
 }
 
 func (kc *K8sClient) kubectlExec(args []string) (bytes.Buffer, bytes.Buffer, error) {
