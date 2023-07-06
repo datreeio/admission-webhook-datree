@@ -3,7 +3,6 @@ package k8sMetadataUtil
 import (
 	"context"
 	"fmt"
-	K8sClient "github.com/datreeio/admission-webhook-datree/pkg/K8sClient2"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
 	"os"
 	"strings"
