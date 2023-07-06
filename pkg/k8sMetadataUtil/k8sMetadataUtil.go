@@ -168,7 +168,7 @@ func (k8sMetadataUtil *K8sMetadataUtil) GetClusterUuid() (k8sTypes.UID, error) {
 		return "", k8sMetadataUtil.CreateClientSetError
 	} else {
 		// test
-		result := k8sMetadataUtil.ClientSet.CoreV1().RESTClient().Get().Resource("groups").Do(context.Background())
+		result := k8sMetadataUtil.ClientSet.Discovery().RESTClient().Get().Resource("groups").Do(context.Background())
 		fmt.Println(result.Get())
 		// test
 
