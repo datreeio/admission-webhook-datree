@@ -9,11 +9,16 @@ metadata:
   {{- end }}
 rules:
   - apiGroups:
+      - "user.openshift.io"
+    resources:
+      - "groups"
+    verbs:
+      - "list"
+  - apiGroups:
       - ""
     resources:
       - "nodes"
       - "namespaces"
-      - "groups"
     verbs:
       - "get"
       - "list"
