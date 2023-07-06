@@ -109,9 +109,9 @@ func (kc *K8sClient) GetAllGroupsTheUserIsIn(username string) ([]string, error) 
 		return nil, err
 	}
 
-	allTheGroupsTheUserIsIn := []string{}
+	var allTheGroupsTheUserIsIn []string
 	for _, group := range getAllGroupsResp.Items {
-		for aaa, user := range group.Users {
+		for _, user := range group.Users {
 			if user == username {
 				allTheGroupsTheUserIsIn = append(allTheGroupsTheUserIsIn, group.Metadata.Name)
 			}
