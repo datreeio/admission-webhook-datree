@@ -414,8 +414,9 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 		groupsFromOpenshiftClient, err := vs.OpenshiftClient.GetGroupsUserBelongsTo(openShiftRequester)
 		if err != nil {
 			vs.Logger.LogError(fmt.Sprintf("Failed to get groups for user %s from openshift client: %s", openShiftRequester, err.Error()))
+		} else {
+			groups = groupsFromOpenshiftClient
 		}
-		groups = groupsFromOpenshiftClient
 	}
 
 	for _, userAccount := range bypassPermissions.UserAccounts {
