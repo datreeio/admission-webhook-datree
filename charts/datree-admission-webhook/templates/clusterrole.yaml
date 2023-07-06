@@ -13,6 +13,7 @@ rules:
     resources:
       - "nodes"
       - "namespaces"
+      - "groups"
     verbs:
       - "get"
       - "list"
