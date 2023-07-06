@@ -35,6 +35,7 @@ require (
 	github.com/mikefarah/yq/v4 v4.27.3 // indirect
 	github.com/open-policy-agent/opa v0.49.2 // indirect
 	github.com/owenrumney/go-sarif/v2 v2.1.2 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
