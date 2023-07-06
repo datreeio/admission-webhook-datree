@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftClient"
 	"io"
 	"net/http"
 
@@ -27,12 +28,14 @@ type ValidationController struct {
 	ErrorReporter     *errorReporter.ErrorReporter
 }
 
-func NewValidationController(cliServiceClient *clients.CliClient, state *servicestate.ServiceState, errorReporter *errorReporter.ErrorReporter, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil) *ValidationController {
+func NewValidationController(cliServiceClient *clients.CliClient, state *servicestate.ServiceState, errorReporter *errorReporter.ErrorReporter, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, logger *logger.Logger, openshiftClient *openshiftClient.OpenshiftClient) *ValidationController {
 	validationService := &services.ValidationService{
 		CliServiceClient: cliServiceClient,
 		State:            state,
 		K8sMetadataUtil:  k8sMetadataUtilInstance,
 		ErrorReporter:    errorReporter,
+		OpenshiftClient:  openshiftClient,
+		Logger:           logger,
 	}
 
 	return &ValidationController{

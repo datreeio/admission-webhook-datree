@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftClient"
 	"net/http"
 	"os"
 	"regexp"
@@ -59,6 +60,8 @@ type ValidationService struct {
 	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
 	ErrorReporter    *errorReporter.ErrorReporter
 	State            *servicestate.ServiceState
+	OpenshiftClient  *openshiftClient.OpenshiftClient
+	Logger           *logger.Logger
 }
 
 func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
@@ -402,8 +405,17 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 	}
 
 	userName := userInfo.Username
+	groups := userInfo.Groups
 	if openShiftRequester != "" {
+		// override username
 		userName = openShiftRequester
+
+		// override groups
+		groupsFromOpenshiftClient, err := vs.OpenshiftClient.GetGroupsUserBelongsTo(openShiftRequester)
+		if err != nil {
+			vs.Logger.LogError(fmt.Sprintf("Failed to get groups for user %s from openshift client: %s", openShiftRequester, err.Error()))
+		}
+		groups = groupsFromOpenshiftClient
 	}
 
 	for _, userAccount := range bypassPermissions.UserAccounts {
@@ -419,7 +431,7 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 	}
 
 	for _, bypassGroup := range bypassPermissions.Groups {
-		for _, userInfoGroup := range userInfo.Groups {
+		for _, userInfoGroup := range groups {
 			if match, _ := regexp.MatchString(bypassGroup, userInfoGroup); match {
 				return true
 			}

@@ -1,4 +1,4 @@
-package main
+package openshiftClient
 
 import (
 	"context"
@@ -60,20 +60,15 @@ func (oc *OpenshiftClient) getGroupsByUsers() (GroupsByUsers, error) {
 	oc.cache.Set(groupsByUsersCacheKey, groupsByUsers, 1*time.Minute)
 	return groupsByUsers, nil
 }
-
 func (oc *OpenshiftClient) GetGroupsUserBelongsTo(username string) ([]string, error) {
-	groups, err := oc.userClientV1.Groups().List(context.TODO(), metav1.ListOptions{})
+	groupsByUsers, err := oc.getGroupsByUsers()
 	if err != nil {
 		return nil, err
 	}
 
-	var groupsUserBelongsTo []string
-	for _, group := range groups.Items {
-		for _, user := range group.Users {
-			if user == username {
-				groupsUserBelongsTo = append(groupsUserBelongsTo, group.Name)
-			}
-		}
+	groups, found := groupsByUsers[username]
+	if !found {
+		return []string{}, nil
 	}
-	return groupsUserBelongsTo, nil
+	return groups, nil
 }
