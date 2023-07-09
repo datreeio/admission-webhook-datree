@@ -6,12 +6,8 @@ import (
 	"time"
 )
 
-type iOpenshiftClient interface {
-	getGroups() (*userClientV1Api.GroupList, error)
-}
-
 type OpenshiftService struct {
-	openshiftClient iOpenshiftClient
+	openshiftClient openshiftClientInterface
 	cache           *cache.Cache
 }
 

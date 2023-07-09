@@ -67,7 +67,6 @@ helm-install-staging:
 	--set image.tag="latest" \
 	--set securityContext.seccompProfile=null \
     --set securityContext.runAsUser=null \
-    --set securityContext.readOnlyRootFilesystem=false \
     --set datree.labelKubeSystem=false \
 	--debug && \
 	make change-ping-uninstall-url-to-production

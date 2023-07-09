@@ -8,6 +8,10 @@ import (
 	"k8s.io/client-go/rest"
 )
 
+type openshiftClientInterface interface {
+	getGroups() (*userClientV1Api.GroupList, error)
+}
+
 type openshiftClient struct {
 	userClientV1 userClientV1.UserV1Interface
 }
