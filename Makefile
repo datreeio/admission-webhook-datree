@@ -67,6 +67,23 @@ helm-install-staging:
 	--set image.tag="latest" \
 	--debug && \
 	make change-ping-uninstall-url-to-production
+	
+okd-helm-install-staging:
+	make change-ping-uninstall-url-to-staging && \
+	helm install -n datree datree-webhook ./charts/datree-admission-webhook \
+	--create-namespace \
+	--set datree.token="${DATREE_TOKEN}" \
+	--set datree.clusterName="okd" \
+	--set datree.policy="Starter" \
+	--set clusterScanner.image.repository="datree/cluster-scanner-staging" \
+	--set clusterScanner.image.tag="latest" \
+	--set image.repository="datree/webhook-staging" \
+	--set image.tag="latest" \
+	--set securityContext.seccompProfile=null \
+	--set securityContext.runAsUser=null \
+	--set datree.labelKubeSystem=false \
+	--debug && \
+	make change-ping-uninstall-url-to-production
 
 helm-template-staging:
 	make change-ping-uninstall-url-to-staging && \
