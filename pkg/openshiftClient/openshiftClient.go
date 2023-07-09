@@ -2,6 +2,7 @@ package openshiftClient
 
 import (
 	"context"
+	"fmt"
 	userClientV1 "github.com/openshift/client-go/user/clientset/versioned/typed/user/v1"
 	"github.com/patrickmn/go-cache"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,6 +45,10 @@ func (oc *OpenshiftClient) getGroupsByUsers() (GroupsByUsers, error) {
 
 	// get from API
 	groups, err := oc.userClientV1.Groups().List(context.TODO(), metav1.ListOptions{})
+	fmt.Println("@@@@@@@@@@@@@@@@@@")
+	fmt.Println(groups)
+	fmt.Println(err)
+	fmt.Println("@@@@@@@@@@@@@@@@@@")
 	if err != nil {
 		return nil, err
 	}
