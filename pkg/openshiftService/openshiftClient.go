@@ -8,11 +8,11 @@ import (
 	"k8s.io/client-go/rest"
 )
 
-type OpenshiftClient struct {
+type openshiftClient struct {
 	userClientV1 userClientV1.UserV1Interface
 }
 
-func NewOpenshiftClient() (*OpenshiftClient, error) {
+func newOpenshiftClient() (*openshiftClient, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
@@ -23,11 +23,11 @@ func NewOpenshiftClient() (*OpenshiftClient, error) {
 		return nil, err
 	}
 
-	return &OpenshiftClient{
+	return &openshiftClient{
 		userClientV1: userClientV1Instance,
 	}, nil
 }
 
-func (oc *OpenshiftClient) getGroups() (*userClientV1Api.GroupList, error) {
+func (oc *openshiftClient) getGroups() (*userClientV1Api.GroupList, error) {
 	return oc.userClientV1.Groups().List(context.TODO(), metav1.ListOptions{})
 }

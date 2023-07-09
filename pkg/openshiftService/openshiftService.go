@@ -6,19 +6,19 @@ import (
 	"time"
 )
 
-type IOpenshiftClient interface {
+type iOpenshiftClient interface {
 	getGroups() (*userClientV1Api.GroupList, error)
 }
 
 type OpenshiftService struct {
-	openshiftClient IOpenshiftClient
+	openshiftClient iOpenshiftClient
 	cache           *cache.Cache
 }
 
 const groupsCacheKey = "groups"
 
 func NewOpenshiftService() (*OpenshiftService, error) {
-	openshiftClient, err := NewOpenshiftClient()
+	openshiftClient, err := newOpenshiftClient()
 	if err != nil {
 		return nil, err
 	}
