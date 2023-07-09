@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftClient"
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 	"net/http"
 	"os"
 	"regexp"
@@ -60,7 +60,7 @@ type ValidationService struct {
 	K8sMetadataUtil  *k8sMetadataUtil.K8sMetadataUtil
 	ErrorReporter    *errorReporter.ErrorReporter
 	State            *servicestate.ServiceState
-	OpenshiftClient  *openshiftClient.OpenshiftClient
+	OpenshiftService *openshiftService.OpenshiftService
 	Logger           *logger.Logger
 }
 
@@ -411,7 +411,7 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 		userName = openShiftRequester
 
 		// override groups
-		groupsFromOpenshiftClient, err := vs.OpenshiftClient.GetGroupsUserBelongsTo(openShiftRequester)
+		groupsFromOpenshiftClient, err := vs.OpenshiftService.GetGroupsUserBelongsTo(openShiftRequester)
 		fmt.Println("@@@@@@@@@@@@@@@@@@@2")
 		fmt.Println(groupsFromOpenshiftClient)
 		fmt.Println(err)

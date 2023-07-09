@@ -3,7 +3,7 @@ package startup
 import (
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftClient"
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"net/http"
 	"os"
@@ -44,7 +44,7 @@ func Start() {
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
 	internalLogger := logger.New("", errorReporter)
-	openshiftClientInstance, err := openshiftClient.NewOpenshiftClient()
+	openshiftServiceInstance, err := openshiftService.NewOpenshiftService()
 
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
@@ -89,7 +89,7 @@ func Start() {
 		panic(err)
 	}
 
-	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &internalLogger, openshiftClientInstance)
+	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &internalLogger, openshiftServiceInstance)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
