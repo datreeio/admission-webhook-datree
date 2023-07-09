@@ -80,8 +80,8 @@ okd-helm-install-staging:
 	--set image.repository="datree/webhook-staging" \
 	--set image.tag="latest" \
 	--set securityContext.seccompProfile=null \
-    --set securityContext.runAsUser=null \
-    --set datree.labelKubeSystem=false \
+	--set securityContext.runAsUser=null \
+	--set datree.labelKubeSystem=false \
 	--debug && \
 	make change-ping-uninstall-url-to-production
 
