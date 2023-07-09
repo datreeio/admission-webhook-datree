@@ -70,6 +70,11 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	cliEvaluationId := -1
 	var err error
 
+	res, err := vs.OpenshiftService.GetGroupsUserBelongsTo("roy@datree.io")
+	fmt.Println("@@@@@@@@@@@@1")
+	fmt.Println(res, err)
+	fmt.Println("@@@@@@@@@@@@")
+
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := vs.State.GetK8sVersion()
@@ -411,11 +416,11 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 		userName = openShiftRequester
 
 		// override groups
-		groupsFromOpenshiftClient, err := vs.OpenshiftService.GetGroupsUserBelongsTo(openShiftRequester)
+		groupsFromOpenshiftService, err := vs.OpenshiftService.GetGroupsUserBelongsTo(openShiftRequester)
 		if err != nil {
 			vs.Logger.LogError(fmt.Sprintf("Failed to get groups for user %s from openshift service: %s", openShiftRequester, err.Error()))
 		} else {
-			groups = groupsFromOpenshiftClient
+			groups = groupsFromOpenshiftService
 		}
 	}
 

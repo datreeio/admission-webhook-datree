@@ -44,7 +44,6 @@ func Start() {
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
 	internalLogger := logger.New("", errorReporter)
-	openshiftServiceInstance, err := openshiftService.NewOpenshiftService()
 
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
@@ -54,6 +53,10 @@ func Start() {
 		}
 	}()
 
+	openshiftServiceInstance, err := openshiftService.NewOpenshiftService()
+	if err != nil {
+		panic(err) // should never happen
+	}
 	k8sClientInstance, err := k8sClient.NewK8sClient()
 	var leaderElectionLeaseGetter v1.LeasesGetter = nil
 	if err == nil && k8sClientInstance != nil {
