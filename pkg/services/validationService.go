@@ -70,11 +70,6 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	cliEvaluationId := -1
 	var err error
 
-	res, err := vs.OpenshiftService.GetGroupsUserBelongsTo("roy@datree.io")
-	fmt.Println("@@@@@@@@@@@@1")
-	fmt.Println(res, err)
-	fmt.Println("@@@@@@@@@@@@")
-
 	ciContext := ciContext.Extract()
 
 	clusterK8sVersion := vs.State.GetK8sVersion()
