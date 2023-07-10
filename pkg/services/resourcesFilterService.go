@@ -65,7 +65,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 		}
 	}
 
-	if isEqualObjectAndOldObject(admissionReviewReq) {
+	if isObjectAndOldObjectEqual(admissionReviewReq) {
 		return ShouldValidatedResourceData{
 			ShouldValidate: false,
 		}
@@ -137,8 +137,7 @@ func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionRevie
 	return slices.Contains(namespacesToSkip, admissionReviewReq.Request.Namespace)
 }
 
-func isEqualObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bool {
-	// fmt.Println("@@admissionReviewReq", admissionReviewReq)
+func isObjectAndOldObjectEqual(admissionReviewReq *admission.AdmissionReview) bool {
 	if admissionReviewReq.Request.OldObject.Raw == nil {
 		return false
 	}
@@ -150,8 +149,14 @@ func isEqualObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bo
 
 	var objectMap map[string]interface{}
 	var oldObjectMap map[string]interface{}
-	_ = json.Unmarshal(clonedObject.Raw, &objectMap)
-	_ = json.Unmarshal(clonedOldObject.Raw, &oldObjectMap)
+	err := json.Unmarshal(clonedObject.Raw, &objectMap)
+	if err != nil {
+		return false
+	}
+	err = json.Unmarshal(clonedOldObject.Raw, &oldObjectMap)
+	if err != nil {
+		return false
+	}
 
 	if objectMetadata, ok := objectMap["metadata"]; ok {
 		delete(objectMetadata.(map[string]interface{}), "managedFields")
@@ -163,13 +168,7 @@ func isEqualObjectAndOldObject(admissionReviewReq *admission.AdmissionReview) bo
 		delete(oldObjectMetadata.(map[string]interface{}), "selfLink")
 	}
 
-	// fmt.Println("@@clonedObject", string(clonedObject.Raw))
-	// fmt.Println("@@clonedOldObject", string(clonedOldObject.Raw))
-
 	isEqual := cmp.Equal(objectMap, oldObjectMap)
-	// diff := cmp.Diff(objectMap, oldObjectMap)
-	// fmt.Println("@@isEqual", isEqual)
-	// fmt.Println("@@diff", diff)
 	return isEqual
 }
 
