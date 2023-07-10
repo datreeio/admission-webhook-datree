@@ -7,6 +7,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/go-cmp v0.5.9
 	github.com/lithammer/shortuuid v3.0.0+incompatible
+	github.com/openshift/api v0.0.0-20230705144233-e28cd4dd28a8
 	github.com/openshift/client-go v0.0.0-20230705133330-7f808ad59404
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/stretchr/testify v1.8.1
@@ -33,7 +34,6 @@ require (
 	github.com/jinzhu/copier v0.3.5 // indirect
 	github.com/mikefarah/yq/v4 v4.27.3 // indirect
 	github.com/open-policy-agent/opa v0.49.2 // indirect
-	github.com/openshift/api v0.0.0-20230705144233-e28cd4dd28a8 // indirect
 	github.com/owenrumney/go-sarif/v2 v2.1.2 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
