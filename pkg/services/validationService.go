@@ -84,20 +84,22 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	resourceUserInfo := admissionReviewReq.Request.UserInfo
 
-	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
+	saveMetadataAndReturnAResponseForSkippedResource := func(addSkipWarning bool) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
-		*warningMessages = append([]string{
-			fmt.Sprintf("⏩ Object with name \"%s\" was skipped by Datree's policy check.", resourceName),
-			"👉 To avoid skipping this resource, contact support using the live chat: https://app.datree.io/",
-		}, *warningMessages...)
+		if addSkipWarning {
+			*warningMessages = append([]string{
+				fmt.Sprintf("⏩ Object with name \"%s\" was skipped by Datree's policy check.", resourceName),
+				"👉 To avoid skipping this resource, contact support using the live chat: https://app.datree.io/",
+			}, *warningMessages...)
+		}
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
 
 	shouldValidatedResourceData := ShouldResourceBeValidated(admissionReviewReq, rootObject)
 
 	if !shouldValidatedResourceData.ShouldValidate {
-		return saveMetadataAndReturnAResponseForSkippedResource()
+		return saveMetadataAndReturnAResponseForSkippedResource(false)
 	}
 
 	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
@@ -115,7 +117,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	}
 
 	if ShouldResourceBeSkippedByConfigMapScanningFilters(admissionReviewReq, rootObject) {
-		return saveMetadataAndReturnAResponseForSkippedResource()
+		return saveMetadataAndReturnAResponseForSkippedResource(true)
 	}
 
 	// convert default rules string into DefaultRulesDefinitions structure
