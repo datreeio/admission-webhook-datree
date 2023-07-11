@@ -72,8 +72,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- with .Values.datree.enabledWarnings }}
             - name: DATREE_ENABLED_WARNINGS
-              value: "{{.Values.datree.enabledWarnings}}"
+              value: '{{ join "," . }}'
+            {{- end }}
           {{- with .Values.securityContext }}
           securityContext: {{ toYaml . | nindent 12 }}
           {{- end }}

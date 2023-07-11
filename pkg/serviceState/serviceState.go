@@ -134,11 +134,9 @@ type EnabledWarnings struct {
 
 func (s *ServiceState) GetEnabledWarnings() EnabledWarnings {
 	// Environment variables are plain strings and not arrays, so we need to parse the string to get the enabled warnings
-	// input example [failedPolicyCheck RBACBypassed skippedBySkipList]
+	// input example failedPolicyChec,RBACBypassed,skippedBySkipList
 	enabledWarningsStr := s.enabledWarnings
-	enabledWarningsStr = strings.ReplaceAll(enabledWarningsStr, "[", "")
-	enabledWarningsStr = strings.ReplaceAll(enabledWarningsStr, "]", "")
-	enabledWarningsStrList := strings.Split(enabledWarningsStr, " ")
+	enabledWarningsStrList := strings.Split(enabledWarningsStr, ",")
 	enabledWarningsTypes := []string{"passedPolicyCheck", "failedPolicyCheck", "RBACBypassed", "skippedBySkipList"}
 	enabledWarnings := EnabledWarnings{}
 
