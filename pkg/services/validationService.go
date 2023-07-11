@@ -83,11 +83,12 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
 	resourceUserInfo := admissionReviewReq.Request.UserInfo
+	enabledWarnings := vs.State.GetEnabledWarnings()
 
 	saveMetadataAndReturnAResponseForSkippedResource := func(addSkipWarning bool) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
-		if addSkipWarning {
+		if addSkipWarning && enabledWarnings.SkippedBySkipList {
 			*warningMessages = append([]string{
 				fmt.Sprintf("⏩ Object with name \"%s\" was skipped by Datree's policy check.", resourceName),
 				"👉 To avoid skipping this resource, contact support using the live chat: https://app.datree.io/",
@@ -212,18 +213,20 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 
 		if shouldBypassByPermissions && didFailCurrentPolicyCheck {
-			*warningMessages = append([]string{
-				"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
-			}, *warningMessages...)
+			if enabledWarnings.RBACBypassed {
+				*warningMessages = append([]string{
+					"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
+				}, *warningMessages...)
+			}
 		} else if !vs.State.GetIsEnforceMode() {
 			baseUrl := strings.Split(prerunData.RegistrationURL, "datree.io")[0] + "datree.io"
 			invocationUrl := fmt.Sprintf("%s/cli/invocations/%d?webhook=true", baseUrl, cliEvaluationId)
-			if didFailCurrentPolicyCheck {
+			if didFailCurrentPolicyCheck && enabledWarnings.FailedPolicyCheck {
 				*warningMessages = append([]string{
 					fmt.Sprintf("🚩 Object with name \"%s\" and kind \"%s\" failed the policy check for policy \"%s\"", resourceName, resourceKind, policyName),
 					fmt.Sprintf("👉 Get the full report %s", invocationUrl),
 				}, *warningMessages...)
-			} else {
+			} else if !didFailCurrentPolicyCheck && enabledWarnings.PassedPolicyCheck {
 				*warningMessages = append([]string{
 					fmt.Sprintf("✅  Object with name \"%s\" and kind \"%s\" passed Datree's policy check for policy \"%s\"", resourceName, resourceKind, policyName),
 					fmt.Sprintf("👉 Get the full report %s", invocationUrl),

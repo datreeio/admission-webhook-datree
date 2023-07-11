@@ -37,6 +37,12 @@ datree:
   output:
   # Don’t send policy checks metadata to the backend. (boolean ,optional)
   noRecord:
+  # choose which warnings to enable. (string array ,optional)
+  enabledWarnings:
+    - failedPolicyCheck
+    - skippedBySkipList
+    - passedPolicyCheck
+    - RBACBypassed
   # The name of the cluster link for cluster name in your dashboard. (string ,optional)
   clusterName: "minikube"
   # How often should the scan run in hours. (int, optional, default: 1 )

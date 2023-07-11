@@ -6,6 +6,7 @@ import (
 	"github.com/ghodss/yaml"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -30,6 +31,7 @@ type ServiceState struct {
 	output            string
 	verbose           string
 	bypassPermissions *BypassPermissions
+	enabledWarnings   string
 }
 
 func New() *ServiceState {
@@ -46,6 +48,7 @@ func New() *ServiceState {
 		output:            os.Getenv(enums.Output),
 		verbose:           os.Getenv(enums.Verbose),
 		bypassPermissions: readBypassPermissions(),
+		enabledWarnings:   os.Getenv(enums.EnabledWarnings),
 	}
 }
 
@@ -120,6 +123,40 @@ func (s *ServiceState) GetBypassPermissions() *BypassPermissions {
 
 func (s *ServiceState) SetBypassPermissions(bypassPermissions *BypassPermissions) {
 	s.bypassPermissions = bypassPermissions
+}
+
+type EnabledWarnings struct {
+	PassedPolicyCheck bool
+	FailedPolicyCheck bool
+	RBACBypassed      bool
+	SkippedBySkipList bool
+}
+
+func (s *ServiceState) GetEnabledWarnings() EnabledWarnings {
+	enabledWarningsStr := s.enabledWarnings
+	enabledWarningsStr = strings.ReplaceAll(enabledWarningsStr, "[", "")
+	enabledWarningsStr = strings.ReplaceAll(enabledWarningsStr, "]", "")
+	enabledWarningsStrList := strings.Split(enabledWarningsStr, " ")
+	enabledWarningsTypes := []string{"passedPolicyCheck", "failedPolicyCheck", "RBACBypassed", "skippedBySkipList"}
+	enabledWarnings := EnabledWarnings{}
+
+	for _, enabledWarningType := range enabledWarningsTypes {
+		for _, enabledWarningStr := range enabledWarningsStrList {
+			if enabledWarningStr == enabledWarningType {
+				switch enabledWarningType {
+				case "passedPolicyCheck":
+					enabledWarnings.PassedPolicyCheck = true
+				case "failedPolicyCheck":
+					enabledWarnings.FailedPolicyCheck = true
+				case "RBACBypassed":
+					enabledWarnings.RBACBypassed = true
+				case "skippedBySkipList":
+					enabledWarnings.SkippedBySkipList = true
+				}
+			}
+		}
+	}
+	return enabledWarnings
 }
 
 type Namespaces struct {
