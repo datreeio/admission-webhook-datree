@@ -167,6 +167,7 @@ func TestValidateRequestBodyWithNotAllowedK8sResourceBypassed(t *testing.T) {
 
 func TestValidateRequestBodyWithNotAllowedK8sResourceEnforceModeOff(t *testing.T) {
 	setMockEnv(t)
+	t.Setenv(enums.EnabledWarnings, "failedPolicyCheck")
 	t.Setenv(enums.Enforce, "false")
 	var applyRequestNotAllowed admission.AdmissionReview
 

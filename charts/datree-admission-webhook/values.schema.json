@@ -110,6 +110,15 @@
               }
             }
           }
+        },
+        "enabledWarnings": {
+          "title": "The enablesWarnings Schema",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["failedPolicyCheck", "skippedBySkipList", "passedPolicyCheck", "RBACBypassed"]
+          },
+          "default": true
         }
       }
     }

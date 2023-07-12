@@ -122,6 +122,19 @@ null
 </td>
 		</tr>
 		<tr>
+			<td>datree.enabledWarnings</td>
+			<td>Choose which warnings to enable. (string array ,optional)</td>
+			<td><pre lang="json">
+[
+  "failedPolicyCheck",
+  "skippedBySkipList",
+  "passedPolicyCheck",
+  "RBACBypassed"
+]
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>datree.clusterName</td>
 			<td>The name of the cluster link for cluster name in your dashboard (string ,optional)</td>
 			<td><pre lang="json">
