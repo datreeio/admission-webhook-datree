@@ -191,7 +191,8 @@ null
 			<td>Excluded resources from policy checks. ("namespace;kind;name" ,optional)</td>
 			<td><pre lang="json">
 [
-  "(.*);(.*);(^aws-node.*)"
+  "(.*);(.*);(^aws-node.*)",
+  "(^openshift.*);(.*);(.*)"
 ]
 </pre>
 </td>
