@@ -71,11 +71,11 @@ image:
 # Security context for the containers
 securityContext:
   allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
+#  readOnlyRootFilesystem: true
+#  runAsNonRoot: true
   runAsUser: 25000
   capabilities:
-    drop: [ "ALL" ]
+#    drop: [ "ALL" ]
   seccompProfile:
     type: RuntimeDefault
 resources: { }
@@ -139,3 +139,5 @@ livenessProbe:
   enabled: false
 readinessProbe:
   enabled: false
+cert-manager:
+  installCRDs: true

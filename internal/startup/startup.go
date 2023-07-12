@@ -3,6 +3,7 @@ package startup
 import (
 	"errors"
 	"fmt"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient2"
 	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"net/http"
@@ -38,6 +39,9 @@ func Start() {
 	if port == "" {
 		port = "8443"
 	}
+
+	k8sClient2Instance, err := k8sClient2.NewK8sClient()
+	_, err = k8sClient2Instance.DoesValidatingWebhookConfigurationExist()
 
 	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
