@@ -142,7 +142,7 @@ metadata:
 spec:
   isCA: true
   commonName: my-selfsigned-ca
-  secretName: webhook-server-tls2
+  secretName: webhook-server-tls
   privateKey:
     algorithm: ECDSA
     size: 256
@@ -158,5 +158,5 @@ metadata:
   namespace: datree
 spec:
   ca:
-    secretName: webhook-server-tls2
+    secretName: webhook-server-tls
 # example from: https://cert-manager.io/docs/configuration/selfsigned/#bootstrapping-ca-issuers

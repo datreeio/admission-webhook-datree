@@ -34,7 +34,7 @@ func NewK8sClient() (*k8sClient, error) {
 	}, nil
 }
 
-func (kc *k8sClient) DoesValidatingWebhookConfigurationExist() (any, error) {
+func (kc *k8sClient) DoesValidatingWebhookConfigurationExist(certificateContent []byte) (any, error) {
 
 	result, err := kc.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Get(context.TODO(), "datree-webhook", metav1.GetOptions{})
 
@@ -43,8 +43,16 @@ func (kc *k8sClient) DoesValidatingWebhookConfigurationExist() (any, error) {
 	fmt.Println(err)
 	fmt.Println("*******************")
 
-	result.Webhooks[0].ClientConfig.CABundle = []byte("bbbbbbbbbb")
+	// update the CABundle
+	result.Webhooks[0].ClientConfig.CABundle = certificateContent
 
+	// remove the item at index 1
+	matchExpressions := result.Webhooks[0].NamespaceSelector.MatchExpressions
+	if len(matchExpressions) > 1 {
+		result.Webhooks[0].NamespaceSelector.MatchExpressions = append(matchExpressions[:1], matchExpressions[2:]...)
+	}
+	
+	// update the ValidatingWebhookConfiguration
 	result2, err2 := kc.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Update(
 		context.TODO(),
 		result,

@@ -40,9 +40,6 @@ func Start() {
 		port = "8443"
 	}
 
-	k8sClient2Instance, err := k8sClient2.NewK8sClient()
-	_, err = k8sClient2Instance.DoesValidatingWebhookConfigurationExist()
-
 	state := servicestate.New()
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
@@ -95,6 +92,15 @@ func Start() {
 	if err != nil {
 		panic(err)
 	}
+
+	certificateContent, readFileError := os.ReadFile(certPath)
+	fmt.Println("certificateContent", certificateContent)
+	if readFileError != nil {
+		panic(readFileError)
+	}
+
+	k8sClient2Instance, err := k8sClient2.NewK8sClient()
+	_, err = k8sClient2Instance.DoesValidatingWebhookConfigurationExist(certificateContent)
 
 	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &internalLogger, openshiftServiceInstance)
 	healthController := controllers.NewHealthController()
