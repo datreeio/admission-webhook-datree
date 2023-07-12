@@ -93,14 +93,17 @@ func Start() {
 		panic(err)
 	}
 
-	certificateContent, readFileError := os.ReadFile(certPath)
-	fmt.Println("certificateContent", certificateContent)
-	if readFileError != nil {
-		panic(readFileError)
-	}
-
+	// TODO - do this after the server is up
+	// TODO - only do this from the leader pod
+	// activate validating webhook configuration
 	k8sClient2Instance, err := k8sClient2.NewK8sClient()
-	_, err = k8sClient2Instance.DoesValidatingWebhookConfigurationExist(certificateContent)
+	if err != nil {
+		panic(err)
+	}
+	err = k8sClient2Instance.ActivateValidatingWebhookConfiguration(certPath)
+	if err != nil {
+		panic(err)
+	}
 
 	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &internalLogger, openshiftServiceInstance)
 	healthController := controllers.NewHealthController()
