@@ -43,8 +43,22 @@ func (kc *k8sClient) DoesValidatingWebhookConfigurationExist() (any, error) {
 	fmt.Println(err)
 	fmt.Println("*******************")
 
+	result.Webhooks[0].ClientConfig.CABundle = []byte("bbbbbbbbbb")
+
+	result2, err2 := kc.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Update(
+		context.TODO(),
+		result,
+		metav1.UpdateOptions{},
+	)
+
+	fmt.Println("*******************")
+	fmt.Println(result2)
+	fmt.Println(err2)
+	fmt.Println("*******************")
+
 	return nil, nil
 }
+
 func (kc *k8sClient) applyValidatingWebhookConfiguration() error {
 	return nil
 }
