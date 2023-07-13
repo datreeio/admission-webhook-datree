@@ -95,6 +95,9 @@ func Start() {
 
 	// TODO - do this after the server is up
 	// TODO - only do this from the leader pod
+	// TODO - are validatingWebhookConfigurations created before or after deployments?
+	// TODO - check cert manager compatibility: https://cert-manager.io/docs/installation/compatibility/
+	// TODO - Build Failed: Internal error occurred: failed calling webhook "webhook.cert-manager.io": failed to call webhook: Post
 	// activate validating webhook configuration
 	k8sClient2Instance, err := k8sClient2.NewK8sClient()
 	if err != nil {

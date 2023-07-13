@@ -141,3 +141,9 @@ readinessProbe:
   enabled: false
 cert-manager:
   installCRDs: true
+#  namespace: cert-manager
+#  rbac:
+#    create: true
+#  global:
+#    leaderElection:
+#      namespace: cert-manager
