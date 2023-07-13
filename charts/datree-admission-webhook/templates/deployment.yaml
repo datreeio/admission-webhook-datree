@@ -108,9 +108,6 @@ spec:
           volumeMounts:
             - mountPath: /etc/webhook-certs
               name: volume
-            - name: webhook-tls-certs
-              mountPath: /run/secrets/tls
-              readOnly: true
             - name: webhook-config
               mountPath: /config
               readOnly: true
@@ -118,9 +115,6 @@ spec:
         - name: volume
           persistentVolumeClaim:
             claimName: volume-claim
-        - name: webhook-tls-certs
-          secret:
-            secretName: webhook-server-tls
         - name: webhook-config
           projected:
             sources:

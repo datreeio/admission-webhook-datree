@@ -19,7 +19,6 @@ const certsFolder = "/etc/webhook-certs"
 const TlsCertPath = certsFolder + "/tls.crt"
 const TlsKeyPath = certsFolder + "/tls.key"
 const CaCertPath = certsFolder + "/ca.crt"
-const CaKeyPath = certsFolder + "/ca.key"
 
 type AllCertificates struct {
 	Cert   []byte
@@ -43,7 +42,7 @@ func doCertificatesExist() bool {
 		return true
 	}
 
-	return doesFileExist(TlsCertPath) && doesFileExist(TlsKeyPath) && doesFileExist(CaCertPath) && doesFileExist(CaKeyPath)
+	return doesFileExist(TlsCertPath) && doesFileExist(TlsKeyPath) && doesFileExist(CaCertPath)
 }
 
 func generateCertificates() {
@@ -81,20 +80,18 @@ func generateCertificates() {
 		Bytes: caBytes,
 	})
 
-	dnsNames := []string{"webhook-service",
-		"webhook-service.default", "webhook-service.default.svc"}
-	commonName := "datree-webhook-server.datree.svc" // TODO use namespace from config
+	webhookDNS := "datree-webhook-server.datree.svc" // TODO use namespace from config
 
 	// server cert config
 	cert := &x509.Certificate{
-		DNSNames:     dnsNames,
+		DNSNames:     []string{webhookDNS},
 		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
-			CommonName:   commonName,
-			Organization: []string{"velotio.com"},
+			CommonName:   fmt.Sprintf("/CN=%v", webhookDNS),
+			Organization: []string{"/CN=Datree Admission Controller Webhook CA"},
 		},
 		NotBefore:    time.Now(),
-		NotAfter:     time.Now().AddDate(1, 0, 0),
+		NotAfter:     time.Now().AddDate(5, 0, 0),
 		SubjectKeyId: []byte{1, 2, 3, 4, 6},
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature,
@@ -124,7 +121,12 @@ func generateCertificates() {
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(serverPrivKey),
 	})
-	
+
+	err = writeFile(CaCertPath, caPEM)
+	if err != nil {
+		log.Panic(err)
+	}
+
 	err = writeFile(TlsCertPath, serverCertPEM)
 	if err != nil {
 		log.Panic(err)

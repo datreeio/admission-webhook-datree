@@ -98,7 +98,7 @@ func Start() {
 	if err != nil {
 		fmt.Printf("Failed to create k8s client: %s \n", err.Error())
 	}
-	err = k8sClient2Instance.ActivateValidatingWebhookConfiguration(cert_manager.CaCertPath)
+	err = k8sClient2Instance.ActivateValidatingWebhookConfiguration()
 	if err != nil {
 		fmt.Printf("Failed to activate validating webhook configuration: %s \n", err.Error())
 	}

@@ -2,23 +2,18 @@ package k8sClient2
 
 import (
 	"context"
-	"fmt"
+	cert_manager "github.com/datreeio/admission-webhook-datree/pkg/cert-manager"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"os"
 )
 
-type k8sClientInterface interface {
-	doesValidatingWebhookConfigurationExist() (any, error)
-	applyValidatingWebhookConfiguration() (any, error)
-}
-
-type k8sClient struct {
+type K8sClient struct {
 	clientset *kubernetes.Clientset
 }
 
-func NewK8sClient() (*k8sClient, error) {
+func NewK8sClient() (*K8sClient, error) {
 	// creates the in-cluster config
 	config, err := rest.InClusterConfig()
 	if err != nil {
@@ -30,20 +25,16 @@ func NewK8sClient() (*k8sClient, error) {
 		return nil, err
 	}
 
-	return &k8sClient{
+	return &K8sClient{
 		clientset: clientsetInstance,
 	}, nil
 }
 
-func (kc *k8sClient) ActivateValidatingWebhookConfiguration(caCertPath string) error {
-	certificateContent, readFileError := os.ReadFile(caCertPath)
+func (kc *K8sClient) ActivateValidatingWebhookConfiguration() error {
+	certificateContent, readFileError := os.ReadFile(cert_manager.CaCertPath)
 	if readFileError != nil {
 		return readFileError
 	}
-
-	fmt.Println("@@@@@@@@@@@@@@@@@")
-	fmt.Println(string(certificateContent))
-	fmt.Println("@@@@@@@@@@@@@@@@@")
 
 	existingValidatingWebhookConfiguration, err := kc.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Get(context.TODO(), "datree-webhook", metav1.GetOptions{})
 	if err != nil {
@@ -64,9 +55,5 @@ func (kc *k8sClient) ActivateValidatingWebhookConfiguration(caCertPath string) e
 		return err
 	}
 
-	return nil
-}
-
-func (kc *k8sClient) applyValidatingWebhookConfiguration() error {
 	return nil
 }
