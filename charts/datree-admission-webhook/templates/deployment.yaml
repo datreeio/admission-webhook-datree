@@ -106,6 +106,8 @@ spec:
             - containerPort: 5555
               name: debug
           volumeMounts:
+            - mountPath: /app/folder
+              name: volume
             - name: webhook-tls-certs
               mountPath: /run/secrets/tls
               readOnly: true
@@ -113,6 +115,9 @@ spec:
               mountPath: /config
               readOnly: true
       volumes:
+        - name: volume
+          persistentVolumeClaim:
+            claimName: volume-claim
         - name: webhook-tls-certs
           secret:
             secretName: webhook-server-tls
@@ -125,3 +130,15 @@ spec:
             - configMap:
                 name: webhook-scanning-filters
                 optional: true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: volume-claim
+  namespace: datree
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 2Gi
