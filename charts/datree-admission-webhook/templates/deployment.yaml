@@ -1,5 +1,7 @@
 {{- $emptyTokenMessage := "\n\t❌ The installation failed since the token that was provided is invalid.\n\t💡 To fix this issue:\n\t\t1. Get your token at: https://app.datree.io/settings/token-management\n\t\t2. Reinstall Datree and set your token using helm:\n\n\t\thelm install -n datree datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<YOUR_TOKEN>\n" -}}
 {{- $uuidv4RegexPattern := "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" -}}
+{{- $webhookCertsVolumeName := "webhook-certs-volume" -}}
+{{- $webhookCertsVolumeClaimName := "webhook-certs-volume-claim" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -107,14 +109,14 @@ spec:
               name: debug
           volumeMounts:
             - mountPath: /etc/webhook-certs
-              name: volume
+              name: {{ $webhookCertsVolumeName }}
             - name: webhook-config
               mountPath: /config
               readOnly: true
       volumes:
-        - name: volume
+        - name: {{ $webhookCertsVolumeName }}
           persistentVolumeClaim:
-            claimName: volume-claim
+            claimName: {{ $webhookCertsVolumeClaimName }}
         - name: webhook-config
           projected:
             sources:
@@ -128,11 +130,11 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: volume-claim
-  namespace: datree
+  name: {{ $webhookCertsVolumeClaimName }}
+  namespace: {{ template "datree.namespace" . }}
 spec:
   accessModes:
     - ReadWriteMany
   resources:
     requests:
-      storage: 2Gi
+      storage: 1Gi
