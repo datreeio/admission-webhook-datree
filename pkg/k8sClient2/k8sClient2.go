@@ -38,7 +38,7 @@ func (kc *k8sClient) ActivateValidatingWebhookConfiguration(certPath string) err
 	certificateContent, readFileError := os.ReadFile(certPath)
 	if readFileError != nil {
 		return readFileError
-	}
+	}x
 
 	result, err := kc.clientset.AdmissionregistrationV1().ValidatingWebhookConfigurations().Get(context.TODO(), "datree-webhook", metav1.GetOptions{})
 	if err != nil {
