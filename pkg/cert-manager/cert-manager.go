@@ -15,9 +15,9 @@ import (
 	"time"
 )
 
-const certsFolder = "/app/folder/certs"
-const CertPath = certsFolder + "/tls.crt"
-const KeyPath = certsFolder + "/tls.key"
+const certsFolder = "/etc/webhook-certs"
+const TlsCertPath = certsFolder + "/tls.crt"
+const TlsKeyPath = certsFolder + "/tls.key"
 const CaCertPath = certsFolder + "/ca.crt"
 const CaKeyPath = certsFolder + "/ca.key"
 
@@ -43,7 +43,7 @@ func doCertificatesExist() bool {
 		return true
 	}
 
-	return doesFileExist(CertPath) && doesFileExist(KeyPath) && doesFileExist(CaCertPath) && doesFileExist(CaKeyPath)
+	return doesFileExist(TlsCertPath) && doesFileExist(TlsKeyPath) && doesFileExist(CaCertPath) && doesFileExist(CaKeyPath)
 }
 
 func generateCertificates() {
@@ -124,17 +124,13 @@ func generateCertificates() {
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(serverPrivKey),
 	})
-
-	err = os.MkdirAll("/app/folder/certs/", 0666)
-	if err != nil {
-		log.Panic(err)
-	}
-	err = writeFile("/app/folder/certs/tls.crt", serverCertPEM)
+	
+	err = writeFile(TlsCertPath, serverCertPEM)
 	if err != nil {
 		log.Panic(err)
 	}
 
-	err = writeFile("/app/folder/certs/tls.key", serverPrivKeyPEM)
+	err = writeFile(TlsKeyPath, serverPrivKeyPEM)
 	if err != nil {
 		log.Panic(err)
 	}

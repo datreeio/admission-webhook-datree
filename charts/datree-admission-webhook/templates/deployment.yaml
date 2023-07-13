@@ -106,7 +106,7 @@ spec:
             - containerPort: 5555
               name: debug
           volumeMounts:
-            - mountPath: /app/folder
+            - mountPath: /etc/webhook-certs
               name: volume
             - name: webhook-tls-certs
               mountPath: /run/secrets/tls

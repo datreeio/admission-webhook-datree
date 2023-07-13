@@ -116,7 +116,7 @@ func Start() {
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
-	if err := http.ListenAndServeTLS(":"+port, cert_manager.CertPath, cert_manager.KeyPath, nil); err != nil {
+	if err := http.ListenAndServeTLS(":"+port, cert_manager.TlsCertPath, cert_manager.TlsKeyPath, nil); err != nil {
 		err = http.ListenAndServe(":"+port, nil)
 		if err != nil {
 			fmt.Println("Failed to start http server", err.Error())
