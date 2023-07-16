@@ -51,7 +51,7 @@ func generateCertificates() {
 	ca := &x509.Certificate{
 		SerialNumber: big.NewInt(2020),
 		Subject: pkix.Name{
-			Organization: []string{"velotio.com"},
+			Organization: []string{"/CN=Datree Admission Controller Webhook CA"},
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(1, 0, 0),
