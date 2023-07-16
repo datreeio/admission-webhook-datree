@@ -31,6 +31,8 @@ github.com/cncf/xds/go v0.0.0-20210312221358-fbca930ec8ed/go.mod h1:eXthEFrGJvWH
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/datreeio/datree v1.8.42 h1:nR2HnqdZFzY8bD78eN8yYLMfaRxmOPYs3MonnOVoYbU=
 github.com/datreeio/datree v1.8.42/go.mod h1:H9iOfrpbK6pLk+5q9e97uUf+hfyFezhnE7pp/ZE0rHA=
+github.com/datreeio/datree v1.9.10 h1:bmyzB49+IPz0t5AMRnufTlS/UeebP9NzpNTWBi3p5cI=
+github.com/datreeio/datree v1.9.10/go.mod h1:RWd7yt4qEFfz2wxaAeJF3oqrJf68ktY6OOuX4c7+l7A=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

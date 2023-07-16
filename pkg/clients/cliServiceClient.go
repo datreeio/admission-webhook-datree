@@ -161,21 +161,44 @@ type WebhookEvaluationRequestData struct {
 	MetadataName   string
 }
 
+type BypassCriteriaType int
+
+const (
+	ServiceAccount BypassCriteriaType = iota
+	UserAccount
+	Group
+)
+
+func (s BypassCriteriaType) String() string {
+	switch s {
+	case ServiceAccount:
+		return "serviceAccount"
+	case UserAccount:
+		return "userAccount"
+	case Group:
+		return "group"
+	default:
+		return "unknown"
+	}
+}
+
 type EvaluationResultRequest struct {
-	ClientId           string                                      `json:"clientId"`
-	Token              string                                      `json:"token"`
-	Metadata           *Metadata                                   `json:"metadata"`
-	K8sVersion         string                                      `json:"k8sVersion"`
-	PolicyName         string                                      `json:"policyName"`
-	FailedYamlFiles    []string                                    `json:"failedYamlFiles"`
-	FailedK8sFiles     []string                                    `json:"failedK8sFiles"`
-	AllExecutedRules   []cliClient.RuleData                        `json:"allExecutedRules"`
-	AllEvaluatedFiles  []cliClient.FileData                        `json:"allEvaluatedFiles"`
-	PolicyCheckResults map[string]map[string]*cliClient.FailedRule `json:"policyCheckResults"`
-	ClusterUuid        k8sTypes.UID                                `json:"clusterUuid,omitempty"`
-	Namespace          string                                      `json:"namespace,omitempty"`
-	Kind               string                                      `json:"kind"`
-	MetadataName       string                                      `json:"metadataName"`
+	ClientId                string                                      `json:"clientId"`
+	Token                   string                                      `json:"token"`
+	Metadata                *Metadata                                   `json:"metadata"`
+	K8sVersion              string                                      `json:"k8sVersion"`
+	PolicyName              string                                      `json:"policyName"`
+	FailedYamlFiles         []string                                    `json:"failedYamlFiles"`
+	FailedK8sFiles          []string                                    `json:"failedK8sFiles"`
+	AllExecutedRules        []cliClient.RuleData                        `json:"allExecutedRules"`
+	AllEvaluatedFiles       []cliClient.FileData                        `json:"allEvaluatedFiles"`
+	PolicyCheckResults      map[string]map[string]*cliClient.FailedRule `json:"policyCheckResults"`
+	ClusterUuid             k8sTypes.UID                                `json:"clusterUuid,omitempty"`
+	Namespace               string                                      `json:"namespace,omitempty"`
+	Kind                    string                                      `json:"kind"`
+	MetadataName            string                                      `json:"metadataName"`
+	MatchedBypassCriteria   *BypassCriteria                             `json:"matchedBypassCriteria,omitempty"`
+	IsBypassedByPermissions bool                                        `json:"isBypassedByPermissions"`
 }
 
 type Metadata struct {
@@ -187,16 +210,22 @@ type Metadata struct {
 	EvaluationDurationSeconds float64              `json:"evaluationDurationSeconds"`
 }
 
+type BypassCriteria struct {
+	Type  BypassCriteriaType
+	Value string
+}
+
 type ClusterContext struct {
 	WebhookVersion string `json:"webhookVersion"`
 	IsInCluster    bool   `json:"isInCluster"`
 	IsEnforceMode  bool   `json:"isEnforceMode"`
 }
 
-func (c *CliClient) SendWebhookEvaluationResult(request *EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
+func (c *CliClient) SaveWebhookEvaluationResults(request *EvaluationResultRequest) (*cliClient.SendEvaluationResultsResponse, error) {
 	if c.networkValidator.IsLocalMode() {
 		return &cliClient.SendEvaluationResultsResponse{}, nil
 	}
+
 	httpRes, err := c.httpClient.Request(http.MethodPost, "/cli/evaluation/policyCheck/result", request, c.flagsHeaders)
 	if err != nil {
 		networkErr := c.networkValidator.IdentifyNetworkError(err)
