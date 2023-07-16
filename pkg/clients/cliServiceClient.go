@@ -172,11 +172,11 @@ const (
 func (s BypassCriteriaType) String() string {
 	switch s {
 	case ServiceAccount:
-		return "serviceAccount"
+		return "serviceAccounts"
 	case UserAccount:
-		return "userAccount"
+		return "userAccounts"
 	case Group:
-		return "group"
+		return "groups"
 	default:
 		return "unknown"
 	}
