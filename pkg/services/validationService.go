@@ -85,10 +85,9 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
-	resourceUserInfo := admissionReviewReq.Request.UserInfo
 	enabledWarnings := vs.State.GetEnabledWarnings()
 
-	saveMetadataAndReturnAResponseForSkippedResource := func() (admissionReview *admission.AdmissionReview, isSkipped bool) {
+	saveMetadataAndReturnAResponseForSkippedResource := func(addSkipWarning bool) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, vs.State.GetK8sVersion(), "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		if addSkipWarning && enabledWarnings.SkippedBySkipList {
