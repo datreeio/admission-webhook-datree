@@ -211,8 +211,8 @@ type Metadata struct {
 }
 
 type BypassCriteria struct {
-	Type  BypassCriteriaType
-	Value string
+	Type  BypassCriteriaType `json:"type"`
+	Value string             `json:"value"`
 }
 
 type ClusterContext struct {
