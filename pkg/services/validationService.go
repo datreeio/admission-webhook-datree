@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 	"net/http"
 	"os"
 	"regexp"
@@ -12,10 +11,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
+	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
+
 	authenticationv1 "k8s.io/api/authentication/v1"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
-	servicestate "github.com/datreeio/admission-webhook-datree/pkg/serviceState"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
 
@@ -23,16 +24,15 @@ import (
 	"github.com/datreeio/admission-webhook-datree/pkg/server"
 
 	cliDefaultRules "github.com/datreeio/datree/pkg/defaultRules"
+	"github.com/datreeio/datree/pkg/utils"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 
 	policyFactory "github.com/datreeio/datree/bl/policy"
 	"github.com/datreeio/datree/pkg/ciContext"
-	baseCliClient "github.com/datreeio/datree/pkg/cliClient"
 	"github.com/datreeio/datree/pkg/evaluation"
 	"github.com/datreeio/datree/pkg/extractor"
 	"github.com/datreeio/datree/pkg/printer"
-	"github.com/datreeio/datree/pkg/utils"
 
 	cliClient "github.com/datreeio/admission-webhook-datree/pkg/clients"
 
@@ -64,6 +64,8 @@ type ValidationService struct {
 	Logger           *logger.Logger
 }
 
+var clusterRequestMetadataAggregatorMap = clusterRequestMetadataMapNew()
+
 func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
@@ -72,7 +74,8 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	ciContext := ciContext.Extract()
 
-	clusterK8sVersion := vs.State.GetK8sVersion()
+	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
+
 	token := vs.State.GetToken()
 	if token == "" {
 		errorMessage := "no DATREE_TOKEN was found in env"
@@ -82,11 +85,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	rootObject := getResourceRootObject(admissionReviewReq)
 	namespace, resourceKind, resourceName, managers := getResourceMetadata(admissionReviewReq, rootObject)
-	resourceUserInfo := admissionReviewReq.Request.UserInfo
 	enabledWarnings := vs.State.GetEnabledWarnings()
 
 	saveMetadataAndReturnAResponseForSkippedResource := func(addSkipWarning bool) (admissionReview *admission.AdmissionReview, isSkipped bool) {
-		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, clusterK8sVersion, "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
+		clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, true, true, resourceKind, resourceName, managers, vs.State.GetK8sVersion(), "", namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
 		vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
 		if addSkipWarning && enabledWarnings.SkippedBySkipList {
 			*warningMessages = append([]string{
@@ -106,11 +108,10 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
 	if err != nil {
 		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
-
-		prerunWarningMsg := "Datree failed to run policy check - an error occurred when pulling your policy"
-		*warningMessages = append(*warningMessages, prerunWarningMsg)
+		*warningMessages = append(*warningMessages, "Datree failed to run policy check - an error occurred when pulling your policy")
 		return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, msg, *warningMessages), true
 	}
+
 	if !vs.State.GetConfigFromHelm() {
 		vs.State.SetIsEnforceMode(prerunData.ActionOnFailure == enums.EnforceActionOnFailure)
 		server.OverrideSkipList(prerunData.IgnorePatterns)
@@ -134,10 +135,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	filesConfigurations := getFileConfiguration(admissionReviewReq.Request)
 
-	evaluator := evaluation.New(vs.CliServiceClient, ciContext)
-
 	allowed := true
-
 	sb := strings.Builder{}
 
 	for _, policyName := range prerunData.ActivePolicies {
@@ -152,32 +150,26 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			continue
 		}
 
-		policyCheckData := evaluation.PolicyCheckData{
-			FilesConfigurations: filesConfigurations,
-			IsInteractiveMode:   false,
-			PolicyName:          policy.Name,
-			Policy:              policy,
-		}
+		evaluationRequest := &EvaluationRequest{Resource: &ResourceMetadata{Namespace: namespace, Kind: resourceKind, Name: resourceName}, PolicyName: policy.Name}
 
 		// evaluate policy against configuration
-		policyCheckResults, err := evaluator.Evaluate(policyCheckData)
+		policyCheckResults, err := evaluator.Evaluate(evaluation.PolicyCheckData{
+			FilesConfigurations: filesConfigurations,
+			IsInteractiveMode:   false,
+			PolicyName:          policyName,
+			Policy:              policy,
+		})
 		if err != nil {
 			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Evaluate err: %s", err.Error()))
 		}
 
-		results := policyCheckResults.FormattedResults
-		passedPolicyCheckCount := 0
-		if results.EvaluationResults != nil {
-			passedPolicyCheckCount = results.EvaluationResults.Summary.FilesPassedCount
-		}
+		matchedBypassCriteria := vs.matchedBypassCriteria(admissionReviewReq.Request.UserInfo, shouldValidatedResourceData.OpenShiftRequester)
+		evaluationResults := &EvaluationResults{Results: policyCheckResults, MatchedBypassCriteria: matchedBypassCriteria, IsBypassedByPermissions: matchedBypassCriteria != nil}
 
-		evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
-
-		// send results to backend
-		noRecords := os.Getenv(enums.NoRecord)
-		if noRecords != "true" {
-			evaluationResultResp, err := vs.sendEvaluationResult(vs.getEvaluationRequestData(policy.Name, startTime,
-				policyCheckResults, namespace, resourceKind, resourceName))
+		if os.Getenv(enums.NoRecord) != "true" {
+			// send results to backend
+			saveEvaluationResultsRequest := vs.createSaveEvaluationResultsRequest(evaluationRequest, evaluationResults, time.Since(startTime))
+			evaluationResultResp, err := vs.CliServiceClient.SaveWebhookEvaluationResults(saveEvaluationResultsRequest)
 			if err == nil {
 				cliEvaluationId = evaluationResultResp.EvaluationId
 			} else {
@@ -187,13 +179,20 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			}
 		}
 
+		passedPolicyCheckCount := 0
+		if policyCheckResults.FormattedResults.EvaluationResults != nil {
+			passedPolicyCheckCount = policyCheckResults.FormattedResults.EvaluationResults.Summary.FilesPassedCount
+		}
+
+		evaluationSummary := getEvaluationSummary(policyCheckResults, passedPolicyCheckCount)
+
 		// get results text
 		resultStr, err := evaluation.GetResultsText(&evaluation.PrintResultsData{
-			Results:           results,
+			Results:           policyCheckResults.FormattedResults,
 			EvaluationSummary: evaluationSummary,
 			LoginURL:          prerunData.RegistrationURL,
 			Printer:           printer.CreateNewPrinter(),
-			K8sVersion:        clusterK8sVersion,
+			K8sVersion:        vs.State.GetK8sVersion(),
 			Verbose:           os.Getenv(enums.Verbose) == "true",
 			PolicyName:        policy.Name,
 			OutputFormat:      os.Getenv(enums.Output),
@@ -203,16 +202,15 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 
 		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
-		shouldBypassByPermissions := vs.shouldBypassByPermissions(resourceUserInfo, shouldValidatedResourceData.OpenShiftRequester)
 
-		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() && !shouldBypassByPermissions {
+		if didFailCurrentPolicyCheck && vs.State.GetIsEnforceMode() && !evaluationResults.IsBypassedByPermissions {
 			allowed = false
 
 			sb.WriteString("\n---\n")
 			sb.WriteString(resultStr)
 		}
 
-		if shouldBypassByPermissions && didFailCurrentPolicyCheck {
+		if evaluationResults.IsBypassedByPermissions && didFailCurrentPolicyCheck {
 			if enabledWarnings.RBACBypassed {
 				*warningMessages = append([]string{
 					"🚩 Your resource failed the policy check, but it has been applied due to your bypass privileges",
@@ -235,70 +233,31 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		}
 	}
 
-	msg = sb.String()
-
 	verifyVersionResponse, err := vs.CliServiceClient.GetVersionRelatedMessages(vs.State.GetServiceVersion())
 	if err != nil {
 		*warningMessages = append(*warningMessages, err.Error())
-	} else {
-		if verifyVersionResponse != nil {
-			*warningMessages = append(*warningMessages, verifyVersionResponse.MessageTextArray...)
-		}
+	} else if verifyVersionResponse != nil {
+		*warningMessages = append(*warningMessages, verifyVersionResponse.MessageTextArray...)
 	}
 
-	clusterRequestMetadata := getClusterRequestMetadata(vs.State.GetClusterUuid(), vs.State.GetServiceVersion(), cliEvaluationId, token, false, allowed, resourceKind, resourceName, managers, clusterK8sVersion, vs.State.GetPolicyName(), namespace, server.ConfigMapScanningFilters, rootObject.Metadata.OwnerReferences)
-	vs.saveRequestMetadataLogInAggregator(clusterRequestMetadata)
-	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, msg, *warningMessages), false
-}
-
-func (m *clusterRequestMetadataMap) Len() int {
-	return m.entriesCount
-}
-func (m *clusterRequestMetadataMap) ShouldSendBatchToServer() bool {
-	return m.entriesCount >= 500
-}
-
-func (m *clusterRequestMetadataMap) LoadOrStore(logJson string, clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
-	existingLog, loaded := m.clusterRequestMetadataAggregator.LoadOrStore(logJson, clusterRequestMetadata)
-	if loaded {
-		existingLog.(*cliClient.ClusterRequestMetadata).Occurrences++
-	} else {
-		m.entriesCount += 1
-	}
-}
-
-func (m *clusterRequestMetadataMap) Clear() {
-	m.clusterRequestMetadataAggregator = &sync.Map{}
-	m.entriesCount = 0
-}
-
-type clusterRequestMetadataMap struct {
-	entriesCount                     int
-	clusterRequestMetadataAggregator *sync.Map
-}
-
-func clusterRequestMetadataMapNew() *clusterRequestMetadataMap {
-	return &clusterRequestMetadataMap{
-		entriesCount:                     0,
-		clusterRequestMetadataAggregator: &sync.Map{},
-	}
-}
-
-var clusterRequestMetadataAggregatorMap = clusterRequestMetadataMapNew()
-
-func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
-	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
-	if err != nil {
-		vs.ErrorReporter.ReportUnexpectedError(err)
-		logger.LogUtil(err.Error())
-		return
-	}
-	logJson := string(logJsonInBytes)
-	clusterRequestMetadataAggregatorMap.LoadOrStore(logJson, clusterRequestMetadata)
-
-	if clusterRequestMetadataAggregatorMap.ShouldSendBatchToServer() {
-		vs.SendMetadataInBatch()
-	}
+	vs.saveRequestMetadataLogInAggregator(&cliClient.ClusterRequestMetadata{
+		ClusterUuid:              vs.State.GetClusterUuid(),
+		WebhookVersion:           vs.State.GetServiceVersion(),
+		CliEvaluationId:          cliEvaluationId,
+		Token:                    token,
+		Skipped:                  false,
+		Allowed:                  allowed,
+		ResourceKind:             resourceKind,
+		ResourceName:             resourceName,
+		Managers:                 managers,
+		PolicyName:               vs.State.GetPolicyName(),
+		K8sVersion:               vs.State.GetK8sVersion(),
+		Namespace:                namespace,
+		ConfigMapScanningFilters: server.ConfigMapScanningFilters,
+		OwnerReferences:          rootObject.Metadata.OwnerReferences,
+		Occurrences:              1,
+	})
+	return ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, allowed, sb.String(), *warningMessages), false
 }
 
 func (vs *ValidationService) SendMetadataInBatch() {
@@ -311,38 +270,6 @@ func (vs *ValidationService) SendMetadataInBatch() {
 	go vs.CliServiceClient.SendRequestMetadataBatch(cliClient.ClusterRequestMetadataBatchReqBody{MetadataLogs: clusterRequestMetadataArray})
 
 	clusterRequestMetadataAggregatorMap.Clear()
-}
-
-func (vs *ValidationService) sendEvaluationResult(evaluationRequestData cliClient.WebhookEvaluationRequestData) (*baseCliClient.SendEvaluationResultsResponse, error) {
-	var OSInfoFn = utils.NewOSInfo
-	osInfo := OSInfoFn()
-
-	sendEvaluationResultsResponse, err := vs.CliServiceClient.SendWebhookEvaluationResult(&cliClient.EvaluationResultRequest{
-		K8sVersion: evaluationRequestData.EvaluationData.K8sVersion,
-		ClientId:   evaluationRequestData.EvaluationData.ClientId,
-		Token:      evaluationRequestData.EvaluationData.Token,
-		PolicyName: evaluationRequestData.EvaluationData.PolicyName,
-		Metadata: &cliClient.Metadata{
-			Os:              osInfo.OS,
-			PlatformVersion: osInfo.PlatformVersion,
-			KernelVersion:   osInfo.KernelVersion,
-			ClusterContext: &cliClient.ClusterContext{
-				IsInCluster:    true,
-				WebhookVersion: evaluationRequestData.WebhookVersion,
-				IsEnforceMode:  evaluationRequestData.IsEnforceMode,
-			},
-			EvaluationDurationSeconds: evaluationRequestData.EvaluationData.EvaluationDurationSeconds,
-		},
-		AllExecutedRules:   evaluationRequestData.EvaluationData.RulesData,
-		AllEvaluatedFiles:  evaluationRequestData.EvaluationData.FilesData,
-		PolicyCheckResults: evaluationRequestData.EvaluationData.PolicyCheckResults,
-		ClusterUuid:        evaluationRequestData.ClusterUuid,
-		Namespace:          evaluationRequestData.Namespace,
-		Kind:               evaluationRequestData.Kind,
-		MetadataName:       evaluationRequestData.MetadataName,
-	})
-
-	return sendEvaluationResultsResponse, err
 }
 
 func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed bool, msg string, warningMessages []string) *admission.AdmissionReview {
@@ -368,6 +295,68 @@ func ParseEvaluationResponseIntoAdmissionReview(requestUID k8sTypes.UID, allowed
 				Message: message,
 			},
 		},
+	}
+}
+
+type ResourceMetadata struct {
+	Namespace string
+	Kind      string
+	Name      string
+}
+
+type EvaluationRequest struct {
+	Resource   *ResourceMetadata
+	PolicyName string
+}
+
+type EvaluationResults struct {
+	Results                 evaluation.PolicyCheckResultData
+	MatchedBypassCriteria   *cliClient.BypassCriteria
+	IsBypassedByPermissions bool
+}
+
+func (vs *ValidationService) createSaveEvaluationResultsRequest(evaluationRequest *EvaluationRequest, evaluationResults *EvaluationResults, duration time.Duration) *cliClient.EvaluationResultRequest {
+	osInfo := utils.NewOSInfo()
+	return &cliClient.EvaluationResultRequest{
+		K8sVersion: vs.State.GetK8sVersion(),
+		ClientId:   vs.State.GetClientId(),
+		Token:      vs.State.GetToken(),
+		PolicyName: evaluationRequest.PolicyName,
+		Metadata: &cliClient.Metadata{
+			Os:              osInfo.OS,
+			PlatformVersion: osInfo.PlatformVersion,
+			KernelVersion:   osInfo.KernelVersion,
+			ClusterContext: &cliClient.ClusterContext{
+				IsInCluster:    true,
+				WebhookVersion: vs.State.GetServiceVersion(),
+				IsEnforceMode:  vs.State.GetIsEnforceMode(),
+			},
+			EvaluationDurationSeconds: duration.Seconds(),
+		},
+		AllExecutedRules:        evaluationResults.Results.RulesData,
+		AllEvaluatedFiles:       evaluationResults.Results.FilesData,
+		PolicyCheckResults:      evaluationResults.Results.RawResults,
+		ClusterUuid:             vs.State.GetClusterUuid(),
+		Namespace:               evaluationRequest.Resource.Namespace,
+		Kind:                    evaluationRequest.Resource.Kind,
+		MetadataName:            evaluationRequest.Resource.Name,
+		MatchedBypassCriteria:   evaluationResults.MatchedBypassCriteria,
+		IsBypassedByPermissions: evaluationResults.MatchedBypassCriteria != nil,
+	}
+}
+
+func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
+	if err != nil {
+		vs.ErrorReporter.ReportUnexpectedError(err)
+		logger.LogUtil(err.Error())
+		return
+	}
+	logJson := string(logJsonInBytes)
+	clusterRequestMetadataAggregatorMap.LoadOrStore(logJson, clusterRequestMetadata)
+
+	if clusterRequestMetadataAggregatorMap.ShouldSendBatchToServer() {
+		vs.SendMetadataInBatch()
 	}
 }
 
@@ -402,48 +391,68 @@ func (vs *ValidationService) getNamespaceRestrictionsByPolicyName(policyName str
 	return nil
 }
 
-func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1.UserInfo, openShiftRequester string) bool {
-	bypassPermissions := vs.State.GetBypassPermissions()
-
-	if bypassPermissions == nil {
-		return false
-	}
-
-	userName := userInfo.Username
-	groups := userInfo.Groups
+// get the user name from the request
+func (vs *ValidationService) getUserName(userInfo authenticationv1.UserInfo, openShiftRequester string) string {
 	if openShiftRequester != "" {
 		// override username
-		userName = openShiftRequester
+		return openShiftRequester
+	}
 
-		// override groups
+	return userInfo.Username
+}
+
+// get the groups from the request
+func (vs *ValidationService) getGroups(userInfo authenticationv1.UserInfo, openShiftRequester string) []string {
+	if openShiftRequester != "" {
 		groupsFromOpenshiftService, err := vs.OpenshiftService.GetGroupsUserBelongsTo(openShiftRequester)
 		if err != nil {
 			vs.Logger.LogError(fmt.Sprintf("Failed to get groups for user %s from openshift service: %s", openShiftRequester, err.Error()))
-		} else {
-			groups = groupsFromOpenshiftService
 		}
+
+		return groupsFromOpenshiftService
 	}
 
-	for _, userAccount := range bypassPermissions.UserAccounts {
-		if match, _ := regexp.MatchString(userAccount, userName); match {
-			return true
-		}
+	return userInfo.Groups
+}
+
+func (vs *ValidationService) matchedBypassCriteria(userInfo authenticationv1.UserInfo, openShiftRequester string) *cliClient.BypassCriteria {
+	if vs.State.GetBypassPermissions() == nil {
+		return nil
 	}
 
-	for _, serviceAccount := range bypassPermissions.ServiceAccounts {
-		if match, _ := regexp.MatchString(serviceAccount, userName); match {
-			return true
-		}
-	}
+	username := vs.getUserName(userInfo, openShiftRequester)
+	groups := vs.getGroups(userInfo, openShiftRequester)
 
-	for _, bypassGroup := range bypassPermissions.Groups {
-		for _, userInfoGroup := range groups {
-			if match, _ := regexp.MatchString(bypassGroup, userInfoGroup); match {
-				return true
+	for _, userAccount := range vs.State.GetBypassPermissions().UserAccounts {
+		if match, _ := regexp.MatchString(userAccount, username); match {
+			return &cliClient.BypassCriteria{
+				Type:  cliClient.UserAccount,
+				Value: username,
 			}
 		}
 	}
-	return false
+
+	for _, serviceAccount := range vs.State.GetBypassPermissions().ServiceAccounts {
+		if match, _ := regexp.MatchString(serviceAccount, username); match {
+			return &cliClient.BypassCriteria{
+				Type:  cliClient.ServiceAccount,
+				Value: username,
+			}
+		}
+	}
+
+	for _, bypassGroup := range vs.State.GetBypassPermissions().Groups {
+		for _, userInfoGroup := range groups {
+			if match, _ := regexp.MatchString(bypassGroup, userInfoGroup); match {
+				return &cliClient.BypassCriteria{
+					Type:  cliClient.Group,
+					Value: userInfoGroup,
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 func getFileConfiguration(admissionReviewReq *admission.AdmissionRequest) []*extractor.FileConfigurations {
@@ -497,32 +506,6 @@ func getResourceMetadata(admissionReviewReq *admission.AdmissionReview, rootObje
 	return namespace, resourceKind, resourceName, managers
 }
 
-func (vs *ValidationService) getEvaluationRequestData(policyName string,
-	startTime time.Time, policyCheckResults evaluation.PolicyCheckResultData, evaluationNamespace string, kind string, metadataName string) cliClient.WebhookEvaluationRequestData {
-
-	evaluationDurationSeconds := time.Since(startTime).Seconds()
-	evaluationRequestData := cliClient.WebhookEvaluationRequestData{
-		EvaluationData: evaluation.EvaluationRequestData{
-			Token:                     vs.State.GetToken(),
-			ClientId:                  vs.State.GetClientId(),
-			K8sVersion:                vs.State.GetK8sVersion(),
-			PolicyName:                policyName,
-			RulesData:                 policyCheckResults.RulesData,
-			FilesData:                 policyCheckResults.FilesData,
-			PolicyCheckResults:        policyCheckResults.RawResults,
-			EvaluationDurationSeconds: evaluationDurationSeconds,
-		},
-		WebhookVersion: vs.State.GetServiceVersion(),
-		ClusterUuid:    vs.State.GetClusterUuid(),
-		IsEnforceMode:  vs.State.GetIsEnforceMode(),
-		Namespace:      evaluationNamespace,
-		Kind:           kind,
-		MetadataName:   metadataName,
-	}
-
-	return evaluationRequestData
-}
-
 func getClusterRequestMetadata(clusterUuid k8sTypes.UID, webhookVersion string, cliEvaluationId int, token string, skipped bool, allowed bool, resourceKind string, resourceName string,
 	managers []string, clusterK8sVersion string, policyName string, namespace string, configMapScanningFilters server.ConfigMapScanningFiltersType, ownerReferences []cliClient.OwnerReference) *cliClient.ClusterRequestMetadata {
 
@@ -545,4 +528,37 @@ func getClusterRequestMetadata(clusterUuid k8sTypes.UID, webhookVersion string, 
 	}
 
 	return clusterRequestMetadata
+}
+
+type clusterRequestMetadataMap struct {
+	entriesCount                     int
+	clusterRequestMetadataAggregator *sync.Map
+}
+
+func clusterRequestMetadataMapNew() *clusterRequestMetadataMap {
+	return &clusterRequestMetadataMap{
+		entriesCount:                     0,
+		clusterRequestMetadataAggregator: &sync.Map{},
+	}
+}
+
+func (m *clusterRequestMetadataMap) Len() int {
+	return m.entriesCount
+}
+func (m *clusterRequestMetadataMap) ShouldSendBatchToServer() bool {
+	return m.entriesCount >= 500
+}
+
+func (m *clusterRequestMetadataMap) LoadOrStore(logJson string, clusterRequestMetadata *cliClient.ClusterRequestMetadata) {
+	existingLog, loaded := m.clusterRequestMetadataAggregator.LoadOrStore(logJson, clusterRequestMetadata)
+	if loaded {
+		existingLog.(*cliClient.ClusterRequestMetadata).Occurrences++
+	} else {
+		m.entriesCount += 1
+	}
+}
+
+func (m *clusterRequestMetadataMap) Clear() {
+	m.clusterRequestMetadataAggregator = &sync.Map{}
+	m.entriesCount = 0
 }
