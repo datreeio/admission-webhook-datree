@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	authenticationv1 "k8s.io/api/authentication/v1"
 
@@ -412,9 +413,6 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 	userName := userInfo.Username
 	groups := userInfo.Groups
 	if openShiftRequester != "" {
-		// override username
-		userName = openShiftRequester
-
 		// override groups
 		groupsFromOpenshiftService, err := vs.OpenshiftService.GetGroupsUserBelongsTo(openShiftRequester)
 		if err != nil {
@@ -425,9 +423,9 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 	}
 
 	for _, userAccount := range bypassPermissions.UserAccounts {
-		if match, _ := regexp.MatchString(userAccount, userName); match {
-			return true
-		}
+		matchUsername, _ := regexp.MatchString(userAccount, userName)
+		matchOpenshiftRequrster, _ := regexp.MatchString(userAccount, openShiftRequester)
+		return matchUsername || matchOpenshiftRequrster
 	}
 
 	for _, serviceAccount := range bypassPermissions.ServiceAccounts {
