@@ -423,9 +423,17 @@ func (vs *ValidationService) shouldBypassByPermissions(userInfo authenticationv1
 	}
 
 	for _, userAccount := range bypassPermissions.UserAccounts {
-		matchUsername, _ := regexp.MatchString(userAccount, userName)
-		matchOpenshiftRequrster, _ := regexp.MatchString(userAccount, openShiftRequester)
-		return matchUsername || matchOpenshiftRequrster
+		if openShiftRequester != "" {
+			matchOpenshiftRequester, _ := regexp.MatchString(userAccount, openShiftRequester)
+			if matchOpenshiftRequester {
+				return true
+			}
+		} else {
+			matchUsername, _ := regexp.MatchString(userAccount, userName)
+			if matchUsername {
+				return true
+			}
+		}
 	}
 
 	for _, serviceAccount := range bypassPermissions.ServiceAccounts {
