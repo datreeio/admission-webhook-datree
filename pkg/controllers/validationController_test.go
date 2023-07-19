@@ -4,12 +4,13 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/logger"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/logger"
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -313,11 +314,11 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
 	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
 
-	mockLogger := &logger.Logger{}
+	mockLogger := logger.New(mockErrorReporter)
 
 	mockOpenshiftService := &openshiftService.OpenshiftService{}
 
-	return NewValidationController(mockedCliServiceClient, mockState, mockErrorReporter, mockK8sMetadataUtil, mockLogger, mockOpenshiftService)
+	return NewValidationController(mockedCliServiceClient, mockState, mockErrorReporter, mockK8sMetadataUtil, &mockLogger, mockOpenshiftService)
 }
 
 func convertPrerunResponseJsonToStruct(prerunResponse []byte) *clients.ClusterEvaluationPrerunDataResponse {
