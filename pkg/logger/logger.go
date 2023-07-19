@@ -88,13 +88,6 @@ func (l *Logger) LogAdmissionRequest(objectToLog any) {
 	l.logInfo(objectToLog, "")
 }
 
-// LogUtil this method creates a new logger instance on every call, and does not have a requestId
-// please prefer using the logger instance from the context instead
-func LogUtil(msg string) {
-	logger := New(nil)
-	logger.LogAdmissionRequest(msg)
-}
-
 func (l *Logger) logInfo(objectToLog any, requestDirection string) {
 	logFields := make(map[string]interface{})
 	logFields["requestId"] = l.requestId

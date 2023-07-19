@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 	"net/http"
 	"os"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	authenticationv1 "k8s.io/api/authentication/v1"
 
@@ -77,7 +78,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if token == "" {
 		errorMessage := "no DATREE_TOKEN was found in env"
 		vs.ErrorReporter.ReportUnexpectedError(errors.New(errorMessage))
-		logger.LogUtil(errorMessage)
+		vs.Logger.LogAdmissionRequest(errorMessage)
 	}
 
 	rootObject := getResourceRootObject(admissionReviewReq)
@@ -290,7 +291,7 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
 		vs.ErrorReporter.ReportUnexpectedError(err)
-		logger.LogUtil(err.Error())
+		vs.Logger.LogAdmissionRequest(err.Error())
 		return
 	}
 	logJson := string(logJsonInBytes)
