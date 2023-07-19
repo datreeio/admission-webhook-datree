@@ -41,8 +41,24 @@ func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
 	}
 }
 
+func (l *Logger) LogDebug(message string) {
+	l.zapLogger.Debug(message, zap.String("requestId", l.requestId))
+}
+
+func (l *Logger) LogInfo(message string) {
+	l.zapLogger.Info(message, zap.String("requestId", l.requestId))
+}
+
+func (l *Logger) LogWarn(message string) {
+	l.zapLogger.Warn(message, zap.String("requestId", l.requestId))
+}
+
 func (l *Logger) LogError(message string) {
 	l.zapLogger.Error(message, zap.String("requestId", l.requestId))
+}
+
+func (l *Logger) Fatal(message string) {
+	l.zapLogger.Fatal(message, zap.String("requestId", l.requestId))
 }
 
 func (l *Logger) LogAndReportUnexpectedError(message string) {
@@ -65,7 +81,7 @@ type outgoingLog struct {
 	IsSkipped       bool
 }
 
-func (l *Logger) LogInfo(objectToLog any) {
+func (l *Logger) LogAdmissionRequest(objectToLog any) {
 	l.logInfo(objectToLog, "")
 }
 
@@ -73,7 +89,7 @@ func (l *Logger) LogInfo(objectToLog any) {
 // please prefer using the logger instance from the context instead
 func LogUtil(msg string) {
 	logger := New("", nil)
-	logger.LogInfo(msg)
+	logger.LogAdmissionRequest(msg)
 }
 
 func (l *Logger) logInfo(objectToLog any, requestDirection string) {
