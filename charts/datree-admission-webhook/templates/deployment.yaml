@@ -1,5 +1,7 @@
 {{- $emptyTokenMessage := "\n\t❌ The installation failed since the token that was provided is invalid.\n\t💡 To fix this issue:\n\t\t1. Get your token at: https://app.datree.io/settings/token-management\n\t\t2. Reinstall Datree and set your token using helm:\n\n\t\thelm install -n datree datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<YOUR_TOKEN>\n" -}}
 {{- $uuidv4RegexPattern := "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" -}}
+{{- $webhookCertsVolumeName := "webhook-certs-volume" -}}
+{{- $webhookCertsVolumeClaimName := "webhook-certs-volume-claim" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -106,16 +108,15 @@ spec:
             - containerPort: 5555
               name: debug
           volumeMounts:
-            - name: webhook-tls-certs
-              mountPath: /run/secrets/tls
-              readOnly: true
+            - mountPath: /etc/webhook-certs
+              name: {{ $webhookCertsVolumeName }}
             - name: webhook-config
               mountPath: /config
               readOnly: true
       volumes:
-        - name: webhook-tls-certs
-          secret:
-            secretName: webhook-server-tls
+        - name: {{ $webhookCertsVolumeName }}
+          persistentVolumeClaim:
+            claimName: {{ $webhookCertsVolumeClaimName }}
         - name: webhook-config
           projected:
             sources:
@@ -125,3 +126,15 @@ spec:
             - configMap:
                 name: webhook-scanning-filters
                 optional: true
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $webhookCertsVolumeClaimName }}
+  namespace: {{ template "datree.namespace" . }}
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi

@@ -10,6 +10,7 @@ require (
 	github.com/openshift/api v0.0.0-20230705144233-e28cd4dd28a8
 	github.com/openshift/client-go v0.0.0-20230705133330-7f808ad59404
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/sirupsen/logrus v1.9.0
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/zap v1.10.0
 	k8s.io/api v0.27.2

@@ -3,6 +3,8 @@ package startup
 import (
 	"errors"
 	"fmt"
+	cert_manager "github.com/datreeio/admission-webhook-datree/pkg/cert-manager"
+	"github.com/datreeio/admission-webhook-datree/pkg/k8sClient2"
 	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"net/http"
@@ -87,9 +89,18 @@ func Start() {
 	if err != nil {
 		fmt.Printf("Failed init skip list: %s \n", err.Error())
 	}
-	certPath, keyPath, err := server.ValidateCertificate()
+
+	err = cert_manager.GenerateCertificatesIfTheyAreMissing()
 	if err != nil {
-		panic(err)
+		fmt.Printf("Failed to generate certificates: %s \n", err.Error())
+	}
+	k8sClient2Instance, err := k8sClient2.NewK8sClient()
+	if err != nil {
+		fmt.Printf("Failed to create k8s client: %s \n", err.Error())
+	}
+	err = k8sClient2Instance.ActivateValidatingWebhookConfiguration()
+	if err != nil {
+		fmt.Printf("Failed to activate validating webhook configuration: %s \n", err.Error())
 	}
 
 	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &internalLogger, openshiftServiceInstance)
@@ -105,7 +116,7 @@ func Start() {
 	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
-	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
+	if err := http.ListenAndServeTLS(":"+port, cert_manager.TlsCertPath, cert_manager.TlsKeyPath, nil); err != nil {
 		err = http.ListenAndServe(":"+port, nil)
 		if err != nil {
 			fmt.Println("Failed to start http server", err.Error())
