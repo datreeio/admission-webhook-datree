@@ -23,7 +23,7 @@ type Logger struct {
 	errorReporter *errorReporter.ErrorReporter
 }
 
-func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
+func New(errorReporter *errorReporter.ErrorReporter) Logger {
 	config := zap.NewProductionEncoderConfig()
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
 	jsonEncoder := zapcore.NewJSONEncoder(config)
@@ -36,9 +36,12 @@ func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
 
 	return Logger{
 		zapLogger:     zapLogger,
-		requestId:     requestId,
 		errorReporter: errorReporter,
 	}
+}
+
+func (l *Logger) SetRequestId(requestId string) {
+	l.requestId = requestId
 }
 
 func (l *Logger) LogDebug(message string) {
@@ -88,7 +91,7 @@ func (l *Logger) LogAdmissionRequest(objectToLog any) {
 // LogUtil this method creates a new logger instance on every call, and does not have a requestId
 // please prefer using the logger instance from the context instead
 func LogUtil(msg string) {
-	logger := New("", nil)
+	logger := New(nil)
 	logger.LogAdmissionRequest(msg)
 }
 

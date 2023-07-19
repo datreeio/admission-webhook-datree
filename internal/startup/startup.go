@@ -3,6 +3,7 @@ package startup
 import (
 	"errors"
 	"fmt"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"net/http"
@@ -43,7 +44,7 @@ func Start() {
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
-	internalLogger := logger.New("", errorReporter)
+	internalLogger := logger.New(errorReporter)
 
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
