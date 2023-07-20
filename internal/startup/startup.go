@@ -86,11 +86,12 @@ func Start() {
 
 	err = server.InitSkipList()
 	if err != nil {
-		fmt.Printf("Failed init skip list: %s \n", err.Error())
+		logger.LogError(fmt.Sprintf("Failed init skip list: %s \n", err.Error()))
 	}
+
 	certPath, keyPath, err := server.ValidateCertificate()
 	if err != nil {
-		panic(err)
+		logger.PanicLevel(fmt.Sprintf("Failed to validate certificate: %s \n", err.Error()))
 	}
 
 	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &logger, openshiftServiceInstance)
@@ -109,7 +110,7 @@ func Start() {
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
 		err = http.ListenAndServe(":"+port, nil)
 		if err != nil {
-			fmt.Println("Failed to start http server", err.Error())
+			logger.LogError(fmt.Sprintf("Failed to start http server: %s \n", err.Error()))
 		}
 	}
 }
@@ -118,7 +119,7 @@ func initMetadataLogsCronjob(validationService *services.ValidationService) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	_, err := cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
 	if err != nil {
-		fmt.Printf("Metadata cronjon failed to be added, err: %s \n", err.Error())
+		validationService.Logger.LogError(fmt.Sprintf("Metadata cronjon failed to be added, err: %s \n", err.Error()))
 	}
 	cornJob.Start()
 }

@@ -62,6 +62,10 @@ func (l *Logger) Fatal(message string, data ...any) {
 	l.zapLogger.Fatal(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
+func (l *Logger) PanicLevel(message string, data ...any) {
+	l.zapLogger.Panic(message, zap.String("requestId", l.requestId), zap.Any("data", data))
+}
+
 func (l *Logger) LogAndReportUnexpectedError(message string) {
 	l.LogError(message)
 	l.errorReporter.ReportUnexpectedError(errors.New(message))
