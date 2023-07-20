@@ -36,6 +36,7 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	}
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
+	resourceName := rootObject.Metadata.Name
 	managedFields := rootObject.Metadata.ManagedFields
 	userInfo := admissionReviewReq.Request.UserInfo
 	resourceAnnotations := rootObject.Metadata.Annotations
@@ -66,6 +67,12 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	}
 
 	if isObjectAndOldObjectEqual(admissionReviewReq) {
+		return ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}
+	}
+
+	if isHelmReleaseInfo(resourceKind, resourceName) {
 		return ShouldValidatedResourceData{
 			ShouldValidate: false,
 		}
@@ -135,6 +142,15 @@ func isResourceDeleted(rootObject RootObject) bool {
 func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionReview) bool {
 	namespacesToSkip := []string{"kube-public", "kube-node-lease"}
 	return slices.Contains(namespacesToSkip, admissionReviewReq.Request.Namespace)
+}
+
+func isHelmReleaseInfo(resourceKind string, resourceName string) bool {
+	if strings.HasPrefix(resourceKind, "Secret") {
+		if strings.Contains(resourceName, "sh.helm.release.v1.") {
+			return true
+		}
+	}
+	return false
 }
 
 func isObjectAndOldObjectEqual(admissionReviewReq *admission.AdmissionReview) bool {
