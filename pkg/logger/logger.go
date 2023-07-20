@@ -44,24 +44,24 @@ func (l *Logger) SetRequestId(requestId string) {
 	l.requestId = requestId
 }
 
-func (l *Logger) LogDebug(message string) {
-	l.zapLogger.Debug(message, zap.String("requestId", l.requestId))
+func (l *Logger) LogDebug(message string, data ...any) {
+	l.zapLogger.Debug(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
-func (l *Logger) LogInfo(message string) {
-	l.zapLogger.Info(message, zap.String("requestId", l.requestId))
+func (l *Logger) LogInfo(message string, data ...any) {
+	l.zapLogger.Info(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
-func (l *Logger) LogWarn(message string) {
-	l.zapLogger.Warn(message, zap.String("requestId", l.requestId))
+func (l *Logger) LogWarn(message string, data ...any) {
+	l.zapLogger.Warn(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
-func (l *Logger) LogError(message string) {
-	l.zapLogger.Error(message, zap.String("requestId", l.requestId))
+func (l *Logger) LogError(message string, data ...any) {
+	l.zapLogger.Error(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
-func (l *Logger) Fatal(message string) {
-	l.zapLogger.Fatal(message, zap.String("requestId", l.requestId))
+func (l *Logger) Fatal(message string, data ...any) {
+	l.zapLogger.Fatal(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
 func (l *Logger) LogAndReportUnexpectedError(message string) {
@@ -80,5 +80,5 @@ func (l *Logger) LogAdmissionRequest(admissionReview *admission.AdmissionReview,
 	logFields["isSkipped"] = isSkipped
 	logFields["admissionReview"] = admissionReview
 
-	l.zapLogger.Debug("AdmissionRequest", zap.Any("fields", logFields))
+	l.zapLogger.Debug("AdmissionRequest", zap.Any("data", logFields))
 }
