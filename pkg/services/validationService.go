@@ -65,7 +65,7 @@ type ValidationService struct {
 	Logger           *logger.Logger
 }
 
-func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string, internalLogger logger.Logger) (admissionReview *admission.AdmissionReview, isSkipped bool) {
+func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionReview, warningMessages *[]string) (admissionReview *admission.AdmissionReview, isSkipped bool) {
 	startTime := time.Now()
 	msg := "We're good!"
 	cliEvaluationId := -1
@@ -106,7 +106,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 
 	prerunData, err := vs.CliServiceClient.RequestClusterEvaluationPrerunData(token, vs.State.GetClusterUuid())
 	if err != nil {
-		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
+		vs.Logger.LogAndReportUnexpectedError(fmt.Sprintf("Getting prerun data err: %s", err.Error()))
 
 		prerunWarningMsg := "Datree failed to run policy check - an error occurred when pulling your policy"
 		*warningMessages = append(*warningMessages, prerunWarningMsg)
@@ -163,7 +163,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 		// evaluate policy against configuration
 		policyCheckResults, err := evaluator.Evaluate(policyCheckData)
 		if err != nil {
-			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("Evaluate err: %s", err.Error()))
+			vs.Logger.LogAndReportUnexpectedError(fmt.Sprintf("Evaluate err: %s", err.Error()))
 		}
 
 		results := policyCheckResults.FormattedResults
@@ -183,7 +183,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 				cliEvaluationId = evaluationResultResp.EvaluationId
 			} else {
 				cliEvaluationId = -2
-				internalLogger.LogAndReportUnexpectedError("saving evaluation results failed")
+				vs.Logger.LogAndReportUnexpectedError("saving evaluation results failed")
 				*warningMessages = append(*warningMessages, "saving evaluation results failed")
 			}
 		}
@@ -200,7 +200,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 			OutputFormat:      os.Getenv(enums.Output),
 		})
 		if err != nil {
-			internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
+			vs.Logger.LogAndReportUnexpectedError(fmt.Sprintf("GetResultsText err: %s", err.Error()))
 		}
 
 		didFailCurrentPolicyCheck := evaluationSummary.PassedPolicyCheckCount == 0
