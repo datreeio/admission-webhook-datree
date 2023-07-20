@@ -219,6 +219,14 @@ true
 </td>
 		</tr>
 		<tr>
+			<td>datree.logLevel</td>
+			<td>log level for the webhook-server, -1 - debug, 0 - info, 1 - warning, 2 - error, 3 - fatal</td>
+			<td><pre lang="json">
+0
+</pre>
+</td>
+		</tr>
+		<tr>
 			<td>image.repository</td>
 			<td>Image repository for the webhook</td>
 			<td><pre lang="json">
