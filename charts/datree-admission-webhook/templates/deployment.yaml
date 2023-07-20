@@ -1,5 +1,3 @@
-{{- $emptyTokenMessage := "\n\t❌ The installation failed since the token that was provided is invalid.\n\t💡 To fix this issue:\n\t\t1. Get your token at: https://app.datree.io/settings/token-management\n\t\t2. Reinstall Datree and set your token using helm:\n\n\t\thelm install -n datree datree-webhook datree-webhook/datree-admission-webhook --create-namespace --set datree.token=<YOUR_TOKEN>\n" -}}
-{{- $uuidv4RegexPattern := "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -46,7 +44,9 @@ spec:
             - name: CLUSTER_NAME
               value: {{.Values.datree.clusterName | required "Cluster name is required"}}
             - name: DATREE_TOKEN
-              {{- if and .Values.datree.existingSecret (and (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.name nil)) (and (ne .Values.datree.existingSecret.key "") (ne .Values.datree.existingSecret.key nil)) }}
+{{/*              {{- if template "doesExistingSecretExist" .}}*/}}
+{{/*              checking if the template value exists*/}}
+              {{- if template "doesExistingSecretExist" .}}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.datree.existingSecret.name }}

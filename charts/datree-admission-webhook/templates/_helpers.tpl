@@ -30,3 +30,7 @@ helm.sh/chart: {{ template "datree.chart" . }}
 {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"email\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password .email (printf "%s:%s" .username .password | b64enc) | b64enc }}
 {{- end }}
 {{- end }}
+
+{{- define "doesExistingSecretExist" }}
+{{- and .Values.datree.existingSecret (and (ne .Values.datree.existingSecret.name "") (ne .Values.datree.existingSecret.name nil)) (and (ne .Values.datree.existingSecret.key "") (ne .Values.datree.existingSecret.key nil)) }} }}
+{{- end }}
