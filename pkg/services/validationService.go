@@ -78,7 +78,7 @@ func (vs *ValidationService) Validate(admissionReviewReq *admission.AdmissionRev
 	if token == "" {
 		errorMessage := "no DATREE_TOKEN was found in env"
 		vs.ErrorReporter.ReportUnexpectedError(errors.New(errorMessage))
-		vs.Logger.LogAdmissionRequest(errorMessage)
+		vs.Logger.LogError(errorMessage)
 	}
 
 	rootObject := getResourceRootObject(admissionReviewReq)
@@ -291,7 +291,7 @@ func (vs *ValidationService) saveRequestMetadataLogInAggregator(clusterRequestMe
 	logJsonInBytes, err := json.Marshal(clusterRequestMetadata)
 	if err != nil {
 		vs.ErrorReporter.ReportUnexpectedError(err)
-		vs.Logger.LogAdmissionRequest(err.Error())
+		vs.Logger.LogError(err.Error())
 		return
 	}
 	logJson := string(logJsonInBytes)

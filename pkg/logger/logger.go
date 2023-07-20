@@ -69,30 +69,16 @@ func (l *Logger) LogAndReportUnexpectedError(message string) {
 	l.errorReporter.ReportUnexpectedError(errors.New(message))
 }
 
-func (l *Logger) LogIncoming(admissionReview *admission.AdmissionReview) {
-	l.logInfo(admissionReview, "incoming")
-}
-func (l *Logger) LogOutgoing(admissionReview *admission.AdmissionReview, isSkipped bool) {
-	l.logInfo(outgoingLog{
-		AdmissionReview: admissionReview,
-		IsSkipped:       isSkipped,
-	}, "outgoing")
-}
+func (l *Logger) LogAdmissionRequest(admissionReview *admission.AdmissionReview, isSkipped bool, direction string) {
+	if direction != "incoming" && direction != "outgoing" {
+		l.LogError("LogAdmissionRequest: direction must be 'incoming' or 'outgoing'")
+	}
 
-type outgoingLog struct {
-	AdmissionReview *admission.AdmissionReview
-	IsSkipped       bool
-}
-
-func (l *Logger) LogAdmissionRequest(objectToLog any) {
-	l.logInfo(objectToLog, "")
-}
-
-func (l *Logger) logInfo(objectToLog any, requestDirection string) {
 	logFields := make(map[string]interface{})
 	logFields["requestId"] = l.requestId
-	logFields["requestDirection"] = requestDirection
-	logFields["msg"] = objectToLog
+	logFields["requestDirection"] = direction
+	logFields["isSkipped"] = isSkipped
+	logFields["admissionReview"] = admissionReview
 
-	l.zapLogger.Info("Logging information", zap.Any("logFields", logFields))
+	l.zapLogger.Debug("AdmissionRequest", zap.Any("fields", logFields))
 }
