@@ -64,6 +64,8 @@ datree:
     - "(^openshift.*);(.*);(.*)" # skip all openshift resources in all namespaces.
   # -- set admission.datree/validate=skip label on kube-system resources. (openshift/okd users should set it to false)
   labelKubeSystem: true
+  # -- log level for the webhook-server, -1 - debug, 0 - info, 1 - warning, 2 - error, 3 - fatal
+  logLevel: 0
 # The Datree webhook-server image to use.
 image:
   # -- Image repository for the webhook

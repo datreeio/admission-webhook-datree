@@ -19,7 +19,7 @@ cmd_button(name='enable all',
 
 namespace_create('datree')
 DATREE_TOKEN=os.environ.get('DATREE_TOKEN')
-k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='internal/fixtures/values.dev.yaml', namespace='datree', set=['devMode.enabled=true ','securityContext.runAsUser=1000', 'securityContext.readOnlyRootFilesystem=false', 'clusterScanner.image.pullPolicy=Never', "datree.token={}".format(DATREE_TOKEN)]))
+k8s_yaml(helm('./charts/datree-admission-webhook/', name='admission-webhook', values='internal/fixtures/values.dev.yaml', namespace='datree', set=['devMode.enabled=true ','securityContext.runAsUser=1000', 'securityContext.readOnlyRootFilesystem=false', 'clusterScanner.image.pullPolicy=Never', "datree.token={}".format(DATREE_TOKEN), 'datree.logLevel=-1']))
 
 
 
