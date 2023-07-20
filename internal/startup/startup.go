@@ -44,7 +44,7 @@ func Start() {
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
-	logger := logger.New(errorReporter)
+	logger := logger.New(state.GetLogLevel(), errorReporter)
 
 	defer func() {
 		if panicErr := recover(); panicErr != nil {

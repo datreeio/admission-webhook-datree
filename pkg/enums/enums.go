@@ -13,6 +13,7 @@ const (
 	Namespace       = "DATREE_NAMESPACE"
 	PodName         = "POD_NAME"
 	EnabledWarnings = "DATREE_ENABLED_WARNINGS"
+	LogLevel        = "DATREE_LOG_LEVEL"
 )
 
 type ActionOnFailure string

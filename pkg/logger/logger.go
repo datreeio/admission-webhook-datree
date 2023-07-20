@@ -23,14 +23,12 @@ type Logger struct {
 	errorReporter *errorReporter.ErrorReporter
 }
 
-func New(errorReporter *errorReporter.ErrorReporter) Logger {
+func New(logLevel zapcore.Level, errorReporter *errorReporter.ErrorReporter) Logger {
 	config := zap.NewProductionEncoderConfig()
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
 	jsonEncoder := zapcore.NewJSONEncoder(config)
 
-	defaultLogLevel := zapcore.DebugLevel
-
-	core := zapcore.NewTee(zapcore.NewCore(jsonEncoder, zapcore.AddSync(os.Stdout), defaultLogLevel))
+	core := zapcore.NewTee(zapcore.NewCore(jsonEncoder, zapcore.AddSync(os.Stdout), logLevel))
 
 	zapLogger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
