@@ -11,6 +11,7 @@ import (
 
 	"github.com/datreeio/admission-webhook-datree/pkg/logger"
 	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
 	"github.com/datreeio/admission-webhook-datree/pkg/errorReporter"
@@ -314,7 +315,7 @@ func mockValidationController(mockedResponse httpClient.Response) *ValidationCon
 	mockErrorReporterClient.On("ReportError", mock.Anything, mock.Anything).Return(200, nil)
 	mockErrorReporter := errorReporter.NewErrorReporter(mockErrorReporterClient, mockState)
 
-	mockLogger := logger.New(mockErrorReporter)
+	mockLogger := logger.New(zapcore.InfoLevel, mockErrorReporter)
 
 	mockOpenshiftService := &openshiftService.OpenshiftService{}
 
