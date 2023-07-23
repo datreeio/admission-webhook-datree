@@ -38,25 +38,6 @@ type ServiceState struct {
 }
 
 func New() *ServiceState {
-	rawLogLEvels := os.Getenv(enums.LogLevel)
-	logLevel := zapcore.InfoLevel
-	switch rawLogLEvels {
-	case "-1":
-		logLevel = zapcore.DebugLevel
-	case "0":
-		logLevel = zapcore.InfoLevel
-	case "1":
-		logLevel = zapcore.WarnLevel
-	case "2":
-		logLevel = zapcore.ErrorLevel
-	case "3":
-		logLevel = zapcore.DPanicLevel
-	case "4":
-		logLevel = zapcore.PanicLevel
-	case "5":
-		logLevel = zapcore.FatalLevel
-	}
-
 	return &ServiceState{
 		clientId:          shortuuid.New(),
 		token:             os.Getenv(enums.Token),
@@ -71,8 +52,27 @@ func New() *ServiceState {
 		verbose:           os.Getenv(enums.Verbose),
 		bypassPermissions: readBypassPermissions(),
 		enabledWarnings:   os.Getenv(enums.EnabledWarnings),
-		LogLevel:          logLevel,
+		LogLevel:          readLogLevel(),
 	}
+}
+
+func readLogLevel() zapcore.Level {
+	rawLogLEvels := os.Getenv(enums.LogLevel)
+	logLevel := zapcore.InfoLevel
+	switch rawLogLEvels {
+	case "-1":
+		logLevel = zapcore.DebugLevel
+	case "0":
+		logLevel = zapcore.InfoLevel
+	case "1":
+		logLevel = zapcore.WarnLevel
+	case "2":
+		logLevel = zapcore.ErrorLevel
+	case "3":
+		logLevel = zapcore.DPanicLevel
+	}
+
+	return logLevel
 }
 
 func (s *ServiceState) SetClusterUuid(clusterUuid types.UID) {
