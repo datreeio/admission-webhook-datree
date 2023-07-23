@@ -92,10 +92,11 @@ func TestPrerequisitesFilters(t *testing.T) {
 			ShouldValidate: false,
 		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
 	})
-	t.Run("resource should be skipped because it has Secret kind and name related to Helm release info", func(t *testing.T) {
+	t.Run("resource should be skipped because it has Secret kind and name related to Helm release metadata", func(t *testing.T) {
 		admissionReviewReq, rootObject := extractAdmissionReviewReqAndRootObject(templateResource)
 		admissionReviewReq.Request.Kind.Kind = "Secret"
 		rootObject.Metadata.Name = "sh.helm.release.v1.my-release2.v3.v3"
+		rootObject.Metadata.Labels["owner"] = "helm"
 		assert.Equal(t, ShouldValidatedResourceData{
 			ShouldValidate: false,
 		}, ShouldResourceBeValidated(admissionReviewReq, rootObject))
