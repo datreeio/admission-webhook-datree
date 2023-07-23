@@ -82,12 +82,12 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 		}
 	}()
 
-	c.logger.LogAdmissionRequest(admissionReviewReq, false, "incoming")
+	c.logger.LogAdmissionRequest(admissionReviewReq, false, logger.Incoming)
 	admissionReview, isSkipped := c.ValidationService.Validate(admissionReviewReq, &warningMessages)
 	writer.WriteBody(admissionReview)
 
 	admissionReview.Request = admissionReviewReq.Request
-	c.logger.LogAdmissionRequest(admissionReview, isSkipped, "outgoing")
+	c.logger.LogAdmissionRequest(admissionReview, isSkipped, logger.Outgoing)
 }
 
 func headerValidation(req *http.Request) error {

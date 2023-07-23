@@ -71,11 +71,14 @@ func (l *Logger) LogAndReportUnexpectedError(message string) {
 	l.errorReporter.ReportUnexpectedError(errors.New(message))
 }
 
-func (l *Logger) LogAdmissionRequest(admissionReview *admission.AdmissionReview, isSkipped bool, direction string) {
-	if direction != "incoming" && direction != "outgoing" {
-		l.LogError("LogAdmissionRequest: direction must be 'incoming' or 'outgoing'")
-	}
+type LogDirection string
 
+const (
+	Incoming LogDirection = "incoming"
+	Outgoing LogDirection = "outgoing"
+)
+
+func (l *Logger) LogAdmissionRequest(admissionReview *admission.AdmissionReview, isSkipped bool, direction LogDirection) {
 	logFields := make(map[string]interface{})
 	logFields["requestId"] = l.requestId
 	logFields["requestDirection"] = direction
