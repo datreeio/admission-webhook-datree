@@ -36,6 +36,8 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	}
 
 	resourceKind := admissionReviewReq.Request.Kind.Kind
+	resourceName := rootObject.Metadata.Name
+	resourceLabels := rootObject.Metadata.Labels
 	managedFields := rootObject.Metadata.ManagedFields
 	userInfo := admissionReviewReq.Request.UserInfo
 	resourceAnnotations := rootObject.Metadata.Annotations
@@ -46,6 +48,14 @@ func ShouldResourceBeValidated(admissionReviewReq *admission.AdmissionReview, ro
 	isResourceDeleted := isResourceDeleted(rootObject)
 	isNamespaceThatShouldBeSkipped := isNamespaceThatShouldBeSkipped(admissionReviewReq)
 	arePrerequisitesMet := isMetadataNameExists && !isUnsupportedKind && !isResourceDeleted && !isNamespaceThatShouldBeSkipped
+
+	// if the resource is a helm release metadata, we don't want to validate it
+	// https://stackoverflow.com/questions/66244697/where-does-helm-store-installation-state
+	if isHelmReleaseMetadata(resourceName, resourceLabels) {
+		return ShouldValidatedResourceData{
+			ShouldValidate: false,
+		}
+	}
 
 	if !arePrerequisitesMet {
 		return ShouldValidatedResourceData{
@@ -135,6 +145,10 @@ func isResourceDeleted(rootObject RootObject) bool {
 func isNamespaceThatShouldBeSkipped(admissionReviewReq *admission.AdmissionReview) bool {
 	namespacesToSkip := []string{"kube-public", "kube-node-lease"}
 	return slices.Contains(namespacesToSkip, admissionReviewReq.Request.Namespace)
+}
+
+func isHelmReleaseMetadata(resourceName string, labels map[string]string) bool {
+	return strings.Contains(resourceName, "sh.helm.release.v1.") && labels["owner"] == "helm"
 }
 
 func isObjectAndOldObjectEqual(admissionReviewReq *admission.AdmissionReview) bool {
