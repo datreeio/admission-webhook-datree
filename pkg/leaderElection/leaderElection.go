@@ -81,7 +81,7 @@ func (le *LeaderElection) listenForChangesInLeader(hasSucceededFirstLeaderElecti
 	signal.Notify(ch, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-ch
-		le.logger.LogInfo("Received termination, signaling shutdown")
+		le.logger.LogError("Received termination, signaling shutdown")
 		cancel()
 	}()
 
