@@ -60,6 +60,7 @@ datree:
     # Recommended resources to exclude from your policy checks.
     - "(.*);(.*);(^aws-node.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
     - "(.*);(.*);(^aws-123.*)" # skip aws-node-xxxxx resources in all namespaces, specifically skips EKS vpc-cni addon.
+  logLevel: -1
 # The Datree webhook-server image to use.
 image:
   # Image repository
