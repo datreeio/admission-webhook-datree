@@ -116,9 +116,20 @@
           "type": "array",
           "items": {
             "type": "string",
-            "enum": ["failedPolicyCheck", "skippedBySkipList", "passedPolicyCheck", "RBACBypassed"]
+            "enum": [
+              "failedPolicyCheck",
+              "skippedBySkipList",
+              "passedPolicyCheck",
+              "RBACBypassed"
+            ]
           },
           "default": true
+        },
+        "logLevel": {
+          "title": "The logLevel Schema",
+          "type": "number",
+          "minimum": -1,
+          "maximum": 3
         }
       }
     }

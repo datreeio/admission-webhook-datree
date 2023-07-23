@@ -23,26 +23,47 @@ type Logger struct {
 	errorReporter *errorReporter.ErrorReporter
 }
 
-func New(requestId string, errorReporter *errorReporter.ErrorReporter) Logger {
+func New(logLevel zapcore.Level, errorReporter *errorReporter.ErrorReporter) Logger {
 	config := zap.NewProductionEncoderConfig()
 	config.EncodeTime = zapcore.ISO8601TimeEncoder
 	jsonEncoder := zapcore.NewJSONEncoder(config)
 
-	defaultLogLevel := zapcore.DebugLevel
-
-	core := zapcore.NewTee(zapcore.NewCore(jsonEncoder, zapcore.AddSync(os.Stdout), defaultLogLevel))
+	core := zapcore.NewTee(zapcore.NewCore(jsonEncoder, zapcore.AddSync(os.Stdout), logLevel))
 
 	zapLogger := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
 	return Logger{
 		zapLogger:     zapLogger,
-		requestId:     requestId,
 		errorReporter: errorReporter,
 	}
 }
 
-func (l *Logger) LogError(message string) {
-	l.zapLogger.Error(message, zap.String("requestId", l.requestId))
+func (l *Logger) SetRequestId(requestId string) {
+	l.requestId = requestId
+}
+
+func (l *Logger) LogDebug(message string, data ...any) {
+	l.zapLogger.Debug(message, zap.String("requestId", l.requestId), zap.Any("data", data))
+}
+
+func (l *Logger) LogInfo(message string, data ...any) {
+	l.zapLogger.Info(message, zap.String("requestId", l.requestId), zap.Any("data", data))
+}
+
+func (l *Logger) LogWarn(message string, data ...any) {
+	l.zapLogger.Warn(message, zap.String("requestId", l.requestId), zap.Any("data", data))
+}
+
+func (l *Logger) LogError(message string, data ...any) {
+	l.zapLogger.Error(message, zap.String("requestId", l.requestId), zap.Any("data", data))
+}
+
+func (l *Logger) Fatal(message string, data ...any) {
+	l.zapLogger.Fatal(message, zap.String("requestId", l.requestId), zap.Any("data", data))
+}
+
+func (l *Logger) PanicLevel(message string, data ...any) {
+	l.zapLogger.Panic(message, zap.String("requestId", l.requestId), zap.Any("data", data))
 }
 
 func (l *Logger) LogAndReportUnexpectedError(message string) {
@@ -50,37 +71,19 @@ func (l *Logger) LogAndReportUnexpectedError(message string) {
 	l.errorReporter.ReportUnexpectedError(errors.New(message))
 }
 
-func (l *Logger) LogIncoming(admissionReview *admission.AdmissionReview) {
-	l.logInfo(admissionReview, "incoming")
-}
-func (l *Logger) LogOutgoing(admissionReview *admission.AdmissionReview, isSkipped bool) {
-	l.logInfo(outgoingLog{
-		AdmissionReview: admissionReview,
-		IsSkipped:       isSkipped,
-	}, "outgoing")
-}
+type LogDirection string
 
-type outgoingLog struct {
-	AdmissionReview *admission.AdmissionReview
-	IsSkipped       bool
-}
+const (
+	Incoming LogDirection = "incoming"
+	Outgoing LogDirection = "outgoing"
+)
 
-func (l *Logger) LogInfo(objectToLog any) {
-	l.logInfo(objectToLog, "")
-}
-
-// LogUtil this method creates a new logger instance on every call, and does not have a requestId
-// please prefer using the logger instance from the context instead
-func LogUtil(msg string) {
-	logger := New("", nil)
-	logger.LogInfo(msg)
-}
-
-func (l *Logger) logInfo(objectToLog any, requestDirection string) {
+func (l *Logger) LogAdmissionRequest(admissionReview *admission.AdmissionReview, isSkipped bool, direction LogDirection) {
 	logFields := make(map[string]interface{})
 	logFields["requestId"] = l.requestId
-	logFields["requestDirection"] = requestDirection
-	logFields["msg"] = objectToLog
+	logFields["requestDirection"] = direction
+	logFields["isSkipped"] = isSkipped
+	logFields["admissionReview"] = admissionReview
 
-	l.zapLogger.Info("Logging information", zap.Any("logFields", logFields))
+	l.zapLogger.Debug("AdmissionRequest", zap.Any("data", logFields))
 }

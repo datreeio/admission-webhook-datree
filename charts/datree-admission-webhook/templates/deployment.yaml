@@ -66,6 +66,8 @@ spec:
               value: "{{.Values.datree.enforce}}"
             - name: DATREE_CONFIG_FROM_HELM
               value: "{{.Values.datree.configFromHelm | default false }}"
+            - name: DATREE_LOG_LEVEL
+              value: "{{.Values.datree.logLevel | default 0 }}"
             - name: DATREE_NAMESPACE
               value: {{template "datree.namespace" .}}
             - name: POD_NAME

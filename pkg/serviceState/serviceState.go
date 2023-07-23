@@ -3,10 +3,12 @@ package servicestate
 import (
 	"errors"
 	"fmt"
-	"github.com/ghodss/yaml"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ghodss/yaml"
+	"go.uber.org/zap/zapcore"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/config"
 	"github.com/datreeio/admission-webhook-datree/pkg/enums"
@@ -32,6 +34,7 @@ type ServiceState struct {
 	verbose           string
 	bypassPermissions *BypassPermissions
 	enabledWarnings   string
+	LogLevel          zapcore.Level
 }
 
 func New() *ServiceState {
@@ -49,7 +52,27 @@ func New() *ServiceState {
 		verbose:           os.Getenv(enums.Verbose),
 		bypassPermissions: readBypassPermissions(),
 		enabledWarnings:   os.Getenv(enums.EnabledWarnings),
+		LogLevel:          readLogLevel(),
 	}
+}
+
+func readLogLevel() zapcore.Level {
+	rawLogLEvels := os.Getenv(enums.LogLevel)
+	logLevel := zapcore.InfoLevel
+	switch rawLogLEvels {
+	case "-1":
+		logLevel = zapcore.DebugLevel
+	case "0":
+		logLevel = zapcore.InfoLevel
+	case "1":
+		logLevel = zapcore.WarnLevel
+	case "2":
+		logLevel = zapcore.ErrorLevel
+	case "3":
+		logLevel = zapcore.DPanicLevel
+	}
+
+	return logLevel
 }
 
 func (s *ServiceState) SetClusterUuid(clusterUuid types.UID) {
@@ -90,6 +113,10 @@ func (s *ServiceState) GetPolicyName() string {
 
 func (s *ServiceState) GetIsEnforceMode() bool {
 	return s.isEnforceMode
+}
+
+func (s *ServiceState) GetLogLevel() zapcore.Level {
+	return s.LogLevel
 }
 
 // SetIsEnforceMode to override when we get cluster config in /prerun

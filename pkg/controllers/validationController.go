@@ -3,9 +3,10 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 	"io"
 	"net/http"
+
+	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"github.com/datreeio/admission-webhook-datree/pkg/clients"
 	"github.com/datreeio/admission-webhook-datree/pkg/k8sMetadataUtil"
@@ -26,6 +27,7 @@ import (
 type ValidationController struct {
 	ValidationService *services.ValidationService
 	ErrorReporter     *errorReporter.ErrorReporter
+	logger            *logger.Logger
 }
 
 func NewValidationController(cliServiceClient *clients.CliClient, state *servicestate.ServiceState, errorReporter *errorReporter.ErrorReporter, k8sMetadataUtilInstance *k8sMetadataUtil.K8sMetadataUtil, logger *logger.Logger, openshiftService *openshiftService.OpenshiftService) *ValidationController {
@@ -41,11 +43,12 @@ func NewValidationController(cliServiceClient *clients.CliClient, state *service
 	return &ValidationController{
 		ValidationService: validationService,
 		ErrorReporter:     errorReporter,
+		logger:            logger,
 	}
 }
 
 func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request) {
-	internalLogger := logger.New(uuid.NewString(), c.ErrorReporter)
+	c.logger.SetRequestId(uuid.NewString())
 
 	var warningMessages []string
 	writer := responseWriter.New(w)
@@ -57,14 +60,14 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 
 	err := headerValidation(req)
 	if err != nil {
-		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("header validation failed: %s", err))
+		c.logger.LogAndReportUnexpectedError(fmt.Sprintf("header validation failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
 
 	admissionReviewReq, err := ParseHTTPRequestBodyToAdmissionReview(req.Body)
 	if err != nil {
-		internalLogger.LogAndReportUnexpectedError(fmt.Sprintf("parsing request body failed: %s", err))
+		c.logger.LogAndReportUnexpectedError(fmt.Sprintf("parsing request body failed: %s", err))
 		writer.BadRequest(err.Error())
 		return
 	}
@@ -73,18 +76,18 @@ func (c *ValidationController) Validate(w http.ResponseWriter, req *http.Request
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			c.ErrorReporter.ReportPanicError(panicErr)
-			internalLogger.LogError(utils.ParseErrorToString(panicErr))
+			c.logger.LogError(utils.ParseErrorToString(panicErr))
 			warningMessages = append(warningMessages, "Datree failed to validate the applied resource. Check the pod logs for more details.")
 			writer.WriteBody(services.ParseEvaluationResponseIntoAdmissionReview(admissionReviewReq.Request.UID, true, utils.ParseErrorToString(panicErr), warningMessages))
 		}
 	}()
 
-	internalLogger.LogIncoming(admissionReviewReq)
-	admissionReview, isSkipped := c.ValidationService.Validate(admissionReviewReq, &warningMessages, internalLogger)
+	c.logger.LogAdmissionRequest(admissionReviewReq, false, logger.Incoming)
+	admissionReview, isSkipped := c.ValidationService.Validate(admissionReviewReq, &warningMessages)
 	writer.WriteBody(admissionReview)
 
 	admissionReview.Request = admissionReviewReq.Request
-	internalLogger.LogOutgoing(admissionReview, isSkipped)
+	c.logger.LogAdmissionRequest(admissionReview, isSkipped, logger.Outgoing)
 }
 
 func headerValidation(req *http.Request) error {

@@ -3,6 +3,7 @@ package startup
 import (
 	"errors"
 	"fmt"
+
 	"github.com/datreeio/admission-webhook-datree/pkg/openshiftService"
 
 	"net/http"
@@ -43,12 +44,12 @@ func Start() {
 	basicNetworkValidator := networkValidator.NewNetworkValidator()
 	basicCliClient := clients.NewCliServiceClient(deploymentConfig.URL, basicNetworkValidator, state)
 	errorReporter := errorReporter.NewErrorReporter(basicCliClient, state)
-	internalLogger := logger.New("", errorReporter)
+	logger := logger.New(state.GetLogLevel(), errorReporter)
 
 	defer func() {
 		if panicErr := recover(); panicErr != nil {
 			errorReporter.ReportPanicError(panicErr)
-			internalLogger.LogError(fmt.Sprintf("Datree Webhook failed to start due to Unexpected error: %s\n", utils.ParseErrorToString(panicErr)))
+			logger.LogError(fmt.Sprintf("Datree Webhook failed to start due to Unexpected error: %s\n", utils.ParseErrorToString(panicErr)))
 			os.Exit(DefaultErrExitCode)
 		}
 	}()
@@ -62,22 +63,22 @@ func Start() {
 	if err == nil && k8sClientInstance != nil {
 		leaderElectionLeaseGetter = k8sClientInstance.CoordinationV1()
 	}
-	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, internalLogger)
-	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, internalLogger)
+	leaderElectionInstance := leaderElection.New(&leaderElectionLeaseGetter, logger)
+	k8sMetadataUtilInstance := k8sMetadataUtil.NewK8sMetadataUtil(k8sClientInstance, err, leaderElectionInstance, logger)
 	k8sMetadataUtilInstance.InitK8sMetadataUtil(state)
 
 	clusterUuid, err := k8sMetadataUtilInstance.GetClusterUuid()
 	if err != nil {
 		formattedErrorMessage := fmt.Sprintf("couldn't get cluster uuid %s", err)
 		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
-		internalLogger.LogInfo(formattedErrorMessage)
+		logger.LogInfo(formattedErrorMessage)
 	}
 
 	k8sVersion, err := k8sMetadataUtilInstance.GetClusterK8sVersion()
 	if err != nil {
 		formattedErrorMessage := fmt.Sprintf("couldn't get k8s version %s", err)
 		errorReporter.ReportUnexpectedError(errors.New(formattedErrorMessage))
-		internalLogger.LogInfo(formattedErrorMessage)
+		logger.LogInfo(formattedErrorMessage)
 	}
 
 	state.SetClusterUuid(clusterUuid)
@@ -85,14 +86,15 @@ func Start() {
 
 	err = server.InitSkipList()
 	if err != nil {
-		fmt.Printf("Failed init skip list: %s \n", err.Error())
-	}
-	certPath, keyPath, err := server.ValidateCertificate()
-	if err != nil {
-		panic(err)
+		logger.LogError(fmt.Sprintf("Failed init skip list: %s \n", err.Error()))
 	}
 
-	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &internalLogger, openshiftServiceInstance)
+	certPath, keyPath, err := server.ValidateCertificate()
+	if err != nil {
+		logger.PanicLevel(fmt.Sprintf("Failed to validate certificate: %s \n", err.Error()))
+	}
+
+	validationController := controllers.NewValidationController(basicCliClient, state, errorReporter, k8sMetadataUtilInstance, &logger, openshiftServiceInstance)
 	healthController := controllers.NewHealthController()
 	// set routes
 	http.HandleFunc("/validate", validationController.Validate)
@@ -102,13 +104,13 @@ func Start() {
 	// use validation service to send metadata in batch
 	initMetadataLogsCronjob(validationController.ValidationService)
 
-	internalLogger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
+	logger.LogInfo(fmt.Sprintf("server starting in webhook-version: %s", config.WebhookVersion))
 
 	// start server
 	if err := http.ListenAndServeTLS(":"+port, certPath, keyPath, nil); err != nil {
 		err = http.ListenAndServe(":"+port, nil)
 		if err != nil {
-			fmt.Println("Failed to start http server", err.Error())
+			logger.LogError(fmt.Sprintf("Failed to start http server: %s \n", err.Error()))
 		}
 	}
 }
@@ -117,7 +119,7 @@ func initMetadataLogsCronjob(validationService *services.ValidationService) {
 	cornJob := cron.New(cron.WithLocation(time.UTC))
 	_, err := cornJob.AddFunc("@every 1h", validationService.SendMetadataInBatch)
 	if err != nil {
-		fmt.Printf("Metadata cronjon failed to be added, err: %s \n", err.Error())
+		validationService.Logger.LogError(fmt.Sprintf("Metadata cronjon failed to be added, err: %s \n", err.Error()))
 	}
 	cornJob.Start()
 }
